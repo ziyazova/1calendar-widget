@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
+import { ClockSettings } from '../../domain/value-objects/ClockSettings';
+import { WeatherSettings } from '../../domain/value-objects/WeatherSettings';
 import { Sidebar } from '../components/ui/sidebar/Sidebar';
 import { Header } from '../components/layout/Header';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
@@ -71,7 +73,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => 
     }
   };
 
-  const handleSettingsChange = async (newSettings: Partial<CalendarSettings>) => {
+  const handleSettingsChange = async (newSettings: Partial<CalendarSettings | ClockSettings | WeatherSettings>) => {
     if (!currentWidget) return;
 
     try {

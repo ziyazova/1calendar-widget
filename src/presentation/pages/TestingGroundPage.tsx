@@ -5,7 +5,7 @@ const TestContainer = styled.div`
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.background};
   padding: 40px 20px;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-family: ${({ theme }) => theme.typography.fonts.primary};
 `;
 
 const TestHeader = styled.div`
