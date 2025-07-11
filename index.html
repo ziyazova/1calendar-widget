@@ -180,8 +180,17 @@
 
     /* Стили для iframe режима */
     body.iframe-mode {
-      padding: 10px;
+      padding: 0;
       min-height: auto;
+      height: auto;
+      display: block;
+      background: transparent;
+    }
+
+    body.iframe-mode .calendar-container {
+      width: fit-content;
+      max-width: none;
+      margin: 0;
     }
   </style>
 </head>
