@@ -31,44 +31,38 @@ const mockWeatherData = {
 const WeatherContainer = styled.div<{
   $backgroundColor: string;
   $accentColor: string;
-  $opacity: number;
   $borderRadius: number;
   $showBorder: boolean;
   $textColor: string;
+  $style: string;
 }>`
   width: 100%;
   max-width: 350px;
-  padding: ${({ theme }) => theme.spacing.xl};
-  background: ${({ $backgroundColor, $opacity }) =>
-    $backgroundColor.includes('gradient')
-      ? $backgroundColor
-      : $opacity < 1
-        ? `${$backgroundColor}${Math.round($opacity * 255).toString(16).padStart(2, '0')}`
-        : $backgroundColor};
+  padding: 24px;
+  background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `1px solid ${$accentColor}40` : 'none'};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   backdrop-filter: blur(20px);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 `;
 
-const LocationTitle = styled.h2<{ $textColor: string }>`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+const LocationTitle = styled.h2<{ $textColor: string; $style: string }>`
+  font-size: ${({ $style }) => $style === 'minimal' ? '16px' : '18px'};
+  font-weight: 600;
   color: ${({ $textColor }) => $textColor};
-  margin: 0 0 ${({ theme }) => theme.spacing.lg} 0;
+  margin: 0 0 20px 0;
   text-align: center;
+  letter-spacing: -0.016em;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
 // Current Weather Style
@@ -76,80 +70,128 @@ const CurrentWeatherContainer = styled.div`
   text-align: center;
 `;
 
-const MainTemperature = styled.div<{ $primaryColor: string; $textColor: string }>`
-  font-size: 4rem;
+const MainTemperature = styled.div<{ $primaryColor: string; $textColor: string; $style: string }>`
+  font-size: ${({ $style }) => {
+    switch ($style) {
+      case 'minimal': return '3rem';
+      case 'detailed': return '4.5rem';
+      default: return '4rem';
+    }
+  }};
   font-weight: 700;
   color: ${({ $textColor }) => $textColor};
-  margin: ${({ theme }) => theme.spacing.lg} 0;
+  margin: 20px 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  letter-spacing: -0.02em;
 `;
 
-const WeatherIcon = styled.div<{ $primaryColor: string }>`
+const WeatherIcon = styled.div<{ $primaryColor: string; $style: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
-  margin: 0 auto ${({ theme }) => theme.spacing.md};
-  background: ${({ $primaryColor }) => `${$primaryColor}20`};
+  width: ${({ $style }) => $style === 'minimal' ? '60px' : '80px'};
+  height: ${({ $style }) => $style === 'minimal' ? '60px' : '80px'};
+  margin: ${({ $style }) => $style === 'minimal' ? '0 auto 16px' : '0 auto 20px'};
+  background: ${({ $primaryColor, $style }) => {
+    switch ($style) {
+      case 'modern':
+        return `linear-gradient(135deg, ${$primaryColor}20, ${$primaryColor}10)`;
+      case 'card':
+        return `${$primaryColor}25`;
+      default:
+        return `${$primaryColor}20`;
+    }
+  }};
   border-radius: 50%;
   border: 2px solid ${({ $primaryColor }) => `${$primaryColor}40`};
   backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
   
   svg {
     color: ${({ $primaryColor }) => $primaryColor};
   }
+
+  &:hover {
+    transform: scale(1.05);
+    background: ${({ $primaryColor }) => `${$primaryColor}30`};
+  }
 `;
 
-const WeatherDescription = styled.div<{ $textColor: string }>`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
+const WeatherDescription = styled.div<{ $textColor: string; $style: string }>`
+  font-size: ${({ $style }) => $style === 'minimal' ? '14px' : '16px'};
   font-weight: 500;
   color: ${({ $textColor }) => `${$textColor}90`};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  margin-bottom: ${({ $style }) => $style === 'minimal' ? '16px' : '24px'};
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
-const WeatherDetails = styled.div`
+const WeatherDetails = styled.div<{ $style: string }>`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing.md};
-  margin-top: ${({ theme }) => theme.spacing.lg};
+  grid-template-columns: repeat(${({ $style }) => $style === 'minimal' ? '2' : '3'}, 1fr);
+  gap: 12px;
+  margin-top: 20px;
 `;
 
 const DetailItem = styled.div<{
   $accentColor: string;
   $borderRadius: number;
   $textColor: string;
+  $style: string;
 }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.xs};
-  padding: ${({ theme }) => theme.spacing.md};
-  background: ${({ $accentColor }) => `${$accentColor}30`};
+  gap: 8px;
+  padding: ${({ $style }) => $style === 'minimal' ? '12px' : '16px'};
+  background: ${({ $accentColor, $style }) => {
+    switch ($style) {
+      case 'modern':
+        return `linear-gradient(135deg, ${$accentColor}30, ${$accentColor}20)`;
+      case 'card':
+        return `${$accentColor}35`;
+      default:
+        return `${$accentColor}30`;
+    }
+  }};
   border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 2, 12)}px;
   backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${({ $accentColor }) => `${$accentColor}40`};
+    transform: translateY(-2px);
+  }
 `;
 
 const DetailIcon = styled.div<{ $accentColor: string }>`
   color: ${({ $accentColor }) => $accentColor};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-const DetailValue = styled.span<{ $textColor: string }>`
+const DetailValue = styled.span<{ $textColor: string; $style: string }>`
   font-weight: 600;
   color: ${({ $textColor }) => $textColor};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-size: ${({ $style }) => $style === 'minimal' ? '13px' : '14px'};
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
-const DetailLabel = styled.span<{ $textColor: string }>`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
+const DetailLabel = styled.span<{ $textColor: string; $style: string }>`
+  font-size: ${({ $style }) => $style === 'minimal' ? '11px' : '12px'};
   color: ${({ $textColor }) => `${$textColor}70`};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
 // Forecast Style
 const ForecastContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
+  gap: 12px;
 `;
 
 const ForecastItem = styled.div<{
@@ -157,52 +199,80 @@ const ForecastItem = styled.div<{
   $accentColor: string;
   $textColor: string;
   $borderRadius: number;
+  $style: string;
 }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  background: ${({ $accentColor }) => `${$accentColor}30`};
+  padding: 16px 18px;
+  background: ${({ $accentColor, $style }) => {
+    switch ($style) {
+      case 'modern':
+        return `linear-gradient(135deg, ${$accentColor}35, ${$accentColor}25)`;
+      case 'card':
+        return `${$accentColor}40`;
+      default:
+        return `${$accentColor}30`;
+    }
+  }};
   border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 2, 12)}px;
   backdrop-filter: blur(10px);
   border: 1px solid ${({ $primaryColor }) => `${$primaryColor}20`};
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${({ $accentColor }) => `${$accentColor}45`};
+    transform: translateX(4px);
+  }
 `;
 
 const ForecastDay = styled.span<{ $textColor: string }>`
   font-weight: 600;
   color: ${({ $textColor }) => $textColor};
-  min-width: 60px;
+  min-width: 70px;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
-const ForecastIconContainer = styled.div<{ $primaryColor: string }>`
+const ForecastIconContainer = styled.div<{ $primaryColor: string; $style: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: ${({ $primaryColor }) => `${$primaryColor}20`};
+  width: 36px;
+  height: 36px;
+  background: ${({ $primaryColor, $style }) => {
+    switch ($style) {
+      case 'modern':
+        return `linear-gradient(135deg, ${$primaryColor}25, ${$primaryColor}15)`;
+      default:
+        return `${$primaryColor}20`;
+    }
+  }};
   border-radius: 50%;
   
   svg {
     color: ${({ $primaryColor }) => $primaryColor};
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 `;
 
 const ForecastTemp = styled.div<{ $textColor: string }>`
   display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: 12px;
   font-weight: 500;
   color: ${({ $textColor }) => $textColor};
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
 const TempHigh = styled.span`
   color: inherit;
+  font-weight: 600;
 `;
 
 const TempLow = styled.span<{ $textColor: string }>`
   color: ${({ $textColor }) => `${$textColor}60`};
+  font-weight: 400;
 `;
 
 // Minimal Style
@@ -216,18 +286,21 @@ const MinimalContainer = styled.div`
 const MinimalLeft = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: 12px;
 `;
 
 const MinimalTemp = styled.div<{ $textColor: string }>`
   font-size: 2.5rem;
   font-weight: 700;
   color: ${({ $textColor }) => $textColor};
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  letter-spacing: -0.02em;
 `;
 
 const MinimalCondition = styled.div<{ $textColor: string }>`
-  font-size: ${({ theme }) => theme.typography.sizes.md};
+  font-size: 15px;
   color: ${({ $textColor }) => `${$textColor}80`};
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
 const getWeatherIcon = (condition: string, size: number = 32) => {
@@ -262,7 +335,7 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
 
   const renderWeatherContent = () => {
     switch (settings.style) {
-      case 'forecast':
+      case 'detailed-forecast':
         return (
           <ForecastContainer>
             {mockWeatherData.forecast.map((day, index) => (
@@ -272,10 +345,14 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
                 $accentColor={settings.accentColor}
                 $textColor={textColor}
                 $borderRadius={settings.borderRadius}
+                $style={settings.style}
               >
                 <ForecastDay $textColor={textColor}>{day.day}</ForecastDay>
-                <ForecastIconContainer $primaryColor={settings.primaryColor}>
-                  {getWeatherIcon(day.condition, 18)}
+                <ForecastIconContainer
+                  $primaryColor={settings.primaryColor}
+                  $style={settings.style}
+                >
+                  {getWeatherIcon(day.condition, 20)}
                 </ForecastIconContainer>
                 <ForecastTemp $textColor={textColor}>
                   <TempHigh>{convertTemperature(day.high)}{getTemperatureUnit()}</TempHigh>
@@ -286,7 +363,7 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
           </ForecastContainer>
         );
 
-      case 'minimal':
+      case 'minimal-info':
         return (
           <MinimalContainer>
             <MinimalLeft>
@@ -297,41 +374,63 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
                 {mockWeatherData.current.description}
               </MinimalCondition>
             </MinimalLeft>
-            <WeatherIcon $primaryColor={settings.primaryColor}>
+            <WeatherIcon
+              $primaryColor={settings.primaryColor}
+              $style={settings.style}
+            >
               {getWeatherIcon(mockWeatherData.current.condition, 40)}
             </WeatherIcon>
           </MinimalContainer>
         );
 
-      default: // current
+      default: // modern, detailed, card
         return (
           <CurrentWeatherContainer>
-            <WeatherIcon $primaryColor={settings.primaryColor}>
+            <WeatherIcon
+              $primaryColor={settings.primaryColor}
+              $style={settings.style}
+            >
               {getWeatherIcon(mockWeatherData.current.condition, 40)}
             </WeatherIcon>
 
-            <MainTemperature $primaryColor={settings.primaryColor} $textColor={textColor}>
+            <MainTemperature
+              $primaryColor={settings.primaryColor}
+              $textColor={textColor}
+              $style={settings.style}
+            >
               {convertTemperature(mockWeatherData.current.temperature)}{getTemperatureUnit()}
             </MainTemperature>
 
-            <WeatherDescription $textColor={textColor}>
+            <WeatherDescription
+              $textColor={textColor}
+              $style={settings.style}
+            >
               {mockWeatherData.current.description}
             </WeatherDescription>
 
-            <WeatherDetails>
+            <WeatherDetails $style={settings.style}>
               {settings.showFeelsLike && (
                 <DetailItem
                   $accentColor={settings.accentColor}
                   $borderRadius={settings.borderRadius}
                   $textColor={textColor}
+                  $style={settings.style}
                 >
                   <DetailIcon $accentColor={settings.accentColor}>
                     <Thermometer size={16} />
                   </DetailIcon>
-                  <DetailValue $textColor={textColor}>
+                  <DetailValue
+                    $textColor={textColor}
+                    $style={settings.style}
+                  >
                     {convertTemperature(mockWeatherData.current.feelsLike)}{getTemperatureUnit()}
                   </DetailValue>
-                  <DetailLabel $textColor={textColor}>Feels like</DetailLabel>
+                  <DetailLabel
+                    $textColor={textColor}
+                    $style={settings.style}
+                  >
+                    Feels like
+                  </DetailLabel>
                 </DetailItem>
               )}
 
@@ -340,14 +439,23 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
                   $accentColor={settings.accentColor}
                   $borderRadius={settings.borderRadius}
                   $textColor={textColor}
+                  $style={settings.style}
                 >
                   <DetailIcon $accentColor={settings.accentColor}>
                     <Droplets size={16} />
                   </DetailIcon>
-                  <DetailValue $textColor={textColor}>
+                  <DetailValue
+                    $textColor={textColor}
+                    $style={settings.style}
+                  >
                     {mockWeatherData.current.humidity}%
                   </DetailValue>
-                  <DetailLabel $textColor={textColor}>Humidity</DetailLabel>
+                  <DetailLabel
+                    $textColor={textColor}
+                    $style={settings.style}
+                  >
+                    Humidity
+                  </DetailLabel>
                 </DetailItem>
               )}
 
@@ -355,14 +463,23 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
                 $accentColor={settings.accentColor}
                 $borderRadius={settings.borderRadius}
                 $textColor={textColor}
+                $style={settings.style}
               >
                 <DetailIcon $accentColor={settings.accentColor}>
                   <Wind size={16} />
                 </DetailIcon>
-                <DetailValue $textColor={textColor}>
+                <DetailValue
+                  $textColor={textColor}
+                  $style={settings.style}
+                >
                   {mockWeatherData.current.windSpeed} km/h
                 </DetailValue>
-                <DetailLabel $textColor={textColor}>Wind</DetailLabel>
+                <DetailLabel
+                  $textColor={textColor}
+                  $style={settings.style}
+                >
+                  Wind
+                </DetailLabel>
               </DetailItem>
             </WeatherDetails>
           </CurrentWeatherContainer>
@@ -374,12 +491,17 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ widget }) => {
     <WeatherContainer
       $backgroundColor={settings.backgroundColor}
       $accentColor={settings.accentColor}
-      $opacity={settings.opacity}
       $borderRadius={settings.borderRadius}
       $showBorder={settings.showBorder}
       $textColor={textColor}
+      $style={settings.style}
     >
-      <LocationTitle $textColor={textColor}>{settings.location}</LocationTitle>
+      <LocationTitle
+        $textColor={textColor}
+        $style={settings.style}
+      >
+        {settings.location}
+      </LocationTitle>
       {renderWeatherContent()}
     </WeatherContainer>
   );

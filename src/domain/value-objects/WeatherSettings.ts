@@ -2,10 +2,9 @@ export class WeatherSettings {
   public readonly primaryColor: string;
   public readonly backgroundColor: string;
   public readonly accentColor: string;
-  public readonly opacity: number;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'current' | 'forecast' | 'minimal';
+  public readonly style: 'modern-card' | 'minimal-info' | 'detailed-forecast' | 'glass-panel' | 'weather-map' | 'compact-widget';
   public readonly temperatureUnit: 'celsius' | 'fahrenheit';
   public readonly showFeelsLike: boolean;
   public readonly showHumidity: boolean;
@@ -15,10 +14,9 @@ export class WeatherSettings {
     this.primaryColor = settings.primaryColor || '#667EEA';
     this.backgroundColor = settings.backgroundColor || '#ffffff';
     this.accentColor = settings.accentColor || '#f1f5f9';
-    this.opacity = settings.opacity ?? 1;
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
-    this.style = settings.style || 'current';
+    this.style = settings.style || 'modern-card';
     this.temperatureUnit = settings.temperatureUnit || 'celsius';
     this.showFeelsLike = settings.showFeelsLike ?? true;
     this.showHumidity = settings.showHumidity ?? true;
@@ -39,7 +37,6 @@ export class WeatherSettings {
       primaryColor: this.primaryColor,
       backgroundColor: this.backgroundColor,
       accentColor: this.accentColor,
-      opacity: this.opacity,
       borderRadius: this.borderRadius,
       showBorder: this.showBorder,
       style: this.style,
@@ -55,7 +52,6 @@ export class WeatherSettings {
       primaryColor: changes.primaryColor ?? this.primaryColor,
       backgroundColor: changes.backgroundColor ?? this.backgroundColor,
       accentColor: changes.accentColor ?? this.accentColor,
-      opacity: changes.opacity ?? this.opacity,
       borderRadius: changes.borderRadius ?? this.borderRadius,
       showBorder: changes.showBorder ?? this.showBorder,
       style: changes.style ?? this.style,

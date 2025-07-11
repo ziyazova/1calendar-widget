@@ -4,12 +4,11 @@ export class ClockSettings {
   public readonly accentColor: string;
   public readonly showSeconds: boolean;
   public readonly format24h: boolean;
-  public readonly opacity: number;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
-  public readonly style: 'digital' | 'analog' | 'world';
+  public readonly style: 'digital-minimal' | 'neon-glow' | 'analog-classic' | 'world-time' | 'flip-clock' | 'led-display';
 
   constructor(settings: Partial<ClockSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -17,12 +16,11 @@ export class ClockSettings {
     this.accentColor = settings.accentColor || '#f1f5f9';
     this.showSeconds = settings.showSeconds ?? true;
     this.format24h = settings.format24h ?? true;
-    this.opacity = settings.opacity ?? 1;
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
     this.showDate = settings.showDate ?? true;
     this.fontSize = settings.fontSize || 'medium';
-    this.style = settings.style || 'digital';
+    this.style = settings.style || 'digital-minimal';
   }
 
   public static fromJson(json: string): ClockSettings {
@@ -41,7 +39,6 @@ export class ClockSettings {
       accentColor: this.accentColor,
       showSeconds: this.showSeconds,
       format24h: this.format24h,
-      opacity: this.opacity,
       borderRadius: this.borderRadius,
       showBorder: this.showBorder,
       showDate: this.showDate,
@@ -57,7 +54,6 @@ export class ClockSettings {
       accentColor: changes.accentColor ?? this.accentColor,
       showSeconds: changes.showSeconds ?? this.showSeconds,
       format24h: changes.format24h ?? this.format24h,
-      opacity: changes.opacity ?? this.opacity,
       borderRadius: changes.borderRadius ?? this.borderRadius,
       showBorder: changes.showBorder ?? this.showBorder,
       showDate: changes.showDate ?? this.showDate,

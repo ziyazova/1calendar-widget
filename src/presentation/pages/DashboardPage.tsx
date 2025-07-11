@@ -24,7 +24,7 @@ const MainContent = styled.main`
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 280px;
+  margin-left: 300px;
   
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-left: 0;
@@ -49,6 +49,7 @@ const WidgetArea = styled.div`
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => {
   const [currentWidget, setCurrentWidget] = useState<Widget | null>(null);
+  const [currentWidgetKey, setCurrentWidgetKey] = useState<string>('calendar-modern-grid');
   const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
 
   useEffect(() => {
@@ -56,20 +57,50 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => 
     const types = diContainer.listAvailableWidgetsUseCase.execute();
     setAvailableWidgets(types);
 
-    // Create default calendar widget
+    // Create default calendar widget with modern-grid style
     if (types.includes('calendar')) {
-      diContainer.createWidgetUseCase.execute('calendar')
-        .then(widget => setCurrentWidget(widget))
-        .catch(console.error);
+      createWidgetWithStyle('calendar', 'modern-grid');
     }
   }, [diContainer]);
 
-  const handleWidgetTypeChange = async (type: string) => {
+  const createWidgetWithStyle = async (type: string, style: string) => {
     try {
       const widget = await diContainer.createWidgetUseCase.execute(type);
-      setCurrentWidget(widget);
+
+      // Update widget with specific style
+      let updatedWidget;
+      if (type === 'calendar') {
+        const settings = new CalendarSettings({ style: style as any });
+        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
+      } else if (type === 'clock') {
+        const settings = new ClockSettings({ style: style as any });
+        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
+      } else if (type === 'weather') {
+        const settings = new WeatherSettings({ style: style as any });
+        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
+      } else {
+        updatedWidget = widget;
+      }
+
+      setCurrentWidget(updatedWidget);
+      setCurrentWidgetKey(`${type}-${style}`);
     } catch (error) {
-      console.error('Failed to create widget:', error);
+      console.error('Failed to create widget with style:', error);
+    }
+  };
+
+  const handleWidgetChange = async (type: string, style?: string) => {
+    if (style) {
+      await createWidgetWithStyle(type, style);
+    } else {
+      // Fallback to basic widget creation
+      try {
+        const widget = await diContainer.createWidgetUseCase.execute(type);
+        setCurrentWidget(widget);
+        setCurrentWidgetKey(type);
+      } catch (error) {
+        console.error('Failed to create widget:', error);
+      }
     }
   };
 
@@ -104,8 +135,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => 
     <DashboardContainer>
       <Sidebar
         availableWidgets={availableWidgets}
-        currentWidget={currentWidget?.type || 'calendar'}
-        onWidgetChange={handleWidgetTypeChange}
+        currentWidget={currentWidgetKey}
+        onWidgetChange={handleWidgetChange}
       />
 
       <MainContent>

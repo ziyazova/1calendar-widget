@@ -4,10 +4,9 @@ export class CalendarSettings {
   public readonly accentColor: string;
   public readonly defaultView: 'month' | 'week' | 'day';
   public readonly showWeekends: boolean;
-  public readonly opacity: number;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'compact' | 'detailed' | 'week';
+  public readonly style: 'compact-date' | 'modern-grid' | 'weekly-timeline' | 'monthly-cards' | 'floating-calendar' | 'glassmorphism';
 
   constructor(settings: Partial<CalendarSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -15,10 +14,9 @@ export class CalendarSettings {
     this.accentColor = settings.accentColor || '#f1f5f9';
     this.defaultView = settings.defaultView || 'month';
     this.showWeekends = settings.showWeekends ?? true;
-    this.opacity = settings.opacity ?? 1;
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
-    this.style = settings.style || 'detailed';
+    this.style = settings.style || 'modern-grid';
   }
 
   public static fromJson(json: string): CalendarSettings {
@@ -37,7 +35,6 @@ export class CalendarSettings {
       accentColor: this.accentColor,
       defaultView: this.defaultView,
       showWeekends: this.showWeekends,
-      opacity: this.opacity,
       borderRadius: this.borderRadius,
       showBorder: this.showBorder,
       style: this.style,
@@ -51,7 +48,6 @@ export class CalendarSettings {
       accentColor: changes.accentColor ?? this.accentColor,
       defaultView: changes.defaultView ?? this.defaultView,
       showWeekends: changes.showWeekends ?? this.showWeekends,
-      opacity: changes.opacity ?? this.opacity,
       borderRadius: changes.borderRadius ?? this.borderRadius,
       showBorder: changes.showBorder ?? this.showBorder,
       style: changes.style ?? this.style,
