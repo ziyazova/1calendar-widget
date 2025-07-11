@@ -2,6 +2,7 @@ import { Widget } from '../../domain/entities/Widget';
 import { WidgetRepository } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
+import { WeatherSettings } from '../../domain/value-objects/WeatherSettings';
 import { UrlCodecService } from '../services/url-codec/UrlCodecService';
 
 // Infrastructure implementation of Widget Repository
@@ -29,33 +30,31 @@ export class WidgetRepositoryImpl implements WidgetRepository {
     this.widgets.delete(id);
   }
 
+  // Использует новый компактный кодек для максимально коротких URL
   saveToUrl(widget: Widget): string {
-    const config = widget.getEmbedConfig();
     const baseUrl = window.location.origin;
-    const route = this.urlCodec.getWidgetEmbedRoute(widget.type);
-
-    return this.urlCodec.createEmbedUrl(baseUrl, route, config);
+    return this.urlCodec.createSuperCompactUrl(baseUrl, widget.type, widget.settings);
   }
 
   loadFromUrl(url: string): Widget | null {
     const config = this.urlCodec.extractConfigFromUrl(url);
-    if (!config || !config.widgetType || !config.settings) {
+
+    if (!config) {
       return null;
     }
 
     try {
-      // Create widget using settings
-      let settings;
+      const settings = config.settings || config;
+      const widgetType = config.widgetType || this.inferTypeFromUrl(url);
 
-      switch (config.widgetType) {
+      switch (widgetType) {
         case 'calendar':
-          settings = new CalendarSettings(config.settings);
-          return Widget.createCalendar('embed-widget', settings);
+          return Widget.createCalendar('url-calendar', new CalendarSettings(settings));
         case 'clock':
-          settings = new ClockSettings(config.settings);
-          return Widget.createClock('embed-widget', settings);
+          return Widget.createClock('url-clock', new ClockSettings(settings));
+        case 'weather':
+          return Widget.createWeather('url-weather', new WeatherSettings(settings));
         default:
-          console.error('Unsupported widget type:', config.widgetType);
           return null;
       }
     } catch (error) {
@@ -64,11 +63,32 @@ export class WidgetRepositoryImpl implements WidgetRepository {
     }
   }
 
+  // Legacy методы для совместимости
   encodeConfig(config: Record<string, any>): string {
+    if (config.widgetType) {
+      return this.urlCodec.encodeCompact(config.widgetType, config.settings || config);
+    }
     return this.urlCodec.encode(config);
   }
 
   decodeConfig(encoded: string): Record<string, any> | null {
+    // Пробуем сначала компактный формат
+    const compactResult = this.urlCodec.decodeCompact(encoded);
+    if (compactResult) {
+      return {
+        widgetType: compactResult.widgetType,
+        settings: compactResult.settings
+      };
+    }
+
+    // Fallback на старый формат
     return this.urlCodec.decode(encoded);
+  }
+
+  private inferTypeFromUrl(url: string): string {
+    if (url.includes('/embed/calendar')) return 'calendar';
+    if (url.includes('/embed/clock')) return 'clock';
+    if (url.includes('/embed/weather')) return 'weather';
+    return 'calendar'; // default
   }
 } 

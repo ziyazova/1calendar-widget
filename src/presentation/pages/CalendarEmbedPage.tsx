@@ -1,24 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { DIContainer } from '../../infrastructure/di/DIContainer';
-import { Widget } from '../../domain/entities/Widget';
 import { CalendarWidget } from '../components/widgets/CalendarWidget';
+import { Widget } from '../../domain/entities/Widget';
+import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
+import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 
 const EmbedContainer = styled.div`
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${({ theme }) => theme.colors.background.primary};
-  font-family: ${({ theme }) => theme.typography.fonts.primary};
-  padding: ${({ theme }) => theme.spacing.md};
+  background: transparent;
+  padding: 20px;
+  box-sizing: border-box;
 `;
 
-const ErrorMessage = styled.div`
+const LoadingState = styled.div`
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  color: #667EEA;
   text-align: center;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.sizes.md};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  
+  &::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 2px solid #667EEA;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const ErrorState = styled.div`
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  color: #ef4444;
+  text-align: center;
+  padding: 20px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  max-width: 400px;
 `;
 
 export const CalendarEmbedPage: React.FC = () => {
@@ -28,21 +59,27 @@ export const CalendarEmbedPage: React.FC = () => {
 
   useEffect(() => {
     try {
-      const diContainer = DIContainer.getInstance();
+      const codecService = new UrlCodecService();
+      const config = codecService.extractConfigFromUrl();
 
-      // Try to load widget from URL
-      const widgetFromUrl = diContainer.loadWidgetFromUrlUseCase.execute(window.location.href);
-
-      if (widgetFromUrl && widgetFromUrl.type === 'calendar') {
-        setWidget(widgetFromUrl);
+      if (config) {
+        // Проверяем новый компактный формат
+        if (config.widgetType === 'calendar' || !config.widgetType) {
+          const settings = new CalendarSettings(config.settings || config);
+          const calendarWidget = Widget.createCalendar('embed-calendar', settings);
+          setWidget(calendarWidget);
+        } else {
+          throw new Error('Invalid calendar widget configuration');
+        }
       } else {
-        // Create default calendar widget if no config in URL
-        diContainer.createWidgetUseCase.execute('calendar')
-          .then(defaultWidget => setWidget(defaultWidget))
-          .catch(err => setError('Failed to create calendar widget'));
+        // Default widget if no config provided
+        const defaultSettings = new CalendarSettings();
+        const defaultWidget = Widget.createCalendar('default-calendar', defaultSettings);
+        setWidget(defaultWidget);
       }
     } catch (err) {
-      setError('Failed to load calendar widget');
+      console.error('Failed to load calendar widget:', err);
+      setError('Failed to load calendar widget configuration');
     } finally {
       setLoading(false);
     }
@@ -51,7 +88,7 @@ export const CalendarEmbedPage: React.FC = () => {
   if (loading) {
     return (
       <EmbedContainer>
-        <ErrorMessage>Loading calendar...</ErrorMessage>
+        <LoadingState>Loading calendar...</LoadingState>
       </EmbedContainer>
     );
   }
@@ -59,7 +96,10 @@ export const CalendarEmbedPage: React.FC = () => {
   if (error || !widget) {
     return (
       <EmbedContainer>
-        <ErrorMessage>{error || 'Calendar widget not found'}</ErrorMessage>
+        <ErrorState>
+          <h3>🚫 Error</h3>
+          <p>{error || 'Failed to load calendar widget'}</p>
+        </ErrorState>
       </EmbedContainer>
     );
   }

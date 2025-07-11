@@ -18,8 +18,27 @@ const EmbedContainer = styled.div`
 
 const LoadingState = styled.div`
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  color: #666;
+  color: #667EEA;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  
+  &::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 2px solid #667EEA;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 const ErrorState = styled.div`
@@ -30,6 +49,7 @@ const ErrorState = styled.div`
   border-radius: 8px;
   background: #fef2f2;
   border: 1px solid #fecaca;
+  max-width: 400px;
 `;
 
 export const WeatherEmbedPage: React.FC = () => {
@@ -39,15 +59,12 @@ export const WeatherEmbedPage: React.FC = () => {
 
   useEffect(() => {
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const configParam = urlParams.get('config');
+      const codecService = new UrlCodecService();
+      const config = codecService.extractConfigFromUrl();
 
-      if (configParam) {
-        const codecService = new UrlCodecService();
-        const decodedConfig = codecService.decode(configParam);
-
-        if (decodedConfig && decodedConfig.widgetType === 'weather') {
-          const settings = new WeatherSettings(decodedConfig.settings);
+      if (config) {
+        if (config.widgetType === 'weather' || !config.widgetType) {
+          const settings = new WeatherSettings(config.settings || config);
           const weatherWidget = Widget.createWeather('embed-weather', settings);
           setWidget(weatherWidget);
         } else {
@@ -70,7 +87,7 @@ export const WeatherEmbedPage: React.FC = () => {
   if (loading) {
     return (
       <EmbedContainer>
-        <LoadingState>Loading weather widget...</LoadingState>
+        <LoadingState>Loading weather...</LoadingState>
       </EmbedContainer>
     );
   }
@@ -79,7 +96,7 @@ export const WeatherEmbedPage: React.FC = () => {
     return (
       <EmbedContainer>
         <ErrorState>
-          <h3>Error</h3>
+          <h3>🚫 Error</h3>
           <p>{error || 'Failed to load weather widget'}</p>
         </ErrorState>
       </EmbedContainer>
