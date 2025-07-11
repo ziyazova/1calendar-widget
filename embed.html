@@ -30,7 +30,8 @@
 
     /* Calendar Component Styles */
     .calendar-container {
-      width: 100%;
+      width: fit-content;
+      min-width: 280px;
       max-width: 400px;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 24px;
@@ -163,10 +164,65 @@
       font-size: 0.85rem;
     }
 
-    /* Responsive */
+    /* Responsive - More adaptive scaling */
+    @media (max-width: 350px) {
+      .calendar-container {
+        padding: 12px;
+        min-width: 260px;
+      }
+
+      .calendar-header h2 {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+      }
+
+      .nav-buttons button {
+        padding: 6px 8px;
+        font-size: 1rem;
+      }
+
+      .weekdays div {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+      }
+
+      .days div {
+        padding: 4px 2px;
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .calendar-container {
+        padding: 14px;
+        min-width: 280px;
+      }
+
+      .calendar-header h2 {
+        font-size: 1rem;
+        letter-spacing: 1.5px;
+      }
+
+      .nav-buttons button {
+        padding: 7px 10px;
+        font-size: 1.1rem;
+      }
+
+      .weekdays div {
+        font-size: 0.75rem;
+        margin-bottom: 5px;
+      }
+
+      .days div {
+        padding: 5px 3px;
+        font-size: 0.8rem;
+      }
+    }
+
     @media (max-width: 480px) {
       .calendar-container {
         padding: 16px;
+        min-width: 300px;
       }
 
       .calendar-header h2 {
@@ -179,9 +235,143 @@
       }
 
       .days div {
-        padding: 6px 2px;
+        padding: 6px 4px;
         font-size: 0.85rem;
       }
+    }
+
+    /* Larger sizes scaling */
+    @media (min-width: 481px) {
+      .calendar-container {
+        max-width: 420px;
+      }
+    }
+
+    @media (min-width: 600px) {
+      .calendar-container {
+        max-width: 450px;
+        padding: 24px;
+      }
+
+      .calendar-header h2 {
+        font-size: 1.3rem;
+        letter-spacing: 3px;
+      }
+
+      .weekdays div {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+      }
+
+      .days div {
+        padding: 10px 6px;
+        font-size: 1rem;
+      }
+    }
+
+    /* Dynamic size classes for JavaScript adaptation */
+    .calendar-container.size-xs {
+      padding: 10px !important;
+      min-width: 240px !important;
+      max-width: 280px !important;
+    }
+
+    .calendar-container.size-xs .calendar-header h2 {
+      font-size: 0.8rem !important;
+      letter-spacing: 0.5px !important;
+    }
+
+    .calendar-container.size-xs .nav-buttons button {
+      padding: 4px 6px !important;
+      font-size: 0.9rem !important;
+    }
+
+    .calendar-container.size-xs .weekdays div {
+      font-size: 0.65rem !important;
+      margin-bottom: 3px !important;
+    }
+
+    .calendar-container.size-xs .days div {
+      padding: 3px 1px !important;
+      font-size: 0.7rem !important;
+    }
+
+    .calendar-container.size-sm {
+      padding: 12px !important;
+      min-width: 260px !important;
+      max-width: 350px !important;
+    }
+
+    .calendar-container.size-sm .calendar-header h2 {
+      font-size: 0.9rem !important;
+      letter-spacing: 1px !important;
+    }
+
+    .calendar-container.size-sm .nav-buttons button {
+      padding: 5px 7px !important;
+      font-size: 1rem !important;
+    }
+
+    .calendar-container.size-sm .weekdays div {
+      font-size: 0.7rem !important;
+      margin-bottom: 4px !important;
+    }
+
+    .calendar-container.size-sm .days div {
+      padding: 4px 2px !important;
+      font-size: 0.75rem !important;
+    }
+
+    .calendar-container.size-md {
+      padding: 16px !important;
+      min-width: 300px !important;
+      max-width: 400px !important;
+    }
+
+    .calendar-container.size-md .calendar-header h2 {
+      font-size: 1.1rem !important;
+      letter-spacing: 2px !important;
+    }
+
+    .calendar-container.size-md .nav-buttons button {
+      padding: 7px 10px !important;
+      font-size: 1.1rem !important;
+    }
+
+    .calendar-container.size-md .weekdays div {
+      font-size: 0.8rem !important;
+      margin-bottom: 6px !important;
+    }
+
+    .calendar-container.size-md .days div {
+      padding: 6px 4px !important;
+      font-size: 0.85rem !important;
+    }
+
+    .calendar-container.size-lg {
+      padding: 20px !important;
+      min-width: 350px !important;
+      max-width: 450px !important;
+    }
+
+    .calendar-container.size-lg .calendar-header h2 {
+      font-size: 1.3rem !important;
+      letter-spacing: 3px !important;
+    }
+
+    .calendar-container.size-lg .nav-buttons button {
+      padding: 8px 12px !important;
+      font-size: 1.2rem !important;
+    }
+
+    .calendar-container.size-lg .weekdays div {
+      font-size: 0.9rem !important;
+      margin-bottom: 8px !important;
+    }
+
+    .calendar-container.size-lg .days div {
+      padding: 8px 6px !important;
+      font-size: 1rem !important;
     }
   </style>
 </head>
@@ -280,6 +470,9 @@
 
         // Generate calendar
         this.generateCalendar();
+
+        // Setup responsive observer
+        this.setupResponsiveObserver();
       }
 
       applyCalendarSettings() {
@@ -341,6 +534,57 @@
       changeMonth(offset) {
         this.currentDate.setMonth(this.currentDate.getMonth() + offset);
         this.generateCalendar();
+      }
+
+      setupResponsiveObserver() {
+        // Use ResizeObserver to dynamically adjust calendar size
+        if ('ResizeObserver' in window) {
+          const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+              this.adaptCalendarSize(entry.contentRect.width);
+            }
+          });
+
+          const container = document.getElementById('embedContainer');
+          if (container) {
+            resizeObserver.observe(container);
+          }
+        }
+
+        // Fallback: listen to window resize
+        window.addEventListener('resize', () => {
+          const container = document.getElementById('embedContainer');
+          if (container) {
+            this.adaptCalendarSize(container.offsetWidth);
+          }
+        });
+
+        // Initial adaptation
+        setTimeout(() => {
+          const container = document.getElementById('embedContainer');
+          if (container) {
+            this.adaptCalendarSize(container.offsetWidth);
+          }
+        }, 100);
+      }
+
+      adaptCalendarSize(containerWidth) {
+        const calendarContainer = document.getElementById('calendarContainer');
+        if (!calendarContainer) return;
+
+        // Remove any existing size classes
+        calendarContainer.classList.remove('size-xs', 'size-sm', 'size-md', 'size-lg');
+
+        // Add appropriate size class based on available width
+        if (containerWidth <= 280) {
+          calendarContainer.classList.add('size-xs');
+        } else if (containerWidth <= 350) {
+          calendarContainer.classList.add('size-sm');
+        } else if (containerWidth <= 450) {
+          calendarContainer.classList.add('size-md');
+        } else {
+          calendarContainer.classList.add('size-lg');
+        }
       }
     }
 
