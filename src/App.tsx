@@ -21,7 +21,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <Router>
+      <Router basename="/">
         <Routes>
           {/* Main dashboard */}
           <Route path="/" element={<DashboardPage diContainer={diContainer} />} />

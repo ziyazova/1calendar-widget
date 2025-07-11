@@ -7,21 +7,17 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          styled: ['styled-components']
-        }
+        manualChunks: undefined // Упрощаем - пусть Vite сам решает
       }
     }
   },
-  // Обеспечиваем правильную работу SPA роутинга в dev режиме
+  // Правильная настройка для SPA роутинга в dev режиме
   server: {
-    historyApiFallback: true
+    port: 5173,
+    open: true
   },
-  // Настройки для production
-  base: './',
   preview: {
-    port: 3000
+    port: 3000,
+    open: true
   }
 }) 
