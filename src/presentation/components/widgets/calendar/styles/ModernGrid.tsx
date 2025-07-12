@@ -16,19 +16,27 @@ const GridContainer = styled.div<{
   $textColor: string;
 }>`
   width: 100%;
-  max-width: 420px;
-  padding: 28px;
+  height: 100%;
+  max-width: 400px;
+  max-height: 450px;
+  min-width: 280px;
+  min-height: 320px;
+  padding: 16px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   
   &::before {
     content: '';
@@ -48,9 +56,21 @@ const GridContainer = styled.div<{
   &:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.15),
-      0 4px 12px rgba(0, 0, 0, 0.1);
+      0 8px 25px rgba(0, 0, 0, 0.15),
+      0 2px 8px rgba(0, 0, 0, 0.08);
     border-color: ${({ $accentColor }) => $accentColor};
+  }
+
+  @media (max-width: 400px) {
+    padding: 12px;
+    min-width: 240px;
+    min-height: 280px;
+  }
+
+  @media (max-width: 300px) {
+    padding: 8px;
+    min-width: 200px;
+    min-height: 240px;
   }
 `;
 
@@ -58,11 +78,20 @@ const CalendarHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+
+  @media (max-width: 400px) {
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 300px) {
+    margin-bottom: 8px;
+  }
 `;
 
 const MonthTitle = styled.h2<{ $textColor: string; $primaryColor: string }>`
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   margin: 0;
   background: linear-gradient(
@@ -75,6 +104,16 @@ const MonthTitle = styled.h2<{ $textColor: string; $primaryColor: string }>`
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.025em;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  text-align: center;
+  flex: 1;
+
+  @media (max-width: 400px) {
+    font-size: 16px;
+  }
+
+  @media (max-width: 300px) {
+    font-size: 14px;
+  }
 `;
 
 const NavButton = styled.button<{
@@ -84,18 +123,19 @@ const NavButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   border: 2px solid ${({ $primaryColor }) => `${$primaryColor}60`};
   background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius, 12)}px;
+  border-radius: ${({ $borderRadius }) => Math.min($borderRadius, 8)}px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
   
   &:hover {
     background: ${({ $primaryColor }) => $primaryColor};
@@ -103,23 +143,59 @@ const NavButton = styled.button<{
     border-color: ${({ $primaryColor }) => $primaryColor};
     transform: scale(1.05);
     box-shadow: 
-      0 4px 12px rgba(0, 0, 0, 0.15),
+      0 2px 6px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   &:active {
     transform: scale(0.98);
     box-shadow: 
-      0 1px 4px rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media (max-width: 400px) {
+    width: 28px;
+    height: 28px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  @media (max-width: 300px) {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
   }
 `;
 
 const WeekDaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 4px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+
+  @media (max-width: 400px) {
+    gap: 3px;
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 300px) {
+    gap: 2px;
+    margin-bottom: 4px;
+  }
 `;
 
 const WeekDay = styled.div<{
@@ -128,19 +204,18 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: 12px 4px;
+  padding: 8px 4px;
   text-align: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 8)}px;
+  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 6)}px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  border: 1px solid ${({ $accentColor }) => `${$accentColor}60`};
+  border: 1px solid ${({ $accentColor }) => `${$accentColor}40`};
   transition: all 0.2s ease;
-  min-width: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,12 +243,32 @@ const WeekDay = styled.div<{
       opacity: 1;
     }
   }
+
+  @media (max-width: 400px) {
+    padding: 6px 2px;
+    font-size: 10px;
+  }
+
+  @media (max-width: 300px) {
+    padding: 4px 1px;
+    font-size: 9px;
+  }
 `;
 
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  gap: 8px;
+  gap: 4px;
+  flex: 1;
+  align-content: start;
+
+  @media (max-width: 400px) {
+    gap: 3px;
+  }
+
+  @media (max-width: 300px) {
+    gap: 2px;
+  }
 `;
 
 const DayCell = styled.button<{
@@ -183,7 +278,7 @@ const DayCell = styled.button<{
   $borderRadius: number;
   $textColor: string;
 }>`
-  padding: 16px 8px;
+  padding: 8px 4px;
   border: 1px solid ${({ $isToday, $primaryColor, $textColor }) => {
     if ($isToday) return $primaryColor;
     return `${$textColor}15`;
@@ -197,13 +292,18 @@ const DayCell = styled.button<{
     if (!$isCurrentMonth) return `${$textColor}25`;
     return $textColor;
   }};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 8)}px;
+  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 6)}px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: ${({ $isToday }) => $isToday ? '700' : '500'};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
   
   &:hover:not(:disabled) {
     background: ${({ $isToday, $primaryColor }) => {
@@ -216,12 +316,12 @@ const DayCell = styled.button<{
   }};
     border-color: ${({ $primaryColor }) => $primaryColor};
     transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   &:active:not(:disabled) {
     transform: scale(0.98);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
   
   &:disabled {
@@ -231,9 +331,21 @@ const DayCell = styled.button<{
 
   ${({ $isToday }) => $isToday && `
     box-shadow: 
-      0 4px 12px rgba(0, 0, 0, 0.15),
+      0 2px 8px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   `}
+
+  @media (max-width: 400px) {
+    padding: 6px 2px;
+    font-size: 12px;
+    min-height: 28px;
+  }
+
+  @media (max-width: 300px) {
+    padding: 4px 1px;
+    font-size: 10px;
+    min-height: 24px;
+  }
 `;
 
 const monthNames = [
@@ -303,7 +415,7 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
           $borderRadius={settings.borderRadius}
           onClick={goToPreviousMonth}
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft />
         </NavButton>
 
         <MonthTitle
@@ -318,7 +430,7 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
           $borderRadius={settings.borderRadius}
           onClick={goToNextMonth}
         >
-          <ChevronRight size={20} />
+          <ChevronRight />
         </NavButton>
       </CalendarHeader>
 

@@ -18,7 +18,12 @@ const CompactContainer = styled.div<{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  width: clamp(150px, 90vw, 400px);
+  height: clamp(150px, 90vh, 400px);
+  aspect-ratio: 1;
+  max-width: 100%;
+  max-height: 100%;
+  padding: clamp(8px, 8vw, 32px);
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `1px solid ${$accentColor}40` : 'none'};
@@ -32,6 +37,7 @@ const CompactContainer = styled.div<{
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 
   &::before {
     content: '';
@@ -54,13 +60,13 @@ const CompactContainer = styled.div<{
 `;
 
 const DateNumber = styled.div<{ $textColor: string; $primaryColor: string }>`
-  font-size: 4.5rem;
+  font-size: clamp(1.5rem, 15vw, 4.5rem);
   font-weight: 800;
   color: ${({ $textColor }) => $textColor};
   line-height: 0.9;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   letter-spacing: -0.05em;
-  margin-bottom: 12px;
+  margin-bottom: clamp(4px, 3vw, 12px);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: linear-gradient(
     135deg,
@@ -83,7 +89,7 @@ const DateNumber = styled.div<{ $textColor: string; $primaryColor: string }>`
 `;
 
 const MonthYear = styled.div<{ $textColor: string }>`
-  font-size: 18px;
+  font-size: clamp(10px, 5vw, 18px);
   font-weight: 600;
   color: ${({ $textColor }) => `${$textColor}90`};
   text-align: center;
@@ -93,13 +99,13 @@ const MonthYear = styled.div<{ $textColor: string }>`
 `;
 
 const DayOfWeek = styled.div<{ $textColor: string; $accentColor: string }>`
-  font-size: 14px;
+  font-size: clamp(8px, 4vw, 14px);
   font-weight: 500;
   color: ${({ $textColor }) => `${$textColor}70`};
-  margin-bottom: 8px;
-  padding: 8px 16px;
+  margin-bottom: clamp(2px, 2vw, 8px);
+  padding: clamp(2px, 2vw, 8px) clamp(4px, 4vw, 16px);
   background: ${({ $accentColor }) => `${$accentColor}30`};
-  border-radius: 20px;
+  border-radius: clamp(5px, 5vw, 20px);
   backdrop-filter: blur(10px);
   text-transform: uppercase;
   letter-spacing: 1px;

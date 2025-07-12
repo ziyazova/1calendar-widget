@@ -1,19 +1,155 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { CalendarWidget } from '../components/widgets/CalendarWidget';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 
+const GlobalEmbedStyles = createGlobalStyle`
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+  }
+  
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Ensure proper responsive behavior in iframe contexts */
+  * {
+    box-sizing: border-box;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  /* Disable viewport zooming that might interfere with embedding */
+  body {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  /* Ensure text never overflows */
+  * {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  /* Prevent any element from growing beyond container */
+  img, svg, video, canvas, audio, iframe, embed, object {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  
+  /* Ensure flex containers don't overflow */
+  div, section, article, aside, main, header, footer, nav {
+    min-width: 0;
+    min-height: 0;
+  }
+`;
+
 const EmbedContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  padding: 20px;
+  padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+`;
+
+const ScaledContent = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  
+  /* Используем CSS-переменную для динамического масштабирования */
+  transform: scale(var(--dynamic-scale, 1));
+  
+  /* Автоматическое масштабирование контента */
+  @media (max-width: 600px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.9));
+  }
+  
+  @media (max-width: 500px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.8));
+  }
+  
+  @media (max-width: 400px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.7));
+  }
+  
+  @media (max-width: 350px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.6));
+  }
+  
+  @media (max-width: 300px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.5));
+  }
+  
+  @media (max-width: 250px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.4));
+  }
+  
+  @media (max-height: 500px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.9));
+  }
+  
+  @media (max-height: 400px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.8));
+  }
+  
+  @media (max-height: 300px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.7));
+  }
+  
+  @media (max-height: 250px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.6));
+  }
+  
+  @media (max-height: 200px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.5));
+  }
+  
+  /* Комбинированное масштабирование для очень маленьких экранов */
+  @media (max-width: 500px) and (max-height: 500px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.75));
+  }
+  
+  @media (max-width: 400px) and (max-height: 400px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.6));
+  }
+  
+  @media (max-width: 350px) and (max-height: 350px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.5));
+  }
+  
+  @media (max-width: 300px) and (max-height: 300px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.4));
+  }
+  
+  @media (max-width: 250px) and (max-height: 250px) {
+    transform: scale(calc(var(--dynamic-scale, 1) * 0.35));
+  }
+  
+  /* Плавное масштабирование */
+  transition: transform 0.3s ease;
 `;
 
 const LoadingState = styled.div`
@@ -63,7 +199,6 @@ export const CalendarEmbedPage: React.FC = () => {
       const config = codecService.extractConfigFromUrl();
 
       if (config) {
-        // Проверяем новый компактный формат
         if (config.widgetType === 'calendar' || !config.widgetType) {
           const settings = new CalendarSettings(config.settings || config);
           const calendarWidget = Widget.createCalendar('embed-calendar', settings);
@@ -85,28 +220,66 @@ export const CalendarEmbedPage: React.FC = () => {
     }
   }, []);
 
+  // Динамическое масштабирование для очень маленьких экранов
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // Дополнительное масштабирование для iframe контекста
+      if (width < 200 || height < 200) {
+        document.documentElement.style.setProperty('--dynamic-scale', '0.3');
+      } else if (width < 250 || height < 250) {
+        document.documentElement.style.setProperty('--dynamic-scale', '0.4');
+      } else if (width < 300 || height < 300) {
+        document.documentElement.style.setProperty('--dynamic-scale', '0.5');
+      } else {
+        document.documentElement.style.setProperty('--dynamic-scale', '1');
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (loading) {
     return (
-      <EmbedContainer>
-        <LoadingState>Loading calendar...</LoadingState>
-      </EmbedContainer>
+      <>
+        <GlobalEmbedStyles />
+        <EmbedContainer>
+          <ScaledContent>
+            <LoadingState>Loading calendar...</LoadingState>
+          </ScaledContent>
+        </EmbedContainer>
+      </>
     );
   }
 
   if (error || !widget) {
     return (
-      <EmbedContainer>
-        <ErrorState>
-          <h3>🚫 Error</h3>
-          <p>{error || 'Failed to load calendar widget'}</p>
-        </ErrorState>
-      </EmbedContainer>
+      <>
+        <GlobalEmbedStyles />
+        <EmbedContainer>
+          <ScaledContent>
+            <ErrorState>
+              <h3>🚫 Error</h3>
+              <p>{error || 'Failed to load calendar widget'}</p>
+            </ErrorState>
+          </ScaledContent>
+        </EmbedContainer>
+      </>
     );
   }
 
   return (
-    <EmbedContainer>
-      <CalendarWidget widget={widget} />
-    </EmbedContainer>
+    <>
+      <GlobalEmbedStyles />
+      <EmbedContainer>
+        <ScaledContent>
+          <CalendarWidget widget={widget} />
+        </ScaledContent>
+      </EmbedContainer>
+    </>
   );
 }; 

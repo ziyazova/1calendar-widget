@@ -3,8 +3,7 @@ import { Widget } from '../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../domain/value-objects/CalendarSettings';
 import {
   CompactDate,
-  ModernGrid,
-  WeeklyTimeline
+  ModernGrid
 } from './calendar/styles';
 
 interface CalendarWidgetProps {
@@ -20,9 +19,6 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({ widget }) => {
 
     case 'modern-grid':
       return <ModernGrid settings={settings} />;
-
-    case 'weekly-timeline':
-      return <WeeklyTimeline settings={settings} />;
 
     default:
       return <ModernGrid settings={settings} />;
