@@ -8,8 +8,6 @@ const EmbedContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  padding: 20px;
 `;
 
 export const TestEmbedPage: React.FC = () => {
