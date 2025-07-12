@@ -35,7 +35,6 @@ const Title = styled.div`
   position: absolute;
   top: 16px;
   left: 50%;
-  transform: translateX(-50%);
   font-size: 18px;
   font-weight: bold;
   color: #333;
