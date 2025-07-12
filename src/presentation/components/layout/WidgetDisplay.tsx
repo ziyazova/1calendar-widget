@@ -4,6 +4,7 @@ import { Widget } from '../../../domain/entities/Widget';
 import { CalendarWidget } from '../widgets/CalendarWidget';
 import { ClockWidget } from '../widgets/ClockWidget';
 import { WeatherWidget } from '../widgets/WeatherWidget';
+import { TestWidget } from '../widgets/TestWidget';
 import { Sparkles, Zap, Palette } from 'lucide-react';
 
 interface WidgetDisplayProps {
@@ -291,6 +292,8 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
         return <ClockWidget widget={widget} />;
       case 'weather':
         return <WeatherWidget widget={widget} />;
+      case 'test':
+        return <TestWidget />;
       default:
         return (
           <ErrorState>

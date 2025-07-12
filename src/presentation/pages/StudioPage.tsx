@@ -86,6 +86,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       } else if (type === 'weather') {
         const settings = new WeatherSettings({ style: style as any });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
+      } else if (type === 'test') {
+        // Test widget doesn't need settings, just use the basic widget
+        updatedWidget = widget;
       } else {
         updatedWidget = widget;
       }

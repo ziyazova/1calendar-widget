@@ -22,6 +22,11 @@ export class WidgetFactoryImpl implements WidgetFactory {
           this.generateId(),
           new WeatherSettings(settings)
         );
+      case 'test':
+        return Widget.createTest(
+          this.generateId(),
+          settings || {}
+        );
       default:
         throw new Error(`Unsupported widget type: ${type}`);
     }
@@ -69,13 +74,17 @@ export class WidgetFactoryImpl implements WidgetFactory {
           showHumidity: true,
           location: 'New York',
         };
+      case 'test':
+        return {
+          style: 'chess-board',
+        };
       default:
         return {};
     }
   }
 
   getSupportedTypes(): string[] {
-    return ['calendar', 'clock', 'weather'];
+    return ['calendar', 'clock', 'weather', 'test'];
   }
 
   private generateId(): string {

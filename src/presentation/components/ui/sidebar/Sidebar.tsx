@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronRight, Calendar, Clock, CloudSun, Sparkles } from 'lucide-react';
+import { ChevronRight, Calendar, Clock, CloudSun, Sparkles, TestTube } from 'lucide-react';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -240,6 +240,13 @@ const WIDGET_CATEGORIES = {
       { label: 'Modern Card', value: 'modern', color: '#F093FB' },
       { label: 'Detailed Forecast', value: 'detailed-forecast', color: '#F8BBD9' },
       { label: 'Minimal Info', value: 'minimal-info', color: '#FFB199' },
+    ],
+  },
+  test: {
+    label: 'Test Widget',
+    icon: TestTube,
+    styles: [
+      { label: 'Chess Board', value: 'chess-board', color: '#8B5A2B' },
     ],
   },
 } as const;

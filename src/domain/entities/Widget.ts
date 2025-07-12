@@ -19,6 +19,10 @@ export class Widget {
     return new Widget(id, 'weather', settings);
   }
 
+  static createTest(id: string, settings: any): Widget {
+    return new Widget(id, 'test', settings);
+  }
+
   updateSettings(newSettings: Record<string, any>): Widget {
     const mergedSettings = { ...this.settings, ...newSettings };
     return new Widget(this.id, this.type, mergedSettings);
