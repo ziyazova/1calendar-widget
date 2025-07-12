@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Copy, ExternalLink } from 'lucide-react';
+import { Copy, Sparkles } from 'lucide-react';
 import { Widget } from '../../../domain/entities/Widget';
 
 interface HeaderProps {
@@ -12,25 +12,99 @@ const HeaderContainer = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing['2xl']};
+  padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['6']};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
-  background: ${({ theme }) => theme.colors.background.primary};
+  background: ${({ theme }) => theme.colors.background.elevated};
+  backdrop-filter: blur(${({ theme }) => theme.blur.md});
+  -webkit-backdrop-filter: blur(${({ theme }) => theme.blur.md});
+  height: 80px;
+  position: relative;
+  z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 
 const HeaderTitle = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing['6']};
+  margin-left: 300px;
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-left: 0;
+  }
 `;
 
-const Title = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing['3']};
+`;
+
+const LogoIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  background: ${({ theme }) => theme.colors.gradients.primary};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: ${({ theme }) => theme.shadows.button};
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: ${({ theme }) => theme.colors.gradients.glass};
+    opacity: 0.5;
+  }
+  
+  svg {
+    color: white;
+    z-index: 1;
+    position: relative;
+  }
+`;
+
+const LogoText = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const BrandName = styled.h1`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
 `;
 
-const Subtitle = styled.p`
+const BrandTagline = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0;
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+`;
+
+const WidgetInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing['1']};
+`;
+
+const WidgetTitle = styled.h2`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0;
+  font-family: ${({ theme }) => theme.typography.fonts.display};
+`;
+
+const WidgetSubtitle = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0;
@@ -38,44 +112,49 @@ const Subtitle = styled.p`
 
 const HeaderActions = styled.div`
   display: flex;
-  gap: ${({ theme }) => theme.spacing.md};
+  gap: ${({ theme }) => theme.spacing['4']};
 `;
 
-const ActionButton = styled.button`
+const PrimaryButton = styled.button<{ $copied?: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  background: ${({ theme }) => theme.colors.background.primary};
-  color: ${({ theme }) => theme.colors.text.primary};
-  border-radius: ${({ theme }) => theme.radii.md};
+  gap: ${({ theme }) => theme.spacing['2']};
+  padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};
+  background: ${({ theme, $copied }) => $copied ? theme.colors.success : theme.colors.primary};
+  color: ${({ theme }) => theme.colors.text.inverse};
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  font-family: ${({ theme }) => theme.typography.fonts.primary};
+  transition: all ${({ theme }) => theme.transitions.apple};
+  box-shadow: ${({ theme }) => theme.shadows.button};
+  min-width: 170px;
+  height: 40px;
+  position: relative;
+  overflow: hidden;
   
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: ${({ theme }) => theme.shadows.lg};
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
   
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
   }
 `;
 
-const PrimaryButton = styled(ActionButton) <{ $copied?: boolean }>`
-  background: ${({ theme, $copied }) => $copied ? '#37bd64' : theme.colors.primary};
-  color: #fcfcfc;
-  border-color: ${({ theme, $copied }) => $copied ? '#43E97B' : theme.colors.primary};
-  transition: background 0.3s cubic-bezier(0.4,0,0.2,1), color 0.3s, border-color 0.3s;
-  position: relative;
-  overflow: hidden;
-  min-width: 190px;
-  font-size: 1rem;
-`;
-
 const ButtonTextWrap = styled.span`
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   width: 100%;
   height: 100%;
@@ -83,12 +162,17 @@ const ButtonTextWrap = styled.span`
 
 const ButtonText = styled.span<{ $visible: boolean }>`
   position: absolute;
-  left: 0; right: 0;
+  left: 0; 
+  right: 0;
   top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: ${({ $visible }) => $visible ? 1 : 0};
   transform: translateY(${({ $visible }) => $visible ? '0' : '10px'});
-  transition: opacity 0.25s, transform 0.25s;
-  text-align: left;
+  transition: opacity 0.25s ${({ theme }) => theme.transitions.apple}, 
+              transform 0.25s ${({ theme }) => theme.transitions.apple};
 `;
 
 export const Header: React.FC<HeaderProps> = ({
@@ -106,16 +190,19 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <HeaderContainer>
       <HeaderTitle>
-        <Title>
-          {currentWidget ? `${currentWidget.type.charAt(0).toUpperCase()}${currentWidget.type.slice(1)} Widget` : 'Widget Studio'}
-        </Title>
-        <Subtitle>
-          {currentWidget ? 'Customize your widget and copy the embed code' : 'Select a widget to get started'}
-        </Subtitle>
+        {currentWidget && (
+          <WidgetInfo>
+            <WidgetTitle>
+              {currentWidget.type.charAt(0).toUpperCase()}{currentWidget.type.slice(1)} Widget
+            </WidgetTitle>
+            <WidgetSubtitle>
+              Customize and embed in your Notion pages
+            </WidgetSubtitle>
+          </WidgetInfo>
+        )}
       </HeaderTitle>
 
       <HeaderActions>
-        {/* Removed Preview button */}
         <PrimaryButton
           onClick={handleCopy}
           disabled={!currentWidget}

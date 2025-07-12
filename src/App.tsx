@@ -5,7 +5,8 @@ import { theme } from './presentation/themes/theme';
 import { GlobalStyles } from './presentation/components/layout/GlobalStyles';
 
 // Import pages
-import { DashboardPage } from './presentation/pages/DashboardPage';
+import { LandingPage } from './presentation/pages/LandingPage';
+import { StudioPage } from './presentation/pages/StudioPage';
 import { CalendarEmbedPage } from './presentation/pages/CalendarEmbedPage';
 import { ClockEmbedPage } from './presentation/pages/ClockEmbedPage';
 import { WeatherEmbedPage } from './presentation/pages/WeatherEmbedPage';
@@ -23,8 +24,11 @@ function App() {
       <GlobalStyles />
       <Router basename="/">
         <Routes>
-          {/* Main dashboard */}
-          <Route path="/" element={<DashboardPage diContainer={diContainer} />} />
+          {/* Landing page */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Studio workspace */}
+          <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
 
           {/* Widget embed routes */}
           <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
@@ -34,8 +38,8 @@ function App() {
           {/* Testing ground for iframe testing */}
           <Route path="/test" element={<TestingGroundPage />} />
 
-          {/* Catch-all */}
-          <Route path="*" element={<DashboardPage diContainer={diContainer} />} />
+          {/* Catch-all redirects to landing */}
+          <Route path="*" element={<LandingPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

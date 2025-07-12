@@ -13,12 +13,14 @@ interface CustomizationPanelProps {
 
 const PanelContainer = styled.div`
   width: 320px;
-  height: 100%;
+  height: calc(100vh - 80px - 64px);
   background: #fafbfc;
   border-left: 1px solid #e1e5e9;
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  flex-shrink: 0;
 `;
 
 const PanelHeader = styled.div`
@@ -39,6 +41,23 @@ const PanelContent = styled.div`
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d2d2d7;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+  }
 `;
 
 const Section = styled.div`
@@ -82,7 +101,7 @@ const Select = styled.select`
   font-size: 15px;
   font-weight: 400;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease;
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 16px center;
@@ -97,7 +116,6 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: #007aff;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
   }
 `;
 

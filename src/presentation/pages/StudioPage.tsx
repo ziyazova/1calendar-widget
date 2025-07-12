@@ -10,33 +10,37 @@ import { Header } from '../components/layout/Header';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel } from '../components/ui/forms/CustomizationPanel';
 
-interface DashboardPageProps {
+interface StudioPageProps {
   diContainer: DIContainer;
 }
 
-const DashboardContainer = styled.div`
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-`;
-
-const MainContent = styled.main`
-  flex: 1;
+const StudioContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 300px;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-left: 0;
-  }
+  min-height: 100vh;
+  background: ${({ theme }) => theme.colors.background.secondary};
+`;
+
+const WorkspaceContainer = styled.div`
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 80px);
 `;
 
 const ContentArea = styled.div`
   display: flex;
   flex: 1;
-  gap: ${({ theme }) => theme.spacing['2xl']};
-  padding: ${({ theme }) => theme.spacing['2xl']};
+  gap: ${({ theme }) => theme.spacing['8']};
+  padding: ${({ theme }) => theme.spacing['8']} ${({ theme }) => theme.spacing['8']} 0;
   overflow: hidden;
+  margin-left: 300px;
+  height: calc(100vh - 80px);
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-left: 0;
+    flex-direction: column;
+    gap: ${({ theme }) => theme.spacing['6']};
+  }
 `;
 
 const WidgetArea = styled.div`
@@ -44,10 +48,14 @@ const WidgetArea = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
+  background: ${({ theme }) => theme.colors.background.primary};
+  border-radius: ${({ theme }) => theme.radii.card};
+  height: calc(100vh - 80px - 64px);
+  position: relative;
+  overflow: hidden;
 `;
 
-export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => {
+export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [currentWidget, setCurrentWidget] = useState<Widget | null>(null);
   const [currentWidgetKey, setCurrentWidgetKey] = useState<string>('calendar-modern-grid');
   const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
@@ -132,17 +140,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => 
   };
 
   return (
-    <DashboardContainer>
-      <Sidebar
-        availableWidgets={availableWidgets}
-        currentWidget={currentWidgetKey}
-        onWidgetChange={handleWidgetChange}
+    <StudioContainer>
+      <Header
+        currentWidget={currentWidget}
+        onCopyEmbedUrl={handleCopyEmbedUrl}
       />
 
-      <MainContent>
-        <Header
-          currentWidget={currentWidget}
-          onCopyEmbedUrl={handleCopyEmbedUrl}
+      <WorkspaceContainer>
+        <Sidebar
+          availableWidgets={availableWidgets}
+          currentWidget={currentWidgetKey}
+          onWidgetChange={handleWidgetChange}
         />
 
         <ContentArea>
@@ -155,7 +163,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ diContainer }) => 
             onSettingsChange={handleSettingsChange}
           />
         </ContentArea>
-      </MainContent>
-    </DashboardContainer>
+      </WorkspaceContainer>
+    </StudioContainer>
   );
 }; 
