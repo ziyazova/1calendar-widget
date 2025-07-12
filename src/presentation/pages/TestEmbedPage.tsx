@@ -9,30 +9,18 @@ const GlobalEmbedStyles = createGlobalStyle`
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: transparent;
-  }
-  
-  #root {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  * {
-    box-sizing: border-box;
+    /* background: transparent; */
   }
 `;
 
 const EmbedContainer = styled.div`
   width: 100%;
   height: 100%;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   padding: 20px;
-  box-sizing: border-box;
 `;
 
 export const TestEmbedPage: React.FC = () => {
