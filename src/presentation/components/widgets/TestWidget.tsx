@@ -2,27 +2,19 @@ import React from 'react';
 import styled from 'styled-components';
 
 const TestContainer = styled.div`
-  width: 320px;
-  height: 320px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 `;
 
 const ChessBoard = styled.div`
-  width: 280px;
-  height: 280px;
+  width: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
-  border: 2px solid #333;
-  border-radius: 8px;
-  overflow: hidden;
 `;
 
 const ChessSquare = styled.div<{ isBlack: boolean }>`
