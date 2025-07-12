@@ -8,7 +8,7 @@ export class ClockSettings {
   public readonly showBorder: boolean;
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
-  public readonly style: 'digital-minimal' | 'neon-glow' | 'analog-classic' | 'world-time' | 'flip-clock' | 'led-display';
+  public readonly style: 'digital-minimal' | 'neon-glow' | 'analog-classic' | 'world-time';
 
   constructor(settings: Partial<ClockSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';

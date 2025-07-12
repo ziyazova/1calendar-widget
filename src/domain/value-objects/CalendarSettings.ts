@@ -6,7 +6,7 @@ export class CalendarSettings {
   public readonly showWeekends: boolean;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'compact-date' | 'modern-grid' | 'weekly-timeline' | 'monthly-cards' | 'floating-calendar' | 'glassmorphism';
+  public readonly style: 'compact-date' | 'modern-grid' | 'weekly-timeline';
 
   constructor(settings: Partial<CalendarSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';

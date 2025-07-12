@@ -20,35 +20,37 @@ const GridContainer = styled.div<{
   padding: 28px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
-    $showBorder ? `1px solid ${$accentColor}30` : 'none'};
+    $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
-  backdrop-filter: blur(25px);
   box-shadow: 
-    0 10px 35px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   position: relative;
   
   &::before {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
     background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.02) 100%
+      90deg,
+      ${({ $accentColor }) => $accentColor} 0%,
+      ${({ $accentColor }) => `${$accentColor}80`} 100%
     );
-    border-radius: inherit;
-    pointer-events: none;
+    border-radius: ${({ $borderRadius }) => $borderRadius}px ${({ $borderRadius }) => $borderRadius}px 0 0;
   }
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 
-      0 15px 45px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: ${({ $accentColor }) => $accentColor};
   }
 `;
 
@@ -84,58 +86,40 @@ const NavButton = styled.button<{
   justify-content: center;
   width: 42px;
   height: 42px;
-  border: none;
-  background: linear-gradient(
-    135deg,
-    ${({ $primaryColor }) => `${$primaryColor}20`} 0%,
-    ${({ $primaryColor }) => `${$primaryColor}10`} 100%
-  );
+  border: 2px solid ${({ $primaryColor }) => `${$primaryColor}60`};
+  background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius, 14)}px;
+  border-radius: ${({ $borderRadius }) => Math.min($borderRadius, 12)}px;
   cursor: pointer;
-  backdrop-filter: blur(15px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid ${({ $primaryColor }) => `${$primaryColor}25`};
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.05) 100%
-    );
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   
   &:hover {
-    background: linear-gradient(
-      135deg,
-      ${({ $primaryColor }) => `${$primaryColor}35`} 0%,
-      ${({ $primaryColor }) => `${$primaryColor}20`} 100%
-    );
-    transform: scale(1.08);
-    border-color: ${({ $primaryColor }) => `${$primaryColor}40`};
-    
-    &::before {
-      opacity: 1;
-    }
+    background: ${({ $primaryColor }) => $primaryColor};
+    color: white;
+    border-color: ${({ $primaryColor }) => $primaryColor};
+    transform: scale(1.05);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.98);
+    box-shadow: 
+      0 1px 4px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 `;
 
 const WeekDaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 20px;
 `;
 
 const WeekDay = styled.div<{
@@ -144,31 +128,45 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: 14px 8px;
+  padding: 12px 4px;
   text-align: center;
-  font-size: 13px;
-  font-weight: 600;
-  color: ${({ $textColor }) => `${$textColor}75`};
-  background: linear-gradient(
-    135deg,
-    ${({ $accentColor }) => `${$accentColor}35`} 0%,
-    ${({ $accentColor }) => `${$accentColor}20`} 100%
-  );
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 2, 10)}px;
-  backdrop-filter: blur(12px);
+  font-size: 14px;
+  font-weight: 700;
+  color: ${({ $textColor }) => `${$textColor}85`};
+  background: ${({ $accentColor }) => `${$accentColor}20`};
+  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 8)}px;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  border: 1px solid ${({ $primaryColor }) => `${$primaryColor}15`};
-  transition: all 0.3s ease;
+  border: 1px solid ${({ $accentColor }) => `${$accentColor}60`};
+  transition: all 0.2s ease;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: ${({ $primaryColor }) => $primaryColor};
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
   
   &:hover {
-    background: linear-gradient(
-      135deg,
-      ${({ $primaryColor }) => `${$primaryColor}25`} 0%,
-      ${({ $primaryColor }) => `${$primaryColor}15`} 100%
-    );
+    background: ${({ $primaryColor }) => `${$primaryColor}30`};
     color: ${({ $primaryColor }) => $primaryColor};
+    border-color: ${({ $primaryColor }) => $primaryColor};
+    
+    &::after {
+      opacity: 1;
+    }
   }
 `;
 
@@ -186,16 +184,12 @@ const DayCell = styled.button<{
   $textColor: string;
 }>`
   padding: 16px 8px;
-  border: none;
+  border: 1px solid ${({ $isToday, $primaryColor, $textColor }) => {
+    if ($isToday) return $primaryColor;
+    return `${$textColor}15`;
+  }};
   background: ${({ $isToday, $primaryColor }) => {
-    if ($isToday) {
-      return `linear-gradient(
-        135deg,
-        ${$primaryColor} 0%,
-        ${$primaryColor}DD 50%,
-        ${$primaryColor}CC 100%
-      )`;
-    }
+    if ($isToday) return $primaryColor;
     return 'transparent';
   }};
   color: ${({ $isCurrentMonth, $isToday, $textColor, $primaryColor }) => {
@@ -203,55 +197,31 @@ const DayCell = styled.button<{
     if (!$isCurrentMonth) return `${$textColor}25`;
     return $textColor;
   }};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 2, 12)}px;
+  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 8)}px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 15px;
   font-weight: ${({ $isToday }) => $isToday ? '700' : '500'};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  border: 1px solid ${({ $isToday, $primaryColor }) =>
-    $isToday ? 'transparent' : 'rgba(255, 255, 255, 0.1)'
-  };
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: ${({ $primaryColor }) => `
-      linear-gradient(
-        135deg,
-        ${$primaryColor}15 0%,
-        ${$primaryColor}08 100%
-      )
-    `};
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
   
   &:hover:not(:disabled) {
     background: ${({ $isToday, $primaryColor }) => {
-    if ($isToday) {
-      return `linear-gradient(
-          135deg,
-          ${$primaryColor} 0%,
-          ${$primaryColor}EE 50%,
-          ${$primaryColor}DD 100%
-        )`;
-    }
-    return `linear-gradient(
-        135deg,
-        ${$primaryColor}20 0%,
-        ${$primaryColor}10 100%
-      )`;
+    if ($isToday) return $primaryColor;
+    return `${$primaryColor}25`;
   }};
+    color: ${({ $isToday, $primaryColor }) => {
+    if ($isToday) return '#FFFFFF';
+    return $primaryColor;
+  }};
+    border-color: ${({ $primaryColor }) => $primaryColor};
     transform: scale(1.05);
-    border-color: ${({ $primaryColor }) => `${$primaryColor}30`};
-    
-    &::before {
-      opacity: 1;
-    }
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   }
   
   &:disabled {
@@ -261,8 +231,8 @@ const DayCell = styled.button<{
 
   ${({ $isToday }) => $isToday && `
     box-shadow: 
-      0 6px 20px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   `}
 `;
 
@@ -271,8 +241,8 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const weekDaysWorkdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const weekDaysWorkdays = ['M', 'T', 'W', 'T', 'F'];
 
 export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
   const [currentDate, setCurrentDate] = useState(new Date());

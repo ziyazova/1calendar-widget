@@ -116,9 +116,8 @@ export const getLuminance = (hex: string): number => {
   return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
 };
 
-// Get contrasting text color (black or white)
+
 export const getContrastColor = (backgroundColor: string): string => {
-  // Handle gradients - use the first color
   if (backgroundColor.includes('gradient')) {
     const colorMatch = backgroundColor.match(/#[a-fA-F0-9]{6}/);
     if (colorMatch) {

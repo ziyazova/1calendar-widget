@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Copy, ExternalLink } from 'lucide-react';
 import { Widget } from '../../../domain/entities/Widget';
@@ -54,7 +54,6 @@ const ActionButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    background: ${({ theme }) => theme.colors.background.secondary};
     border-color: ${({ theme }) => theme.colors.primary};
   }
   
@@ -64,26 +63,44 @@ const ActionButton = styled.button`
   }
 `;
 
-const PrimaryButton = styled(ActionButton)`
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.background.primary};
-  border-color: ${({ theme }) => theme.colors.primary};
-  
-  &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.primaryDark};
-    border-color: ${({ theme }) => theme.colors.primaryDark};
-  }
+const PrimaryButton = styled(ActionButton) <{ $copied?: boolean }>`
+  background: ${({ theme, $copied }) => $copied ? '#37bd64' : theme.colors.primary};
+  color: #fcfcfc;
+  border-color: ${({ theme, $copied }) => $copied ? '#43E97B' : theme.colors.primary};
+  transition: background 0.3s cubic-bezier(0.4,0,0.2,1), color 0.3s, border-color 0.3s;
+  position: relative;
+  overflow: hidden;
+  min-width: 190px;
+  font-size: 1rem;
+`;
+
+const ButtonTextWrap = styled.span`
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+
+const ButtonText = styled.span<{ $visible: boolean }>`
+  position: absolute;
+  left: 0; right: 0;
+  top: 0;
+  opacity: ${({ $visible }) => $visible ? 1 : 0};
+  transform: translateY(${({ $visible }) => $visible ? '0' : '10px'});
+  transition: opacity 0.25s, transform 0.25s;
+  text-align: left;
 `;
 
 export const Header: React.FC<HeaderProps> = ({
   currentWidget,
   onCopyEmbedUrl,
 }) => {
-  const handlePreview = () => {
-    if (!currentWidget) return;
+  const [copied, setCopied] = useState(false);
 
-    const embedUrl = `/embed/${currentWidget.type}`;
-    window.open(embedUrl, '_blank');
+  const handleCopy = () => {
+    onCopyEmbedUrl();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -98,20 +115,17 @@ export const Header: React.FC<HeaderProps> = ({
       </HeaderTitle>
 
       <HeaderActions>
-        <ActionButton
-          onClick={handlePreview}
-          disabled={!currentWidget}
-        >
-          <ExternalLink size={16} />
-          Preview
-        </ActionButton>
-
+        {/* Removed Preview button */}
         <PrimaryButton
-          onClick={onCopyEmbedUrl}
+          onClick={handleCopy}
           disabled={!currentWidget}
+          $copied={copied}
         >
           <Copy size={16} />
-          Copy Embed URL
+          <ButtonTextWrap>
+            <ButtonText $visible={!copied}>Copy Embed URL</ButtonText>
+            <ButtonText $visible={copied}>Copied!</ButtonText>
+          </ButtonTextWrap>
         </PrimaryButton>
       </HeaderActions>
     </HeaderContainer>

@@ -129,9 +129,6 @@ const WIDGET_CATEGORIES = {
       { value: 'compact-date', label: 'Compact Date', color: '#667EEA' },
       { value: 'modern-grid', label: 'Modern Grid', color: '#764AF1' },
       { value: 'weekly-timeline', label: 'Weekly Timeline', color: '#F093FB' },
-      { value: 'monthly-cards', label: 'Monthly Cards', color: '#4FACFE' },
-      { value: 'floating-calendar', label: 'Floating Calendar', color: '#43E97B' },
-      { value: 'glassmorphism', label: 'Glassmorphism', color: '#FA709A' },
     ]
   },
   clock: {
@@ -142,8 +139,6 @@ const WIDGET_CATEGORIES = {
       { value: 'neon-glow', label: 'Neon Glow', color: '#00F5FF' },
       { value: 'analog-classic', label: 'Analog Classic', color: '#8B4513' },
       { value: 'world-time', label: 'World Time', color: '#FF6B6B' },
-      { value: 'flip-clock', label: 'Flip Clock', color: '#4ECDC4' },
-      { value: 'led-display', label: 'LED Display', color: '#FFE66D' },
     ]
   },
   weather: {
@@ -153,9 +148,6 @@ const WIDGET_CATEGORIES = {
       { value: 'modern-card', label: 'Modern Card', color: '#667EEA' },
       { value: 'minimal-info', label: 'Minimal Info', color: '#81C784' },
       { value: 'detailed-forecast', label: 'Detailed Forecast', color: '#42A5F5' },
-      { value: 'glass-panel', label: 'Glass Panel', color: '#AB47BC' },
-      { value: 'weather-map', label: 'Weather Map', color: '#FF7043' },
-      { value: 'compact-widget', label: 'Compact Widget', color: '#26A69A' },
     ]
   },
 };

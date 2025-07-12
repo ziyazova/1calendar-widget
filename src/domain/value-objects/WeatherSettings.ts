@@ -4,7 +4,7 @@ export class WeatherSettings {
   public readonly accentColor: string;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'modern-card' | 'minimal-info' | 'detailed-forecast' | 'glass-panel' | 'weather-map' | 'compact-widget';
+  public readonly style: 'modern-card' | 'minimal-info' | 'detailed-forecast';
   public readonly temperatureUnit: 'celsius' | 'fahrenheit';
   public readonly showFeelsLike: boolean;
   public readonly showHumidity: boolean;
