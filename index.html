@@ -43,6 +43,22 @@
   <meta name="theme-color" content="#3b82f6" />
   <meta name="msapplication-TileColor" content="#3b82f6" />
 
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #root {
+      min-height: 300px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -145,6 +161,25 @@
         if (preloader) preloader.remove();
       });
     }, delay);
+  </script>
+  <script type="module">
+    if (import.meta.env && import.meta.env.DEV) {
+      (() => {
+        const root = document.getElementById('root') || document.body;
+        const h = root.scrollHeight;
+        console.log('📏 iframe content height:', h);
+
+        window.parent.postMessage(
+          { type: 'notion-widget-height', height: h },
+          '*'
+        );
+        console.log('📤 postMessage sent');
+
+        window.addEventListener('message', (e) => {
+          console.log('📥 message from parent:', e.data);
+        });
+      })();
+    }
   </script>
 </body>
 
