@@ -11,15 +11,14 @@ const GlobalEmbedStyles = createGlobalStyle`
 `;
 
 const EmbedContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  min-height: 100px;
-  min-width: 100px;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  padding: 20px;
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
 `;
 

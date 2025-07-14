@@ -47,16 +47,28 @@
     html, body {
       margin: 0;
       padding: 0;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
     }
     #root {
+      width: 100vw;
+      max-width: 100vw;
       min-height: 100px;
       min-width: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
+      background: transparent;
+    }
+    body {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background-color: rgba(255,255,255,0.1);
     }
   </style>
+  <script src="https://unpkg.com/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
 
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -87,12 +99,16 @@
 </head>
 
 <body>
-  <div id="root">
-    <div id="preloader" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:absolute;left:0;top:0;z-index:9999;background:white;">
-      <span>Loading...</span>
-    </div>
-  </div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>
+<!--
+Recommended Notion embed:
+<iframe
+  src="https://calendar-widget.vercel.app/testembed"
+  style="width: 100%; height: 100%; border: none;"
+  allowtransparency="true"
+  sandbox="allow-scripts allow-same-origin"
+></iframe>
+-->

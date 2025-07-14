@@ -48,14 +48,16 @@ const GlobalEmbedStyles = createGlobalStyle`
 `;
 
 const EmbedContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   padding: 0;
+  margin: 0;
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
