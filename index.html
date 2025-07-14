@@ -44,16 +44,20 @@
   <meta name="msapplication-TileColor" content="#3b82f6" />
 
 <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      overflow: hidden;
+      /* overflow: hidden; */
     }
     #root {
       min-height: 300px;
-      min-width: 300px;
+      width: 100%;
+      max-width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -96,8 +100,7 @@
           if (window.parent && window.parent !== window) {
             window.parent.postMessage({
               type: "embed-size",
-              height: document.documentElement.scrollHeight,
-              width: document.documentElement.scrollWidth
+              height: document.documentElement.scrollHeight
             }, "*");
           }
         }
@@ -116,19 +119,32 @@
         requestAnimationFrame(() => {
           setTimeout(() => {
             const height = document.documentElement.scrollHeight;
-            const width = document.documentElement.scrollWidth;
-
-            // Сообщаем родителю (Notion) размеры
+            // Сообщаем родителю (Notion) только высоту
             window.parent.postMessage({
               type: "embed-size",
-              height,
-              width
+              height
             }, "*");
           }, 150); // задержка нужна чтобы все элементы успели отрисоваться
         });
+
+        // Дополнительный postMessage через 1.5 сек (на всякий случай)
+        setTimeout(() => {
+          window.parent.postMessage({
+            type: "embed-size",
+            height: document.documentElement.scrollHeight
+          }, "*");
+        }, 1500);
       });
 
-      window.addEventListener("resize", notifyParentOfSizeThrottled);
+      // Новый обработчик resize с задержкой 300мс
+      window.addEventListener("resize", () => {
+        setTimeout(() => {
+          window.parent.postMessage({
+            type: "embed-size",
+            height: document.documentElement.scrollHeight
+          }, "*");
+        }, 300);
+      });
 
       // Слушаем команды от родителя
       window.addEventListener("message", (event) => {
