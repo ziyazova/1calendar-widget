@@ -69,6 +69,53 @@
     }
   }
   </script>
+  <script>
+    (function() {
+      function notifyParentOfSize() {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: "embed-size",
+            height: document.documentElement.scrollHeight,
+            width: document.documentElement.scrollWidth
+          }, "*");
+        }
+      }
+
+      function reloadEmbed() {
+        window.location.reload();
+      }
+
+      window.addEventListener("load", () => {
+        notifyParentOfSize();
+
+        const observer = new ResizeObserver(() => {
+          notifyParentOfSize();
+        });
+        observer.observe(document.body);
+
+        setTimeout(notifyParentOfSize, 1000);
+        setTimeout(notifyParentOfSize, 2000);
+      });
+
+      window.addEventListener("resize", notifyParentOfSize);
+
+      // Слушаем команды от родителя
+      window.addEventListener("message", (event) => {
+        if (typeof event.data === "object" && event.data) {
+          if (event.data.type === "force-resize") {
+            notifyParentOfSize();
+          }
+          if (event.data.type === "reload-embed") {
+            reloadEmbed();
+          }
+          // show-loader/hide-loader — прокидываем в React
+          if (event.data.type === "show-loader" || event.data.type === "hide-loader") {
+            window.dispatchEvent(new CustomEvent("embed-loader", { detail: event.data.type }));
+          }
+        }
+      });
+    })();
+  </script>
 </head>
 
 <body>

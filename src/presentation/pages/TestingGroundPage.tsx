@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 
 const TestContainer = styled.div`
@@ -117,9 +117,17 @@ export const TestingGroundPage: React.FC = () => {
   const [iframeWidth, setIframeWidth] = useState(400);
   const [iframeHeight, setIframeHeight] = useState(500);
   const [widgetType] = useState('calendar');
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const baseUrl = window.location.origin;
   const embedUrl = `${baseUrl}/embed/${widgetType}`;
+
+  // Функции для теста управления embed
+  const postToIframe = (type: string) => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type }, '*');
+    }
+  };
 
   return (
     <TestContainer>
@@ -158,12 +166,23 @@ export const TestingGroundPage: React.FC = () => {
             <Label>URL виджета</Label>
             <UrlDisplay>{embedUrl}</UrlDisplay>
           </ControlGroup>
+
+          <ControlGroup>
+            <Label>Тестовые действия</Label>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button type="button" onClick={() => postToIframe('reload-embed')}>Reload embed</button>
+              <button type="button" onClick={() => postToIframe('force-resize')}>Force resize</button>
+              <button type="button" onClick={() => postToIframe('show-loader')}>Show loader</button>
+              <button type="button" onClick={() => postToIframe('hide-loader')}>Hide loader</button>
+            </div>
+          </ControlGroup>
         </ControlPanel>
 
         <IframeContainer>
           <SectionTitle>Предварительный просмотр</SectionTitle>
           <IframeWrapper width={iframeWidth} height={iframeHeight}>
             <TestIframe
+              ref={iframeRef}
               src={embedUrl}
               title="Widget Preview"
             />

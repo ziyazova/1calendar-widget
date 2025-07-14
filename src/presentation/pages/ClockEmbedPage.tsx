@@ -4,6 +4,7 @@ import { ClockWidget } from '../components/widgets/ClockWidget';
 import { Widget } from '../../domain/entities/Widget';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
+import { EmbedController } from './EmbedController';
 
 const EmbedContainer = styled.div`
   width: 100vw;
@@ -57,16 +58,6 @@ export const ClockEmbedPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Функция для уведомления родительского окна о размере
-  const notifyParentOfSize = () => {
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({
-        type: "embed-size",
-        height: document.documentElement.scrollHeight
-      }, "*");
-    }
-  };
-
   useEffect(() => {
     try {
       const codecService = new UrlCodecService();
@@ -94,53 +85,34 @@ export const ClockEmbedPage: React.FC = () => {
     }
   }, []);
 
-  // ResizeObserver для автоматического обновления размера
-  useEffect(() => {
-    // Уведомляем о размере при загрузке
-    notifyParentOfSize();
-
-    // Создаем ResizeObserver для отслеживания изменений размера
-    const observer = new ResizeObserver(() => {
-      notifyParentOfSize();
-    });
-
-    // Наблюдаем за изменениями размера body
-    observer.observe(document.body);
-
-    // Fallback через setTimeout на случай, если ResizeObserver не сработал
-    const fallbackTimer = setTimeout(() => {
-      notifyParentOfSize();
-    }, 1000);
-
-    // Очистка при размонтировании
-    return () => {
-      observer.disconnect();
-      clearTimeout(fallbackTimer);
-    };
-  }, []);
-
   if (loading) {
     return (
-      <EmbedContainer>
-        <LoadingState>Loading clock...</LoadingState>
-      </EmbedContainer>
+      <EmbedController>
+        <EmbedContainer>
+          <LoadingState>Loading clock...</LoadingState>
+        </EmbedContainer>
+      </EmbedController>
     );
   }
 
   if (error || !widget) {
     return (
-      <EmbedContainer>
-        <ErrorState>
-          <h3>🚫 Error</h3>
-          <p>{error || 'Failed to load clock widget'}</p>
-        </ErrorState>
-      </EmbedContainer>
+      <EmbedController>
+        <EmbedContainer>
+          <ErrorState>
+            <h3>🚫 Error</h3>
+            <p>{error || 'Failed to load clock widget'}</p>
+          </ErrorState>
+        </EmbedContainer>
+      </EmbedController>
     );
   }
 
   return (
-    <EmbedContainer>
-      <ClockWidget widget={widget} />
-    </EmbedContainer>
+    <EmbedController>
+      <EmbedContainer>
+        <ClockWidget widget={widget} />
+      </EmbedContainer>
+    </EmbedController>
   );
 }; 
