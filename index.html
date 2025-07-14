@@ -97,6 +97,14 @@
           notifyParentOfSizeThrottled();
         });
         observer.observe(document.body);
+        observer.observe(document.documentElement); // <html>
+
+        // Добавляем MutationObserver для body и html
+        const mutationObserver = new MutationObserver(() => {
+          notifyParentOfSizeThrottled();
+        });
+        mutationObserver.observe(document.body, { childList: true, subtree: true });
+        mutationObserver.observe(document.documentElement, { childList: true, subtree: true });
 
         setTimeout(notifyParentOfSizeThrottled, 1000);
         setTimeout(notifyParentOfSizeThrottled, 2000);
