@@ -71,13 +71,18 @@
   </script>
   <script>
     (function() {
-      function notifyParentOfSize() {
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage({
-            type: "embed-size",
-            height: document.documentElement.scrollHeight,
-            width: document.documentElement.scrollWidth
-          }, "*");
+      let lastSent = 0;
+      function notifyParentOfSizeThrottled() {
+        const now = Date.now();
+        if (now - lastSent > 150) { // не чаще, чем раз в 150 мс
+          lastSent = now;
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              type: "embed-size",
+              height: document.documentElement.scrollHeight,
+              width: document.documentElement.scrollWidth
+            }, "*");
+          }
         }
       }
 
@@ -86,24 +91,24 @@
       }
 
       window.addEventListener("load", () => {
-        notifyParentOfSize();
+        notifyParentOfSizeThrottled();
 
         const observer = new ResizeObserver(() => {
-          notifyParentOfSize();
+          notifyParentOfSizeThrottled();
         });
         observer.observe(document.body);
 
-        setTimeout(notifyParentOfSize, 1000);
-        setTimeout(notifyParentOfSize, 2000);
+        setTimeout(notifyParentOfSizeThrottled, 1000);
+        setTimeout(notifyParentOfSizeThrottled, 2000);
       });
 
-      window.addEventListener("resize", notifyParentOfSize);
+      window.addEventListener("resize", notifyParentOfSizeThrottled);
 
       // Слушаем команды от родителя
       window.addEventListener("message", (event) => {
         if (typeof event.data === "object" && event.data) {
           if (event.data.type === "force-resize") {
-            notifyParentOfSize();
+            notifyParentOfSizeThrottled();
           }
           if (event.data.type === "reload-embed") {
             reloadEmbed();
@@ -121,11 +126,11 @@
 <body>
   <div id="root"></div>
   <div id="preloader" style="width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;position:fixed;left:0;top:0;z-index:9999;background:white;">
-    <span>Загрузка…</span>
+    <span>Loading...</span>
   </div>
   <script type="module">
     const isEmbed = window.location.pathname.includes('/embed/');
-    const delay = isEmbed ? 6000 : 0;
+    const delay = isEmbed ? 1000 : 0;
     setTimeout(() => {
       import('/src/main.tsx').then(() => {
         const preloader = document.getElementById('preloader');
@@ -133,7 +138,6 @@
       });
     }, delay);
   </script>
-  <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>
