@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
@@ -339,6 +339,36 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 Show Weekends
               </CheckboxContainer>
             </FormGroup>
+
+            {settings.style === 'aesthetic' && (
+              <div style={{ margin: '16px 0' }}>
+                <label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>Background Image URL</label>
+                <input
+                  type="text"
+                  value={settings.backgroundImage || ''}
+                  onChange={e => onSettingsChange({ backgroundImage: e.target.value })}
+                  placeholder="Paste image URL or upload below"
+                  style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ccc', marginBottom: 8 }}
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = ev => {
+                        if (typeof ev.target?.result === 'string') {
+                          onSettingsChange({ backgroundImage: ev.target.result });
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  style={{ display: 'block', marginTop: 4 }}
+                />
+              </div>
+            )}
           </Section>
         )}
 

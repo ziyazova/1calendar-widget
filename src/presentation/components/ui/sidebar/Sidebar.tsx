@@ -220,7 +220,9 @@ const WIDGET_CATEGORIES = {
     icon: Calendar,
     styles: [
       { label: 'Modern Grid', value: 'modern-grid', color: '#667EEA' },
-      { label: 'Compact Date', value: 'compact-date', color: '#764BA2' }
+      { label: 'Compact Date', value: 'compact-date', color: '#764BA2' },
+      { label: 'Aesthetic Calendar', value: 'aesthetic', color: '#A67C52' },
+      { label: 'Modern Weekly', value: 'modern-weekly', color: '#f857a6' },
     ],
   },
   clock: {
