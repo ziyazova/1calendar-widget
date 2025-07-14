@@ -2,10 +2,13 @@ import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 
 const TestContainer = styled.div`
-  min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.background};
   padding: 40px 20px;
   font-family: ${({ theme }) => theme.typography.fonts.primary};
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
+  min-width: 100px;
 `;
 
 const TestHeader = styled.div`
@@ -27,7 +30,6 @@ const Subtitle = styled.p`
 `;
 
 const TestSection = styled.div`
-  max-width: 1200px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
