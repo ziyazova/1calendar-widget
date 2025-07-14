@@ -1,5 +1,31 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useEffect } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
+
+const GlobalEmbedStyles = createGlobalStyle`
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: visible;
+    background: transparent;
+  }
+  #root {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    box-sizing: border-box;
+  }
+`;
+
+const Wrapper = styled.div`
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+`;
 
 const TestContainer = styled.div`
   display: flex;
@@ -34,8 +60,31 @@ const ChessSquare = styled.div<{ isBlack: boolean }>`
   }
 `;
 
+function useNotionAutoHeight() {
+  useEffect(() => {
+    // Подключаем iframeResizer для автоматической высоты
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/iframe-resizer/js/iframeResizer.contentWindow.min.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    function sendHeight() {
+      const height = document.documentElement.scrollHeight;
+      window.parent.postMessage({ type: 'embed-size', height }, '*');
+    }
+    sendHeight();
+    window.addEventListener('load', sendHeight);
+    const interval = setInterval(sendHeight, 500);
+    return () => {
+      window.removeEventListener('load', sendHeight);
+      clearInterval(interval);
+      if (script.parentNode) script.parentNode.removeChild(script);
+    };
+  }, []);
+}
 
 export const TestWidget: React.FC = () => {
+  useNotionAutoHeight();
   const renderChessBoard = () => {
     const squares = [];
     for (let row = 0; row < 8; row++) {
@@ -53,10 +102,15 @@ export const TestWidget: React.FC = () => {
   };
 
   return (
-    <TestContainer>
-      <ChessBoard>
-        {renderChessBoard()}
-      </ChessBoard>
-    </TestContainer>
+    <>
+      <GlobalEmbedStyles />
+      <Wrapper>
+        <TestContainer>
+          <ChessBoard>
+            {renderChessBoard()}
+          </ChessBoard>
+        </TestContainer>
+      </Wrapper>
+    </>
   );
 }; 
