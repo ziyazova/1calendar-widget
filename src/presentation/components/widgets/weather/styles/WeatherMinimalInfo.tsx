@@ -2,16 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { WeatherSettings } from '../../../../../domain/value-objects/WeatherSettings';
 import { getContrastColor } from '../../../../../presentation/themes/colors';
-import { Sun, Cloud, CloudRain } from 'lucide-react';
+import { Sun, Cloud, CloudRain, Loader2 } from 'lucide-react';
 import { WeatherWidgetContainer } from './WeatherCommonStyles';
-
-const mockWeatherData = {
-  current: {
-    temperature: 22,
-    description: 'Partly Cloudy',
-    condition: 'partly-cloudy',
-  }
-};
+import { WeatherCurrent } from '../../../../../domain/entities/WeatherData';
 
 const MinimalContainer = styled.div`
   display: flex;
@@ -63,22 +56,43 @@ const WeatherIcon = styled.div<{ $primaryColor: string; $style: string }>`
   }
 `;
 
-const getWeatherIcon = (condition: string, size: number = 32) => {
+const getWeatherIcon = (icon: string, size: number = 32) => {
   const props = { size };
-  switch (condition) {
-    case 'sunny':
+  switch (icon) {
+    case 'clear-day':
+      return <Sun {...props} />;
+    case 'clear-night':
       return <Sun {...props} />;
     case 'cloudy':
       return <Cloud {...props} />;
-    case 'rainy':
-      return <CloudRain {...props} />;
-    case 'partly-cloudy':
-    default:
+    case 'partly-cloudy-day':
+    case 'partly-cloudy-night':
       return <Cloud {...props} />;
+    case 'rain':
+    case 'sleet':
+      return <CloudRain {...props} />;
+    case 'snow':
+      return <CloudRain {...props} />;
+    case 'fog':
+      return <Cloud {...props} />;
+    default:
+      return <Sun {...props} />;
   }
 };
 
-export const WeatherMinimalInfo: React.FC<{ settings: WeatherSettings }> = ({ settings }) => {
+interface WeatherMinimalInfoProps {
+  settings: WeatherSettings;
+  weatherData?: WeatherCurrent;
+  loading?: boolean;
+  error?: string | null;
+}
+
+export const WeatherMinimalInfo: React.FC<WeatherMinimalInfoProps> = ({ 
+  settings, 
+  weatherData, 
+  loading = false, 
+  error = null 
+}) => {
   const textColor = getContrastColor(settings.backgroundColor);
 
   const convertTemperature = (celsius: number) => {
@@ -92,6 +106,42 @@ export const WeatherMinimalInfo: React.FC<{ settings: WeatherSettings }> = ({ se
     return settings.temperatureUnit === 'fahrenheit' ? '°F' : '°C';
   };
 
+  if (loading) {
+    return (
+      <WeatherWidgetContainer
+        $backgroundColor={settings.backgroundColor}
+        $accentColor={settings.accentColor}
+        $borderRadius={settings.borderRadius}
+        $showBorder={settings.showBorder}
+        $textColor={textColor}
+        $style={settings.style}
+      >
+        <MinimalContainer>
+          <Loader2 size={40} className="animate-spin" />
+        </MinimalContainer>
+      </WeatherWidgetContainer>
+    );
+  }
+
+  if (error || !weatherData) {
+    return (
+      <WeatherWidgetContainer
+        $backgroundColor={settings.backgroundColor}
+        $accentColor={settings.accentColor}
+        $borderRadius={settings.borderRadius}
+        $showBorder={settings.showBorder}
+        $textColor={textColor}
+        $style={settings.style}
+      >
+        <MinimalContainer>
+          <MinimalCondition $textColor={textColor}>
+            {error || 'No weather data'}
+          </MinimalCondition>
+        </MinimalContainer>
+      </WeatherWidgetContainer>
+    );
+  }
+
   return (
     <WeatherWidgetContainer
       $backgroundColor={settings.backgroundColor}
@@ -104,17 +154,17 @@ export const WeatherMinimalInfo: React.FC<{ settings: WeatherSettings }> = ({ se
       <MinimalContainer>
         <MinimalLeft>
           <MinimalTemp $textColor={textColor}>
-            {convertTemperature(mockWeatherData.current.temperature)}{getTemperatureUnit()}
+            {convertTemperature(weatherData.temp)}{getTemperatureUnit()}
           </MinimalTemp>
           <MinimalCondition $textColor={textColor}>
-            {mockWeatherData.current.description}
+            {weatherData.summary}
           </MinimalCondition>
         </MinimalLeft>
         <WeatherIcon
           $primaryColor={settings.primaryColor}
           $style={settings.style}
         >
-          {getWeatherIcon(mockWeatherData.current.condition, 40)}
+          {getWeatherIcon(weatherData.icon, 40)}
         </WeatherIcon>
       </MinimalContainer>
     </WeatherWidgetContainer>

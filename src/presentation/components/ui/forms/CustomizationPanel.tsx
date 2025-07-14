@@ -405,12 +405,11 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 value={(settings as WeatherSettings).location}
                 onChange={(e) => onSettingsChange({ location: e.target.value })}
               >
-                <option value="New York">New York</option>
-                <option value="London">London</option>
-                <option value="Tokyo">Tokyo</option>
-                <option value="Paris">Paris</option>
-                <option value="Sydney">Sydney</option>
                 <option value="Moscow">Moscow</option>
+                <option value="London">London</option>
+                <option value="New York">New York</option>
+                <option value="Tokyo">Tokyo</option>
+                <option value="Alexandria">Alexandria</option>
               </Select>
             </FormGroup>
 

@@ -193,6 +193,16 @@ export const CalendarEmbedPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Функция для уведомления родительского окна о размере
+  const notifyParentOfSize = () => {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: "embed-size",
+        height: document.documentElement.scrollHeight
+      }, "*");
+    }
+  };
+
   useEffect(() => {
     try {
       const codecService = new UrlCodecService();
@@ -218,6 +228,31 @@ export const CalendarEmbedPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // ResizeObserver для автоматического обновления размера
+  useEffect(() => {
+    // Уведомляем о размере при загрузке
+    notifyParentOfSize();
+
+    // Создаем ResizeObserver для отслеживания изменений размера
+    const observer = new ResizeObserver(() => {
+      notifyParentOfSize();
+    });
+
+    // Наблюдаем за изменениями размера body
+    observer.observe(document.body);
+
+    // Fallback через setTimeout на случай, если ResizeObserver не сработал
+    const fallbackTimer = setTimeout(() => {
+      notifyParentOfSize();
+    }, 1000);
+
+    // Очистка при размонтировании
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   // Динамическое масштабирование для очень маленьких экранов

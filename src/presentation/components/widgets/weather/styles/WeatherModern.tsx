@@ -2,19 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { WeatherSettings } from '../../../../../domain/value-objects/WeatherSettings';
 import { getContrastColor } from '../../../../../presentation/themes/colors';
-import { Cloud, Sun, CloudRain, Wind, Droplets, Thermometer } from 'lucide-react';
+import { Cloud, Sun, CloudRain, Wind, Droplets, Thermometer, Loader2 } from 'lucide-react';
 import { WeatherWidgetContainer } from './WeatherCommonStyles';
-
-const mockWeatherData = {
-  current: {
-    temperature: 22,
-    feelsLike: 25,
-    humidity: 65,
-    condition: 'partly-cloudy',
-    description: 'Partly Cloudy',
-    windSpeed: 12,
-  }
-};
+import { WeatherCurrent } from '../../../../../domain/entities/WeatherData';
 
 const CurrentWeatherContainer = styled.div`
   text-align: center;
@@ -137,22 +127,45 @@ const DetailLabel = styled.span<{ $textColor: string; $style: string }>`
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;
 
-const getWeatherIcon = (condition: string, size: number = 32) => {
+const getWeatherIcon = (icon: string, size: number = 32) => {
   const props = { size };
-  switch (condition) {
-    case 'sunny':
+  switch (icon) {
+    case 'clear-day':
+      return <Sun {...props} />;
+    case 'clear-night':
       return <Sun {...props} />;
     case 'cloudy':
       return <Cloud {...props} />;
-    case 'rainy':
-      return <CloudRain {...props} />;
-    case 'partly-cloudy':
-    default:
+    case 'partly-cloudy-day':
+    case 'partly-cloudy-night':
       return <Cloud {...props} />;
+    case 'rain':
+    case 'sleet':
+      return <CloudRain {...props} />;
+    case 'snow':
+      return <CloudRain {...props} />;
+    case 'fog':
+      return <Cloud {...props} />;
+    case 'wind':
+      return <Wind {...props} />;
+    default:
+      return <Sun {...props} />;
   }
 };
 
-export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ settings }) => {
+interface WeatherModernProps {
+  settings: WeatherSettings;
+  weatherData?: WeatherCurrent;
+  loading?: boolean;
+  error?: string | null;
+}
+
+export const WeatherModern: React.FC<WeatherModernProps> = ({ 
+  settings, 
+  weatherData, 
+  loading = false, 
+  error = null 
+}) => {
   const textColor = getContrastColor(settings.backgroundColor);
 
   const convertTemperature = (celsius: number) => {
@@ -165,6 +178,64 @@ export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ setting
   const getTemperatureUnit = () => {
     return settings.temperatureUnit === 'fahrenheit' ? '°F' : '°C';
   };
+
+  if (loading) {
+    return (
+      <WeatherWidgetContainer
+        $backgroundColor={settings.backgroundColor}
+        $accentColor={settings.accentColor}
+        $borderRadius={settings.borderRadius}
+        $showBorder={settings.showBorder}
+        $textColor={textColor}
+        $style={settings.style}
+      >
+        <CurrentWeatherContainer>
+          <Loader2 size={40} className="animate-spin" />
+          <WeatherDescription $textColor={textColor} $style={settings.style}>
+            Loading weather data...
+          </WeatherDescription>
+        </CurrentWeatherContainer>
+      </WeatherWidgetContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <WeatherWidgetContainer
+        $backgroundColor={settings.backgroundColor}
+        $accentColor={settings.accentColor}
+        $borderRadius={settings.borderRadius}
+        $showBorder={settings.showBorder}
+        $textColor={textColor}
+        $style={settings.style}
+      >
+        <CurrentWeatherContainer>
+          <WeatherDescription $textColor={textColor} $style={settings.style}>
+            Error: {error}
+          </WeatherDescription>
+        </CurrentWeatherContainer>
+      </WeatherWidgetContainer>
+    );
+  }
+
+  if (!weatherData) {
+    return (
+      <WeatherWidgetContainer
+        $backgroundColor={settings.backgroundColor}
+        $accentColor={settings.accentColor}
+        $borderRadius={settings.borderRadius}
+        $showBorder={settings.showBorder}
+        $textColor={textColor}
+        $style={settings.style}
+      >
+        <CurrentWeatherContainer>
+          <WeatherDescription $textColor={textColor} $style={settings.style}>
+            No weather data available
+          </WeatherDescription>
+        </CurrentWeatherContainer>
+      </WeatherWidgetContainer>
+    );
+  }
 
   return (
     <WeatherWidgetContainer
@@ -180,7 +251,7 @@ export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ setting
           $primaryColor={settings.primaryColor}
           $style={settings.style}
         >
-          {getWeatherIcon(mockWeatherData.current.condition, 40)}
+          {getWeatherIcon(weatherData.icon, 40)}
         </WeatherIcon>
 
         <MainTemperature
@@ -188,14 +259,14 @@ export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ setting
           $textColor={textColor}
           $style={settings.style}
         >
-          {convertTemperature(mockWeatherData.current.temperature)}{getTemperatureUnit()}
+          {convertTemperature(weatherData.temp)}{getTemperatureUnit()}
         </MainTemperature>
 
         <WeatherDescription
           $textColor={textColor}
           $style={settings.style}
         >
-          {mockWeatherData.current.description}
+          {weatherData.summary}
         </WeatherDescription>
 
         <WeatherDetails $style={settings.style}>
@@ -213,7 +284,7 @@ export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ setting
                 $textColor={textColor}
                 $style={settings.style}
               >
-                {convertTemperature(mockWeatherData.current.feelsLike)}{getTemperatureUnit()}
+                {convertTemperature(weatherData.feelsLike)}{getTemperatureUnit()}
               </DetailValue>
               <DetailLabel
                 $textColor={textColor}
@@ -238,7 +309,7 @@ export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ setting
                 $textColor={textColor}
                 $style={settings.style}
               >
-                {mockWeatherData.current.humidity}%
+                {weatherData.humidity}%
               </DetailValue>
               <DetailLabel
                 $textColor={textColor}
@@ -262,7 +333,7 @@ export const WeatherModern: React.FC<{ settings: WeatherSettings }> = ({ setting
               $textColor={textColor}
               $style={settings.style}
             >
-              {mockWeatherData.current.windSpeed} km/h
+              {weatherData.windSpeed} km/h
             </DetailValue>
             <DetailLabel
               $textColor={textColor}

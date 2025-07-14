@@ -72,7 +72,7 @@ export class WidgetFactoryImpl implements WidgetFactory {
           temperatureUnit: 'celsius',
           showFeelsLike: true,
           showHumidity: true,
-          location: 'New York',
+          location: 'Moscow',
         };
       case 'test':
         return {

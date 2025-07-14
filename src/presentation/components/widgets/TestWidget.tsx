@@ -7,14 +7,23 @@ const TestContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  min-height: 300px;
 `;
 
 const ChessBoard = styled.div`
   width: 100%;
+  max-width: 400px;
   height: 100%;
+  max-height: 400px;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1;
+  border: 2px solid #8B5A2B;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
 
 const ChessSquare = styled.div<{ isBlack: boolean }>`
@@ -22,9 +31,10 @@ const ChessSquare = styled.div<{ isBlack: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: clamp(10px, 2vw, 14px);
   font-weight: bold;
   color: ${({ isBlack }) => (isBlack ? '#F5DEB3' : '#8B5A2B')};
+  transition: background-color 0.2s ease;
   
   &:hover {
     background: ${({ isBlack }) => (isBlack ? '#A0522D' : '#DEB887')};
@@ -35,10 +45,16 @@ const Title = styled.div`
   position: absolute;
   top: 16px;
   left: 50%;
-  font-size: 18px;
+  transform: translateX(-50%);
+  font-size: clamp(14px, 3vw, 18px);
   font-weight: bold;
   color: #333;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 export const TestWidget: React.FC = () => {
@@ -60,7 +76,7 @@ export const TestWidget: React.FC = () => {
 
   return (
     <TestContainer>
-      <Title>Test Widget</Title>
+      <Title>Chess Board</Title>
       <ChessBoard>
         {renderChessBoard()}
       </ChessBoard>

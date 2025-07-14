@@ -4,7 +4,7 @@ export class WeatherSettings {
   public readonly accentColor: string;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'modern-card' | 'minimal-info' | 'detailed-forecast';
+  public readonly style: 'modern' | 'minimal-info' | 'detailed-forecast';
   public readonly temperatureUnit: 'celsius' | 'fahrenheit';
   public readonly showFeelsLike: boolean;
   public readonly showHumidity: boolean;
@@ -16,11 +16,11 @@ export class WeatherSettings {
     this.accentColor = settings.accentColor || '#f1f5f9';
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
-    this.style = settings.style || 'modern-card';
+    this.style = settings.style || 'modern';
     this.temperatureUnit = settings.temperatureUnit || 'celsius';
     this.showFeelsLike = settings.showFeelsLike ?? true;
     this.showHumidity = settings.showHumidity ?? true;
-    this.location = settings.location || 'New York';
+    this.location = settings.location || 'Moscow';
   }
 
   public static fromJson(json: string): WeatherSettings {
