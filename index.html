@@ -120,6 +120,19 @@
 
 <body>
   <div id="root"></div>
+  <div id="preloader" style="width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;position:fixed;left:0;top:0;z-index:9999;background:white;">
+    <span>Загрузка…</span>
+  </div>
+  <script type="module">
+    const isEmbed = window.location.pathname.includes('/embed/');
+    const delay = isEmbed ? 1000 : 0;
+    setTimeout(() => {
+      import('/src/main.tsx').then(() => {
+        const preloader = document.getElementById('preloader');
+        if (preloader) preloader.remove();
+      });
+    }, delay);
+  </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
