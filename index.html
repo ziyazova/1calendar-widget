@@ -125,7 +125,7 @@
   </div>
   <script type="module">
     const isEmbed = window.location.pathname.includes('/embed/');
-    const delay = isEmbed ? 1000 : 0;
+    const delay = isEmbed ? 6000 : 0;
     setTimeout(() => {
       import('/src/main.tsx').then(() => {
         const preloader = document.getElementById('preloader');
