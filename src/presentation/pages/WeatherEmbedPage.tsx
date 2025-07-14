@@ -7,8 +7,9 @@ import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCode
 import { EmbedController } from './EmbedController';
 
 const EmbedContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,7 +54,24 @@ const ErrorState = styled.div`
   max-width: 400px;
 `;
 
+function useNotionAutoHeight() {
+  useEffect(() => {
+    function sendHeight() {
+      const height = document.documentElement.scrollHeight;
+      window.parent.postMessage({ type: 'embed-size', height }, '*');
+    }
+    sendHeight();
+    window.addEventListener('resize', sendHeight);
+    const interval = setInterval(sendHeight, 500);
+    return () => {
+      window.removeEventListener('resize', sendHeight);
+      clearInterval(interval);
+    };
+  }, []);
+}
+
 export const WeatherEmbedPage: React.FC = () => {
+  useNotionAutoHeight();
   const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
