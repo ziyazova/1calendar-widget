@@ -13,8 +13,7 @@ const EmbedContainer = styled.div`
   align-items: center;
   justify-content: center;
   background: transparent;
-  padding: 0;
-  margin: 0;
+  padding: 20px;
   box-sizing: border-box;
 `;
 

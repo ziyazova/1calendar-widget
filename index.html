@@ -47,28 +47,20 @@
     html, body {
       margin: 0;
       padding: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
-    #root {
-      width: 100vw;
-      max-width: 100vw;
-      min-height: 100px;
-      min-width: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
+      height: 100%;
+      overflow: visible;
       background: transparent;
     }
-    body {
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      background-color: rgba(255,255,255,0.1);
+    #root {
+      width: 100%;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      box-sizing: border-box;
     }
   </style>
-  <script src="https://unpkg.com/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
 
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -99,16 +91,17 @@
 </head>
 
 <body>
+  <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+  <script>
+    function sendHeight() {
+      const height = document.documentElement.scrollHeight;
+      window.parent.postMessage({ type: 'embed-size', height }, '*');
+    }
+
+    window.addEventListener('load', sendHeight);
+    setInterval(sendHeight, 500);
+  </script>
 </body>
 
 </html>
-<!--
-Recommended Notion embed:
-<iframe
-  src="https://calendar-widget.vercel.app/testembed"
-  style="width: 100%; height: 100%; border: none;"
-  allowtransparency="true"
-  sandbox="allow-scripts allow-same-origin"
-></iframe>
--->
