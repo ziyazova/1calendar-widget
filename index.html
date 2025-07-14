@@ -43,7 +43,7 @@
   <meta name="theme-color" content="#3b82f6" />
   <meta name="msapplication-TileColor" content="#3b82f6" />
 
-  <style>
+зако  <style>
     html, body {
       margin: 0;
       padding: 0;
@@ -107,28 +107,24 @@
       }
 
       window.addEventListener("load", () => {
-        // 🧽 Сначала убираем прелоадер
+        // Удаляем прелоадер
         const preloader = document.getElementById('preloader');
         if (preloader) preloader.remove();
 
-        // Только потом шлём размер
-        notifyParentOfSizeThrottled();
+        // Ждём один animation frame + небольшой delay
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            const height = document.documentElement.scrollHeight;
+            const width = document.documentElement.scrollWidth;
 
-        const observer = new ResizeObserver(() => {
-          notifyParentOfSizeThrottled();
+            // Сообщаем родителю (Notion) размеры
+            window.parent.postMessage({
+              type: "embed-size",
+              height,
+              width
+            }, "*");
+          }, 150); // задержка нужна чтобы все элементы успели отрисоваться
         });
-        observer.observe(document.body);
-        observer.observe(document.documentElement); // <html>
-
-        // Добавляем MutationObserver для body и html
-        const mutationObserver = new MutationObserver(() => {
-          notifyParentOfSizeThrottled();
-        });
-        mutationObserver.observe(document.body, { childList: true, subtree: true });
-        mutationObserver.observe(document.documentElement, { childList: true, subtree: true });
-
-        setTimeout(notifyParentOfSizeThrottled, 1000);
-        setTimeout(notifyParentOfSizeThrottled, 2000);
       });
 
       window.addEventListener("resize", notifyParentOfSizeThrottled);
