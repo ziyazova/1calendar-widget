@@ -18,9 +18,6 @@ const GridContainer = styled.div<{
   width: 100%;
   height: 100%;
   max-width: 400px;
-  max-height: 450px;
-  min-width: 280px;
-  min-height: 320px;
   padding: 16px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
@@ -63,14 +60,10 @@ const GridContainer = styled.div<{
 
   @media (max-width: 400px) {
     padding: 12px;
-    min-width: 240px;
-    min-height: 280px;
   }
 
   @media (max-width: 300px) {
     padding: 8px;
-    min-width: 200px;
-    min-height: 240px;
   }
 `;
 

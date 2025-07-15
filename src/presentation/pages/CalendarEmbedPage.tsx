@@ -41,10 +41,7 @@ const GlobalEmbedStyles = createGlobalStyle`
     width: auto !important;
     height: auto !important;
   }
-  div, section, article, aside, main, header, footer, nav {
-    min-width: 0;
-    min-height: 0;
-  }
+  div, section, article, aside, main, header, footer, nav 
 `;
 
 const EmbedContainer = styled.div`

@@ -47,7 +47,6 @@ const ForecastItem = styled.div<{
 const ForecastDay = styled.span<{ $textColor: string }>`
   font-weight: 600;
   color: ${({ $textColor }) => $textColor};
-  min-width: 70px;
   font-size: 15px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 `;

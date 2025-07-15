@@ -7,8 +7,6 @@ const TestContainer = styled.div`
   font-family: ${({ theme }) => theme.typography.fonts.primary};
   width: 100%;
   height: 100%;
-  min-height: 100px;
-  min-width: 100px;
 `;
 
 const TestHeader = styled.div`

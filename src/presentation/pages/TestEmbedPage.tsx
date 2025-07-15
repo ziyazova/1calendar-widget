@@ -13,8 +13,6 @@ const GlobalEmbedStyles = createGlobalStyle`
 const EmbedContainer = styled.div`
   width: 100%;
   height: 100%;
-  min-height: 100px;
-  min-width: 100px;
   display: flex;
   align-items: center;
   justify-content: center;

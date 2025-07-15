@@ -130,7 +130,6 @@ const PrimaryButton = styled.button<{ $copied?: boolean }>`
   font-family: ${({ theme }) => theme.typography.fonts.primary};
   transition: all ${({ theme }) => theme.transitions.apple};
   box-shadow: ${({ theme }) => theme.shadows.button};
-  min-width: 170px;
   height: 40px;
   position: relative;
   overflow: hidden;
