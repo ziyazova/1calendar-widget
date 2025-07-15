@@ -26,7 +26,6 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:site_name" content="Calendar Widget Studio" />
   
-
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://calendar-widget.vercel.app" />
@@ -44,17 +43,19 @@
   <meta name="theme-color" content="#3b82f6" />
   <meta name="msapplication-TileColor" content="#3b82f6" />
 
-<style>
-    html, body {
+  <style>
+    html,
+    body,
+    #root {
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: visible;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden; /* предотвращаем вторую прокрутку внутри iFrame */
       background: transparent;
     }
+
     #root {
-      width: 100%;
-      height: auto;
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -94,15 +95,25 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <script src="https://unpkg.com/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
-  <script>
-    function sendHeight() {
-      const height = document.documentElement.scrollHeight;
-      window.parent.postMessage({ type: 'embed-size', height }, '*');
-    }
 
-    window.addEventListener('load', sendHeight);
-    setInterval(sendHeight, 500);
+  <!-- Лёгкое авто-измерение высоты без setInterval -->
+  <script>
+    const postSize = (h) => {
+      window.parent.postMessage({ type: 'embed-size', height: h }, '*');
+    };
+
+    const resize = () => postSize(document.documentElement.scrollHeight);
+
+    const debounce = (fn, ms = 200) => {
+      let id;
+      return () => {
+        clearTimeout(id);
+        id = setTimeout(fn, ms);
+      };
+    };
+
+    new ResizeObserver(debounce(resize)).observe(document.documentElement);
+    window.addEventListener('load', resize);
   </script>
 </body>
 
