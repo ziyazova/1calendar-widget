@@ -15,8 +15,6 @@ const HeaderContainer = styled.header`
   padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['6']};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
   background: ${({ theme }) => theme.colors.background.elevated};
-  backdrop-filter: blur(${({ theme }) => theme.blur.md});
-  -webkit-backdrop-filter: blur(${({ theme }) => theme.blur.md});
   height: 80px;
   position: relative;
   z-index: ${({ theme }) => theme.zIndex.sticky};
