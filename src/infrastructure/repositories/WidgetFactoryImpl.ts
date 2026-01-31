@@ -2,7 +2,6 @@ import { Widget } from '../../domain/entities/Widget';
 import { WidgetFactory } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
-import { WeatherSettings } from '../../domain/value-objects/WeatherSettings';
 
 export class WidgetFactoryImpl implements WidgetFactory {
   createWidget(type: string, settings?: Record<string, any>): Widget {
@@ -16,16 +15,6 @@ export class WidgetFactoryImpl implements WidgetFactory {
         return Widget.createClock(
           this.generateId(),
           new ClockSettings(settings)
-        );
-      case 'weather':
-        return Widget.createWeather(
-          this.generateId(),
-          new WeatherSettings(settings)
-        );
-      case 'test':
-        return Widget.createTest(
-          this.generateId(),
-          settings || {}
         );
       default:
         throw new Error(`Unsupported widget type: ${type}`);
@@ -41,10 +30,9 @@ export class WidgetFactoryImpl implements WidgetFactory {
           accentColor: '#F1F5F9',
           defaultView: 'month',
           showWeekends: true,
-          opacity: 1,
           borderRadius: 12,
           showBorder: true,
-          style: 'detailed',
+          style: 'modern-grid',
         };
       case 'clock':
         return {
@@ -53,30 +41,11 @@ export class WidgetFactoryImpl implements WidgetFactory {
           accentColor: '#F1F5F9',
           showSeconds: true,
           format24h: true,
-          opacity: 1,
           borderRadius: 12,
           showBorder: true,
           showDate: true,
           fontSize: 'medium',
-          style: 'digital',
-        };
-      case 'weather':
-        return {
-          primaryColor: '#667EEA',
-          backgroundColor: '#FFFFFF',
-          accentColor: '#F1F5F9',
-          opacity: 1,
-          borderRadius: 12,
-          showBorder: true,
-          style: 'current',
-          temperatureUnit: 'celsius',
-          showFeelsLike: true,
-          showHumidity: true,
-          location: 'Moscow',
-        };
-      case 'test':
-        return {
-          style: 'chess-board',
+          style: 'modern',
         };
       default:
         return {};
@@ -84,7 +53,7 @@ export class WidgetFactoryImpl implements WidgetFactory {
   }
 
   getSupportedTypes(): string[] {
-    return ['calendar', 'clock', 'weather', 'test'];
+    return ['calendar', 'clock'];
   }
 
   private generateId(): string {

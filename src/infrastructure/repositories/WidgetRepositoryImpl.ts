@@ -2,7 +2,6 @@ import { Widget } from '../../domain/entities/Widget';
 import { WidgetRepository } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
-import { WeatherSettings } from '../../domain/value-objects/WeatherSettings';
 import { UrlCodecService } from '../services/url-codec/UrlCodecService';
 
 // Infrastructure implementation of Widget Repository
@@ -52,8 +51,6 @@ export class WidgetRepositoryImpl implements WidgetRepository {
           return Widget.createCalendar('url-calendar', new CalendarSettings(settings));
         case 'clock':
           return Widget.createClock('url-clock', new ClockSettings(settings));
-        case 'weather':
-          return Widget.createWeather('url-weather', new WeatherSettings(settings));
         default:
           return null;
       }
@@ -88,7 +85,6 @@ export class WidgetRepositoryImpl implements WidgetRepository {
   private inferTypeFromUrl(url: string): string {
     if (url.includes('/embed/calendar')) return 'calendar';
     if (url.includes('/embed/clock')) return 'clock';
-    if (url.includes('/embed/weather')) return 'weather';
     return 'calendar'; // default
   }
 } 

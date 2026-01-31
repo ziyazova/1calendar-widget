@@ -1,19 +1,57 @@
-# To run
+# 1calendar-widget
 
-npm install 
+Виджеты календаря и часов для Notion.
 
+## Структура проекта (упрощённая)
+
+```
+src/
+├── App.tsx              # Роутинг приложения
+├── main.tsx             # Точка входа
+│
+├── domain/              # Доменная логика
+│   ├── entities/        # Widget — сущность виджета
+│   ├── value-objects/   # CalendarSettings, ClockSettings — настройки
+│   ├── repositories/    # Интерфейсы для работы с данными
+│   └── use-cases/       # ManageWidget — создание, обновление виджетов
+│
+├── infrastructure/      # Реализация
+│   ├── di/              # DIContainer — dependency injection
+│   ├── repositories/    # WidgetFactoryImpl, WidgetRepositoryImpl
+│   └── services/        # UrlCodec — кодирование настроек в URL
+│
+└── presentation/        # UI
+    ├── components/
+    │   ├── layout/      # Header, WidgetDisplay
+    │   ├── ui/          # Sidebar, CustomizationPanel, ColorPicker
+    │   └── widgets/     # CalendarWidget, ClockWidget
+    │       ├── calendar/styles/  # ModernGrid, ModernWeeklyCalendar
+    │       └── clock/styles/     # ModernClock, DigitalMinimalClock, AnalogClassicClock
+    ├── pages/           # LandingPage, StudioPage, CalendarEmbedPage, ClockEmbedPage
+    └── themes/          # Цвета и стили
+```
+
+## Виджеты
+
+**Calendar:** Modern Grid, Modern Weekly  
+**Clock:** Modern Digital, Digital Minimal, Analog Classic
+
+## Запуск
+
+```bash
+npm install
 npm run dev
+```
 
-## To check build
+## Сборка
 
+```bash
 npm run build
-
-## Совет для Notion
-
-Если вставляете embed-виджет в Notion, всегда добавляйте уникальный query string, например:
-
-```
-https://calendar-widget.vercel.app/embed/calendar?ts=123456789
 ```
 
-Это поможет избежать кэширования высоты iframe в Notion.
+## Embed для Notion
+
+Добавляйте уникальный query string, чтобы избежать кэширования:
+```
+https://your-domain.com/embed/calendar?ts=123456789
+```

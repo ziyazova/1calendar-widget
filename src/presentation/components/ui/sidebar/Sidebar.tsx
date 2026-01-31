@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronRight, Calendar, Clock, CloudSun, Sparkles, TestTube } from 'lucide-react';
+import { ChevronRight, Calendar, Clock, Sparkles } from 'lucide-react';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -220,8 +220,6 @@ const WIDGET_CATEGORIES = {
     icon: Calendar,
     styles: [
       { label: 'Modern Grid', value: 'modern-grid', color: '#667EEA' },
-      { label: 'Compact Date', value: 'compact-date', color: '#764BA2' },
-      { label: 'Aesthetic Calendar', value: 'aesthetic', color: '#A67C52' },
       { label: 'Modern Weekly', value: 'modern-weekly', color: '#f857a6' },
     ],
   },
@@ -230,25 +228,8 @@ const WIDGET_CATEGORIES = {
     icon: Clock,
     styles: [
       { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
-      { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
       { label: 'Digital Minimal', value: 'digital-minimal', color: '#FEE140' },
-      { label: 'World Time', value: 'world-time', color: '#A8E6CF' },
-    ],
-  },
-  weather: {
-    label: 'Weather',
-    icon: CloudSun,
-    styles: [
-      { label: 'Modern Card', value: 'modern', color: '#F093FB' },
-      { label: 'Detailed Forecast', value: 'detailed-forecast', color: '#F8BBD9' },
-      { label: 'Minimal Info', value: 'minimal-info', color: '#FFB199' },
-    ],
-  },
-  test: {
-    label: 'Test Widget',
-    icon: TestTube,
-    styles: [
-      { label: 'Chess Board', value: 'chess-board', color: '#8B5A2B' },
+      { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
     ],
   },
 } as const;

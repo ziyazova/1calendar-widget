@@ -6,8 +6,7 @@ export class CalendarSettings {
   public readonly showWeekends: boolean;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'compact-date' | 'modern-grid' | 'aesthetic' | 'modern-weekly';
-  public readonly backgroundImage?: string;
+  public readonly style: 'modern-grid' | 'modern-weekly';
 
   constructor(settings: Partial<CalendarSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -18,7 +17,6 @@ export class CalendarSettings {
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
     this.style = settings.style || 'modern-grid';
-    this.backgroundImage = settings.backgroundImage;
   }
 
   public static fromJson(json: string): CalendarSettings {
@@ -40,7 +38,6 @@ export class CalendarSettings {
       borderRadius: this.borderRadius,
       showBorder: this.showBorder,
       style: this.style,
-      backgroundImage: this.backgroundImage,
     });
   }
 
@@ -54,7 +51,6 @@ export class CalendarSettings {
       borderRadius: changes.borderRadius ?? this.borderRadius,
       showBorder: changes.showBorder ?? this.showBorder,
       style: changes.style ?? this.style,
-      backgroundImage: changes.backgroundImage ?? this.backgroundImage,
     });
   }
 } 

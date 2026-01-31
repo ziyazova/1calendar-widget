@@ -8,7 +8,7 @@ export class ClockSettings {
   public readonly showBorder: boolean;
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
-  public readonly style: 'digital-minimal' | 'neon-glow' | 'analog-classic' | 'world-time';
+  public readonly style: 'modern' | 'digital-minimal' | 'analog-classic';
 
   constructor(settings: Partial<ClockSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -20,7 +20,7 @@ export class ClockSettings {
     this.showBorder = settings.showBorder ?? true;
     this.showDate = settings.showDate ?? true;
     this.fontSize = settings.fontSize || 'medium';
-    this.style = settings.style || 'digital-minimal';
+    this.style = settings.style || 'modern';
   }
 
   public static fromJson(json: string): ClockSettings {

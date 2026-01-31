@@ -435,7 +435,7 @@ export const LandingPage: React.FC = () => {
               </FeatureItem>
               <FeatureItem>
                 <Check size={20} />
-                All widget types (Calendar, Clock, Weather)
+                Calendar & Clock widgets
               </FeatureItem>
               <FeatureItem>
                 <Check size={20} />

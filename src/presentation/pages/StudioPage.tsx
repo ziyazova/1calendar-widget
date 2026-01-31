@@ -4,7 +4,6 @@ import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
-import { WeatherSettings } from '../../domain/value-objects/WeatherSettings';
 import { Sidebar } from '../components/ui/sidebar/Sidebar';
 import { Header } from '../components/layout/Header';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
@@ -78,19 +77,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       // Update widget with specific style
       let updatedWidget;
       if (type === 'calendar') {
-        const settings = new CalendarSettings({ style: style as any });
+        const settings = new CalendarSettings({ style: style as 'modern-grid' | 'modern-weekly' });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
-      } else if (type === 'clock') {
-        const settings = new ClockSettings({ style: style as any });
-        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
-      } else if (type === 'weather') {
-        const settings = new WeatherSettings({ style: style as any });
-        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
-      } else if (type === 'test') {
-        // Test widget doesn't need settings, just use the basic widget
-        updatedWidget = widget;
       } else {
-        updatedWidget = widget;
+        const settings = new ClockSettings({ style: style as 'modern' | 'digital-minimal' | 'analog-classic' });
+        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
       }
 
       setCurrentWidget(updatedWidget);
@@ -115,7 +106,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
   };
 
-  const handleSettingsChange = async (newSettings: Partial<CalendarSettings | ClockSettings | WeatherSettings>) => {
+  const handleSettingsChange = async (newSettings: Partial<CalendarSettings | ClockSettings>) => {
     if (!currentWidget) return;
 
     try {

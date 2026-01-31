@@ -3,12 +3,11 @@ import styled from 'styled-components';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
-import { WeatherSettings } from '../../../../domain/value-objects/WeatherSettings';
 import { ColorPicker } from '../ColorPicker';
 
 interface CustomizationPanelProps {
   widget: Widget | null;
-  onSettingsChange: (settings: Partial<CalendarSettings | ClockSettings | WeatherSettings>) => void;
+  onSettingsChange: (settings: Partial<CalendarSettings | ClockSettings>) => void;
 }
 
 const PanelContainer = styled.div`
@@ -242,7 +241,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     );
   }
 
-  const settings = widget.settings as CalendarSettings | ClockSettings | WeatherSettings;
+  const settings = widget.settings as CalendarSettings | ClockSettings;
 
   return (
     <PanelContainer>
@@ -339,36 +338,6 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 Show Weekends
               </CheckboxContainer>
             </FormGroup>
-
-            {settings.style === 'aesthetic' && (
-              <div style={{ margin: '16px 0' }}>
-                <label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>Background Image URL</label>
-                <input
-                  type="text"
-                  value={settings.backgroundImage || ''}
-                  onChange={e => onSettingsChange({ backgroundImage: e.target.value })}
-                  placeholder="Paste image URL or upload below"
-                  style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ccc', marginBottom: 8 }}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async e => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = ev => {
-                        if (typeof ev.target?.result === 'string') {
-                          onSettingsChange({ backgroundImage: ev.target.result });
-                        }
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  style={{ display: 'block', marginTop: 4 }}
-                />
-              </div>
-            )}
           </Section>
         )}
 
@@ -424,59 +393,6 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </Section>
         )}
 
-        {/* Weather specific settings */}
-        {widget.type === 'weather' && (
-          <Section>
-            <SectionTitle>Weather Options</SectionTitle>
-
-            <FormGroup>
-              <Label>Location</Label>
-              <Select
-                value={(settings as WeatherSettings).location}
-                onChange={(e) => onSettingsChange({ location: e.target.value })}
-              >
-                <option value="Moscow">Moscow</option>
-                <option value="London">London</option>
-                <option value="New York">New York</option>
-                <option value="Tokyo">Tokyo</option>
-                <option value="Alexandria">Alexandria</option>
-              </Select>
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Temperature Unit</Label>
-              <Select
-                value={(settings as WeatherSettings).temperatureUnit}
-                onChange={(e) => onSettingsChange({ temperatureUnit: e.target.value as 'celsius' | 'fahrenheit' })}
-              >
-                <option value="celsius">Celsius (°C)</option>
-                <option value="fahrenheit">Fahrenheit (°F)</option>
-              </Select>
-            </FormGroup>
-
-            <FormGroup>
-              <CheckboxContainer>
-                <Checkbox
-                  type="checkbox"
-                  checked={(settings as WeatherSettings).showFeelsLike}
-                  onChange={(e) => onSettingsChange({ showFeelsLike: e.target.checked })}
-                />
-                Show "Feels Like"
-              </CheckboxContainer>
-            </FormGroup>
-
-            <FormGroup>
-              <CheckboxContainer>
-                <Checkbox
-                  type="checkbox"
-                  checked={(settings as WeatherSettings).showHumidity}
-                  onChange={(e) => onSettingsChange({ showHumidity: e.target.checked })}
-                />
-                Show Humidity
-              </CheckboxContainer>
-            </FormGroup>
-          </Section>
-        )}
       </PanelContent>
     </PanelContainer>
   );
