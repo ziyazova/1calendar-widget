@@ -1,35 +1,40 @@
 import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+import { WIDGET_CONTAINER, WIDGET_TYPOGRAPHY, WIDGET_SPACING } from '../../../../themes/widgetTokens';
 
 const GradientWrapper = styled.div`
   position: relative;
-  width: 370px;
-  min-height: 340px;
-  border-radius: 28px;
+  width: 100%;
+  min-width: ${WIDGET_CONTAINER.minWidth};
+  max-width: ${WIDGET_CONTAINER.maxWidth};
+  min-height: ${WIDGET_CONTAINER.minHeight};
+  padding: ${WIDGET_CONTAINER.padding};
+  border-radius: clamp(16px, 6vw, 28px);
   background: linear-gradient(135deg, #fcb7e2 0%, #a1c4fd 100%);
-  box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
+  box-sizing: border-box;
 `;
 
 const ViewToggle = styled.div`
   display: flex;
-  margin: 18px 0 0 0;
-  background: rgba(255,255,255,0.35);
-  border-radius: 16px;
+  margin: clamp(12px, 3vw, 20px) 0 0 0;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: clamp(10px, 3vw, 18px);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 `;
 
 const ToggleButton = styled.button<{ $active?: boolean }>`
-  padding: 8px 32px;
-  font-size: 1.1rem;
+  padding: clamp(6px, 1.5vw, 10px) clamp(20px, 6vw, 36px);
+  font-size: ${WIDGET_TYPOGRAPHY.body};
   font-weight: 500;
-  background: ${({ $active }) => $active ? '#fff' : 'transparent'};
-  color: ${({ $active }) => $active ? '#222' : '#555'};
+  background: ${({ $active }) => ($active ? '#fff' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#222' : '#555')};
   border: none;
   outline: none;
   cursor: pointer;
@@ -41,25 +46,33 @@ const NavRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
+  margin-top: ${WIDGET_SPACING.margin};
 `;
 
 const NavArrow = styled.button`
   background: none;
   border: none;
-  width: 36px;
-  height: 36px;
+  width: clamp(28px, 8vw, 40px);
+  height: clamp(28px, 8vw, 40px);
+  min-width: 28px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.7rem;
   color: #fff;
   cursor: pointer;
   transition: color 0.2s;
   opacity: 0.7;
+  flex-shrink: 0;
+
   &:hover {
     color: #f857a6;
     opacity: 1;
+  }
+
+  svg {
+    width: clamp(14px, 4vw, 20px);
+    height: clamp(14px, 4vw, 20px);
   }
 `;
 
@@ -67,91 +80,91 @@ const DateRow = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin: 0 0 0 0;
+  flex-wrap: wrap;
+  gap: clamp(4px, 1vw, 12px);
   width: 100%;
+  padding: 0 4px;
 `;
 
 const MonthText = styled.span`
-  font-size: 2.1rem;
+  font-size: clamp(1.2rem, 5vw, 2.2rem);
   font-weight: 700;
   color: #fff;
   letter-spacing: 0.02em;
-  margin-right: 10px;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  margin-top: 0.5em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const DayText = styled.span`
-  font-size: 2.5rem;
+  font-size: clamp(1.4rem, 6vw, 2.6rem);
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  margin-top: 0.5em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const WeekRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 18px 0 0 0;
-  width: 92%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: ${WIDGET_SPACING.gap};
+  margin: clamp(12px, 3vw, 20px) 0 0 0;
+  width: 100%;
   position: relative;
 `;
 
 const WeekDay = styled.div`
-  font-size: 1.1rem;
+  font-size: ${WIDGET_TYPOGRAPHY.small};
   color: #fff;
   font-weight: 500;
   text-align: center;
-  width: 40px;
   z-index: 1;
 `;
 
 const DaysRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  width: 92%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: ${WIDGET_SPACING.gap};
+  margin-top: ${WIDGET_SPACING.gapMedium};
+  width: 100%;
   position: relative;
   z-index: 1;
 `;
 
 const DayCell = styled.div<{ $today?: boolean }>`
-  width: 40px;
-  height: 40px;
+  aspect-ratio: 1;
+  min-height: clamp(28px, 8vw, 44px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 3vw, 1.4rem);
   font-weight: 600;
-  color: ${({ $today }) => $today ? '#fff' : '#fff'};
-  background: ${({ $today }) => $today ? 'linear-gradient(135deg, #f857a6 0%, #ff5858 100%)' : 'transparent'};
+  color: #fff;
+  background: ${({ $today }) =>
+    $today ? 'linear-gradient(135deg, #f857a6 0%, #ff5858 100%)' : 'transparent'};
   border-radius: 50%;
-  box-shadow: ${({ $today }) => $today ? '0 2px 8px rgba(248,87,166,0.18)' : 'none'};
-  border: none;
+  box-shadow: ${({ $today }) => ($today ? '0 2px 8px rgba(248,87,166,0.18)' : 'none')};
   transition: background 0.2s;
 `;
 
 const MonthGrid = styled.div`
-  margin-top: 10px;
-  width: 98%;
+  margin-top: ${WIDGET_SPACING.gapMedium};
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px 0;
+  gap: clamp(2px, 0.5vw, 8px);
 `;
 
 const MonthDayCell = styled.div<{ $today?: boolean }>`
-  width: 32px;
-  height: 32px;
+  aspect-ratio: 1;
+  min-height: clamp(24px, 6vw, 36px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: ${WIDGET_TYPOGRAPHY.small};
   font-weight: 600;
-  color: ${({ $today }) => $today ? '#fff' : '#fff'};
-  background: ${({ $today }) => $today ? 'linear-gradient(135deg, #f857a6 0%, #ff5858 100%)' : 'transparent'};
+  color: #fff;
+  background: ${({ $today }) =>
+    $today ? 'linear-gradient(135deg, #f857a6 0%, #ff5858 100%)' : 'transparent'};
   border-radius: 50%;
-  box-shadow: ${({ $today }) => $today ? '0 2px 8px rgba(248,87,166,0.18)' : 'none'};
-  border: none;
+  box-shadow: ${({ $today }) => ($today ? '0 2px 8px rgba(248,87,166,0.18)' : 'none')};
   transition: background 0.2s;
 `;
 

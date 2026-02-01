@@ -80,7 +80,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         const settings = new CalendarSettings({ style: style as 'modern-grid' | 'modern-weekly' });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
       } else {
-        const settings = new ClockSettings({ style: style as 'modern' | 'digital-minimal' | 'analog-classic' });
+        const settings = new ClockSettings({ style: style as 'modern' | 'analog-classic' });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
       }
 

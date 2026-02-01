@@ -2,6 +2,15 @@
 
 Виджеты календаря и часов для Notion.
 
+## Адаптивность виджетов
+
+Все виджеты адаптивны и консистентны:
+- **Токены**: `src/presentation/themes/widgetTokens.ts`
+- **Breakpoints**: 360px, 480px, 640px
+- **Контейнеры**: min 200px, max 420px (calendar) / 360px (clock)
+
+Подробный план: [docs/ADAPTIVE-WIDGETS-PLAN.md](docs/ADAPTIVE-WIDGETS-PLAN.md)
+
 ## Структура проекта (упрощённая)
 
 ```
@@ -28,7 +37,7 @@ src/
     │       ├── calendar/styles/  # ModernGrid, ModernWeeklyCalendar
     │       └── clock/styles/     # ModernClock, DigitalMinimalClock, AnalogClassicClock
     ├── pages/           # LandingPage, StudioPage, CalendarEmbedPage, ClockEmbedPage
-    └── themes/          # Цвета и стили
+    └── themes/          # Цвета, theme, widgetTokens (адаптивность)
 ```
 
 ## Виджеты

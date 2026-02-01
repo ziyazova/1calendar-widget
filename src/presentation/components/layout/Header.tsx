@@ -116,19 +116,21 @@ const HeaderActions = styled.div`
 const PrimaryButton = styled.button<{ $copied?: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['2']};
-  padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing['3']};
+  padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['6']};
+  min-height: 44px;
+  min-width: 160px;
   background: ${({ theme, $copied }) => $copied ? theme.colors.success : theme.colors.primary};
   color: ${({ theme }) => theme.colors.text.inverse};
   border: none;
   border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
   font-family: ${({ theme }) => theme.typography.fonts.primary};
   transition: all ${({ theme }) => theme.transitions.apple};
   box-shadow: ${({ theme }) => theme.shadows.button};
-  height: 40px;
   position: relative;
   overflow: hidden;
   
@@ -153,13 +155,13 @@ const ButtonTextWrap = styled.span`
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 100%;
-  height: 100%;
+  min-width: 120px;
+  white-space: nowrap;
 `;
 
 const ButtonText = styled.span<{ $visible: boolean }>`
   position: absolute;
-  left: 0; 
+  left: 0;
   right: 0;
   top: 0;
   bottom: 0;
@@ -168,7 +170,7 @@ const ButtonText = styled.span<{ $visible: boolean }>`
   justify-content: center;
   opacity: ${({ $visible }) => $visible ? 1 : 0};
   transform: translateY(${({ $visible }) => $visible ? '0' : '10px'});
-  transition: opacity 0.25s ${({ theme }) => theme.transitions.apple}, 
+  transition: opacity 0.25s ${({ theme }) => theme.transitions.apple},
               transform 0.25s ${({ theme }) => theme.transitions.apple};
 `;
 
@@ -205,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
           disabled={!currentWidget}
           $copied={copied}
         >
-          <Copy size={16} />
+          <Copy size={18} />
           <ButtonTextWrap>
             <ButtonText $visible={!copied}>Copy Embed URL</ButtonText>
             <ButtonText $visible={copied}>Copied!</ButtonText>

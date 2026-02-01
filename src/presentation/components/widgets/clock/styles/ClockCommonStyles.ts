@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { CLOCK_CONTAINER } from '../../../../themes/widgetTokens';
 
 export const ClockWidgetContainer = styled.div<{
   $backgroundColor?: string;
@@ -9,12 +10,13 @@ export const ClockWidgetContainer = styled.div<{
   $style?: string;
 }>`
   width: 100%;
-  max-width: 300px;
-  min-height: 200px;
-  padding: 16px;
+  max-width: ${CLOCK_CONTAINER.maxWidth};
+  min-width: 200px;
+  min-height: ${CLOCK_CONTAINER.minHeight};
+  padding: ${CLOCK_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor || 'transparent'};
   border: ${({ $showBorder, $accentColor }) =>
-    $showBorder ? `1px solid ${$accentColor || '#000'}40` : 'none'};
+    $showBorder ? `2px solid ${$accentColor || '#000'}50` : `1px solid ${$accentColor || '#000'}30`};
   border-radius: ${({ $borderRadius }) => $borderRadius || 12}px;
   color: ${({ $textColor }) => $textColor || 'inherit'};
   backdrop-filter: blur(20px);

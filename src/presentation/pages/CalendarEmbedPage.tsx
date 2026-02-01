@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { CalendarWidget } from '../components/widgets/CalendarWidget';
+import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
@@ -12,13 +13,13 @@ const GlobalEmbedStyles = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
     background: transparent;
   }
   #root {
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
   }
   * {
     box-sizing: border-box;
@@ -54,19 +55,8 @@ const EmbedContainer = styled.div`
   background: transparent;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: auto;
   position: relative;
-`;
-
-const ScaledContent = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform-origin: center center;
-  transform: scale(var(--dynamic-scale, 1));
-  transition: transform 0.3s ease;
 `;
 
 const LoadingState = styled.div`
@@ -140,9 +130,9 @@ export const CalendarEmbedPage: React.FC = () => {
       <EmbedController>
         <GlobalEmbedStyles />
         <EmbedContainer>
-          <ScaledContent>
+          <EmbedScaleWrapper>
             <LoadingState>Loading calendar...</LoadingState>
-          </ScaledContent>
+          </EmbedScaleWrapper>
         </EmbedContainer>
       </EmbedController>
     );
@@ -153,12 +143,12 @@ export const CalendarEmbedPage: React.FC = () => {
       <EmbedController>
         <GlobalEmbedStyles />
         <EmbedContainer>
-          <ScaledContent>
+          <EmbedScaleWrapper>
             <ErrorState>
               <h3>🚫 Error</h3>
               <p>{error || 'Failed to load calendar widget'}</p>
             </ErrorState>
-          </ScaledContent>
+          </EmbedScaleWrapper>
         </EmbedContainer>
       </EmbedController>
     );
@@ -168,9 +158,9 @@ export const CalendarEmbedPage: React.FC = () => {
     <EmbedController>
       <GlobalEmbedStyles />
       <EmbedContainer>
-        <ScaledContent>
+        <EmbedScaleWrapper>
           <CalendarWidget widget={widget} />
-        </ScaledContent>
+        </EmbedScaleWrapper>
       </EmbedContainer>
     </EmbedController>
   );

@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ClockWidget } from '../components/widgets/ClockWidget';
+import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
 import { Widget } from '../../domain/entities/Widget';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
 
 const EmbedContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  padding: 20px;
+  padding: 0;
   box-sizing: border-box;
+  overflow: auto;
 `;
 
 const LoadingState = styled.div`
@@ -89,7 +92,9 @@ export const ClockEmbedPage: React.FC = () => {
     return (
       <EmbedController>
         <EmbedContainer>
-          <LoadingState>Loading clock...</LoadingState>
+          <EmbedScaleWrapper>
+            <LoadingState>Loading clock...</LoadingState>
+          </EmbedScaleWrapper>
         </EmbedContainer>
       </EmbedController>
     );
@@ -99,10 +104,12 @@ export const ClockEmbedPage: React.FC = () => {
     return (
       <EmbedController>
         <EmbedContainer>
-          <ErrorState>
-            <h3>🚫 Error</h3>
-            <p>{error || 'Failed to load clock widget'}</p>
-          </ErrorState>
+          <EmbedScaleWrapper>
+            <ErrorState>
+              <h3>🚫 Error</h3>
+              <p>{error || 'Failed to load clock widget'}</p>
+            </ErrorState>
+          </EmbedScaleWrapper>
         </EmbedContainer>
       </EmbedController>
     );
@@ -111,7 +118,9 @@ export const ClockEmbedPage: React.FC = () => {
   return (
     <EmbedController>
       <EmbedContainer>
-        <ClockWidget widget={widget} />
+        <EmbedScaleWrapper>
+          <ClockWidget widget={widget} />
+        </EmbedScaleWrapper>
       </EmbedContainer>
     </EmbedController>
   );

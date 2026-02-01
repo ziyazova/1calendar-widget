@@ -228,7 +228,6 @@ const WIDGET_CATEGORIES = {
     icon: Clock,
     styles: [
       { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
-      { label: 'Digital Minimal', value: 'digital-minimal', color: '#FEE140' },
       { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
     ],
   },

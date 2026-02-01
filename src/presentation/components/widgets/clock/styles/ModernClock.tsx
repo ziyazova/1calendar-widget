@@ -29,16 +29,16 @@ const ModernTimeDisplay = styled.div<{
 }>`
   font-size: ${({ $fontSize }) => {
     switch ($fontSize) {
-      case 'small': return '2rem';
-      case 'large': return '3.5rem';
-      default: return '2.8rem';
+      case 'small': return 'clamp(1.4rem, 5vw, 2.2rem)';
+      case 'large': return 'clamp(2rem, 7vw, 3.8rem)';
+      default: return 'clamp(1.8rem, 6vw, 3rem)';
     }
   }};
   font-weight: 700;
   color: ${({ $textColor }) => $textColor};
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  margin-bottom: 16px;
-  padding: 20px 24px;
+  margin-bottom: clamp(12px, 3vw, 20px);
+  padding: clamp(12px, 3vw, 24px) clamp(16px, 4vw, 28px);
   background: ${({ $primaryColor, $style }) => {
     switch ($style) {
       case 'neon':
@@ -54,10 +54,11 @@ const ModernTimeDisplay = styled.div<{
   border: 1px solid ${({ $primaryColor, $style }) =>
     $style === 'neon' ? `${$primaryColor}60` : `${$primaryColor}30`};
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.02em;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.02em;
   text-shadow: ${({ $style }) =>
     $style === 'neon' ? '0 0 10px currentColor' : '0 2px 4px rgba(0, 0, 0, 0.1)'};
   animation: ${({ $style }) => $style === 'neon' ? `${glow} 2s ease-in-out infinite` : 'none'};
@@ -93,7 +94,7 @@ const DateDisplay = styled.div<{
   $textColor: string;
   $style: string;
 }>`
-  font-size: 15px;
+  font-size: clamp(12px, 2.5vw, 16px);
   color: ${({ $textColor }) => `${$textColor}80`};
   background: ${({ $accentColor, $style }) => {
     if ($style === 'gradient') {
@@ -101,7 +102,7 @@ const DateDisplay = styled.div<{
     }
     return `${$accentColor}20`;
   }};
-  padding: 12px 18px;
+  padding: clamp(8px, 2vw, 14px) clamp(12px, 3vw, 20px);
   border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 2, 12)}px;
   display: ${({ $showDate }) => $showDate ? 'block' : 'none'};
   font-weight: 500;
