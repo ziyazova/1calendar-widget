@@ -35,7 +35,7 @@ src/
     │   ├── ui/          # Sidebar, CustomizationPanel, ColorPicker
     │   └── widgets/     # CalendarWidget, ClockWidget
     │       ├── calendar/styles/  # ModernGrid, ModernWeeklyCalendar
-    │       └── clock/styles/     # ModernClock, DigitalMinimalClock, AnalogClassicClock
+    │       └── clock/styles/     # ModernClock, AnalogClassicClock
     ├── pages/           # LandingPage, StudioPage, CalendarEmbedPage, ClockEmbedPage
     └── themes/          # Цвета, theme, widgetTokens (адаптивность)
 ```
@@ -43,7 +43,7 @@ src/
 ## Виджеты
 
 **Calendar:** Modern Grid, Modern Weekly  
-**Clock:** Modern Digital, Digital Minimal, Analog Classic
+**Clock:** Modern Digital, Analog Classic
 
 ## Запуск
 
@@ -57,6 +57,12 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Документация
+
+- [docs/CHANGELOG.md](docs/CHANGELOG.md) — история изменений
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — руководство для разработчиков и агентов
+- [docs/ADAPTIVE-WIDGETS-PLAN.md](docs/ADAPTIVE-WIDGETS-PLAN.md) — план адаптивности виджетов
 
 ## Embed для Notion
 

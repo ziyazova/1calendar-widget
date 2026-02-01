@@ -7,14 +7,14 @@
 
 ---
 
-## Текущее состояние
+## Текущее состояние (после реализации)
 
-| Виджет | Адаптивность | Проблемы |
-|--------|--------------|----------|
-| **Modern Grid** | Частично | Уже есть clamp, breakpoints; можно унифицировать |
-| **Modern Weekly** | ❌ | Фикс. width: 370px, жёсткие px везде |
-| **Modern Clock** | ❌ | Фикс. font-size, max-width 300px |
-| **Analog Classic** | ❌ | Фикс. 160px циферблат, не масштабируется |
+| Виджет | Адаптивность |
+|--------|--------------|
+| **Modern Grid** | ✅ Токены, clamp |
+| **Modern Weekly** | ✅ width 100%, grid, clamp |
+| **Modern Clock** | ✅ clamp для font-size, padding |
+| **Analog Classic** | ✅ --clock-size, scale для стрелок |
 
 ---
 
