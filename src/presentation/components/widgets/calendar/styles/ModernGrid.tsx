@@ -19,6 +19,7 @@ const GridContainer = styled.div<{
   width: 100%;
   min-width: ${WIDGET_CONTAINER.minWidth};
   max-width: ${WIDGET_CONTAINER.maxWidth};
+  max-height: ${WIDGET_CONTAINER.maxHeight};
   padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
@@ -296,7 +297,7 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
 
   const days = [];
   const currentDay = new Date(firstDisplayDay);
-  const totalDays = settings.showWeekends ? 42 : 30;
+  const totalDays = settings.showWeekends ? 35 : 25;
 
   for (let i = 0; i < totalDays; i++) {
     if (!settings.showWeekends && (currentDay.getDay() === 0 || currentDay.getDay() === 6)) {
