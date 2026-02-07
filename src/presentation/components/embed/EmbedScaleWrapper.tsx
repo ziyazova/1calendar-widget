@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-/** Reference size of the widget - used to calculate scale */
-const WIDGET_REF_WIDTH = 420;
-const WIDGET_REF_HEIGHT = 380;
+/** Default reference size of the widget - used to calculate scale */
+const DEFAULT_REF_WIDTH = 420;
+const DEFAULT_REF_HEIGHT = 380;
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 2.0;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -25,13 +27,19 @@ const ScaledInner = styled.div<{ $scale: number }>`
 
 interface EmbedScaleWrapperProps {
   children: React.ReactNode;
+  refWidth?: number;
+  refHeight?: number;
 }
 
 /**
  * Wraps embed content and scales it to fit the viewport.
- * Prevents widgets from being cut off in small iframes (e.g. Notion).
+ * Scales both down and up within MIN_SCALE–MAX_SCALE bounds.
  */
-export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({ children }) => {
+export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
+  children,
+  refWidth = DEFAULT_REF_WIDTH,
+  refHeight = DEFAULT_REF_HEIGHT,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -44,10 +52,10 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({ children }
       const h = el.clientHeight;
       if (w <= 0 || h <= 0) return;
 
-      const scaleX = (w - 16) / WIDGET_REF_WIDTH;
-      const scaleY = (h - 16) / WIDGET_REF_HEIGHT;
-      const newScale = Math.min(scaleX, scaleY, 1);
-      setScale(Math.max(0.25, newScale));
+      const scaleX = (w - 16) / refWidth;
+      const scaleY = (h - 16) / refHeight;
+      const newScale = Math.min(scaleX, scaleY, MAX_SCALE);
+      setScale(Math.max(MIN_SCALE, newScale));
     };
 
     const rafId = requestAnimationFrame(updateScale);
@@ -60,7 +68,7 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({ children }
       observer.disconnect();
       window.removeEventListener('resize', updateScale);
     };
-  }, []);
+  }, [refWidth, refHeight]);
 
   return (
     <Wrapper ref={containerRef}>

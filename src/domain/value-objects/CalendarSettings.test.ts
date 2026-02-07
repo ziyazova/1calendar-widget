@@ -12,6 +12,8 @@ describe('CalendarSettings', () => {
       expect(settings.borderRadius).toBe(12);
       expect(settings.showBorder).toBe(true);
       expect(settings.style).toBe('modern-grid');
+      expect(settings.embedWidth).toBe(420);
+      expect(settings.embedHeight).toBe(380);
     });
   });
 
@@ -28,6 +30,15 @@ describe('CalendarSettings', () => {
       // defaults preserved
       expect(settings.backgroundColor).toBe('#ffffff');
       expect(settings.style).toBe('modern-grid');
+    });
+
+    it('accepts embedWidth and embedHeight overrides', () => {
+      const settings = new CalendarSettings({
+        embedWidth: 600,
+        embedHeight: 500,
+      });
+      expect(settings.embedWidth).toBe(600);
+      expect(settings.embedHeight).toBe(500);
     });
   });
 

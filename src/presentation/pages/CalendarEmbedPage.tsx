@@ -155,11 +155,16 @@ export const CalendarEmbedPage: React.FC = () => {
     );
   }
 
+  const calendarSettings = widget.settings as CalendarSettings;
+
   return (
     <EmbedController>
       <GlobalEmbedStyles />
       <EmbedContainer>
-        <EmbedScaleWrapper>
+        <EmbedScaleWrapper
+          refWidth={calendarSettings.embedWidth}
+          refHeight={calendarSettings.embedHeight}
+        >
           <CalendarWidget widget={widget} />
         </EmbedScaleWrapper>
       </EmbedContainer>

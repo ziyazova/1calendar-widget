@@ -9,6 +9,8 @@ export class ClockSettings {
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
   public readonly style: 'modern' | 'analog-classic';
+  public readonly embedWidth: number;
+  public readonly embedHeight: number;
 
   constructor(settings: Partial<ClockSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -21,6 +23,8 @@ export class ClockSettings {
     this.showDate = settings.showDate ?? true;
     this.fontSize = settings.fontSize || 'medium';
     this.style = settings.style || 'modern';
+    this.embedWidth = settings.embedWidth ?? 360;
+    this.embedHeight = settings.embedHeight ?? 360;
   }
 
   public static fromJson(json: string): ClockSettings {
@@ -44,6 +48,8 @@ export class ClockSettings {
       showDate: this.showDate,
       fontSize: this.fontSize,
       style: this.style,
+      embedWidth: this.embedWidth,
+      embedHeight: this.embedHeight,
     });
   }
 
@@ -59,6 +65,8 @@ export class ClockSettings {
       showDate: changes.showDate ?? this.showDate,
       fontSize: changes.fontSize ?? this.fontSize,
       style: changes.style ?? this.style,
+      embedWidth: changes.embedWidth ?? this.embedWidth,
+      embedHeight: changes.embedHeight ?? this.embedHeight,
     });
   }
 } 

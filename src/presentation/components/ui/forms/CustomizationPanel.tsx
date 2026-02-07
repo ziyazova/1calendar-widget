@@ -311,6 +311,40 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </FormGroup>
         </Section>
 
+        <Section>
+          <SectionTitle>Embed Size</SectionTitle>
+
+          <FormGroup>
+            <Label>Width</Label>
+            <SliderContainer>
+              <Slider
+                type="range"
+                min="200"
+                max={widget.type === 'calendar' ? '800' : '600'}
+                step="10"
+                value={(settings as unknown as { embedWidth: number }).embedWidth}
+                onChange={(e) => onSettingsChange({ embedWidth: parseInt(e.target.value) })}
+              />
+              <SliderValue>{(settings as unknown as { embedWidth: number }).embedWidth}px</SliderValue>
+            </SliderContainer>
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Height</Label>
+            <SliderContainer>
+              <Slider
+                type="range"
+                min="200"
+                max="600"
+                step="10"
+                value={(settings as unknown as { embedHeight: number }).embedHeight}
+                onChange={(e) => onSettingsChange({ embedHeight: parseInt(e.target.value) })}
+              />
+              <SliderValue>{(settings as unknown as { embedHeight: number }).embedHeight}px</SliderValue>
+            </SliderContainer>
+          </FormGroup>
+        </Section>
+
         {/* Calendar specific settings */}
         {widget.type === 'calendar' && (
           <Section>

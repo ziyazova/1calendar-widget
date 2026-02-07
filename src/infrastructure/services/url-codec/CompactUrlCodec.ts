@@ -17,11 +17,15 @@ export class CompactUrlCodec {
     defaultView: 'cv',
     showWeekends: 'cw',
 
-    // Clock специфичные (k+символ) 
+    // Clock специфичные (k+символ)
     showSeconds: 'ks',
     format24h: 'kf',
     showDate: 'kd',
     fontSize: 'kz',
+
+    // Embed size
+    embedWidth: 'ew',
+    embedHeight: 'eh',
 
     // Weather специфичные (w+символ)
     temperatureUnit: 'wu',
@@ -60,6 +64,10 @@ export class CompactUrlCodec {
     showFeelsLike: true,
     showHumidity: true,
     location: 'New York',
+
+    // Embed size (calendar defaults; clock overrides at decode)
+    embedWidth: 420,
+    embedHeight: 380,
   };
 
   // Цвета из палитры кодируем индексами (0-9, a-f для 16 цветов)

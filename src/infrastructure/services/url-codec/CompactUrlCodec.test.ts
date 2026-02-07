@@ -43,6 +43,43 @@ describe('CompactUrlCodec', () => {
     });
   });
 
+  describe('embed size encoding', () => {
+    it('roundtrips non-default embedWidth and embedHeight', () => {
+      const settings = {
+        primaryColor: '#667EEA',
+        backgroundColor: '#ffffff',
+        style: 'modern-grid',
+        embedWidth: 600,
+        embedHeight: 500,
+      };
+
+      const encoded = CompactUrlCodec.encode('calendar', settings);
+      const decoded = CompactUrlCodec.decode(encoded);
+
+      expect(decoded).not.toBeNull();
+      expect(decoded!.settings.embedWidth).toBe(600);
+      expect(decoded!.settings.embedHeight).toBe(500);
+    });
+
+    it('omits default embedWidth/embedHeight from encoded output', () => {
+      const settings = {
+        primaryColor: '#667EEA',
+        backgroundColor: '#ffffff',
+        style: 'modern-grid',
+        embedWidth: 420,
+        embedHeight: 380,
+      };
+
+      const encoded = CompactUrlCodec.encode('calendar', settings);
+      const decoded = CompactUrlCodec.decode(encoded);
+
+      expect(decoded).not.toBeNull();
+      // defaults are restored
+      expect(decoded!.settings.embedWidth).toBe(420);
+      expect(decoded!.settings.embedHeight).toBe(380);
+    });
+  });
+
   describe('invalid input', () => {
     it('returns null for garbage input', () => {
       const result = CompactUrlCodec.decode('!!!not-base64!!!');

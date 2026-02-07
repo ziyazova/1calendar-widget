@@ -116,10 +116,15 @@ export const ClockEmbedPage: React.FC = () => {
     );
   }
 
+  const clockSettings = widget.settings as ClockSettings;
+
   return (
     <EmbedController>
       <EmbedContainer>
-        <EmbedScaleWrapper>
+        <EmbedScaleWrapper
+          refWidth={clockSettings.embedWidth}
+          refHeight={clockSettings.embedHeight}
+        >
           <ClockWidget widget={widget} />
         </EmbedScaleWrapper>
       </EmbedContainer>

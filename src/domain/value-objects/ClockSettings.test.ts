@@ -14,6 +14,8 @@ describe('ClockSettings', () => {
       expect(settings.showDate).toBe(true);
       expect(settings.fontSize).toBe('medium');
       expect(settings.style).toBe('modern');
+      expect(settings.embedWidth).toBe(360);
+      expect(settings.embedHeight).toBe(360);
     });
   });
 
@@ -30,6 +32,15 @@ describe('ClockSettings', () => {
       // defaults preserved
       expect(settings.primaryColor).toBe('#667EEA');
       expect(settings.style).toBe('modern');
+    });
+
+    it('accepts embedWidth and embedHeight overrides', () => {
+      const settings = new ClockSettings({
+        embedWidth: 500,
+        embedHeight: 400,
+      });
+      expect(settings.embedWidth).toBe(500);
+      expect(settings.embedHeight).toBe(400);
     });
   });
 
