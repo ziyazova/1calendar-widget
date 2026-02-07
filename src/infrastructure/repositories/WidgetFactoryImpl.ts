@@ -2,6 +2,7 @@ import { Widget } from '../../domain/entities/Widget';
 import { WidgetFactory } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
+import { Logger } from '../services/Logger';
 
 export class WidgetFactoryImpl implements WidgetFactory {
   createWidget(type: string, settings?: Record<string, any>): Widget {
@@ -66,7 +67,7 @@ export class WidgetFactoryImpl implements WidgetFactory {
       const factory = new WidgetFactoryImpl();
       return factory.createWidget(config.widgetType, config.settings);
     } catch (error) {
-      console.error('Failed to create widget from embed config:', error);
+      Logger.error('WidgetFactory', 'Failed to create widget from embed config', error);
       return null;
     }
   }

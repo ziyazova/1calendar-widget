@@ -1,4 +1,5 @@
 import { CompactUrlCodec } from './CompactUrlCodec';
+import { Logger } from '../Logger';
 
 // Infrastructure service for URL encoding/decoding
 export class UrlCodecService {
@@ -104,7 +105,7 @@ export class UrlCodecService {
       // Update URL without page reload
       window.history.replaceState({}, '', url.toString());
     } catch (error) {
-      console.error('Failed to update browser URL:', error);
+      Logger.error('UrlCodecService', 'Failed to update browser URL', error);
     }
   }
 

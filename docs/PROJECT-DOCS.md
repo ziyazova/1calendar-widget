@@ -1,0 +1,331 @@
+# Project Documentation
+
+> Consolidated docs for **1calendar-widget**. For AI agent context see `CLAUDE.md`. For project overview see `README.md`.
+
+---
+
+## Table of Contents
+
+- [Development Guide](#development-guide)
+  - [Quick Start](#quick-start)
+  - [Adding a New Widget Style](#adding-a-new-widget-style)
+  - [Embed System](#embed-system)
+  - [Deployment](#deployment)
+- [Adaptive Design Spec](#adaptive-design-spec)
+- [Changelog](#changelog)
+- [Issues & Roadmap](#issues--roadmap)
+
+---
+
+## Development Guide
+
+### Quick Start
+
+```bash
+npm install
+npm run dev          # http://localhost:5173
+npm run build        # tsc && vite build → dist/
+npm run preview      # Preview build on port 3000
+npm run lint         # ESLint (warnings only, no errors)
+npm run test         # Vitest single run (CI)
+npm run test:watch   # Vitest watch mode (dev)
+npm run test:coverage # Vitest with coverage
+npm run typecheck    # tsc --noEmit
+npm run check        # Full pipeline: lint + typecheck + test
+```
+
+### Adding a New Widget Style
+
+1. Create the component in `src/presentation/components/widgets/calendar/styles/` or `clock/styles/`
+2. Add it to `CalendarWidget.tsx` / `ClockWidget.tsx` in the switch on `settings.style`
+3. Update `CalendarSettings.ts` / `ClockSettings.ts` — add the value to the `style` union type
+4. Update `Sidebar.tsx` — add to `WIDGET_CATEGORIES`
+5. Update `WidgetFactoryImpl.getDefaultSettings` if needed
+
+**Responsiveness (required):**
+- Use `widgetTokens.ts` for all sizing — never hardcode pixel values
+- Use `clamp()` for typography, padding, spacing
+- Container constraints: `min-width: 200px`, `max-width: min(420px, 95vw)` (calendar) or `min(360px, 95vw)` (clock)
+
+### Embed System
+
+Widgets are embedded as iframes. All configuration lives in the URL query string.
+
+- **Compact format:** `/embed/calendar?c=<encoded>` — field shorthand, color palette indexing, default omission (60-70% smaller)
+- **Legacy format:** `/embed/calendar?config=<base64>` — still supported for decoding
+- **EmbedScaleWrapper** (`src/presentation/components/embed/EmbedScaleWrapper.tsx`):
+  - ResizeObserver measures the iframe container
+  - Calculates `scale = min(containerWidth/420, containerHeight/380, 1)`
+  - Applies `transform: scale(scale)` — min scale 0.25
+  - Prevents widget cutoff in narrow Notion iframes
+
+**Notion cache-busting tip:** append a unique query param to force refresh:
+```
+https://your-domain.com/embed/calendar?c=...&ts=123456789
+```
+
+### Deployment
+
+- Push to `main` or `Version-1` triggers Vercel deploy
+- Build command: `tsc && npx vite build`
+- Output: `dist/`
+- `vercel.json` handles SPA rewrites
+
+---
+
+## Adaptive Design Spec
+
+All widgets use shared design tokens from `src/presentation/themes/widgetTokens.ts`.
+
+### Breakpoints
+
+| Name | Width | Target |
+|------|-------|--------|
+| xs | 375px | iPhone SE, narrow embeds |
+| sm | 480px | Mobile |
+| md | 640px | Tablets |
+| lg | 1024px | Desktop |
+
+### Container Tokens
+
+```
+min-width:  200px
+max-width:  min(420px, 95vw)    — calendar
+            min(360px, 95vw)    — clock
+padding:    clamp(12px, 4vw, 24px)
+```
+
+### Typography Tokens
+
+```
+Heading:    clamp(14px, 4vw, 22px)
+Body:       clamp(12px, 2.8vw, 16px)
+Small:      clamp(10px, 2.2vw, 14px)
+```
+
+### Spacing Tokens
+
+```
+gap:    clamp(2px, 1vw, 8px)
+margin: clamp(8px, 2vw, 16px)
+```
+
+### Per-Widget Implementation
+
+| Widget | Approach |
+|--------|----------|
+| Modern Grid | Token imports, `clamp()` for typography and spacing |
+| Modern Weekly | `width: 100%` + max-width from tokens, CSS grid, `clamp()` throughout |
+| Modern Clock | `clamp()` for font-size and padding, adaptive DateDisplay |
+| Analog Classic | `--clock-size: clamp(120px, 35vw, 200px)`, hands scale via `calc(var(--clock-size) / 160px)` |
+
+---
+
+## Changelog
+
+### Dev Pipeline — Linting, Testing, Logging, Error Handling
+
+Added complete development infrastructure:
+- **ESLint:** `.eslintrc.cjs` with `@typescript-eslint`, `react-hooks`, `react-refresh` plugins
+- **Vitest:** 4 test suites (29 tests) — CalendarSettings, ClockSettings, Widget, CompactUrlCodec
+- **Logger:** `src/infrastructure/services/Logger.ts` — dev-only, formatted, color-coded; replaced all 11 `console.error`/`console.log` calls across 7 files
+- **Error Boundary:** `src/presentation/components/ErrorBoundary.tsx` wrapping `App.tsx` (outside ThemeProvider)
+- **Global error handlers:** `window.onerror` + `window.onunhandledrejection` in `main.tsx`
+- **npm scripts:** `test`, `test:watch`, `test:coverage`, `typecheck`, `check` (full pipeline)
+
+Resolves issues #1, #2, #3. Partially resolves #15 (logging replacement done, user-facing feedback still TODO).
+
+### Project Simplification
+
+Removed Weather, Test Widget, Digital Minimal (clock), World Time (clock), Compact Date (calendar), and Aesthetic (calendar). Kept only:
+- **Calendar:** Modern Grid, Modern Weekly
+- **Clock:** Modern Digital, Analog Classic
+
+Removed routes: `/embed/weather`, `/embed/test`, `/test`.
+
+### Widget Tokens & Adaptivity
+
+Created `widgetTokens.ts` with shared responsive tokens (containers, typography, spacing). All four widgets refactored to use `clamp()` values and token-based sizing. Widgets now render correctly from 200px to 1920px+.
+
+### EmbedScaleWrapper
+
+New component for iframe scaling. Uses ResizeObserver to calculate and apply CSS transform scale so widgets don't get cut off in Notion embeds.
+
+### Copy Embed URL Button
+
+Redesigned with larger padding (`16px 24px`), `min-height: 44px`, increased icon size, `white-space: nowrap`.
+
+### Vercel Build Fix
+
+Changed build command from `vite build` to `npx vite build` to resolve `vite: command not found` on Vercel.
+
+---
+
+## Issues & Roadmap
+
+> Audit date: 2026-02-07 | Branch: `Version-1` | 49 issues identified
+
+### Critical Issues
+
+| # | Issue | Location | Details |
+|---|-------|----------|---------|
+| 1 | ~~**No ESLint config**~~ | Root | **RESOLVED** — `.eslintrc.cjs` created with TS + React hooks + react-refresh |
+| 2 | ~~**No tests or test framework**~~ | Entire project | **RESOLVED** — Vitest 1.6 + 4 test suites (29 tests) |
+| 3 | ~~**No React Error Boundary**~~ | Missing globally | **RESOLVED** — `ErrorBoundary.tsx` wraps App, fallback card + reload |
+| 4 | **Missing static assets** | `public/` | `og-image.png` and `vite.svg` referenced in `index.html` don't exist |
+| 5 | **Incomplete CSS rule** | `CalendarEmbedPage.tsx:45-46` | Unterminated selector in `GlobalEmbedStyles` |
+| 6 | **Default settings mismatch** | `WidgetFactoryImpl.ts` vs `CompactUrlCodec.ts` | Factory defaults `'modern-grid'`, Codec defaults `'detailed'` |
+| 7 | **Color palette case-sensitivity** | `CompactUrlCodec.ts:64-87` | `indexOf` exact match — lowercase hex won't match uppercase palette |
+| 8 | **String decoding ambiguity** | `CompactUrlCodec.ts:188-194` | Single-letter codes resolve via fragile `.includes()` heuristics |
+
+### High Priority Issues
+
+| # | Issue | Location | Details |
+|---|-------|----------|---------|
+| 9 | **Excessive `any` types** | `Widget.ts`, `WidgetRepository.ts`, `ManageWidget.ts` | Settings typed as `any` throughout domain layer |
+| 10 | **Weak `Widget.isValid()`** | `Widget.ts:31-33` | Only checks truthiness, not type/shape validity |
+| 11 | **No settings validation** | `CalendarSettings.ts:11-20`, `ClockSettings.ts:13-24` | Accepts any values — no format/range/enum checks |
+| 12 | **Calendar grid bug** | `ModernGrid.tsx:300-317` | `showWeekends=false` hardcodes 30-day loop, actual weekday count varies |
+| 13 | **Weekday header mismatch** | `ModernWeeklyCalendar.tsx:171, 268-298` | `[Tue,Wed,...Mon]` order doesn't match grid |
+| 14 | **Analog clock transition bug** | `AnalogClassicClock.tsx:153-172` | 59→0 second wrap causes visible snap-back animation |
+| 15 | ~~**Silent error handling**~~ | `StudioPage.tsx`, `CompactUrlCodec.ts`, `WidgetRepositoryImpl.ts` | **PARTIALLY RESOLVED** — All `console.error` replaced with `Logger`; user feedback still TODO |
+| 16 | **Weak ID generation** | `WidgetFactoryImpl.ts:59-61` | `Math.random()` collision risk + deprecated `.substr()` |
+| 17 | **DI bypass in embed pages** | `CalendarEmbedPage.tsx:103`, `ClockEmbedPage.tsx:66` | Direct `new UrlCodecService()` instead of DIContainer |
+| 18 | **Boolean coercion bug** | `CalendarSettings.ts:15`, `ClockSettings.ts:18` | String `"false"` from URL is truthy, treated as `true` |
+| 19 | **No `fromEmbedData` validation** | `Widget.ts:44-46` | Constructs Widget without checking fields exist |
+| 20 | **Base64 padding edge case** | `CompactUrlCodec.ts:139` | Invalid base64 length silently corrupts data |
+
+### Medium Priority Issues
+
+#### Accessibility
+
+| # | Issue | Location |
+|---|-------|----------|
+| 21 | **Missing ARIA on navigation** | `ModernGrid.tsx:336-357` — no `aria-label` on prev/next buttons |
+| 22 | **Missing ARIA on sidebar** | `Sidebar.tsx:285-288` — no `aria-expanded`/`aria-controls` |
+| 23 | **Missing ARIA on copy button** | `Header.tsx:205-215` — state not announced to screen readers |
+| 24 | **Focus indicators removed** | `Sidebar.tsx:119-121` — `outline: none` with no replacement |
+| 25 | **No keyboard navigation** | `ModernGrid.tsx`, `Sidebar.tsx` — not keyboard-accessible |
+| 26 | **Dates not semantically accessible** | `ModernGrid.tsx:374-388` — missing role/aria on disabled days |
+
+#### Responsiveness & Styling
+
+| # | Issue | Location |
+|---|-------|----------|
+| 27 | **Fixed panel width** | `CustomizationPanel.tsx:14` — `width: 320px` breaks on mobile |
+| 28 | **Hardcoded pixels** | `CustomizationPanel.tsx:16-210` — should use theme tokens |
+| 29 | **Hardcoded colors in embeds** | `CalendarEmbedPage.tsx:62-92`, `ClockEmbedPage.tsx:23-57` |
+| 30 | **Hardcoded colors in weekly calendar** | `ModernWeeklyCalendar.tsx:13-165` |
+| 31 | **Hardcoded colors in clocks** | `ModernClock.tsx:53-79`, `AnalogClassicClock.tsx:72-122` |
+| 32 | **Magic numbers in StudioPage** | `StudioPage.tsx:26-52` — hardcoded header height assumptions |
+| 33 | **Inconsistent spacing** | `CustomizationPanel.tsx` — mix of px and theme tokens |
+
+#### Performance
+
+| # | Issue | Location |
+|---|-------|----------|
+| 34 | **Missing `React.memo`** | `ModernGrid.tsx`, `ModernWeeklyCalendar.tsx`, `ClockWidget.tsx` |
+| 35 | **Clock interval drift** | `ClockWidget.tsx:17-22` — not synced to second boundaries |
+| 36 | **Redundant resize listener** | `EmbedScaleWrapper.tsx:38-63` — duplicates ResizeObserver |
+| 37 | **Array index as React key** | `ModernGrid.tsx:377`, `ModernWeeklyCalendar.tsx:277, 292` |
+| 38 | **Missing `useCallback`** | `ModernGrid.tsx:319-325` — handlers recreated every render |
+| 39 | **Clipboard error swallowed** | `Header.tsx:128-133` |
+
+#### Architecture & Code Quality
+
+| # | Issue | Location |
+|---|-------|----------|
+| 40 | **Window global in infrastructure** | `WidgetRepositoryImpl.ts`, `UrlCodecService.ts`, `CompactUrlCodec.ts` |
+| 41 | **Static method bypasses DI** | `WidgetFactoryImpl.ts:63-72` |
+| 42 | **Unused `EmbedController`** | `EmbedController.tsx` — empty passthrough component |
+| 43 | **Type casts without guards** | `CustomizationPanel.tsx:244-387` |
+| 44 | **Inconsistent error patterns** | `ManageWidget.ts:25-28` |
+| 45 | **Mixed-language comments** | `ModernWeeklyCalendar.tsx`, `vite.config.ts` |
+| 46 | **Deprecated `.substr()`** | `WidgetFactoryImpl.ts:60` |
+
+#### Localization
+
+| # | Issue | Location |
+|---|-------|----------|
+| 47 | **Hardcoded English month/day names** | `ModernGrid.tsx:274-280` |
+| 48 | **Hardcoded `'en-US'` locale** | `ModernClock.tsx:141`, `AnalogClassicClock.tsx:175`, `ModernWeeklyCalendar.tsx:212` |
+| 49 | **Sunday-first week assumed** | `ModernGrid.tsx:293-298` |
+
+### Roadmap
+
+#### Phase 1 — Stability & Correctness
+
+> **Highest priority** — bugs that affect every embedded widget
+
+- [ ] Fix incomplete CSS rule in `CalendarEmbedPage.tsx` GlobalEmbedStyles (#5)
+- [ ] Align default settings between `WidgetFactoryImpl` and `CompactUrlCodec` (#6)
+- [ ] Fix color palette case bug — normalize to uppercase before lookup (#7)
+- [ ] Fix string decoding — explicit field→value map instead of heuristics (#8)
+- [ ] Fix calendar grid for `showWeekends=false` — dynamic weekday count (#12)
+- [ ] Fix weekday header alignment in `ModernWeeklyCalendar` (#13)
+- [ ] Fix analog clock 59→0 transition (#14)
+- [ ] Fix boolean coercion — parse `'true'`/`'false'` strings explicitly (#18)
+- [ ] Add missing favicon and OG image to `/public` (#4)
+- [ ] Replace `Math.random().substr()` with `crypto.randomUUID()` (#16)
+
+#### Phase 2 — Type Safety & Validation
+
+> **High priority** — prevent future bugs at the type level
+
+- [ ] Replace `any` with `CalendarSettings | ClockSettings` generics (#9)
+- [ ] Add validation to settings constructors — color format, range, enums (#11)
+- [ ] Strengthen `Widget.isValid()` — validate type and settings shape (#10)
+- [ ] Add runtime validation at URL decode boundary (#19, #20)
+- [ ] Replace type casts with type guards in `CustomizationPanel` (#43)
+- [ ] Enforce DI consistently — embed pages use `DIContainer` (#17)
+
+#### Phase 3 — Developer Experience
+
+> **High priority** — catch regressions, enable refactoring
+
+- [x] Add ESLint configuration (#1) — `.eslintrc.cjs` with TS + React hooks
+- [x] Set up Vitest — tests for codec roundtrip, settings validation, widget entity (#2) — 4 suites, 29 tests
+- [x] Add React Error Boundary for `App.tsx` (#3) — `ErrorBoundary.tsx` + global handlers in `main.tsx`
+- [x] Replace `console.error` with Logger utility (#15) — dev-only, formatted, color-coded
+- [ ] Add user-visible error feedback — toast/snackbar for user-facing errors (#15 remaining)
+- [ ] Remove dead code — `EmbedController`, unused imports (#42)
+
+#### Phase 4 — Accessibility & UX
+
+> **Medium priority** — WCAG basics
+
+- [ ] Add ARIA labels: nav buttons, sidebar toggles, copy button (#21-23, #26)
+- [ ] Restore focus indicators with `:focus-visible` (#24)
+- [ ] Add keyboard navigation for calendar grid (#25)
+- [ ] Make CustomizationPanel responsive — `clamp()` or `max-width` (#27)
+- [ ] Move hardcoded colors to theme (#29-31)
+- [ ] Replace magic numbers with theme values (#32)
+
+#### Phase 5 — Performance
+
+> **Medium priority** — smoother embed experience
+
+- [ ] `React.memo` on widget components (#34)
+- [ ] `useCallback` on navigation handlers (#38)
+- [ ] Sync clock to second boundary (#35)
+- [ ] Remove redundant resize listener from `EmbedScaleWrapper` (#36)
+- [ ] Use stable date-based keys for calendar days (#37)
+
+#### Phase 6 — Internationalization
+
+> **Lower priority** — non-English markets
+
+- [ ] Use `Intl.DateTimeFormat` with browser locale for month/day names (#47)
+- [ ] Replace hardcoded `'en-US'` with configurable locale (#48)
+- [ ] Support Monday-first weeks based on locale (#49)
+- [ ] Standardize code comments to English (#45)
+
+#### Phase 7 — Polish
+
+> **Lowest priority** — final quality pass
+
+- [ ] Loading skeletons for widget preview
+- [ ] Document compact URL encoding algorithm
+- [ ] Clean up `_redirects` Netlify artifact
+- [ ] Audit dependency versions
+- [ ] Replace deprecated `.substr()` (#46)

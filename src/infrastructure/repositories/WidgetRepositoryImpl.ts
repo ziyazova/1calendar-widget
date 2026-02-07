@@ -3,6 +3,7 @@ import { WidgetRepository } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { UrlCodecService } from '../services/url-codec/UrlCodecService';
+import { Logger } from '../services/Logger';
 
 // Infrastructure implementation of Widget Repository
 export class WidgetRepositoryImpl implements WidgetRepository {
@@ -31,7 +32,7 @@ export class WidgetRepositoryImpl implements WidgetRepository {
 
   // Использует новый компактный кодек для максимально коротких URL
   saveToUrl(widget: Widget): string {
-    const baseUrl = window.location.origin;
+    const baseUrl = import.meta.env.VITE_EMBED_BASE_URL || window.location.origin;
     return this.urlCodec.createSuperCompactUrl(baseUrl, widget.type, widget.settings);
   }
 
@@ -55,7 +56,7 @@ export class WidgetRepositoryImpl implements WidgetRepository {
           return null;
       }
     } catch (error) {
-      console.error('Failed to create widget from URL config:', error);
+      Logger.error('WidgetRepository', 'Failed to create widget from URL config', error);
       return null;
     }
   }

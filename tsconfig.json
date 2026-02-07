@@ -6,6 +6,7 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "types": ["vitest/globals", "vite/client"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

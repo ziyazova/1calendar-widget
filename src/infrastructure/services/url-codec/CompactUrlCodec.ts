@@ -1,3 +1,5 @@
+import { Logger } from '../Logger';
+
 // Компактный кодек для минимальных URL
 export class CompactUrlCodec {
   // Карта сокращений для экономии байтов
@@ -205,7 +207,7 @@ export class CompactUrlCodec {
 
       return { widgetType, settings };
     } catch (error) {
-      console.error('Failed to decode compact URL:', error);
+      Logger.error('CompactUrlCodec', 'Failed to decode compact URL', error);
       return null;
     }
   }

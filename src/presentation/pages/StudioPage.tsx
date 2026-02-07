@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
@@ -87,7 +88,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       setCurrentWidget(updatedWidget);
       setCurrentWidgetKey(`${type}-${style}`);
     } catch (error) {
-      console.error('Failed to create widget with style:', error);
+      Logger.error('StudioPage', 'Failed to create widget with style', error);
     }
   };
 
@@ -101,7 +102,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         setCurrentWidget(widget);
         setCurrentWidgetKey(type);
       } catch (error) {
-        console.error('Failed to create widget:', error);
+        Logger.error('StudioPage', 'Failed to create widget', error);
       }
     }
   };
@@ -116,7 +117,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       );
       setCurrentWidget(updatedWidget);
     } catch (error) {
-      console.error('Failed to update widget:', error);
+      Logger.error('StudioPage', 'Failed to update widget', error);
     }
   };
 
@@ -128,9 +129,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     navigator.clipboard.writeText(embedUrl)
       .then(() => {
         // Show success feedback
-        console.log('Embed URL copied to clipboard');
+        Logger.info('StudioPage', 'Embed URL copied to clipboard');
       })
-      .catch(console.error);
+      .catch((err) => Logger.error('StudioPage', 'Failed to copy embed URL', err));
   };
 
   return (

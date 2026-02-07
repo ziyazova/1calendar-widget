@@ -60,9 +60,7 @@ npm run build
 
 ## Документация
 
-- [docs/CHANGELOG.md](docs/CHANGELOG.md) — история изменений
-- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — руководство для разработчиков и агентов
-- [docs/ADAPTIVE-WIDGETS-PLAN.md](docs/ADAPTIVE-WIDGETS-PLAN.md) — план адаптивности виджетов
+- [docs/PROJECT-DOCS.md](docs/PROJECT-DOCS.md) — dev guide, adaptive design spec, changelog, issues & roadmap
 
 ## Embed для Notion
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import { Logger } from '../../infrastructure/services/Logger';
 import { CalendarWidget } from '../components/widgets/CalendarWidget';
 import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
 import { Widget } from '../../domain/entities/Widget';
@@ -118,7 +119,7 @@ export const CalendarEmbedPage: React.FC = () => {
         setWidget(defaultWidget);
       }
     } catch (err) {
-      console.error('Failed to load calendar widget:', err);
+      Logger.error('CalendarEmbed', 'Failed to load calendar widget', err);
       setError('Failed to load calendar widget configuration');
     } finally {
       setLoading(false);

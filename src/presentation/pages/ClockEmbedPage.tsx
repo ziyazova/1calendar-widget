@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Logger } from '../../infrastructure/services/Logger';
 import { ClockWidget } from '../components/widgets/ClockWidget';
 import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
 import { Widget } from '../../domain/entities/Widget';
@@ -81,7 +82,7 @@ export const ClockEmbedPage: React.FC = () => {
         setWidget(defaultWidget);
       }
     } catch (err) {
-      console.error('Failed to load clock widget:', err);
+      Logger.error('ClockEmbed', 'Failed to load clock widget', err);
       setError('Failed to load clock widget configuration');
     } finally {
       setLoading(false);
