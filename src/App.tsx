@@ -16,7 +16,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider theme={theme}>
-        <Router basename="/">
+        <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />

@@ -51,7 +51,8 @@ export class CompactUrlCodec {
     // Calendar
     defaultView: 'month',
     showWeekends: true,
-    style: 'detailed',
+    // Note: `style` has no default here — it differs per widget type
+    // (calendar: 'modern-grid', clock: 'modern'), so it's always encoded
 
     // Clock
     showSeconds: true,

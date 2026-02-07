@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Logger } from '../../../infrastructure/services/Logger';
 
 /** Default reference size of the widget - used to calculate scale */
 const DEFAULT_REF_WIDTH = 420;
@@ -43,9 +44,13 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
+  Logger.debug('EmbedScaleWrapper', 'Render with ref size', { refWidth, refHeight });
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+
+    Logger.info('EmbedScaleWrapper', 'Mounting scale observer', { refWidth, refHeight });
 
     const updateScale = () => {
       const w = el.clientWidth;
@@ -54,19 +59,27 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
 
       const scaleX = (w - 16) / refWidth;
       const scaleY = (h - 16) / refHeight;
-      const newScale = Math.min(scaleX, scaleY, MAX_SCALE);
-      setScale(Math.max(MIN_SCALE, newScale));
+      const rawScale = Math.min(scaleX, scaleY, MAX_SCALE);
+      const newScale = Math.max(MIN_SCALE, rawScale);
+
+      Logger.debug('EmbedScaleWrapper', 'Scale calculation', {
+        container: `${w}x${h}`,
+        ref: `${refWidth}x${refHeight}`,
+        scaleX: scaleX.toFixed(3),
+        scaleY: scaleY.toFixed(3),
+        finalScale: newScale.toFixed(3),
+      });
+
+      setScale(newScale);
     };
 
     const rafId = requestAnimationFrame(updateScale);
     const observer = new ResizeObserver(updateScale);
     observer.observe(el);
-    window.addEventListener('resize', updateScale);
 
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
-      window.removeEventListener('resize', updateScale);
     };
   }, [refWidth, refHeight]);
 

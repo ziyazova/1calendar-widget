@@ -32,6 +32,7 @@ npm run test:watch   # Vitest watch mode (dev)
 npm run test:coverage # Vitest with coverage
 npm run typecheck    # tsc --noEmit
 npm run check        # Full pipeline: lint + typecheck + test
+npm run test:smoke   # Smoke test for embed size (terminal-visible logs)
 ```
 
 ### Adding a New Widget Style
@@ -54,10 +55,24 @@ Widgets are embedded as iframes. All configuration lives in the URL query string
 - **Compact format:** `/embed/calendar?c=<encoded>` — field shorthand, color palette indexing, default omission (60-70% smaller)
 - **Legacy format:** `/embed/calendar?config=<base64>` — still supported for decoding
 - **EmbedScaleWrapper** (`src/presentation/components/embed/EmbedScaleWrapper.tsx`):
+  - Accepts `refWidth`/`refHeight` props (from widget `embedWidth`/`embedHeight` settings)
   - ResizeObserver measures the iframe container
-  - Calculates `scale = min(containerWidth/420, containerHeight/380, 1)`
-  - Applies `transform: scale(scale)` — min scale 0.25
-  - Prevents widget cutoff in narrow Notion iframes
+  - Calculates `scale = min(containerWidth/refWidth, containerHeight/refHeight, 2.0)`
+  - Applies `transform: scale(scale)` — range: **0.25–2.0** (scales both down and up)
+  - Logs scale calculations via Logger in dev mode
+
+#### Embed Size Settings
+
+Users configure embed dimensions in the studio via Width/Height sliders. Values are stored in `CalendarSettings.embedWidth/embedHeight` and `ClockSettings.embedWidth/embedHeight`, encoded in URL as `ew`/`eh`.
+
+| Widget | Property | Min | Default | Max |
+|--------|----------|-----|---------|-----|
+| Calendar | embedWidth | 200 | 420 | 800 |
+| Calendar | embedHeight | 200 | 380 | 600 |
+| Clock | embedWidth | 200 | 360 | 600 |
+| Clock | embedHeight | 200 | 360 | 600 |
+
+Default values are omitted from the URL to keep it short. The embed pages extract these values and pass them to `EmbedScaleWrapper`.
 
 **Notion cache-busting tip:** append a unique query param to force refresh:
 ```
@@ -136,6 +151,33 @@ margin: clamp(8px, 2vw, 16px)
 
 ## Changelog
 
+### Console-Clean Bugfix Sweep
+
+Fixed all issues that produced browser console warnings/errors:
+
+- **#5** — Completed unterminated CSS selector in `CalendarEmbedPage.tsx` GlobalEmbedStyles
+- **#6** — Removed stale `style: 'detailed'` default from `CompactUrlCodec`; style is now always encoded (differs per widget type)
+- **#4** — Added `vite.svg` favicon to `public/` (was 404ing)
+- **#14** — Fixed analog clock 59→0 snap-back: second hand now tracks cumulative rotation, always rotating forward
+- **#16/#46** — Replaced `Math.random().toString(36).substr(2,9)` with `crypto.randomUUID()` in `WidgetFactoryImpl`
+- **#36** — Removed redundant `window.addEventListener('resize')` from `EmbedScaleWrapper`; ResizeObserver handles all resize events
+- **#37** — Fixed duplicate React keys in `ModernGrid.tsx` (weekday headers `S`,`T` duplicated) and `ModernWeeklyCalendar.tsx`; now using positional index for static headers and `toISOString()`/day-number keys for day cells
+- **#39** — Confirmed clipboard errors already logged via Logger in `StudioPage.tsx`
+
+### Embed Size Controls & Dynamic Scaling
+
+Added user-configurable embed dimensions so widgets scale properly in Notion iframes of any size:
+
+- **New settings:** `embedWidth`/`embedHeight` on both `CalendarSettings` and `ClockSettings`
+- **Studio UI:** Width/Height sliders in "Embed Size" section of `CustomizationPanel`
+- **EmbedScaleWrapper:** Now accepts `refWidth`/`refHeight` props, scales **up to 2.0x** (previously capped at 1.0). Widgets fill large iframes instead of floating small
+- **URL encoding:** New fields encoded as `ew`/`eh` in compact URL; defaults omitted for short URLs
+- **Dev logging:** Logger calls in EmbedScaleWrapper (scale math), embed pages (parsed settings), CustomizationPanel (slider changes)
+- **Smoke test:** `src/test/embed-size-smoke.test.ts` (13 tests) — exercises full pipeline from settings through URL encoding to scale calculation, with `[SMOKE]` tagged terminal output. Run via `npm run test:smoke`
+- **Tests:** 5 suites, 46 tests total (up from 4 suites, 29 tests)
+
+Files modified: `CalendarSettings.ts`, `ClockSettings.ts`, `CompactUrlCodec.ts`, `EmbedScaleWrapper.tsx`, `CalendarEmbedPage.tsx`, `ClockEmbedPage.tsx`, `CustomizationPanel.tsx` + corresponding test files.
+
 ### Fix Notion Embed URL
 
 Embed URLs were using `window.location.origin`, which captured preview/branch deployment domains. Vercel blocks these with authentication (`401 + X-Frame-Options: DENY`), and Notion/Iframely caches the rejection. Fixed by using `VITE_EMBED_BASE_URL` env var (production domain) instead. See `.env.production`.
@@ -144,7 +186,7 @@ Embed URLs were using `window.location.origin`, which captured preview/branch de
 
 Added complete development infrastructure:
 - **ESLint:** `.eslintrc.cjs` with `@typescript-eslint`, `react-hooks`, `react-refresh` plugins
-- **Vitest:** 4 test suites (29 tests) — CalendarSettings, ClockSettings, Widget, CompactUrlCodec
+- **Vitest:** 5 test suites (46 tests) — CalendarSettings, ClockSettings, Widget, CompactUrlCodec, embed-size-smoke
 - **Logger:** `src/infrastructure/services/Logger.ts` — dev-only, formatted, color-coded; replaced all 11 `console.error`/`console.log` calls across 7 files
 - **Error Boundary:** `src/presentation/components/ErrorBoundary.tsx` wrapping `App.tsx` (outside ThemeProvider)
 - **Global error handlers:** `window.onerror` + `window.onunhandledrejection` in `main.tsx`
@@ -189,9 +231,9 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 | 1 | ~~**No ESLint config**~~ | Root | **RESOLVED** — `.eslintrc.cjs` created with TS + React hooks + react-refresh |
 | 2 | ~~**No tests or test framework**~~ | Entire project | **RESOLVED** — Vitest 1.6 + 4 test suites (29 tests) |
 | 3 | ~~**No React Error Boundary**~~ | Missing globally | **RESOLVED** — `ErrorBoundary.tsx` wraps App, fallback card + reload |
-| 4 | **Missing static assets** | `public/` | `og-image.png` and `vite.svg` referenced in `index.html` don't exist |
-| 5 | **Incomplete CSS rule** | `CalendarEmbedPage.tsx:45-46` | Unterminated selector in `GlobalEmbedStyles` |
-| 6 | **Default settings mismatch** | `WidgetFactoryImpl.ts` vs `CompactUrlCodec.ts` | Factory defaults `'modern-grid'`, Codec defaults `'detailed'` |
+| 4 | ~~**Missing static assets**~~ | `public/` | **RESOLVED** — Added `vite.svg` favicon to `public/` |
+| 5 | ~~**Incomplete CSS rule**~~ | `CalendarEmbedPage.tsx:45-46` | **RESOLVED** — Completed the unterminated CSS selector with `max-width: 100%; box-sizing: border-box` |
+| 6 | ~~**Default settings mismatch**~~ | `WidgetFactoryImpl.ts` vs `CompactUrlCodec.ts` | **RESOLVED** — Removed stale `style: 'detailed'` default from codec; style is always encoded since it differs per widget type |
 | 7 | **Color palette case-sensitivity** | `CompactUrlCodec.ts:64-87` | `indexOf` exact match — lowercase hex won't match uppercase palette |
 | 8 | **String decoding ambiguity** | `CompactUrlCodec.ts:188-194` | Single-letter codes resolve via fragile `.includes()` heuristics |
 
@@ -204,9 +246,9 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 | 11 | **No settings validation** | `CalendarSettings.ts:11-20`, `ClockSettings.ts:13-24` | Accepts any values — no format/range/enum checks |
 | 12 | **Calendar grid bug** | `ModernGrid.tsx:300-317` | `showWeekends=false` hardcodes 30-day loop, actual weekday count varies |
 | 13 | **Weekday header mismatch** | `ModernWeeklyCalendar.tsx:171, 268-298` | `[Tue,Wed,...Mon]` order doesn't match grid |
-| 14 | **Analog clock transition bug** | `AnalogClassicClock.tsx:153-172` | 59→0 second wrap causes visible snap-back animation |
+| 14 | ~~**Analog clock transition bug**~~ | `AnalogClassicClock.tsx:153-172` | **RESOLVED** — Cumulative rotation tracking; second hand always rotates forward past 360° |
 | 15 | ~~**Silent error handling**~~ | `StudioPage.tsx`, `CompactUrlCodec.ts`, `WidgetRepositoryImpl.ts` | **PARTIALLY RESOLVED** — All `console.error` replaced with `Logger`; user feedback still TODO |
-| 16 | **Weak ID generation** | `WidgetFactoryImpl.ts:59-61` | `Math.random()` collision risk + deprecated `.substr()` |
+| 16 | ~~**Weak ID generation**~~ | `WidgetFactoryImpl.ts:59-61` | **RESOLVED** — Replaced with `crypto.randomUUID()` |
 | 17 | **DI bypass in embed pages** | `CalendarEmbedPage.tsx:103`, `ClockEmbedPage.tsx:66` | Direct `new UrlCodecService()` instead of DIContainer |
 | 18 | **Boolean coercion bug** | `CalendarSettings.ts:15`, `ClockSettings.ts:18` | String `"false"` from URL is truthy, treated as `true` |
 | 19 | **No `fromEmbedData` validation** | `Widget.ts:44-46` | Constructs Widget without checking fields exist |
@@ -243,10 +285,10 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 |---|-------|----------|
 | 34 | **Missing `React.memo`** | `ModernGrid.tsx`, `ModernWeeklyCalendar.tsx`, `ClockWidget.tsx` |
 | 35 | **Clock interval drift** | `ClockWidget.tsx:17-22` — not synced to second boundaries |
-| 36 | **Redundant resize listener** | `EmbedScaleWrapper.tsx:38-63` — duplicates ResizeObserver |
-| 37 | **Array index as React key** | `ModernGrid.tsx:377`, `ModernWeeklyCalendar.tsx:277, 292` |
+| 36 | ~~**Redundant resize listener**~~ | `EmbedScaleWrapper.tsx` | **RESOLVED** — Removed `window.addEventListener('resize')`, ResizeObserver handles it |
+| 37 | ~~**Array index as React key**~~ | `ModernGrid.tsx`, `ModernWeeklyCalendar.tsx` | **RESOLVED** — Weekday headers use positional index (static), day cells use `toISOString()` or `d-{day}` keys |
 | 38 | **Missing `useCallback`** | `ModernGrid.tsx:319-325` — handlers recreated every render |
-| 39 | **Clipboard error swallowed** | `Header.tsx:128-133` |
+| 39 | ~~**Clipboard error swallowed**~~ | `StudioPage.tsx:134` | **RESOLVED** — Already logged via `Logger.error` in StudioPage |
 
 #### Architecture & Code Quality
 
@@ -258,7 +300,7 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 | 43 | **Type casts without guards** | `CustomizationPanel.tsx:244-387` |
 | 44 | **Inconsistent error patterns** | `ManageWidget.ts:25-28` |
 | 45 | **Mixed-language comments** | `ModernWeeklyCalendar.tsx`, `vite.config.ts` |
-| 46 | **Deprecated `.substr()`** | `WidgetFactoryImpl.ts:60` |
+| 46 | ~~**Deprecated `.substr()`**~~ | `WidgetFactoryImpl.ts:60` | **RESOLVED** via #16 — `crypto.randomUUID()` |
 
 #### Localization
 
@@ -274,16 +316,16 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 
 > **Highest priority** — bugs that affect every embedded widget
 
-- [ ] Fix incomplete CSS rule in `CalendarEmbedPage.tsx` GlobalEmbedStyles (#5)
-- [ ] Align default settings between `WidgetFactoryImpl` and `CompactUrlCodec` (#6)
+- [x] Fix incomplete CSS rule in `CalendarEmbedPage.tsx` GlobalEmbedStyles (#5)
+- [x] Align default settings between `WidgetFactoryImpl` and `CompactUrlCodec` (#6)
 - [ ] Fix color palette case bug — normalize to uppercase before lookup (#7)
 - [ ] Fix string decoding — explicit field→value map instead of heuristics (#8)
 - [ ] Fix calendar grid for `showWeekends=false` — dynamic weekday count (#12)
 - [ ] Fix weekday header alignment in `ModernWeeklyCalendar` (#13)
-- [ ] Fix analog clock 59→0 transition (#14)
+- [x] Fix analog clock 59→0 transition (#14)
 - [ ] Fix boolean coercion — parse `'true'`/`'false'` strings explicitly (#18)
-- [ ] Add missing favicon and OG image to `/public` (#4)
-- [ ] Replace `Math.random().substr()` with `crypto.randomUUID()` (#16)
+- [x] Add missing favicon to `/public` (#4)
+- [x] Replace `Math.random().substr()` with `crypto.randomUUID()` (#16)
 
 #### Phase 2 — Type Safety & Validation
 
@@ -325,8 +367,8 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 - [ ] `React.memo` on widget components (#34)
 - [ ] `useCallback` on navigation handlers (#38)
 - [ ] Sync clock to second boundary (#35)
-- [ ] Remove redundant resize listener from `EmbedScaleWrapper` (#36)
-- [ ] Use stable date-based keys for calendar days (#37)
+- [x] Remove redundant resize listener from `EmbedScaleWrapper` (#36)
+- [x] Use stable date-based keys for calendar days (#37)
 
 #### Phase 6 — Internationalization
 
@@ -345,4 +387,4 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 - [ ] Document compact URL encoding algorithm
 - [ ] Clean up `_redirects` Netlify artifact
 - [ ] Audit dependency versions
-- [ ] Replace deprecated `.substr()` (#46)
+- [x] Replace deprecated `.substr()` (#46) — resolved via #16 (`crypto.randomUUID()`)

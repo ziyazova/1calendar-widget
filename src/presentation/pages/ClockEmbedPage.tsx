@@ -67,9 +67,16 @@ export const ClockEmbedPage: React.FC = () => {
       const codecService = new UrlCodecService();
       const config = codecService.extractConfigFromUrl();
 
+      Logger.info('ClockEmbed', 'Parsing URL config', config);
+
       if (config) {
         if (config.widgetType === 'clock' || !config.widgetType) {
           const settings = new ClockSettings(config.settings || config);
+          Logger.info('ClockEmbed', 'Loaded settings', {
+            embedWidth: settings.embedWidth,
+            embedHeight: settings.embedHeight,
+            style: settings.style,
+          });
           const clockWidget = Widget.createClock('embed-clock', settings);
           setWidget(clockWidget);
         } else {
@@ -117,6 +124,10 @@ export const ClockEmbedPage: React.FC = () => {
   }
 
   const clockSettings = widget.settings as ClockSettings;
+  Logger.debug('ClockEmbed', 'Rendering with embed size', {
+    embedWidth: clockSettings.embedWidth,
+    embedHeight: clockSettings.embedHeight,
+  });
 
   return (
     <EmbedController>

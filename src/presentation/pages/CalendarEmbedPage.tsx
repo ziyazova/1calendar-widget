@@ -43,7 +43,10 @@ const GlobalEmbedStyles = createGlobalStyle`
     width: auto !important;
     height: auto !important;
   }
-  div, section, article, aside, main, header, footer, nav 
+  div, section, article, aside, main, header, footer, nav {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 `;
 
 const EmbedContainer = styled.div`
@@ -104,9 +107,16 @@ export const CalendarEmbedPage: React.FC = () => {
       const codecService = new UrlCodecService();
       const config = codecService.extractConfigFromUrl();
 
+      Logger.info('CalendarEmbed', 'Parsing URL config', config);
+
       if (config) {
         if (config.widgetType === 'calendar' || !config.widgetType) {
           const settings = new CalendarSettings(config.settings || config);
+          Logger.info('CalendarEmbed', 'Loaded settings', {
+            embedWidth: settings.embedWidth,
+            embedHeight: settings.embedHeight,
+            style: settings.style,
+          });
           const calendarWidget = Widget.createCalendar('embed-calendar', settings);
           setWidget(calendarWidget);
         } else {
@@ -156,6 +166,10 @@ export const CalendarEmbedPage: React.FC = () => {
   }
 
   const calendarSettings = widget.settings as CalendarSettings;
+  Logger.debug('CalendarEmbed', 'Rendering with embed size', {
+    embedWidth: calendarSettings.embedWidth,
+    embedHeight: calendarSettings.embedHeight,
+  });
 
   return (
     <EmbedController>

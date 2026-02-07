@@ -31,6 +31,7 @@ npm run test:watch   # Vitest watch mode (dev)
 npm run test:coverage # Vitest with coverage
 npm run typecheck    # tsc --noEmit
 npm run check        # Full pipeline: lint + typecheck + test
+npm run test:smoke   # Smoke test for embed size feature (terminal-visible logs)
 ```
 
 ## Architecture — Clean Architecture (3 Layers)
@@ -55,7 +56,7 @@ src/
 │   │   ├── widgets/     # CalendarWidget, ClockWidget + style variants
 │   │   └── ErrorBoundary.tsx  # React Error Boundary (wraps App)
 │   └── themes/          # theme.ts, colors.ts, widgetTokens.ts
-└── test/                # setup.ts (Vitest + jest-dom config)
+└── test/                # setup.ts, embed-size-smoke.test.ts (smoke tests)
 ```
 
 ### Key Patterns
@@ -87,16 +88,28 @@ src/
 - **Analog Classic** (`analog-classic`) — Circular face, hour marks, animated hands
 
 ### Widget Settings
-- Shared: `primaryColor`, `backgroundColor`, `accentColor`, `borderRadius`, `showBorder`
+- Shared: `primaryColor`, `backgroundColor`, `accentColor`, `borderRadius`, `showBorder`, `embedWidth`, `embedHeight`
 - Calendar-specific: `style`, `defaultView` (month/week/day), `showWeekends`
 - Clock-specific: `style`, `showSeconds`, `format24h`, `showDate`, `fontSize`
+
+### Embed Size Boundaries
+
+| Widget Type | Property | Min | Default | Max |
+|-------------|----------|-----|---------|-----|
+| Calendar | embedWidth | 200 | 420 | 800 |
+| Calendar | embedHeight | 200 | 380 | 600 |
+| Clock | embedWidth | 200 | 360 | 600 |
+| Clock | embedHeight | 200 | 360 | 600 |
 
 ## Embed System
 
 - Widgets are embedded as iframes; all config lives in the URL query string
 - **Compact URL encoding** (`?c=<encoded>`) via `CompactUrlCodec.ts` — field shorthand, color palette indexing, default omission → 60-70% smaller URLs
 - **Legacy format** (`?config=<base64>`) still supported for decoding
-- `EmbedScaleWrapper.tsx`: reference size 420×380px, scales via CSS transform using ResizeObserver (min scale 0.25)
+- `EmbedScaleWrapper.tsx`: accepts `refWidth`/`refHeight` props (from `embedWidth`/`embedHeight` settings), scales via CSS transform using ResizeObserver. Scale range: **0.25–2.0** (scales both down and up)
+- Embed pages (`CalendarEmbedPage`, `ClockEmbedPage`) extract `embedWidth`/`embedHeight` from parsed settings and pass to `EmbedScaleWrapper`
+- Studio `CustomizationPanel` has Width/Height sliders in "Embed Size" section
+- URL encoding: `embedWidth` → `ew`, `embedHeight` → `eh` (omitted when equal to defaults)
 - `index.html` includes a script for iframe auto-height via `postMessage`/`ResizeObserver`
 
 ### Embed URL Base Domain
@@ -125,12 +138,28 @@ Vercel protects non-production deployments (preview, branch) with authentication
 - **Framework:** Vitest 1.6 with jsdom environment, globals enabled
 - **Config:** `vite.config.ts` → `test` block; setup file at `src/test/setup.ts`
 - **Test files:** Co-located with source as `*.test.ts` / `*.test.tsx`
-- **4 test suites (29 tests):**
-  - `CalendarSettings.test.ts` — defaults, overrides, immutability, JSON roundtrip
-  - `ClockSettings.test.ts` — defaults, overrides, immutability, JSON roundtrip
+- **5 test suites (46 tests):**
+  - `CalendarSettings.test.ts` — defaults, overrides (incl. embedWidth/embedHeight), immutability, JSON roundtrip
+  - `ClockSettings.test.ts` — defaults, overrides (incl. embedWidth/embedHeight), immutability, JSON roundtrip
   - `Widget.test.ts` — factory methods, updateSettings, isValid, serialization
-  - `CompactUrlCodec.test.ts` — encode/decode roundtrip, invalid input, palette colors, URL generation
+  - `CompactUrlCodec.test.ts` — encode/decode roundtrip, embed size encoding, invalid input, palette colors, URL generation
+  - `embed-size-smoke.test.ts` — end-to-end smoke test: settings → URL encode → decode → scale math (13 tests with `[SMOKE]` console output)
 - **Run:** `npm run test` (single run) or `npm run test:watch` (dev)
+
+### Smoke Tests (Terminal-Visible Dev Logs)
+
+For features that run in the browser (React components, embed scaling), use **smoke tests** to verify logic from the terminal without needing a browser:
+
+```bash
+npm run test:smoke   # Runs src/test/embed-size-smoke.test.ts
+```
+
+Smoke tests print `[SMOKE]` tagged output to stdout, covering:
+- Settings defaults and JSON roundtrip
+- URL encode/decode with embed size params
+- Scale calculation for 6 iframe size scenarios (tiny → huge)
+
+**Convention:** New smoke tests go in `src/test/<feature>-smoke.test.ts`. Use `console.log` with `[SMOKE]` prefix for terminal-visible output. These run inside Vitest's jsdom environment so `import.meta.env.DEV` is true and Logger works.
 
 ## Logging & Error Handling
 
@@ -139,6 +168,11 @@ Vercel protects non-production deployments (preview, branch) with authentication
   - API: `Logger.error('Module', 'message', ...data)` — also `.debug`, `.info`, `.warn`
   - Formatted: `[HH:mm:ss.sss] [LEVEL] [Module] message` with color-coded console output
   - Replaces all raw `console.error`/`console.log` calls across the codebase
+  - **Active log points** (visible in browser DevTools console during dev):
+    - `[EmbedScaleWrapper]` — ref size on render, scale calculation details (container size, scaleX/Y, final scale)
+    - `[CalendarEmbed]` — URL config parsing, loaded settings (embedWidth/embedHeight/style), render size
+    - `[ClockEmbed]` — same as CalendarEmbed
+    - `[CustomizationPanel]` — embed width/height slider changes
 
 - **Error Boundary** (`src/presentation/components/ErrorBoundary.tsx`):
   - Wraps entire app in `App.tsx` (outside ThemeProvider so it works even if theme breaks)
@@ -170,6 +204,7 @@ Vercel protects non-production deployments (preview, branch) with authentication
 - Error Boundary: `src/presentation/components/ErrorBoundary.tsx`
 - ESLint config: `.eslintrc.cjs`
 - Test setup: `src/test/setup.ts`
+- Smoke test: `src/test/embed-size-smoke.test.ts`
 - Embed base URL: `.env.production` → `VITE_EMBED_BASE_URL`
 
 ## Documentation

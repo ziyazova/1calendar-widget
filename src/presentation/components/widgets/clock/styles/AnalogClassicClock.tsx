@@ -155,21 +155,21 @@ export const AnalogClassicClock: React.FC<{ settings: ClockSettings; time: Date;
   const minutes = time.getMinutes();
   const seconds = time.getSeconds();
 
-  const prevSecondRef = useRef<number>(seconds);
-  const prevSecond = prevSecondRef.current;
-  React.useEffect(() => {
+  // Track cumulative rotation to avoid snap-back at 59→0
+  const totalRotationsRef = useRef(0);
+  const prevSecondRef = useRef(seconds);
+
+  if (seconds !== prevSecondRef.current) {
+    if (prevSecondRef.current === 59 && seconds === 0) {
+      // Wrapped around — keep rotating forward
+      totalRotationsRef.current += 1;
+    }
     prevSecondRef.current = seconds;
-  }, [seconds]);
+  }
 
   const hourRotation = (hours * 30) + (minutes * 0.5);
   const minuteRotation = minutes * 6;
-  const secondRotation = seconds * 6;
-
-  // Определяем transition для секундной стрелки
-  let secondHandTransition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-  if (prevSecond === 59 && seconds === 0) {
-    secondHandTransition = 'none';
-  }
+  const secondRotation = seconds * 6 + totalRotationsRef.current * 360;
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -216,7 +216,6 @@ export const AnalogClassicClock: React.FC<{ settings: ClockSettings; time: Date;
               $rotation={secondRotation}
               $color={settings.accentColor}
               $style={settings.style}
-              $transition={secondHandTransition}
             />
           )}
           <ClockCenter

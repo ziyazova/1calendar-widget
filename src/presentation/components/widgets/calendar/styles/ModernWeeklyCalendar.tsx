@@ -273,8 +273,8 @@ export const ModernWeeklyCalendar: React.FC = () => {
             ))}
           </WeekRow>
           <DaysRow>
-            {weekDates.map((d, i) => (
-              <DayCell key={i} $today={isToday(d)}>
+            {weekDates.map((d) => (
+              <DayCell key={d.toISOString()} $today={isToday(d)}>
                 {d.getDate()}
               </DayCell>
             ))}
@@ -289,7 +289,7 @@ export const ModernWeeklyCalendar: React.FC = () => {
           </WeekRow>
           <MonthGrid>
             {monthMatrix.flat().map((d, i) => (
-              <MonthDayCell key={i} $today={isTodayMonth(d)}>
+              <MonthDayCell key={d != null ? `d-${d}` : `empty-${i}`} $today={isTodayMonth(d)}>
                 {d || ''}
               </MonthDayCell>
             ))}

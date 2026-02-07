@@ -4,6 +4,7 @@ import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
 import { ColorPicker } from '../ColorPicker';
+import { Logger } from '../../../../infrastructure/services/Logger';
 
 interface CustomizationPanelProps {
   widget: Widget | null;
@@ -323,7 +324,11 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 max={widget.type === 'calendar' ? '800' : '600'}
                 step="10"
                 value={(settings as unknown as { embedWidth: number }).embedWidth}
-                onChange={(e) => onSettingsChange({ embedWidth: parseInt(e.target.value) })}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  Logger.info('CustomizationPanel', 'Embed width changed', { embedWidth: val });
+                  onSettingsChange({ embedWidth: val });
+                }}
               />
               <SliderValue>{(settings as unknown as { embedWidth: number }).embedWidth}px</SliderValue>
             </SliderContainer>
@@ -338,7 +343,11 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 max="600"
                 step="10"
                 value={(settings as unknown as { embedHeight: number }).embedHeight}
-                onChange={(e) => onSettingsChange({ embedHeight: parseInt(e.target.value) })}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  Logger.info('CustomizationPanel', 'Embed height changed', { embedHeight: val });
+                  onSettingsChange({ embedHeight: val });
+                }}
               />
               <SliderValue>{(settings as unknown as { embedHeight: number }).embedHeight}px</SliderValue>
             </SliderContainer>

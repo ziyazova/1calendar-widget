@@ -358,9 +358,9 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
       </CalendarHeader>
 
       <WeekDaysGrid $showWeekends={settings.showWeekends}>
-        {(settings.showWeekends ? weekDays : weekDaysWorkdays).map((day) => (
+        {(settings.showWeekends ? weekDays : weekDaysWorkdays).map((day, index) => (
           <WeekDay
-            key={day}
+            key={index}
             $accentColor={settings.accentColor}
             $borderRadius={settings.borderRadius}
             $textColor={textColor}
@@ -372,9 +372,9 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
       </WeekDaysGrid>
 
       <DaysGrid $showWeekends={settings.showWeekends}>
-        {days.map((day, index) => (
+        {days.map((day) => (
           <DayCell
-            key={index}
+            key={day.date.toISOString()}
             $isCurrentMonth={day.isCurrentMonth}
             $isToday={day.isToday}
             $primaryColor={settings.primaryColor}

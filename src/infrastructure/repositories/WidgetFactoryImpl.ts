@@ -58,7 +58,7 @@ export class WidgetFactoryImpl implements WidgetFactory {
   }
 
   private generateId(): string {
-    return Math.random().toString(36).substr(2, 9);
+    return crypto.randomUUID();
   }
 
   // Static method for creating widget from embed config
