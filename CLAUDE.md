@@ -99,6 +99,20 @@ src/
 - `EmbedScaleWrapper.tsx`: reference size 420×380px, scales via CSS transform using ResizeObserver (min scale 0.25)
 - `index.html` includes a script for iframe auto-height via `postMessage`/`ResizeObserver`
 
+### Embed URL Base Domain
+
+**Critical:** Embed URLs must use the **production domain**, not `window.location.origin`.
+
+- Controlled by `VITE_EMBED_BASE_URL` env var (set in `.env.production`)
+- Current production domain: `https://1calendar-widget-aliias-projects-37358320.vercel.app`
+- Falls back to `window.location.origin` if env var is not set (for local dev)
+- Code: `WidgetRepositoryImpl.saveToUrl()` reads `import.meta.env.VITE_EMBED_BASE_URL`
+
+**Why this matters — Vercel + Notion iframe issue:**
+Vercel protects non-production deployments (preview, branch) with authentication by default. This returns `401 + X-Frame-Options: DENY`, which completely blocks iframe embedding. Notion/Iframely caches this rejection server-side, so even after turning off Vercel protection, the embed stays broken for that domain. Using the stable production domain avoids this entirely.
+
+**If the production domain changes:** update `VITE_EMBED_BASE_URL` in `.env.production` and redeploy.
+
 ## Styling System
 
 - **Theme** (`theme.ts`): Apple-inspired tokens — 8px spacing grid, SF Pro font, cubic-bezier transitions, z-index layers, shadow presets
@@ -142,6 +156,7 @@ src/
 - **Responsive design:** Always use `clamp()` and widgetTokens for sizing; never hardcode pixel values in widgets
 - **Immutability:** Settings objects create new instances via spread, never mutate
 - **Logging:** Use `Logger.error('Module', 'msg')` instead of `console.error` — silent in prod
+- **Embed URLs:** Always use `VITE_EMBED_BASE_URL` for embed link generation, never hardcode `window.location.origin` — preview/branch deployments are blocked by Notion
 - **Widget addition guide:** See `docs/DEVELOPMENT.md` for step-by-step instructions
 
 ## File References
@@ -155,6 +170,7 @@ src/
 - Error Boundary: `src/presentation/components/ErrorBoundary.tsx`
 - ESLint config: `.eslintrc.cjs`
 - Test setup: `src/test/setup.ts`
+- Embed base URL: `.env.production` → `VITE_EMBED_BASE_URL`
 
 ## Documentation
 

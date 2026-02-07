@@ -70,6 +70,19 @@ https://your-domain.com/embed/calendar?c=...&ts=123456789
 - Build command: `tsc && npx vite build`
 - Output: `dist/`
 - `vercel.json` handles SPA rewrites
+- **Production domain:** `https://1calendar-widget-aliias-projects-37358320.vercel.app`
+
+### Notion Embed — Vercel Gotcha
+
+**Problem:** Vercel protects non-production deployments (preview/branch URLs) with authentication. This returns `401 + X-Frame-Options: DENY`, which blocks iframe embedding. Notion and its backend service (Iframely) cache this rejection, so even after disabling protection, the embed stays broken for that domain.
+
+**Solution:** Embed URLs always use the production domain via `VITE_EMBED_BASE_URL` (set in `.env.production`), not `window.location.origin`. This ensures embeds work regardless of which deployment the studio is accessed from.
+
+**If embeds break in Notion:**
+1. Check that `VITE_EMBED_BASE_URL` in `.env.production` matches the current production domain
+2. Open the embed URL directly in a browser — if it shows a Vercel login page, Deployment Protection is on
+3. In Vercel: Settings → Deployment Protection → disable "Vercel Authentication" (or set to production only)
+4. If Notion still shows "Click to view content", it may be caching — wait or append `&_=<random>` to bust Notion's cache
 
 ---
 
@@ -122,6 +135,10 @@ margin: clamp(8px, 2vw, 16px)
 ---
 
 ## Changelog
+
+### Fix Notion Embed URL
+
+Embed URLs were using `window.location.origin`, which captured preview/branch deployment domains. Vercel blocks these with authentication (`401 + X-Frame-Options: DENY`), and Notion/Iframely caches the rejection. Fixed by using `VITE_EMBED_BASE_URL` env var (production domain) instead. See `.env.production`.
 
 ### Dev Pipeline — Linting, Testing, Logging, Error Handling
 
