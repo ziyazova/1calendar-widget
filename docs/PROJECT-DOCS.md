@@ -388,3 +388,4 @@ Changed build command from `vite build` to `npx vite build` to resolve `vite: co
 - [ ] Clean up `_redirects` Netlify artifact
 - [ ] Audit dependency versions
 - [x] Replace deprecated `.substr()` (#46) — resolved via #16 (`crypto.randomUUID()`)
+

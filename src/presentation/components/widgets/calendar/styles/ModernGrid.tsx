@@ -17,7 +17,6 @@ const GridContainer = styled.div<{
   $textColor: string;
 }>`
   width: 100%;
-  height: 100%;
   min-width: ${WIDGET_CONTAINER.minWidth};
   max-width: ${WIDGET_CONTAINER.maxWidth};
   padding: ${WIDGET_CONTAINER.padding};
@@ -199,9 +198,7 @@ const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
   gap: ${WIDGET_SPACING.gap};
-  flex: 1;
   align-content: start;
-  min-height: 0;
 `;
 
 const DayCell = styled.button<{
