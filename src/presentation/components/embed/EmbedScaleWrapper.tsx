@@ -31,6 +31,11 @@ interface EmbedScaleWrapperProps {
 /**
  * Wraps embed content and scales it to fit the viewport.
  * Scales both down and up within MIN_SCALE–MAX_SCALE bounds.
+ *
+ * CSS transform doesn't affect layout box, so we use a negative
+ * margin-bottom on ScaledInner to shrink its layout box to match
+ * the visual (scaled) height. This avoids setting explicit height
+ * on the Wrapper which could create a feedback loop with ResizeObserver.
  */
 export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   children,
@@ -56,7 +61,8 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
 
       const scaleX = (w - 16) / refWidth;
       const newScale = Math.min(Math.max(MIN_SCALE, scaleX), MAX_SCALE);
-      const innerH = inner.scrollHeight;
+      // offsetHeight is the unscaled layout height — not affected by transform
+      const innerH = inner.offsetHeight;
 
       Logger.debug('EmbedScaleWrapper', 'Scale calculation', {
         containerWidth: w,
@@ -71,25 +77,33 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
     };
 
     const rafId = requestAnimationFrame(update);
-    const containerObserver = new ResizeObserver(update);
-    const innerObserver = new ResizeObserver(update);
-    containerObserver.observe(el);
-    innerObserver.observe(inner);
+    // Only observe the container (for width changes).
+    // Do NOT observe inner — that creates a feedback loop.
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
 
     return () => {
       cancelAnimationFrame(rafId);
-      containerObserver.disconnect();
-      innerObserver.disconnect();
+      observer.disconnect();
     };
   }, [refWidth]);
 
-  // CSS transform doesn't affect layout box, so set wrapper height
-  // explicitly to match the visual (scaled) height of the content.
-  const visualHeight = contentHeight * scale + 16;
+  // Compensate for CSS transform not affecting layout box.
+  // The layout box is contentHeight (unscaled). The visual height is
+  // contentHeight * scale. The difference is contentHeight * (1 - scale).
+  // A negative margin-bottom shrinks the layout box to match the visual.
+  const marginCompensation = contentHeight > 0 ? contentHeight * (1 - scale) : 0;
 
   return (
-    <Wrapper ref={containerRef} style={{ height: visualHeight > 16 ? `${visualHeight}px` : 'auto' }}>
-      <ScaledInner ref={innerRef} $scale={scale} $width={refWidth}>{children}</ScaledInner>
+    <Wrapper ref={containerRef}>
+      <ScaledInner
+        ref={innerRef}
+        $scale={scale}
+        $width={refWidth}
+        style={{ marginBottom: `-${marginCompensation}px` }}
+      >
+        {children}
+      </ScaledInner>
     </Wrapper>
   );
 };
