@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Logger } from '../../../infrastructure/services/Logger';
 
 /** Default reference width of the widget - used to calculate scale */
-const DEFAULT_REF_WIDTH = 360;
+const DEFAULT_REF_WIDTH = 420;
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 2.0;
 

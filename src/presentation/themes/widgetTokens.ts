@@ -6,7 +6,7 @@
 // Container sizing — all widgets
 export const WIDGET_CONTAINER = {
   minWidth: '200px',
-  maxWidth: 'min(360px, 95vw)',
+  maxWidth: 'min(420px, 95vw)',
   padding: 'clamp(12px, 4vw, 24px)',
   minHeight: 'clamp(160px, 40vw, 220px)',
 } as const;

@@ -12,8 +12,8 @@ describe('CalendarSettings', () => {
       expect(settings.borderRadius).toBe(12);
       expect(settings.showBorder).toBe(true);
       expect(settings.style).toBe('modern-grid');
-      expect(settings.embedWidth).toBe(360);
-      expect(settings.embedHeight).toBe(360);
+      expect(settings.embedWidth).toBe(420);
+      expect(settings.embedHeight).toBe(420);
     });
   });
 

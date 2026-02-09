@@ -39,8 +39,8 @@ describe('Embed Size — Smoke Test', () => {
         embedWidth: s.embedWidth,
         embedHeight: s.embedHeight,
       });
-      expect(s.embedWidth).toBe(360);
-      expect(s.embedHeight).toBe(360);
+      expect(s.embedWidth).toBe(420);
+      expect(s.embedHeight).toBe(420);
     });
 
     it('height equals width after update()', () => {
@@ -118,7 +118,7 @@ describe('Embed Size — Smoke Test', () => {
       const withDefaults = {
         primaryColor: '#667EEA',
         style: 'modern-grid',
-        embedWidth: 360,
+        embedWidth: 420,
         embedHeight: 380,
       };
       const withCustom = {
@@ -145,12 +145,12 @@ describe('Embed Size — Smoke Test', () => {
   // -------- Scale Calculation --------
   describe('Scale math (EmbedScaleWrapper logic)', () => {
     const scenarios = [
-      { name: 'Notion small iframe',  cw: 300, ch: 250, rw: 360, rh: 360 },
-      { name: 'Notion default',       cw: 360, ch: 360, rw: 360, rh: 360 },
-      { name: 'Large iframe',         cw: 800, ch: 600, rw: 360, rh: 360 },
+      { name: 'Notion small iframe',  cw: 300, ch: 250, rw: 420, rh: 380 },
+      { name: 'Notion default',       cw: 420, ch: 380, rw: 420, rh: 380 },
+      { name: 'Large iframe',         cw: 800, ch: 600, rw: 420, rh: 380 },
       { name: 'Custom ref 600x500',   cw: 800, ch: 600, rw: 600, rh: 500 },
-      { name: 'Tiny iframe (clamp)',   cw: 100, ch: 80,  rw: 360, rh: 360 },
-      { name: 'Huge iframe (cap 2x)',  cw: 2000, ch: 1500, rw: 360, rh: 360 },
+      { name: 'Tiny iframe (clamp)',   cw: 100, ch: 80,  rw: 420, rh: 380 },
+      { name: 'Huge iframe (cap 2x)',  cw: 2000, ch: 1500, rw: 420, rh: 380 },
     ];
 
     for (const s of scenarios) {
