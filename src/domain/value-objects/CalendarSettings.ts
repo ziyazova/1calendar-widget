@@ -1,3 +1,6 @@
+/** Calendar aspect ratio: height = width * ASPECT_RATIO */
+const CALENDAR_ASPECT_RATIO = 380 / 420;
+
 export class CalendarSettings {
   public readonly primaryColor: string;
   public readonly backgroundColor: string;
@@ -20,7 +23,7 @@ export class CalendarSettings {
     this.showBorder = settings.showBorder ?? true;
     this.style = settings.style || 'modern-grid';
     this.embedWidth = settings.embedWidth ?? 420;
-    this.embedHeight = settings.embedHeight ?? 380;
+    this.embedHeight = Math.round((this.embedWidth) * CALENDAR_ASPECT_RATIO);
   }
 
   public static fromJson(json: string): CalendarSettings {

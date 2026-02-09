@@ -12,16 +12,14 @@ import { CompactUrlCodec } from '../infrastructure/services/url-codec/CompactUrl
 // ── helpers ──────────────────────────────────────────────────────────
 function simulateScale(
   containerW: number,
-  containerH: number,
+  _containerH: number,
   refW: number,
-  refH: number,
+  _refH: number,
 ) {
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 2.0;
   const scaleX = (containerW - 16) / refW;
-  const scaleY = (containerH - 16) / refH;
-  const raw = Math.min(scaleX, scaleY, MAX_SCALE);
-  return Math.max(MIN_SCALE, raw);
+  return Math.min(Math.max(MIN_SCALE, scaleX), MAX_SCALE);
 }
 
 function log(label: string, data: Record<string, unknown>) {
@@ -45,25 +43,27 @@ describe('Embed Size — Smoke Test', () => {
       expect(s.embedHeight).toBe(380);
     });
 
-    it('custom values survive update()', () => {
-      const s = new CalendarSettings().update({ embedWidth: 700, embedHeight: 500 });
+    it('height is proportional to width after update()', () => {
+      const s = new CalendarSettings().update({ embedWidth: 700 });
       log('CalendarSettings after update()', {
         embedWidth: s.embedWidth,
         embedHeight: s.embedHeight,
       });
       expect(s.embedWidth).toBe(700);
-      expect(s.embedHeight).toBe(500);
+      // height = round(700 * 380/420) = 633
+      expect(s.embedHeight).toBe(Math.round(700 * 380 / 420));
     });
 
-    it('JSON roundtrip preserves embed size', () => {
-      const orig = new CalendarSettings({ embedWidth: 600, embedHeight: 450 });
+    it('JSON roundtrip preserves proportional embed size', () => {
+      const orig = new CalendarSettings({ embedWidth: 600 });
       const restored = CalendarSettings.fromJson(orig.toJson());
       log('CalendarSettings JSON roundtrip', {
         original: { w: orig.embedWidth, h: orig.embedHeight },
         restored: { w: restored.embedWidth, h: restored.embedHeight },
       });
       expect(restored.embedWidth).toBe(600);
-      expect(restored.embedHeight).toBe(450);
+      // height = round(600 * 380/420) = 543
+      expect(restored.embedHeight).toBe(Math.round(600 * 380 / 420));
     });
   });
 

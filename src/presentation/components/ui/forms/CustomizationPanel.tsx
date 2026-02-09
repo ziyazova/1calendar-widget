@@ -334,24 +334,32 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </SliderContainer>
           </FormGroup>
 
-          <FormGroup>
-            <Label>Height</Label>
-            <SliderContainer>
-              <Slider
-                type="range"
-                min="200"
-                max="600"
-                step="10"
-                value={(settings as unknown as { embedHeight: number }).embedHeight}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  Logger.info('CustomizationPanel', 'Embed height changed', { embedHeight: val });
-                  onSettingsChange({ embedHeight: val });
-                }}
-              />
+          {widget.type === 'clock' && (
+            <FormGroup>
+              <Label>Height</Label>
+              <SliderContainer>
+                <Slider
+                  type="range"
+                  min="200"
+                  max="600"
+                  step="10"
+                  value={(settings as unknown as { embedHeight: number }).embedHeight}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    Logger.info('CustomizationPanel', 'Embed height changed', { embedHeight: val });
+                    onSettingsChange({ embedHeight: val });
+                  }}
+                />
+                <SliderValue>{(settings as unknown as { embedHeight: number }).embedHeight}px</SliderValue>
+              </SliderContainer>
+            </FormGroup>
+          )}
+          {widget.type === 'calendar' && (
+            <FormGroup>
+              <Label>Height (auto)</Label>
               <SliderValue>{(settings as unknown as { embedHeight: number }).embedHeight}px</SliderValue>
-            </SliderContainer>
-          </FormGroup>
+            </FormGroup>
+          )}
         </Section>
 
         {/* Calendar specific settings */}
