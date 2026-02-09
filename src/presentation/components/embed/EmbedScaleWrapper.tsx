@@ -2,26 +2,22 @@ import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Logger } from '../../../infrastructure/services/Logger';
 
-/** Default reference size of the widget - used to calculate scale */
+/** Default reference width of the widget - used to calculate scale */
 const DEFAULT_REF_WIDTH = 420;
-const DEFAULT_REF_HEIGHT = 380;
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 2.0;
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: 8px;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
 `;
 
 const ScaledInner = styled.div<{ $scale: number }>`
-  transform-origin: center center;
+  transform-origin: top center;
   transform: scale(${({ $scale }) => $scale});
   flex-shrink: 0;
 `;
@@ -29,7 +25,6 @@ const ScaledInner = styled.div<{ $scale: number }>`
 interface EmbedScaleWrapperProps {
   children: React.ReactNode;
   refWidth?: number;
-  refHeight?: number;
 }
 
 /**
@@ -39,53 +34,61 @@ interface EmbedScaleWrapperProps {
 export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   children,
   refWidth = DEFAULT_REF_WIDTH,
-  refHeight = DEFAULT_REF_HEIGHT,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [contentHeight, setContentHeight] = useState(0);
 
-  Logger.debug('EmbedScaleWrapper', 'Render with ref size', { refWidth, refHeight });
+  Logger.debug('EmbedScaleWrapper', 'Render with ref width', { refWidth });
 
   useEffect(() => {
     const el = containerRef.current;
-    if (!el) return;
+    const inner = innerRef.current;
+    if (!el || !inner) return;
 
-    Logger.info('EmbedScaleWrapper', 'Mounting scale observer', { refWidth, refHeight });
+    Logger.info('EmbedScaleWrapper', 'Mounting scale observer', { refWidth });
 
-    const updateScale = () => {
+    const update = () => {
       const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w <= 0 || h <= 0) return;
+      if (w <= 0) return;
 
       const scaleX = (w - 16) / refWidth;
-      const scaleY = (h - 16) / refHeight;
-      const rawScale = Math.min(scaleX, scaleY, MAX_SCALE);
-      const newScale = Math.max(MIN_SCALE, rawScale);
+      const newScale = Math.min(Math.max(MIN_SCALE, scaleX), MAX_SCALE);
+      const innerH = inner.scrollHeight;
 
       Logger.debug('EmbedScaleWrapper', 'Scale calculation', {
-        container: `${w}x${h}`,
-        ref: `${refWidth}x${refHeight}`,
+        containerWidth: w,
+        refWidth,
+        contentHeight: innerH,
         scaleX: scaleX.toFixed(3),
-        scaleY: scaleY.toFixed(3),
         finalScale: newScale.toFixed(3),
       });
 
       setScale(newScale);
+      setContentHeight(innerH);
     };
 
-    const rafId = requestAnimationFrame(updateScale);
-    const observer = new ResizeObserver(updateScale);
-    observer.observe(el);
+    const rafId = requestAnimationFrame(update);
+    const containerObserver = new ResizeObserver(update);
+    const innerObserver = new ResizeObserver(update);
+    containerObserver.observe(el);
+    innerObserver.observe(inner);
 
     return () => {
       cancelAnimationFrame(rafId);
-      observer.disconnect();
+      containerObserver.disconnect();
+      innerObserver.disconnect();
     };
-  }, [refWidth, refHeight]);
+  }, [refWidth]);
+
+  // CSS transform doesn't affect layout box, so set wrapper height
+  // explicitly to match the visual (scaled) height of the content.
+  const visualHeight = contentHeight * scale + 16;
 
   return (
-    <Wrapper ref={containerRef}>
-      <ScaledInner $scale={scale}>{children}</ScaledInner>
+    <Wrapper ref={containerRef} style={{ height: visualHeight > 16 ? `${visualHeight}px` : 'auto' }}>
+      <ScaledInner ref={innerRef} $scale={scale}>{children}</ScaledInner>
     </Wrapper>
   );
 };

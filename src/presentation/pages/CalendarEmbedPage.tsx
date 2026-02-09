@@ -13,14 +13,11 @@ const GlobalEmbedStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
-    overflow: auto;
+    overflow: hidden;
     background: transparent;
   }
   #root {
     width: 100%;
-    height: 100%;
-    overflow: auto;
   }
   * {
     box-sizing: border-box;
@@ -51,16 +48,12 @@ const GlobalEmbedStyles = createGlobalStyle`
 
 const EmbedContainer = styled.div`
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
   background: transparent;
   padding: 0;
   box-sizing: border-box;
-  overflow: auto;
-  position: relative;
+  overflow: hidden;
 `;
 
 const LoadingState = styled.div`
@@ -177,7 +170,6 @@ export const CalendarEmbedPage: React.FC = () => {
       <EmbedContainer>
         <EmbedScaleWrapper
           refWidth={calendarSettings.embedWidth}
-          refHeight={calendarSettings.embedHeight}
         >
           <CalendarWidget widget={widget} />
         </EmbedScaleWrapper>
