@@ -13,7 +13,6 @@ const GlobalEmbedStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     width: 100%;
-    overflow: hidden;
     background: transparent;
   }
   #root {
@@ -21,28 +20,14 @@ const GlobalEmbedStyles = createGlobalStyle`
   }
   * {
     box-sizing: border-box;
-    max-width: 100%;
-    max-height: 100%;
   }
   body {
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
   }
-  * {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-  }
   img, svg, video, canvas, audio, iframe, embed, object {
     max-width: 100% !important;
-    max-height: 100% !important;
-    width: auto !important;
-    height: auto !important;
-  }
-  div, section, article, aside, main, header, footer, nav {
-    max-width: 100%;
-    box-sizing: border-box;
   }
 `;
 
@@ -53,7 +38,6 @@ const EmbedContainer = styled.div`
   background: transparent;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
 `;
 
 const LoadingState = styled.div`

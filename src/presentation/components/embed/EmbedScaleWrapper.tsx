@@ -13,7 +13,6 @@ const Wrapper = styled.div`
   justify-content: center;
   padding: 8px;
   box-sizing: border-box;
-  overflow: hidden;
 `;
 
 const ScaledInner = styled.div<{ $scale: number }>`

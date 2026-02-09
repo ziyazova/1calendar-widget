@@ -15,7 +15,6 @@ const EmbedContainer = styled.div`
   background: transparent;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
 `;
 
 const LoadingState = styled.div`
