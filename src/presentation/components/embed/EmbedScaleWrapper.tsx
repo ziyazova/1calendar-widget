@@ -11,11 +11,13 @@ const Wrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   padding: 8px;
   box-sizing: border-box;
 `;
 
-const ScaledInner = styled.div<{ $scale: number }>`
+const ScaledInner = styled.div<{ $scale: number; $width: number }>`
+  width: ${({ $width }) => $width}px;
   transform-origin: top center;
   transform: scale(${({ $scale }) => $scale});
   flex-shrink: 0;
@@ -87,7 +89,7 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
 
   return (
     <Wrapper ref={containerRef} style={{ height: visualHeight > 16 ? `${visualHeight}px` : 'auto' }}>
-      <ScaledInner ref={innerRef} $scale={scale}>{children}</ScaledInner>
+      <ScaledInner ref={innerRef} $scale={scale} $width={refWidth}>{children}</ScaledInner>
     </Wrapper>
   );
 };
