@@ -34,7 +34,7 @@ const GridContainer = styled.div<{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: fit-content;
+  aspect-ratio: 1;
   overflow: hidden;
 
   &::before {
@@ -198,9 +198,9 @@ const WeekDay = styled.div<{
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  grid-template-rows: repeat(5, auto);
+  grid-template-rows: repeat(5, 1fr);
   gap: ${WIDGET_SPACING.gap};
-  align-content: start;
+  flex: 1;
 `;
 
 const EmptyCell = styled.div`
