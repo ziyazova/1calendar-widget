@@ -34,6 +34,7 @@ const GridContainer = styled.div<{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  height: fit-content;
   overflow: hidden;
 
   &::before {
