@@ -19,7 +19,6 @@ const GridContainer = styled.div<{
   width: 100%;
   min-width: ${WIDGET_CONTAINER.minWidth};
   max-width: ${WIDGET_CONTAINER.maxWidth};
-  max-height: ${WIDGET_CONTAINER.maxHeight};
   padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
@@ -370,19 +369,22 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
       </WeekDaysGrid>
 
       <DaysGrid $showWeekends={settings.showWeekends}>
-        {days.map((day) => (
-          <DayCell
-            key={day.date.toISOString()}
-            $isCurrentMonth={day.isCurrentMonth}
-            $isToday={day.isToday}
-            $primaryColor={settings.primaryColor}
-            $borderRadius={settings.borderRadius}
-            $textColor={textColor}
-            disabled={!day.isCurrentMonth}
-          >
-            {day.date.getDate()}
-          </DayCell>
-        ))}
+        {days.map((day, index) =>
+          day.isCurrentMonth ? (
+            <DayCell
+              key={day.date.toISOString()}
+              $isCurrentMonth={true}
+              $isToday={day.isToday}
+              $primaryColor={settings.primaryColor}
+              $borderRadius={settings.borderRadius}
+              $textColor={textColor}
+            >
+              {day.date.getDate()}
+            </DayCell>
+          ) : (
+            <div key={`empty-${index}`} />
+          )
+        )}
       </DaysGrid>
     </GridContainer>
   );

@@ -9,7 +9,6 @@ export const WIDGET_CONTAINER = {
   maxWidth: 'min(420px, 95vw)',
   padding: 'clamp(12px, 4vw, 24px)',
   minHeight: 'clamp(160px, 40vw, 220px)',
-  maxHeight: 'min(380px, 95vh)',
 } as const;
 
 // Clock-specific (slightly narrower)

@@ -40,21 +40,20 @@ describe('Embed Size — Smoke Test', () => {
         embedHeight: s.embedHeight,
       });
       expect(s.embedWidth).toBe(420);
-      expect(s.embedHeight).toBe(380);
+      expect(s.embedHeight).toBe(420);
     });
 
-    it('height is proportional to width after update()', () => {
+    it('height equals width after update()', () => {
       const s = new CalendarSettings().update({ embedWidth: 700 });
       log('CalendarSettings after update()', {
         embedWidth: s.embedWidth,
         embedHeight: s.embedHeight,
       });
       expect(s.embedWidth).toBe(700);
-      // height = round(700 * 380/420) = 633
-      expect(s.embedHeight).toBe(Math.round(700 * 380 / 420));
+      expect(s.embedHeight).toBe(700);
     });
 
-    it('JSON roundtrip preserves proportional embed size', () => {
+    it('JSON roundtrip preserves 1:1 embed size', () => {
       const orig = new CalendarSettings({ embedWidth: 600 });
       const restored = CalendarSettings.fromJson(orig.toJson());
       log('CalendarSettings JSON roundtrip', {
@@ -62,8 +61,7 @@ describe('Embed Size — Smoke Test', () => {
         restored: { w: restored.embedWidth, h: restored.embedHeight },
       });
       expect(restored.embedWidth).toBe(600);
-      // height = round(600 * 380/420) = 543
-      expect(restored.embedHeight).toBe(Math.round(600 * 380 / 420));
+      expect(restored.embedHeight).toBe(600);
     });
   });
 

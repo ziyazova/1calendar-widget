@@ -1,5 +1,5 @@
-/** Calendar aspect ratio: height = width * ASPECT_RATIO */
-const CALENDAR_ASPECT_RATIO = 380 / 420;
+/** Calendar aspect ratio: height = width (1:1 square) */
+const CALENDAR_ASPECT_RATIO = 1;
 
 export class CalendarSettings {
   public readonly primaryColor: string;
