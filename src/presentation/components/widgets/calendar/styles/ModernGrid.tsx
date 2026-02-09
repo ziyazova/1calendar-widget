@@ -197,8 +197,14 @@ const WeekDay = styled.div<{
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
+  grid-template-rows: repeat(5, auto);
   gap: ${WIDGET_SPACING.gap};
   align-content: start;
+`;
+
+const EmptyCell = styled.div`
+  aspect-ratio: 1;
+  min-height: clamp(24px, 6vw, 36px);
 `;
 
 const DayCell = styled.button<{
@@ -294,11 +300,13 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
     firstDisplayDay.setDate(firstDisplayDay.getDate() + mondayOffset);
   }
 
+  // Always produce exactly 5 rows of cells
+  const cols = settings.showWeekends ? 7 : 5;
+  const totalCells = cols * 5;
   const days = [];
   const currentDay = new Date(firstDisplayDay);
-  const totalDays = settings.showWeekends ? 35 : 25;
 
-  for (let i = 0; i < totalDays; i++) {
+  while (days.length < totalCells) {
     if (!settings.showWeekends && (currentDay.getDay() === 0 || currentDay.getDay() === 6)) {
       currentDay.setDate(currentDay.getDate() + 1);
       continue;
@@ -382,7 +390,7 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
               {day.date.getDate()}
             </DayCell>
           ) : (
-            <div key={`empty-${index}`} />
+            <EmptyCell key={`empty-${index}`} />
           )
         )}
       </DaysGrid>
