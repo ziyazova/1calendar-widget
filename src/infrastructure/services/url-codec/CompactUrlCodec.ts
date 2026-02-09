@@ -66,9 +66,9 @@ export class CompactUrlCodec {
     showHumidity: true,
     location: 'New York',
 
-    // Embed size (calendar defaults; clock overrides at decode)
-    embedWidth: 420,
-    embedHeight: 380,
+    // Embed size (shared defaults for calendar and clock)
+    embedWidth: 360,
+    embedHeight: 360,
   };
 
   // Цвета из палитры кодируем индексами (0-9, a-f для 16 цветов)

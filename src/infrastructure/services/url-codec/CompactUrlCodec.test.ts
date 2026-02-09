@@ -66,8 +66,8 @@ describe('CompactUrlCodec', () => {
         primaryColor: '#667EEA',
         backgroundColor: '#ffffff',
         style: 'modern-grid',
-        embedWidth: 420,
-        embedHeight: 380,
+        embedWidth: 360,
+        embedHeight: 360,
       };
 
       const encoded = CompactUrlCodec.encode('calendar', settings);
@@ -75,8 +75,8 @@ describe('CompactUrlCodec', () => {
 
       expect(decoded).not.toBeNull();
       // defaults are restored
-      expect(decoded!.settings.embedWidth).toBe(420);
-      expect(decoded!.settings.embedHeight).toBe(380);
+      expect(decoded!.settings.embedWidth).toBe(360);
+      expect(decoded!.settings.embedHeight).toBe(360);
     });
   });
 

@@ -22,7 +22,7 @@ export class CalendarSettings {
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
     this.style = settings.style || 'modern-grid';
-    this.embedWidth = settings.embedWidth ?? 420;
+    this.embedWidth = settings.embedWidth ?? 360;
     this.embedHeight = Math.round((this.embedWidth) * CALENDAR_ASPECT_RATIO);
   }
 
