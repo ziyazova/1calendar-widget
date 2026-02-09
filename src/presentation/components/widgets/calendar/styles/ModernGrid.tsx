@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
 import { getContrastColor } from '../../../../themes/colors';
-import { WIDGET_CONTAINER, WIDGET_TYPOGRAPHY, WIDGET_SPACING } from '../../../../themes/widgetTokens';
+import { WIDGET_TYPOGRAPHY, WIDGET_SPACING } from '../../../../themes/widgetTokens';
 
 interface ModernGridProps {
   settings: CalendarSettings;
@@ -16,10 +16,9 @@ const GridContainer = styled.div<{
   $accentColor: string;
   $textColor: string;
 }>`
-  width: 100%;
-  min-width: ${WIDGET_CONTAINER.minWidth};
-  max-width: ${WIDGET_CONTAINER.maxWidth};
-  padding: ${WIDGET_CONTAINER.padding};
+  width: 420px;
+  height: 420px;
+  padding: 20px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
@@ -34,7 +33,6 @@ const GridContainer = styled.div<{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 1;
   overflow: hidden;
 
   &::before {
@@ -61,16 +59,6 @@ const GridContainer = styled.div<{
     border-color: ${({ $accentColor }) => $accentColor};
   }
 
-  /* Adaptive layout */
-  @media (max-width: 480px) {
-    padding: 12px;
-    max-width: 100%;
-  }
-
-  @media (max-width: 360px) {
-    padding: 10px;
-    min-width: 180px;
-  }
 `;
 
 const CalendarHeader = styled.div`
