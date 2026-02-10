@@ -17,7 +17,7 @@ const GridContainer = styled.div<{
   $textColor: string;
 }>`
   width: 420px;
-  padding: 20px;
+  padding: 14px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
@@ -64,7 +64,7 @@ const CalendarHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 `;
 
@@ -130,8 +130,8 @@ const NavButton = styled.button<{
 const WeekDaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 3px;
+  margin-bottom: 4px;
   flex-shrink: 0;
 `;
 
@@ -141,9 +141,9 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: 6px 4px;
+  padding: 4px 2px;
   text-align: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};
@@ -185,13 +185,11 @@ const WeekDay = styled.div<{
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  gap: 4px;
+  grid-template-rows: repeat(5, auto);
+  gap: 3px;
 `;
 
-const EmptyCell = styled.div`
-  aspect-ratio: 1;
-`;
+const EmptyCell = styled.div``;
 
 const DayCell = styled.button<{
   $isCurrentMonth: boolean;
@@ -200,7 +198,7 @@ const DayCell = styled.button<{
   $borderRadius: number;
   $textColor: string;
 }>`
-  padding: 4px;
+  padding: 6px 4px;
   border: 1px solid ${({ $isToday, $primaryColor, $textColor }) => {
     if ($isToday) return $primaryColor;
     return `${$textColor}20`;
@@ -221,7 +219,6 @@ const DayCell = styled.button<{
   font-weight: ${({ $isToday }) => ($isToday ? '700' : '500')};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
