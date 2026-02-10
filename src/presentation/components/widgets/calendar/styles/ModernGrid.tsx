@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
 import { getContrastColor } from '../../../../themes/colors';
-/* All sizes are fixed px — no vw/clamp so the 420×420 backplate never changes */
+/* All sizes are fixed px — no vw/clamp so the backplate never changes with iframe */
 
 interface ModernGridProps {
   settings: CalendarSettings;
@@ -17,7 +17,6 @@ const GridContainer = styled.div<{
   $textColor: string;
 }>`
   width: 420px;
-  height: 420px;
   padding: 20px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
@@ -188,11 +187,11 @@ const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
   grid-template-rows: repeat(5, 1fr);
   gap: 4px;
-  flex: 1;
-  min-height: 0;
 `;
 
-const EmptyCell = styled.div``;
+const EmptyCell = styled.div`
+  aspect-ratio: 1;
+`;
 
 const DayCell = styled.button<{
   $isCurrentMonth: boolean;
@@ -222,6 +221,7 @@ const DayCell = styled.button<{
   font-weight: ${({ $isToday }) => ($isToday ? '700' : '500')};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
