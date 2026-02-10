@@ -13,10 +13,14 @@ const GlobalEmbedStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     width: 100%;
+    height: fit-content;
     background: transparent;
+    overflow: hidden;
   }
   #root {
     width: 100%;
+    height: fit-content;
+    overflow: hidden;
   }
   * {
     box-sizing: border-box;
@@ -33,11 +37,13 @@ const GlobalEmbedStyles = createGlobalStyle`
 
 const EmbedContainer = styled.div`
   width: 100%;
+  height: fit-content;
   display: flex;
   justify-content: center;
   background: transparent;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
 `;
 
 const LoadingState = styled.div`

@@ -9,11 +9,13 @@ const MAX_SCALE = 2.0;
 
 const Wrapper = styled.div`
   width: 100%;
+  height: fit-content;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 8px;
   box-sizing: border-box;
+  overflow: hidden;
 `;
 
 const ScaledInner = styled.div<{ $scale: number; $width: number }>`
@@ -91,8 +93,8 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   // Compensate for CSS transform not affecting layout box.
   // The layout box is contentHeight (unscaled). The visual height is
   // contentHeight * scale. The difference is contentHeight * (1 - scale).
-  // A negative margin-bottom shrinks the layout box to match the visual.
-  const marginCompensation = contentHeight > 0 ? contentHeight * (1 - scale) : 0;
+  // Negative value shrinks the layout box, positive expands it.
+  const marginBottom = contentHeight > 0 ? -(contentHeight * (1 - scale)) : 0;
 
   return (
     <Wrapper ref={containerRef}>
@@ -100,7 +102,7 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
         ref={innerRef}
         $scale={scale}
         $width={refWidth}
-        style={{ marginBottom: `-${marginCompensation}px` }}
+        style={{ marginBottom: `${marginBottom}px` }}
       >
         {children}
       </ScaledInner>

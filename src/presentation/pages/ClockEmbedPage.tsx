@@ -10,11 +10,13 @@ import { EmbedController } from './EmbedController';
 
 const EmbedContainer = styled.div`
   width: 100%;
+  height: fit-content;
   display: flex;
   justify-content: center;
   background: transparent;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
 `;
 
 const LoadingState = styled.div`
