@@ -13,54 +13,28 @@ const GlobalEmbedStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
-    overflow: auto;
     background: transparent;
+    overflow: hidden;
   }
   #root {
     width: 100%;
-    height: 100%;
-    overflow: auto;
   }
   * {
     box-sizing: border-box;
-    max-width: 100%;
-    max-height: 100%;
   }
   body {
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
   }
-  * {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-  }
-  img, svg, video, canvas, audio, iframe, embed, object {
-    max-width: 100% !important;
-    max-height: 100% !important;
-    width: auto !important;
-    height: auto !important;
-  }
-  div, section, article, aside, main, header, footer, nav {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
 `;
 
 const EmbedContainer = styled.div`
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
   background: transparent;
-  padding: 0;
-  box-sizing: border-box;
-  overflow: auto;
-  position: relative;
+  overflow: hidden;
 `;
 
 const LoadingState = styled.div`
@@ -177,7 +151,6 @@ export const CalendarEmbedPage: React.FC = () => {
       <EmbedContainer>
         <EmbedScaleWrapper
           refWidth={calendarSettings.embedWidth}
-          refHeight={calendarSettings.embedHeight}
         >
           <CalendarWidget widget={widget} />
         </EmbedScaleWrapper>

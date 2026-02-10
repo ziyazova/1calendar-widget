@@ -2,90 +2,93 @@ import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Logger } from '../../../infrastructure/services/Logger';
 
-/** Default reference size of the widget - used to calculate scale */
+/** Default reference width — widget renders at this width, then gets scaled */
 const DEFAULT_REF_WIDTH = 420;
-const DEFAULT_REF_HEIGHT = 380;
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 2.0;
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 8px;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
 `;
 
-const ScaledInner = styled.div<{ $scale: number }>`
-  transform-origin: center center;
-  transform: scale(${({ $scale }) => $scale});
+const ScaledInner = styled.div`
+  transform-origin: top center;
   flex-shrink: 0;
 `;
 
 interface EmbedScaleWrapperProps {
   children: React.ReactNode;
   refWidth?: number;
-  refHeight?: number;
 }
 
 /**
- * Wraps embed content and scales it to fit the viewport.
- * Scales both down and up within MIN_SCALE–MAX_SCALE bounds.
+ * Wraps embed content and scales it to fit the container width.
+ * Compensates height via negative margin so iframe borders match widget borders.
  */
 export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   children,
   refWidth = DEFAULT_REF_WIDTH,
-  refHeight = DEFAULT_REF_HEIGHT,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [marginBottom, setMarginBottom] = useState(0);
 
-  Logger.debug('EmbedScaleWrapper', 'Render with ref size', { refWidth, refHeight });
+  Logger.debug('EmbedScaleWrapper', 'Render with ref width', { refWidth });
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    Logger.info('EmbedScaleWrapper', 'Mounting scale observer', { refWidth, refHeight });
+    const container = containerRef.current;
+    if (!container) return;
 
     const updateScale = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w <= 0 || h <= 0) return;
+      const w = container.clientWidth;
+      if (w <= 0) return;
 
-      const scaleX = (w - 16) / refWidth;
-      const scaleY = (h - 16) / refHeight;
-      const rawScale = Math.min(scaleX, scaleY, MAX_SCALE);
-      const newScale = Math.max(MIN_SCALE, rawScale);
-
-      Logger.debug('EmbedScaleWrapper', 'Scale calculation', {
-        container: `${w}x${h}`,
-        ref: `${refWidth}x${refHeight}`,
-        scaleX: scaleX.toFixed(3),
-        scaleY: scaleY.toFixed(3),
-        finalScale: newScale.toFixed(3),
-      });
-
+      const newScale = Math.max(MIN_SCALE, Math.min(w / refWidth, MAX_SCALE));
       setScale(newScale);
+
+      // Measure inner element and compensate margin after render
+      requestAnimationFrame(() => {
+        const inner = innerRef.current;
+        if (!inner) return;
+        const naturalHeight = inner.offsetHeight;
+        const compensation = -(naturalHeight * (1 - newScale));
+
+        Logger.debug('EmbedScaleWrapper', 'Scale calculation', {
+          containerWidth: w,
+          refWidth,
+          scale: newScale.toFixed(3),
+          naturalHeight,
+          marginBottom: compensation.toFixed(1),
+        });
+
+        setMarginBottom(compensation);
+      });
     };
 
-    const rafId = requestAnimationFrame(updateScale);
     const observer = new ResizeObserver(updateScale);
-    observer.observe(el);
+    observer.observe(container);
+    requestAnimationFrame(updateScale);
 
-    return () => {
-      cancelAnimationFrame(rafId);
-      observer.disconnect();
-    };
-  }, [refWidth, refHeight]);
+    return () => observer.disconnect();
+  }, [refWidth]);
 
   return (
     <Wrapper ref={containerRef}>
-      <ScaledInner $scale={scale}>{children}</ScaledInner>
+      <ScaledInner
+        ref={innerRef}
+        style={{
+          width: `${refWidth}px`,
+          transform: `scale(${scale})`,
+          marginBottom: `${marginBottom}px`,
+        }}
+      >
+        {children}
+      </ScaledInner>
     </Wrapper>
   );
 };
