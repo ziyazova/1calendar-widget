@@ -17,7 +17,8 @@ const GridContainer = styled.div<{
   $textColor: string;
 }>`
   width: 420px;
-  padding: 14px;
+  height: 420px;
+  padding: 20px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
@@ -185,8 +186,10 @@ const WeekDay = styled.div<{
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  grid-template-rows: repeat(5, auto);
+  grid-template-rows: repeat(5, 1fr);
   gap: 3px;
+  flex: 1;
+  min-height: 0;
 `;
 
 const EmptyCell = styled.div``;
