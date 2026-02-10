@@ -10,13 +10,15 @@ import { EmbedController } from './EmbedController';
 
 const EmbedContainer = styled.div`
   width: 100%;
-  height: fit-content;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
+  align-items: center;
   justify-content: center;
   background: transparent;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: auto;
 `;
 
 const LoadingState = styled.div`
@@ -132,6 +134,7 @@ export const ClockEmbedPage: React.FC = () => {
       <EmbedContainer>
         <EmbedScaleWrapper
           refWidth={clockSettings.embedWidth}
+          refHeight={clockSettings.embedHeight}
         >
           <ClockWidget widget={widget} />
         </EmbedScaleWrapper>

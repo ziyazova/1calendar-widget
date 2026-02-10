@@ -13,7 +13,7 @@ describe('CalendarSettings', () => {
       expect(settings.showBorder).toBe(true);
       expect(settings.style).toBe('modern-grid');
       expect(settings.embedWidth).toBe(420);
-      expect(settings.embedHeight).toBe(420);
+      expect(settings.embedHeight).toBe(380);
     });
   });
 
@@ -32,12 +32,13 @@ describe('CalendarSettings', () => {
       expect(settings.style).toBe('modern-grid');
     });
 
-    it('embedHeight equals embedWidth (1:1 ratio)', () => {
+    it('accepts embedWidth and embedHeight overrides', () => {
       const settings = new CalendarSettings({
         embedWidth: 600,
+        embedHeight: 500,
       });
       expect(settings.embedWidth).toBe(600);
-      expect(settings.embedHeight).toBe(600);
+      expect(settings.embedHeight).toBe(500);
     });
   });
 

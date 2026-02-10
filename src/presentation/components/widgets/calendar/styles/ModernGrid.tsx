@@ -19,6 +19,7 @@ const GridContainer = styled.div<{
   width: 100%;
   min-width: ${WIDGET_CONTAINER.minWidth};
   max-width: ${WIDGET_CONTAINER.maxWidth};
+  max-height: ${WIDGET_CONTAINER.maxHeight};
   padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
@@ -34,7 +35,6 @@ const GridContainer = styled.div<{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 1;
   overflow: hidden;
 
   &::before {
@@ -198,14 +198,8 @@ const WeekDay = styled.div<{
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  grid-template-rows: repeat(5, 1fr);
   gap: ${WIDGET_SPACING.gap};
-  flex: 1;
-`;
-
-const EmptyCell = styled.div`
-  aspect-ratio: 1;
-  min-height: clamp(24px, 6vw, 36px);
+  align-content: start;
 `;
 
 const DayCell = styled.button<{
@@ -301,13 +295,11 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
     firstDisplayDay.setDate(firstDisplayDay.getDate() + mondayOffset);
   }
 
-  // Always produce exactly 5 rows of cells
-  const cols = settings.showWeekends ? 7 : 5;
-  const totalCells = cols * 5;
   const days = [];
   const currentDay = new Date(firstDisplayDay);
+  const totalDays = settings.showWeekends ? 35 : 25;
 
-  while (days.length < totalCells) {
+  for (let i = 0; i < totalDays; i++) {
     if (!settings.showWeekends && (currentDay.getDay() === 0 || currentDay.getDay() === 6)) {
       currentDay.setDate(currentDay.getDate() + 1);
       continue;
@@ -378,22 +370,19 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
       </WeekDaysGrid>
 
       <DaysGrid $showWeekends={settings.showWeekends}>
-        {days.map((day, index) =>
-          day.isCurrentMonth ? (
-            <DayCell
-              key={day.date.toISOString()}
-              $isCurrentMonth={true}
-              $isToday={day.isToday}
-              $primaryColor={settings.primaryColor}
-              $borderRadius={settings.borderRadius}
-              $textColor={textColor}
-            >
-              {day.date.getDate()}
-            </DayCell>
-          ) : (
-            <EmptyCell key={`empty-${index}`} />
-          )
-        )}
+        {days.map((day) => (
+          <DayCell
+            key={day.date.toISOString()}
+            $isCurrentMonth={day.isCurrentMonth}
+            $isToday={day.isToday}
+            $primaryColor={settings.primaryColor}
+            $borderRadius={settings.borderRadius}
+            $textColor={textColor}
+            disabled={!day.isCurrentMonth}
+          >
+            {day.date.getDate()}
+          </DayCell>
+        ))}
       </DaysGrid>
     </GridContainer>
   );

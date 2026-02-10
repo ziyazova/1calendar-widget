@@ -12,14 +12,16 @@ import { CompactUrlCodec } from '../infrastructure/services/url-codec/CompactUrl
 // ── helpers ──────────────────────────────────────────────────────────
 function simulateScale(
   containerW: number,
-  _containerH: number,
+  containerH: number,
   refW: number,
-  _refH: number,
+  refH: number,
 ) {
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 2.0;
   const scaleX = (containerW - 16) / refW;
-  return Math.min(Math.max(MIN_SCALE, scaleX), MAX_SCALE);
+  const scaleY = (containerH - 16) / refH;
+  const raw = Math.min(scaleX, scaleY, MAX_SCALE);
+  return Math.max(MIN_SCALE, raw);
 }
 
 function log(label: string, data: Record<string, unknown>) {
@@ -40,28 +42,28 @@ describe('Embed Size — Smoke Test', () => {
         embedHeight: s.embedHeight,
       });
       expect(s.embedWidth).toBe(420);
-      expect(s.embedHeight).toBe(420);
+      expect(s.embedHeight).toBe(380);
     });
 
-    it('height equals width after update()', () => {
-      const s = new CalendarSettings().update({ embedWidth: 700 });
+    it('custom values survive update()', () => {
+      const s = new CalendarSettings().update({ embedWidth: 700, embedHeight: 500 });
       log('CalendarSettings after update()', {
         embedWidth: s.embedWidth,
         embedHeight: s.embedHeight,
       });
       expect(s.embedWidth).toBe(700);
-      expect(s.embedHeight).toBe(700);
+      expect(s.embedHeight).toBe(500);
     });
 
-    it('JSON roundtrip preserves 1:1 embed size', () => {
-      const orig = new CalendarSettings({ embedWidth: 600 });
+    it('JSON roundtrip preserves embed size', () => {
+      const orig = new CalendarSettings({ embedWidth: 600, embedHeight: 450 });
       const restored = CalendarSettings.fromJson(orig.toJson());
       log('CalendarSettings JSON roundtrip', {
         original: { w: orig.embedWidth, h: orig.embedHeight },
         restored: { w: restored.embedWidth, h: restored.embedHeight },
       });
       expect(restored.embedWidth).toBe(600);
-      expect(restored.embedHeight).toBe(600);
+      expect(restored.embedHeight).toBe(450);
     });
   });
 
