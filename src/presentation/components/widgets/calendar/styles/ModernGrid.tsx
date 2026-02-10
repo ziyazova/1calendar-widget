@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
 import { getContrastColor } from '../../../../themes/colors';
-/* All sizes are fixed px — no vw/clamp so the backplate never changes with iframe */
+import { WIDGET_CONTAINER, WIDGET_TYPOGRAPHY, WIDGET_SPACING } from '../../../../themes/widgetTokens';
 
 interface ModernGridProps {
   settings: CalendarSettings;
@@ -16,9 +16,10 @@ const GridContainer = styled.div<{
   $accentColor: string;
   $textColor: string;
 }>`
-  width: 420px;
-  height: 420px;
-  padding: 20px;
+  width: 100%;
+  min-width: ${WIDGET_CONTAINER.minWidth};
+  max-width: ${WIDGET_CONTAINER.maxWidth};
+  padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
     $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
@@ -33,6 +34,7 @@ const GridContainer = styled.div<{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  aspect-ratio: 1;
   overflow: hidden;
 
   &::before {
@@ -59,18 +61,28 @@ const GridContainer = styled.div<{
     border-color: ${({ $accentColor }) => $accentColor};
   }
 
+  /* Adaptive layout */
+  @media (max-width: 480px) {
+    padding: 12px;
+    max-width: 100%;
+  }
+
+  @media (max-width: 360px) {
+    padding: 10px;
+    min-width: 180px;
+  }
 `;
 
 const CalendarHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: ${WIDGET_SPACING.margin};
   flex-shrink: 0;
 `;
 
 const MonthTitle = styled.h2<{ $textColor: string; $primaryColor: string }>`
-  font-size: 18px;
+  font-size: ${WIDGET_TYPOGRAPHY.heading};
   font-weight: 700;
   margin: 0;
   background: linear-gradient(
@@ -94,8 +106,8 @@ const NavButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: clamp(28px, 8vw, 36px);
+  height: clamp(28px, 8vw, 36px);
   border: 2px solid ${({ $primaryColor }) => `${$primaryColor}60`};
   background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
@@ -123,16 +135,16 @@ const NavButton = styled.button<{
   }
 
   svg {
-    width: 16px;
-    height: 16px;
+    width: clamp(12px, 3.5vw, 18px);
+    height: clamp(12px, 3.5vw, 18px);
   }
 `;
 
 const WeekDaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  gap: 3px;
-  margin-bottom: 4px;
+  gap: ${WIDGET_SPACING.gap};
+  margin-bottom: ${WIDGET_SPACING.gapMedium};
   flex-shrink: 0;
 `;
 
@@ -142,9 +154,9 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: 4px 2px;
+  padding: clamp(4px, 1.5vw, 10px) clamp(2px, 0.5vw, 6px);
   text-align: center;
-  font-size: 10px;
+  font-size: clamp(9px, 2.5vw, 13px);
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};
@@ -187,12 +199,14 @@ const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
   grid-template-rows: repeat(5, 1fr);
-  gap: 3px;
+  gap: ${WIDGET_SPACING.gap};
   flex: 1;
-  min-height: 0;
 `;
 
-const EmptyCell = styled.div``;
+const EmptyCell = styled.div`
+  aspect-ratio: 1;
+  min-height: clamp(24px, 6vw, 36px);
+`;
 
 const DayCell = styled.button<{
   $isCurrentMonth: boolean;
@@ -201,7 +215,7 @@ const DayCell = styled.button<{
   $borderRadius: number;
   $textColor: string;
 }>`
-  padding: 6px 4px;
+  padding: clamp(4px, 1.5vw, 10px);
   border: 1px solid ${({ $isToday, $primaryColor, $textColor }) => {
     if ($isToday) return $primaryColor;
     return `${$textColor}20`;
@@ -218,13 +232,15 @@ const DayCell = styled.button<{
   border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 6)}px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 14px;
+  font-size: ${WIDGET_TYPOGRAPHY.body};
   font-weight: ${({ $isToday }) => ($isToday ? '700' : '500')};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: clamp(24px, 6vw, 36px);
 
   &:hover:not(:disabled) {
     background: ${({ $isToday, $primaryColor }) => {
