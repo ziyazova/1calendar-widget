@@ -12,11 +12,16 @@ import { CompactUrlCodec } from '../infrastructure/services/url-codec/CompactUrl
 // ── helpers ──────────────────────────────────────────────────────────
 function simulateScale(
   containerW: number,
+  containerH: number,
   refW: number,
+  refH: number,
 ) {
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 2.0;
-  return Math.max(MIN_SCALE, Math.min(containerW / refW, MAX_SCALE));
+  const scaleX = (containerW - 16) / refW;
+  const scaleY = (containerH - 16) / refH;
+  const raw = Math.min(scaleX, scaleY, MAX_SCALE);
+  return Math.max(MIN_SCALE, raw);
 }
 
 function log(label: string, data: Record<string, unknown>) {
@@ -139,23 +144,23 @@ describe('Embed Size — Smoke Test', () => {
     });
   });
 
-  // -------- Scale Calculation (width-only) --------
+  // -------- Scale Calculation --------
   describe('Scale math (EmbedScaleWrapper logic)', () => {
     const scenarios = [
-      { name: 'Notion small iframe',  cw: 300, rw: 420 },
-      { name: 'Notion default',       cw: 420, rw: 420 },
-      { name: 'Large iframe',         cw: 800, rw: 420 },
-      { name: 'Custom ref 600',       cw: 800, rw: 600 },
-      { name: 'Tiny iframe (clamp)',   cw: 100, rw: 420 },
-      { name: 'Huge iframe (cap 2x)',  cw: 2000, rw: 420 },
+      { name: 'Notion small iframe',  cw: 300, ch: 250, rw: 420, rh: 380 },
+      { name: 'Notion default',       cw: 420, ch: 380, rw: 420, rh: 380 },
+      { name: 'Large iframe',         cw: 800, ch: 600, rw: 420, rh: 380 },
+      { name: 'Custom ref 600x500',   cw: 800, ch: 600, rw: 600, rh: 500 },
+      { name: 'Tiny iframe (clamp)',   cw: 100, ch: 80,  rw: 420, rh: 380 },
+      { name: 'Huge iframe (cap 2x)',  cw: 2000, ch: 1500, rw: 420, rh: 380 },
     ];
 
     for (const s of scenarios) {
       it(s.name, () => {
-        const scale = simulateScale(s.cw, s.rw);
+        const scale = simulateScale(s.cw, s.ch, s.rw, s.rh);
         log(`Scale: ${s.name}`, {
-          containerWidth: s.cw,
-          refWidth: s.rw,
+          container: `${s.cw}x${s.ch}`,
+          ref: `${s.rw}x${s.rh}`,
           scale: scale.toFixed(3),
         });
         expect(scale).toBeGreaterThanOrEqual(0.25);
