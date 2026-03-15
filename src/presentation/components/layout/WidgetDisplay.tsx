@@ -3,7 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import { Widget } from '../../../domain/entities/Widget';
 import { CalendarWidget } from '../widgets/CalendarWidget';
 import { ClockWidget } from '../widgets/ClockWidget';
-import { Sparkles } from 'lucide-react';
 
 interface WidgetDisplayProps {
   widget: Widget | null;
@@ -12,17 +11,12 @@ interface WidgetDisplayProps {
 const fadeIn = keyframes`
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-`;
-
-const float = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
 `;
 
 const DisplayContainer = styled.div`
@@ -53,38 +47,22 @@ const EmptyState = styled.div`
   z-index: 1;
 `;
 
-const EmptyIcon = styled.div`
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 20px;
-  background: ${({ theme }) => theme.colors.gradients.primary};
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadows.md};
-  animation: ${float} 4s ease-in-out infinite;
-
-  svg {
-    color: white;
-  }
-`;
-
 const EmptyTitle = styled.h3`
-  font-size: 20px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 8px 0;
-  letter-spacing: -0.02em;
+  font-size: 15px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
 `;
 
 const EmptyDescription = styled.p`
-  font-size: 14px;
+  font-size: 13px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
-  max-width: 280px;
+  max-width: 220px;
   line-height: 1.5;
   margin: 0 auto;
+  opacity: 0.7;
 `;
 
 const ErrorState = styled.div`
@@ -101,7 +79,7 @@ const WidgetContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: ${fadeIn} 0.4s cubic-bezier(0.54, 1.5, 0.38, 1.11);
+  animation: ${fadeIn} 0.25s ease;
 `;
 
 export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
@@ -109,9 +87,6 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
     return (
       <DisplayContainer>
         <EmptyState>
-          <EmptyIcon>
-            <Sparkles size={24} />
-          </EmptyIcon>
           <EmptyTitle>Choose a Widget</EmptyTitle>
           <EmptyDescription>
             Select a widget from the sidebar to preview and customize

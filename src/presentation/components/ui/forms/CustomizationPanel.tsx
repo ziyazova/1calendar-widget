@@ -11,99 +11,104 @@ interface CustomizationPanelProps {
 }
 
 const PanelContainer = styled.div`
-  width: 320px;
-  height: calc(100vh - 64px - 40px);
+  width: 290px;
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
   background: #ffffff;
-  border-radius: 16px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: ${({ theme }) => theme.shadows.card};
+  border-left: 1px solid ${({ theme }) => theme.colors.border.primary};
+  z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 
 const PanelHeader = styled.div`
-  padding: 24px 24px 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.secondary};
+  height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
 `;
 
 const PanelTitle = styled.h2`
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 24px;
   color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 `;
 
 const PanelContent = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 8px 24px 24px;
+  padding: 0 24px 32px;
 
   &::-webkit-scrollbar {
-    width: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.border.primary};
-    border-radius: 10px;
+    width: 0;
   }
 `;
 
 const Section = styled.div`
-  padding: 20px 0;
+  padding: 24px 0;
+
+  &:first-child {
+    padding-top: 20px;
+  }
 
   & + & {
-    border-top: 1px solid ${({ theme }) => theme.colors.border.secondary};
+    border-top: 1px solid ${({ theme }) => theme.colors.border.primary};
   }
 `;
 
 const SectionTitle = styled.h3`
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 16px 0;
-  letter-spacing: -0.01em;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 `;
 
 const FormGroup = styled.div`
   & + & {
-    margin-top: 16px;
+    margin-top: 20px;
   }
 `;
 
 const Label = styled.label`
   display: block;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin-bottom: 8px;
-  letter-spacing: 0;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin-bottom: 10px;
+  letter-spacing: -0.006em;
 `;
 
 const Select = styled.select`
   width: 100%;
-  height: 38px;
-  padding: 0 14px;
+  height: 34px;
+  padding: 0 12px;
   border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  border-radius: 10px;
-  background: ${({ theme }) => theme.colors.background.primary};
+  border-radius: 8px;
+  background: #ffffff;
   color: ${({ theme }) => theme.colors.text.primary};
   font-size: 13px;
   font-weight: 400;
   font-family: inherit;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.12s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 12px center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23aeaeb2' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 10px center;
   background-repeat: no-repeat;
   background-size: 14px;
-  padding-right: 36px;
+  padding-right: 32px;
 
   &:hover {
-    border-color: #ccc;
+    border-color: ${({ theme }) => theme.colors.text.tertiary};
   }
 
   &:focus {
@@ -120,7 +125,7 @@ const SliderRow = styled.div`
 
 const Slider = styled.input`
   flex: 1;
-  height: 4px;
+  height: 3px;
   border-radius: 2px;
   background: ${({ theme }) => theme.colors.border.primary};
   outline: none;
@@ -128,17 +133,18 @@ const Slider = styled.input`
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: ${({ theme }) => theme.colors.primary};
+    background: #ffffff;
+    border: 2px solid ${({ theme }) => theme.colors.primary};
     cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    transition: transform 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.12s ease;
   }
 
   &::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
+    transform: scale(1.1);
   }
 
   &::-webkit-slider-thumb:active {
@@ -147,11 +153,11 @@ const Slider = styled.input`
 `;
 
 const SliderValue = styled.span`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  font-weight: 500;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  min-width: 36px;
+  min-width: 32px;
   text-align: right;
 `;
 
@@ -160,22 +166,27 @@ const Toggle = styled.label`
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  padding: 2px 0;
-  transition: color 0.15s ease;
+  padding: 4px 0;
+  border-radius: 4px;
+  transition: opacity 0.12s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 const ToggleText = styled.span`
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.01em;
+  letter-spacing: -0.006em;
 `;
 
 const ToggleSwitch = styled.div<{ $checked: boolean }>`
-  width: 38px;
-  height: 22px;
-  border-radius: 11px;
-  background: ${({ $checked, theme }) => $checked ? theme.colors.primary : theme.colors.border.primary};
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: ${({ $checked, theme }) => $checked ? theme.colors.primary : '#d1d1d6'};
   position: relative;
   transition: background 0.2s ease;
   flex-shrink: 0;
@@ -185,11 +196,11 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
     position: absolute;
     top: 2px;
     left: ${({ $checked }) => $checked ? '18px' : '2px'};
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     transition: left 0.2s ease;
   }
 `;
@@ -203,14 +214,13 @@ const HiddenCheckbox = styled.input`
 const EmptyState = styled.div`
   text-align: center;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  padding: 60px 20px;
+  padding: 64px 24px;
 
   h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 0 6px 0;
-    color: ${({ theme }) => theme.colors.text.primary};
-    letter-spacing: -0.02em;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+    color: ${({ theme }) => theme.colors.text.secondary};
   }
 
   p {
@@ -223,7 +233,7 @@ const EmptyState = styled.div`
 const ToggleGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
 `;
 
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
@@ -254,6 +264,21 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
       <PanelContent>
         <Section>
+          <SectionTitle>Appearance</SectionTitle>
+          <FormGroup>
+            <Label>Theme</Label>
+            <Select
+              value={(settings as CalendarSettings).theme || 'auto'}
+              onChange={(e) => onSettingsChange({ theme: e.target.value as 'auto' | 'light' | 'dark' })}
+            >
+              <option value="auto">Auto (System)</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </Select>
+          </FormGroup>
+        </Section>
+
+        <Section>
           <SectionTitle>Colors</SectionTitle>
 
           <FormGroup>
@@ -279,8 +304,8 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             <ColorPicker
               selectedColor={settings.accentColor}
               onColorChange={(color) => onSettingsChange({ accentColor: color })}
-              type="primary"
-              showPresets={false}
+              type="accent"
+              showPresets={true}
             />
           </FormGroup>
         </Section>

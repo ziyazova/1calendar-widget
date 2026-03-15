@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
 import { getContrastColor } from '../../../../themes/colors';
 import { WIDGET_CONTAINER, WIDGET_TYPOGRAPHY, WIDGET_SPACING } from '../../../../themes/widgetTokens';
+import { useResolvedTheme, adaptColorForDarkMode } from '../../../../hooks/useResolvedTheme';
 
 interface ModernGridZoomProps {
   settings: CalendarSettings;
@@ -246,7 +247,11 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
   const [debug, setDebug] = useState(false);
   const [zoom, setZoom] = useState(1);
   const outerRef = useRef<HTMLDivElement>(null);
-  const textColor = getContrastColor(settings.backgroundColor);
+  const resolvedTheme = useResolvedTheme(settings.theme);
+  const isDark = resolvedTheme === 'dark';
+  const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
+  const effectiveAccent = isDark ? adaptColorForDarkMode(settings.accentColor, 'accent') : settings.accentColor;
+  const textColor = getContrastColor(effectiveBg);
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
@@ -319,10 +324,10 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
     <OuterWrapper ref={outerRef}>
       <ZoomWrapper $zoom={zoom}>
         <GridContainer
-          $backgroundColor={settings.backgroundColor}
+          $backgroundColor={effectiveBg}
           $borderRadius={settings.borderRadius}
           $showBorder={settings.showBorder}
-          $accentColor={settings.accentColor}
+          $accentColor={effectiveAccent}
           $textColor={textColor}
           $debug={debug}
         >
@@ -355,7 +360,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
             {(settings.showWeekends ? weekDays : weekDaysWorkdays).map((day, index) => (
               <WeekDay
                 key={index}
-                $accentColor={settings.accentColor}
+                $accentColor={effectiveAccent}
                 $borderRadius={settings.borderRadius}
                 $textColor={textColor}
                 $primaryColor={settings.primaryColor}

@@ -7,15 +7,16 @@ import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
+import { useResolvedTheme, adaptColorForDarkMode } from '../hooks/useResolvedTheme';
 
-const GlobalEmbedStyles = createGlobalStyle`
+const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: transparent;
+    background: ${({ $bgColor }) => $bgColor};
   }
   #root {
     width: 100%;
@@ -82,6 +83,7 @@ export const CalendarEmbedPage: React.FC = () => {
   const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [settings, setSettings] = useState<CalendarSettings>(new CalendarSettings());
 
   useEffect(() => {
     try {
@@ -92,20 +94,22 @@ export const CalendarEmbedPage: React.FC = () => {
 
       if (config) {
         if (config.widgetType === 'calendar' || !config.widgetType) {
-          const settings = new CalendarSettings(config.settings || config);
+          const s = new CalendarSettings(config.settings || config);
+          setSettings(s);
           Logger.info('CalendarEmbed', 'Loaded settings', {
-            embedWidth: settings.embedWidth,
-            embedHeight: settings.embedHeight,
-            style: settings.style,
+            embedWidth: s.embedWidth,
+            embedHeight: s.embedHeight,
+            style: s.style,
+            theme: s.theme,
           });
-          const calendarWidget = Widget.createCalendar('embed-calendar', settings);
+          const calendarWidget = Widget.createCalendar('embed-calendar', s);
           setWidget(calendarWidget);
         } else {
           throw new Error('Invalid calendar widget configuration');
         }
       } else {
-        // Default widget if no config provided
         const defaultSettings = new CalendarSettings();
+        setSettings(defaultSettings);
         const defaultWidget = Widget.createCalendar('default-calendar', defaultSettings);
         setWidget(defaultWidget);
       }
@@ -117,10 +121,16 @@ export const CalendarEmbedPage: React.FC = () => {
     }
   }, []);
 
+  const resolvedTheme = useResolvedTheme(settings.theme);
+  const isDark = resolvedTheme === 'dark';
+  const effectiveBg = isDark
+    ? adaptColorForDarkMode(settings.backgroundColor, 'background')
+    : settings.backgroundColor;
+
   if (loading) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles />
+        <GlobalEmbedStyles $bgColor={effectiveBg} />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <LoadingState>Loading calendar...</LoadingState>
@@ -133,11 +143,11 @@ export const CalendarEmbedPage: React.FC = () => {
   if (error || !widget) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles />
+        <GlobalEmbedStyles $bgColor={effectiveBg} />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <ErrorState>
-              <h3>🚫 Error</h3>
+              <h3>Error</h3>
               <p>{error || 'Failed to load calendar widget'}</p>
             </ErrorState>
           </EmbedScaleWrapper>
@@ -146,19 +156,19 @@ export const CalendarEmbedPage: React.FC = () => {
     );
   }
 
-  const calendarSettings = widget.settings as CalendarSettings;
   Logger.debug('CalendarEmbed', 'Rendering with embed size', {
-    embedWidth: calendarSettings.embedWidth,
-    embedHeight: calendarSettings.embedHeight,
+    embedWidth: settings.embedWidth,
+    embedHeight: settings.embedHeight,
+    theme: resolvedTheme,
   });
 
   return (
     <EmbedController>
-      <GlobalEmbedStyles />
+      <GlobalEmbedStyles $bgColor={effectiveBg} />
       <EmbedContainer>
         <EmbedScaleWrapper
-          refWidth={calendarSettings.embedWidth}
-          refHeight={calendarSettings.embedHeight}
+          refWidth={settings.embedWidth}
+          refHeight={settings.embedHeight}
         >
           <CalendarWidget widget={widget} />
         </EmbedScaleWrapper>

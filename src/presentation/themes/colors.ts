@@ -1,35 +1,40 @@
 // Более современная и комплементарная палитра цветов
 export const widgetColors = [
-  '#667EEA', // Soft Blue
-  '#764BA2', // Deep Purple
-  '#43E97B', // Green
-  '#FA709A', // Coral
-  '#FEE140', // Yellow
+  '#6E7FF2', // Soft Indigo
+  '#7C63B8', // Muted Purple
+  '#E89A78', // Warm Peach
 ] as const;
 
 export const colorNames = [
-  'Ocean',
+  'Indigo',
   'Purple',
-  'Emerald',
-  'Coral',
-  'Sunshine',
+  'Peach',
 ] as const;
 
-// Дополнительные нейтральные цвета для фона
+// Background presets
 export const backgroundColors = [
   '#FFFFFF', // Pure White
-  '#F1F5F9', // Light Gray
-  '#E2E8F0', // Soft Gray
-  '#1E293B', // Dark Blue
-  '#0F172A', // Deep Dark
+  '#F7F7F5', // Warm Gray
+  '#EEF1F5', // Cool Gray
 ] as const;
 
 export const backgroundNames = [
   'White',
-  'Light',
-  'Gray',
-  'Dark',
-  'Black',
+  'Warm',
+  'Cool',
+] as const;
+
+// Accent presets
+export const accentColors = [
+  '#E8EDFF', // Soft Indigo
+  '#EEE8FA', // Soft Purple
+  '#FBE9E1', // Soft Peach
+] as const;
+
+export const accentNames = [
+  'Indigo Mist',
+  'Lavender',
+  'Peach Blush',
 ] as const;
 
 // Apple-style градиенты для фонов
@@ -64,6 +69,10 @@ export const colors = {
   })),
   backgrounds: backgroundColors.map((color, index) => ({
     name: backgroundNames[index],
+    value: color,
+  })),
+  accents: accentColors.map((color, index) => ({
+    name: accentNames[index],
     value: color,
   })),
   gradients: gradientBackgrounds.map((gradient, index) => ({
@@ -124,11 +133,9 @@ export const getSuggestedColors = (backgroundColor: string) => {
   const isLight = getContrastColor(backgroundColor) === '#000000';
 
   if (isLight) {
-    // For light backgrounds, suggest darker colors
-    return colors.complementary.filter((_, index) => [0, 1, 3].includes(index));
+    return colors.complementary.filter((_, index) => [0, 1].includes(index));
   } else {
-    // For dark backgrounds, suggest lighter colors
-    return colors.complementary.filter((_, index) => [2, 3, 4].includes(index));
+    return colors.complementary.filter((_, index) => [2].includes(index));
   }
 };
 

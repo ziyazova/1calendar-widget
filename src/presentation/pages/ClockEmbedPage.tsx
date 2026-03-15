@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Logger } from '../../infrastructure/services/Logger';
 import { ClockWidget } from '../components/widgets/ClockWidget';
 import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
@@ -7,6 +7,31 @@ import { Widget } from '../../domain/entities/Widget';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
+import { useResolvedTheme, adaptColorForDarkMode } from '../hooks/useResolvedTheme';
+
+const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: ${({ $bgColor }) => $bgColor};
+  }
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+`;
 
 const EmbedContainer = styled.div`
   width: 100%;
@@ -60,6 +85,7 @@ export const ClockEmbedPage: React.FC = () => {
   const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [settings, setSettings] = useState<ClockSettings>(new ClockSettings());
 
   useEffect(() => {
     try {
@@ -70,20 +96,22 @@ export const ClockEmbedPage: React.FC = () => {
 
       if (config) {
         if (config.widgetType === 'clock' || !config.widgetType) {
-          const settings = new ClockSettings(config.settings || config);
+          const s = new ClockSettings(config.settings || config);
+          setSettings(s);
           Logger.info('ClockEmbed', 'Loaded settings', {
-            embedWidth: settings.embedWidth,
-            embedHeight: settings.embedHeight,
-            style: settings.style,
+            embedWidth: s.embedWidth,
+            embedHeight: s.embedHeight,
+            style: s.style,
+            theme: s.theme,
           });
-          const clockWidget = Widget.createClock('embed-clock', settings);
+          const clockWidget = Widget.createClock('embed-clock', s);
           setWidget(clockWidget);
         } else {
           throw new Error('Invalid clock widget configuration');
         }
       } else {
-        // Default widget if no config provided
         const defaultSettings = new ClockSettings();
+        setSettings(defaultSettings);
         const defaultWidget = Widget.createClock('default-clock', defaultSettings);
         setWidget(defaultWidget);
       }
@@ -95,9 +123,16 @@ export const ClockEmbedPage: React.FC = () => {
     }
   }, []);
 
+  const resolvedTheme = useResolvedTheme(settings.theme);
+  const isDark = resolvedTheme === 'dark';
+  const effectiveBg = isDark
+    ? adaptColorForDarkMode(settings.backgroundColor, 'background')
+    : settings.backgroundColor;
+
   if (loading) {
     return (
       <EmbedController>
+        <GlobalEmbedStyles $bgColor={effectiveBg} />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <LoadingState>Loading clock...</LoadingState>
@@ -110,10 +145,11 @@ export const ClockEmbedPage: React.FC = () => {
   if (error || !widget) {
     return (
       <EmbedController>
+        <GlobalEmbedStyles $bgColor={effectiveBg} />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <ErrorState>
-              <h3>🚫 Error</h3>
+              <h3>Error</h3>
               <p>{error || 'Failed to load clock widget'}</p>
             </ErrorState>
           </EmbedScaleWrapper>
@@ -122,18 +158,19 @@ export const ClockEmbedPage: React.FC = () => {
     );
   }
 
-  const clockSettings = widget.settings as ClockSettings;
   Logger.debug('ClockEmbed', 'Rendering with embed size', {
-    embedWidth: clockSettings.embedWidth,
-    embedHeight: clockSettings.embedHeight,
+    embedWidth: settings.embedWidth,
+    embedHeight: settings.embedHeight,
+    theme: resolvedTheme,
   });
 
   return (
     <EmbedController>
+      <GlobalEmbedStyles $bgColor={effectiveBg} />
       <EmbedContainer>
         <EmbedScaleWrapper
-          refWidth={clockSettings.embedWidth}
-          refHeight={clockSettings.embedHeight}
+          refWidth={settings.embedWidth}
+          refHeight={settings.embedHeight}
         >
           <ClockWidget widget={widget} />
         </EmbedScaleWrapper>

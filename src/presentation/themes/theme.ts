@@ -6,18 +6,18 @@ export const theme = {
     primary: '#6C63FF',
     primaryDark: '#5A52E0',
     secondary: '#5856D6',
-    accent: '#FF3B30',
+    accent: '#F4845F',
     success: '#15803d',
     warning: '#de6d02',
 
     // Widget colors
     widgets: widgetColors,
 
-    // Background system — warm neutrals
+    // Background system — cool neutrals
     background: {
-      primary: '#faf9f7',
-      secondary: '#f5f3f0',
-      tertiary: '#edeae6',
+      primary: '#f8f8f8',
+      secondary: '#f2f2f2',
+      tertiary: '#ebebeb',
       elevated: '#ffffff',
       glass: 'rgba(255, 255, 255, 0.72)',
       dark: '#1c1c1e',
@@ -27,28 +27,28 @@ export const theme = {
 
     // Text system
     text: {
-      primary: '#1a1a1a',
-      secondary: '#5c5c5c',
-      tertiary: '#8a8a8a',
+      primary: '#1d1d1f',
+      secondary: '#6e6e73',
+      tertiary: '#aeaeb2',
       inverse: '#ffffff',
       accent: '#6C63FF',
       link: '#6C63FF',
     },
 
-    // Border system — warm grays
+    // Border system — neutral grays
     border: {
-      primary: '#e8e5e1',
-      secondary: '#f0ede9',
-      tertiary: '#f5f3f0',
+      primary: '#e5e5e7',
+      secondary: '#f0f0f0',
+      tertiary: '#f5f5f5',
       focus: '#6C63FF',
     },
 
     // Interactive states
     interactive: {
-      hover: 'rgba(108, 99, 255, 0.04)',
-      active: 'rgba(108, 99, 255, 0.08)',
-      focus: 'rgba(108, 99, 255, 0.15)',
-      disabled: 'rgba(60, 60, 67, 0.3)',
+      hover: 'rgba(0, 0, 0, 0.03)',
+      active: 'rgba(0, 0, 0, 0.05)',
+      focus: 'rgba(108, 99, 255, 0.12)',
+      disabled: 'rgba(60, 60, 67, 0.18)',
     },
 
     // Gradients
@@ -57,30 +57,30 @@ export const theme = {
       hero: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       card: 'linear-gradient(145deg, #ffffff 0%, #faf9f7 100%)',
       glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)',
-      subtle: 'radial-gradient(at 27% 37%, rgba(108, 99, 255, 0.06) 0px, transparent 50%), radial-gradient(at 97% 21%, rgba(159, 122, 234, 0.04) 0px, transparent 50%)',
+      subtle: 'radial-gradient(at 27% 37%, rgba(108, 99, 255, 0.04) 0px, transparent 50%), radial-gradient(at 97% 21%, rgba(159, 122, 234, 0.03) 0px, transparent 50%)',
     },
   },
 
-  // Typography - Apple San Francisco inspired
+  // Typography — Inter
   typography: {
     fonts: {
-      primary: "'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+      primary: "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
       mono: "'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
-      display: "'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
+      display: "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
     },
 
     sizes: {
-      xs: '0.75rem',      // 12px
-      sm: '0.875rem',     // 14px
-      md: '1rem',         // 16px
-      lg: '1.125rem',     // 18px
-      xl: '1.25rem',      // 20px
-      '2xl': '1.5rem',    // 24px
-      '3xl': '1.875rem',  // 30px
-      '4xl': '2.25rem',   // 36px
-      '5xl': '3rem',      // 48px
-      '6xl': '3.75rem',   // 60px
-      '7xl': '4.5rem',    // 72px
+      xs: '0.6875rem',   // 11px
+      sm: '0.75rem',     // 12px
+      md: '0.875rem',    // 14px
+      lg: '1rem',        // 16px
+      xl: '1.25rem',     // 20px
+      '2xl': '1.5rem',   // 24px
+      '3xl': '1.875rem', // 30px
+      '4xl': '2.25rem',  // 36px
+      '5xl': '3rem',     // 48px
+      '6xl': '3.75rem',  // 60px
+      '7xl': '4.5rem',   // 72px
     },
 
     weights: {
@@ -93,19 +93,19 @@ export const theme = {
     },
 
     lineHeights: {
-      tight: 1.25,
+      tight: 1.2,
       normal: 1.5,
       relaxed: 1.75,
     },
 
     letterSpacing: {
-      tight: '-0.025em',
+      tight: '-0.011em',
       normal: '0',
-      wide: '0.025em',
+      wide: '0.04em',
     },
   },
 
-  // Spacing - Apple's 8px grid system
+  // Spacing — 8pt grid
   spacing: {
     px: '1px',
     '0.5': '0.125rem',   // 2px
@@ -135,52 +135,52 @@ export const theme = {
     '5xl': '3rem',
   },
 
-  // Border radius - Apple's rounded corners
+  // Border radius — restrained
   radii: {
     none: '0',
     xs: '0.125rem',      // 2px
     sm: '0.25rem',       // 4px
     md: '0.5rem',        // 8px
-    lg: '0.75rem',       // 12px
-    xl: '1rem',          // 16px
+    lg: '0.625rem',      // 10px
+    xl: '0.75rem',       // 12px
     '2xl': '1.5rem',     // 24px
     '3xl': '2rem',       // 32px
     full: '9999px',
 
-    // Apple-specific
-    card: '1.25rem',     // 20px - Apple card radius
-    button: '0.5rem',    // 8px - Apple button radius
-    input: '0.75rem',    // 12px - Apple input radius
+    // Semantic
+    card: '0.75rem',     // 12px
+    button: '0.5rem',    // 8px
+    input: '0.5rem',     // 8px
   },
 
-  // Shadows — multi-layer with inset borders (Lovable-style)
+  // Shadows — very soft, minimal
   shadows: {
-    xs: '0 0 0 0.5px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.05), inset 0 0 0 1px rgba(0,0,0,0.04)',
-    sm: '0 0 0 0.5px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.05), inset 0 -1px 0 0 rgba(0,0,0,0.06)',
-    md: '0 0 0 0.5px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.1), 0 10px 15px -3px rgba(0,0,0,0.08), inset 0 -1px 0 0 rgba(0,0,0,0.06)',
-    lg: '0 0 0 0.5px rgba(0,0,0,0.08), 0 10px 15px -3px rgba(0,0,0,0.08), 0 20px 25px -5px rgba(0,0,0,0.06), inset 0 -1px 0 0 rgba(0,0,0,0.06)',
-    xl: '0 0 0 0.5px rgba(0,0,0,0.08), 0 20px 25px -5px rgba(0,0,0,0.1), 0 25px 50px -12px rgba(0,0,0,0.06)',
-    '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    xs: '0 1px 2px rgba(0,0,0,0.04)',
+    sm: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+    md: '0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+    lg: '0 4px 16px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03)',
+    xl: '0 8px 24px rgba(0,0,0,0.06)',
+    '2xl': '0 16px 48px rgba(0,0,0,0.08)',
 
     // Surface shadows
-    card: '0 0 0 0.5px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), inset 0 -1px 0 0 rgba(0,0,0,0.04)',
-    button: '0 0 0 0.5px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)',
-    glass: '0 0 0 0.5px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.1)',
-    hero: '0 32px 64px rgba(0, 0, 0, 0.12)',
+    card: '0 0 0 1px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03)',
+    button: '0 1px 2px rgba(0,0,0,0.06)',
+    glass: '0 4px 24px rgba(0,0,0,0.06)',
+    hero: '0 24px 48px rgba(0, 0, 0, 0.08)',
 
     // Inner shadows
-    inset: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.04)',
+    inset: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)',
   },
 
-  // Breakpoints - Apple's responsive breakpoints
+  // Breakpoints
   breakpoints: {
-    xs: '375px',         // iPhone SE
-    sm: '640px',         // Small tablets
-    md: '768px',         // iPad
-    lg: '1024px',        // iPad Pro
-    xl: '1280px',        // Desktop
-    '2xl': '1536px',     // Large desktop
-    '3xl': '1920px',     // Ultra-wide
+    xs: '375px',
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px',
+    '3xl': '1920px',
   },
 
   // Z-index system
@@ -200,15 +200,14 @@ export const theme = {
     tooltip: 1090,
   },
 
-  // Transitions - Apple's easing curves
+  // Transitions
   transitions: {
-    fast: '150ms cubic-bezier(0.4, 0, 0.2, 1)',
-    base: '200ms cubic-bezier(0.4, 0, 0.2, 1)',
-    slow: '300ms cubic-bezier(0.4, 0, 0.2, 1)',
+    fast: '120ms ease',
+    base: '180ms ease',
+    slow: '280ms ease',
     bounce: '500ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
 
-    // Lovable-style
-    apple: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    apple: '0.25s cubic-bezier(0.25, 0.1, 0.25, 1)',
     spring: '0.4s cubic-bezier(0.54, 1.5, 0.38, 1.11)',
     elastic: '0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   },
@@ -226,4 +225,4 @@ export const theme = {
   },
 } as const;
 
-export type Theme = typeof theme; 
+export type Theme = typeof theme;

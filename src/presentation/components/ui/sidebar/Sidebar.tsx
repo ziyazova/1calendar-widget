@@ -12,10 +12,10 @@ const SidebarContainer = styled.aside`
   position: fixed;
   left: 0;
   top: 0;
-  width: 300px;
+  width: 270px;
   height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid ${({ theme }) => theme.colors.border.secondary};
+  background: #fafafa;
+  border-right: 1px solid ${({ theme }) => theme.colors.border.primary};
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
@@ -27,11 +27,12 @@ const SidebarContainer = styled.aside`
 `;
 
 const SidebarHeader = styled.div`
-  padding: 0 20px;
-  height: 56px;
+  padding: 0 24px;
+  height: 72px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.secondary};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
+  background: #ffffff;
 `;
 
 const LogoWrapper = styled.div`
@@ -41,7 +42,7 @@ const LogoWrapper = styled.div`
 `;
 
 const PeachIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="48" cy="54" r="36" fill="#F8B898" stroke="#4a4a4a" strokeWidth="5" strokeLinecap="round"/>
     <path d="M30 40 Q36 50 32 64" stroke="#4a4a4a" strokeWidth="4" strokeLinecap="round" fill="none"/>
     <path d="M62 36 Q58 48 64 62" stroke="#4a4a4a" strokeWidth="4" strokeLinecap="round" fill="none"/>
@@ -50,47 +51,42 @@ const PeachIcon = () => (
 );
 
 const LogoText = styled.h1`
-  font-size: 17px;
-  font-weight: 650;
-  color: #1a1a1a;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 28px;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 
   span {
-    color: #F4845F;
+    color: ${({ theme }) => theme.colors.text.secondary};
+    font-weight: 400;
   }
 `;
 
 const NavSection = styled.nav`
   flex: 1;
-  padding: 16px 0;
+  padding: 20px 0;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
-    width: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.border.primary};
-    border-radius: 10px;
+    width: 0;
   }
 `;
 
 const SectionLabel = styled.h2`
   font-size: 11px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 8px 0;
-  padding: 0 20px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0 0 12px 0;
+  padding: 0 24px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 
   &:nth-of-type(n+2) {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid ${({ theme }) => theme.colors.border.secondary};
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid ${({ theme }) => theme.colors.border.primary};
   }
 `;
 
@@ -102,15 +98,16 @@ const CategoryHeader = styled.button<{ $expanded: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
+  gap: 12px;
+  padding: 10px 24px;
   background: transparent;
   border: none;
   color: ${({ theme }) => theme.colors.text.primary};
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
+  line-height: 22px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.12s ease;
   font-family: inherit;
   letter-spacing: -0.01em;
 
@@ -122,20 +119,21 @@ const CategoryHeader = styled.button<{ $expanded: boolean }>`
     margin-left: auto;
     transition: transform 0.2s ease;
     transform: rotate(${({ $expanded }) => $expanded ? '90deg' : '0deg'});
-    opacity: 0.25;
-    width: 14px;
-    height: 14px;
+    opacity: 0.18;
+    width: 12px;
+    height: 12px;
   }
 `;
 
 const CategoryIcon = styled.div`
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: ${({ theme }) => theme.colors.background.tertiary};
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
 
   svg {
     color: ${({ theme }) => theme.colors.text.secondary};
@@ -147,8 +145,8 @@ const CategoryIcon = styled.div`
 const StylesList = styled.div<{ $expanded: boolean }>`
   max-height: ${({ $expanded }) => $expanded ? '500px' : '0'};
   overflow: hidden;
-  transition: max-height 0.25s ease;
-  padding: 0 12px 0 58px;
+  transition: max-height 0.2s ease;
+  padding: 4px 16px 0 66px;
 `;
 
 const StyleItem = styled.button<{ $active: boolean }>`
@@ -156,29 +154,29 @@ const StyleItem = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px;
-  background: ${({ $active }) => $active ? 'rgba(244, 132, 95, 0.08)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#F4845F' : '#6b6b6b'};
+  padding: 8px 10px;
+  background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.04)' : 'transparent'};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.secondary};
   border: none;
-  border-radius: 7px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: ${({ $active }) => $active ? 500 : 400};
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   text-align: left;
   margin-bottom: 2px;
   font-family: inherit;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.006em;
 
   &:hover {
-    background: ${({ $active }) => $active ? 'rgba(244, 132, 95, 0.08)' : 'rgba(0, 0, 0, 0.025)'};
-    color: ${({ $active }) => $active ? '#F4845F' : '#1a1a1a'};
+    background: rgba(0, 0, 0, 0.04);
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
 const StyleDot = styled.div<{ $color: string }>`
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: ${({ $color }) => $color};
   border-radius: 50%;
   flex-shrink: 0;

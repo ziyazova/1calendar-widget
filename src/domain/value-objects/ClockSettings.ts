@@ -11,6 +11,7 @@ export class ClockSettings {
   public readonly style: 'modern' | 'analog-classic';
   public readonly embedWidth: number;
   public readonly embedHeight: number;
+  public readonly theme: 'auto' | 'light' | 'dark';
 
   constructor(settings: Partial<ClockSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -25,6 +26,7 @@ export class ClockSettings {
     this.style = settings.style || 'modern';
     this.embedWidth = settings.embedWidth ?? 360;
     this.embedHeight = settings.embedHeight ?? 360;
+    this.theme = settings.theme || 'auto';
   }
 
   public static fromJson(json: string): ClockSettings {
@@ -50,6 +52,7 @@ export class ClockSettings {
       style: this.style,
       embedWidth: this.embedWidth,
       embedHeight: this.embedHeight,
+      theme: this.theme,
     });
   }
 
@@ -67,6 +70,7 @@ export class ClockSettings {
       style: changes.style ?? this.style,
       embedWidth: changes.embedWidth ?? this.embedWidth,
       embedHeight: changes.embedHeight ?? this.embedHeight,
+      theme: changes.theme ?? this.theme,
     });
   }
 } 

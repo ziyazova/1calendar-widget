@@ -16,10 +16,10 @@ const HeaderContainer = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 0 24px;
   background: #ffffff;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.secondary};
-  height: 64px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
+  height: 72px;
   position: relative;
   z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
@@ -27,7 +27,8 @@ const HeaderContainer = styled.header`
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 300px;
+  gap: 18px;
+  margin-left: 270px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-left: 0;
@@ -39,7 +40,7 @@ const TabGroup = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.colors.background.tertiary};
   border-radius: 10px;
-  padding: 4px;
+  padding: 3px;
   gap: 2px;
 `;
 
@@ -47,29 +48,37 @@ const Tab = styled.button<{ $active: boolean }>`
   padding: 7px 18px;
   height: 34px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: ${({ $active }) => $active ? 600 : 500};
   font-family: inherit;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.006em;
   color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.tertiary};
   background: ${({ $active }) => $active ? '#ffffff' : 'transparent'};
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'};
+  box-shadow: ${({ $active }) => $active
+    ? '0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04)'
+    : 'none'};
 
   &:hover {
-    color: ${({ theme }) => theme.colors.text.primary};
+    color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.secondary};
   }
+`;
+
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
 `;
 
 const CopyButton = styled.button<{ $copied?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 20px;
+  gap: 7px;
+  padding: 0 18px;
   height: 40px;
-  background: ${({ $copied }) => $copied ? '#15803d' : '#1a1a1a'};
+  background: ${({ $copied }) => $copied ? '#22863a' : '#1d1d1f'};
   color: #ffffff;
   border: none;
   border-radius: 10px;
@@ -78,10 +87,10 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   font-weight: 500;
   font-family: inherit;
   transition: all 0.15s ease;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.006em;
 
   &:hover:not(:disabled) {
-    background: ${({ $copied }) => $copied ? '#15803d' : '#333'};
+    background: ${({ $copied }) => $copied ? '#22863a' : '#3a3a3c'};
   }
 
   &:active:not(:disabled) {
@@ -89,13 +98,14 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   }
 
   &:disabled {
-    opacity: 0.35;
+    opacity: 0.25;
     cursor: not-allowed;
   }
 
   svg {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
+    opacity: 0.85;
   }
 `;
 
@@ -117,25 +127,28 @@ export const Header: React.FC<HeaderProps> = ({
     <HeaderContainer>
       <HeaderLeft>
         {currentWidget && (
-          <TabGroup>
-            <Tab $active={viewMode === 'editor'} onClick={() => onViewModeChange('editor')}>
-              Editor
-            </Tab>
-            <Tab $active={viewMode === 'layout-check'} onClick={() => onViewModeChange('layout-check')}>
-              Layout Check
-            </Tab>
-          </TabGroup>
+          <>
+            <TabGroup>
+              <Tab $active={viewMode === 'editor'} onClick={() => onViewModeChange('editor')}>
+                Editor
+              </Tab>
+              <Tab $active={viewMode === 'layout-check'} onClick={() => onViewModeChange('layout-check')}>
+                Layout Check
+              </Tab>
+            </TabGroup>
+            <CopyButton
+              onClick={handleCopy}
+              disabled={!currentWidget}
+              $copied={copied}
+            >
+              {copied ? <Check /> : <Copy />}
+              {copied ? 'Copied!' : 'Copy Embed URL'}
+            </CopyButton>
+          </>
         )}
       </HeaderLeft>
 
-      <CopyButton
-        onClick={handleCopy}
-        disabled={!currentWidget}
-        $copied={copied}
-      >
-        {copied ? <Check /> : <Copy />}
-        {copied ? 'Copied!' : 'Copy Embed URL'}
-      </CopyButton>
+      <HeaderRight />
     </HeaderContainer>
   );
 };

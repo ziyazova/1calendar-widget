@@ -10,6 +10,7 @@ export class CalendarSettings {
   public readonly showDayBorders: boolean;
   public readonly embedWidth: number;
   public readonly embedHeight: number;
+  public readonly theme: 'auto' | 'light' | 'dark';
 
   constructor(settings: Partial<CalendarSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -23,6 +24,7 @@ export class CalendarSettings {
     this.style = settings.style || 'modern-grid';
     this.embedWidth = settings.embedWidth ?? 420;
     this.embedHeight = settings.embedHeight ?? 380;
+    this.theme = settings.theme || 'auto';
   }
 
   public static fromJson(json: string): CalendarSettings {
@@ -47,6 +49,7 @@ export class CalendarSettings {
       style: this.style,
       embedWidth: this.embedWidth,
       embedHeight: this.embedHeight,
+      theme: this.theme,
     });
   }
 
@@ -63,6 +66,7 @@ export class CalendarSettings {
       style: changes.style ?? this.style,
       embedWidth: changes.embedWidth ?? this.embedWidth,
       embedHeight: changes.embedHeight ?? this.embedHeight,
+      theme: changes.theme ?? this.theme,
     });
   }
 } 

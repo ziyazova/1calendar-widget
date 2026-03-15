@@ -27,6 +27,9 @@ export class CompactUrlCodec {
     embedWidth: 'ew',
     embedHeight: 'eh',
 
+    // Theme
+    theme: 'tm',
+
     // Weather специфичные (w+символ)
     temperatureUnit: 'wu',
     showFeelsLike: 'wf',
@@ -69,6 +72,9 @@ export class CompactUrlCodec {
     // Embed size (calendar defaults; clock overrides at decode)
     embedWidth: 420,
     embedHeight: 380,
+
+    // Theme
+    theme: 'auto',
   };
 
   // Цвета из палитры кодируем индексами (0-9, a-f для 16 цветов)
@@ -130,6 +136,8 @@ export class CompactUrlCodec {
           'month': 'm', 'day': 'd',
           // Units
           'celsius': 'c', 'fahrenheit': 'f',
+          // Theme
+          'auto': 'A', 'light': 'L', 'dark': 'D',
         };
 
         compact[shortKey] = stringShortcuts[value] || value;
@@ -205,6 +213,8 @@ export class CompactUrlCodec {
             'm': longKey.includes('Size') ? 'medium' : longKey.includes('style') ? 'minimal' : 'month',
             // Sizes
             's': 'small', 'l': 'large',
+            // Theme
+            'A': 'auto', 'L': 'light', 'D': 'dark',
           };
 
           settings[longKey] = stringExpansions[value] || value;
