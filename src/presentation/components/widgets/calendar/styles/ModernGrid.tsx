@@ -84,7 +84,7 @@ const NavButton = styled.button<{
   justify-content: center;
   width: 30px;
   height: 30px;
-  border: 2px solid ${({ $primaryColor }) => `${$primaryColor}60`};
+  border: 1px solid ${({ $primaryColor }) => `${$primaryColor}60`};
   background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
   border-radius: ${({ $borderRadius }) => Math.min($borderRadius, 8)}px;

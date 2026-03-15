@@ -354,35 +354,6 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </FormGroup>
         </Section>
 
-        {/* Calendar specific settings */}
-        {widget.type === 'calendar' && (
-          <Section>
-            <SectionTitle>Calendar Options</SectionTitle>
-
-            <FormGroup>
-              <Label>Default View</Label>
-              <Select
-                value={(settings as CalendarSettings).defaultView}
-                onChange={(e) => onSettingsChange({ defaultView: e.target.value as 'month' | 'week' | 'day' })}
-              >
-                <option value="month">Month View</option>
-                <option value="week">Week View</option>
-                <option value="day">Day View</option>
-              </Select>
-            </FormGroup>
-
-            <FormGroup>
-              <CheckboxContainer>
-                <Checkbox
-                  type="checkbox"
-                  checked={(settings as CalendarSettings).showWeekends}
-                  onChange={(e) => onSettingsChange({ showWeekends: e.target.checked })}
-                />
-                Show Weekends
-              </CheckboxContainer>
-            </FormGroup>
-          </Section>
-        )}
 
         {/* Clock specific settings */}
         {widget.type === 'clock' && (

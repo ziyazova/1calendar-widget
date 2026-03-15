@@ -9,8 +9,8 @@
 // Container sizing — all widgets
 export const WIDGET_CONTAINER = {
   minWidth: '200px',
-  maxWidth: '280px',
-  padding: '14px',
+  maxWidth: '270px',
+  padding: '12px',
   minHeight: '160px',
   maxHeight: '380px',
 } as const;
@@ -31,7 +31,7 @@ export const WIDGET_TYPOGRAPHY = {
 
 // Spacing
 export const WIDGET_SPACING = {
-  gap: '3px',
+  gap: '4px',
   gapMedium: '6px',
   margin: '10px',
 } as const;
