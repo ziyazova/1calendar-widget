@@ -24,7 +24,7 @@ const GridContainer = styled.div<{
   padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
-    $showBorder ? `3px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
+    $showBorder ? `1px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   box-shadow:
@@ -205,7 +205,7 @@ const DayCell = styled.button<{
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: ${WIDGET_TYPOGRAPHY.body};
-  font-weight: ${({ $isToday }) => ($isToday ? '700' : '500')};
+  font-weight: ${({ $isToday }) => ($isToday ? '700' : '400')};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   display: flex;

@@ -18,7 +18,6 @@ export const colorNames = [
 // Дополнительные нейтральные цвета для фона
 export const backgroundColors = [
   '#FFFFFF', // Pure White
-  '#F8FAFC', // Snow
   '#F1F5F9', // Light Gray
   '#E2E8F0', // Soft Gray
   '#1E293B', // Dark Blue
@@ -27,7 +26,6 @@ export const backgroundColors = [
 
 export const backgroundNames = [
   'White',
-  'Snow',
   'Light',
   'Gray',
   'Dark',
