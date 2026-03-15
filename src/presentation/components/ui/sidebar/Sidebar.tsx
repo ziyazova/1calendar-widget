@@ -184,6 +184,7 @@ const StyleDot = styled.div<{ $color: string }>`
 
 const CALENDAR_STYLES = [
   { label: 'CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
+  { label: 'Classic Calendar', value: 'classic', color: '#6E7FF2' },
 ];
 
 const ARCHIVE_STYLES = [
@@ -196,6 +197,7 @@ const ARCHIVE_STYLES = [
 const CLOCK_STYLES = [
   { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
   { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
+  { label: 'Clock', value: 'classic', color: '#6E7FF2' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({

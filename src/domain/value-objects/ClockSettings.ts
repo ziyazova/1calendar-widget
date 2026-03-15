@@ -8,7 +8,7 @@ export class ClockSettings {
   public readonly showBorder: boolean;
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
-  public readonly style: 'modern' | 'analog-classic';
+  public readonly style: 'modern' | 'analog-classic' | 'classic';
   public readonly embedWidth: number;
   public readonly embedHeight: number;
   public readonly theme: 'auto' | 'light' | 'dark';

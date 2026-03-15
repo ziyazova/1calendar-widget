@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**1calendar-widget** is a client-side widget studio for creating embeddable Calendar and Clock widgets, primarily targeting Notion embeds. There is no backend — all widget configuration is encoded in the URL. Built with an Apple-inspired design language.
+**Peachy Studio** (repo: `1calendar-widget`) is a client-side widget studio for creating embeddable Calendar and Clock widgets, primarily targeting Notion embeds. There is no backend — all widget configuration is encoded in the URL. Built with an Apple-inspired design language using Inter font.
 
 **Repo:** `https://github.com/ziyazova/1calendar-widget.git`
 **Branch:** `Version-1` (active development), `main` (stable)
@@ -80,17 +80,28 @@ src/
 ## Widgets
 
 ### Calendar
-- **Modern Grid** (`modern-grid`) — 7-column month grid, navigation, today highlight
-- **Modern Weekly** (`modern-weekly`) — Weekly/monthly toggle, gradient background
+- **CSS Zoom Fixed** (`modern-grid-zoom-fixed`) — Primary calendar style, CSS zoom scaling, full customization
+- **Classic Calendar** (`classic`) — Colored header bar with primary color, simple chevron nav, clean body. Accent Color not used (hidden in panel). Duplicated from CSS Zoom Fixed with distinct header style
+- **Modern Grid** (`modern-grid`) — 7-column month grid, navigation, today highlight (archive)
+- **Modern Weekly** (`modern-weekly`) — Weekly/monthly toggle, gradient background (archive)
 
 ### Clock
 - **Modern Digital** (`modern`) — Digital time, 12h/24h, seconds toggle, date
 - **Analog Classic** (`analog-classic`) — Circular face, hour marks, animated hands
 
 ### Widget Settings
-- Shared: `primaryColor`, `backgroundColor`, `accentColor`, `borderRadius`, `showBorder`, `embedWidth`, `embedHeight`
-- Calendar-specific: `style`, `defaultView` (month/week/day), `showWeekends`
+- Shared: `primaryColor`, `backgroundColor`, `accentColor`, `borderRadius`, `showBorder`, `embedWidth`, `embedHeight`, `theme`
+- Calendar-specific: `style`, `defaultView` (month/week/day), `showWeekends`, `showDayBorders`
 - Clock-specific: `style`, `showSeconds`, `format24h`, `showDate`, `fontSize`
+
+### Customization Panel
+
+One adaptive `CustomizationPanel.tsx` component serves all widget types. Sections are shown/hidden based on `widget.type` and `settings.style`:
+
+- **Appearance** (all): Theme selector (Auto/Light/Dark)
+- **Colors** (all): Primary Color, Background. Accent Color hidden for Classic Calendar (`style === 'classic'`)
+- **Layout** (all): Border Radius slider, Show Border toggle. Show Day Borders toggle for calendars only
+- **Clock** (clock only): Font Size, Show Seconds, 24h Format, Show Date
 
 ### Embed Size Boundaries
 
@@ -101,6 +112,18 @@ src/
 | Clock | embedWidth | 200 | 360 | 600 |
 | Clock | embedHeight | 200 | 360 | 600 |
 
+## Dark Mode / Theme Support
+
+- **Setting:** `theme: 'auto' | 'light' | 'dark'` on both CalendarSettings and ClockSettings (default: `auto`)
+- **Auto mode:** Detects via `prefers-color-scheme` media query — works with Notion's "Use system setting"
+- **Explicit mode:** User sets Light/Dark in studio → encoded in embed URL as `tm` parameter
+- **For Notion explicit Dark mode:** User must set theme to "Dark" in studio (Notion's app-level dark mode doesn't change `prefers-color-scheme`)
+- **Hook:** `useResolvedTheme(theme)` in `src/presentation/hooks/useResolvedTheme.ts` — resolves auto via media query, listens for changes
+- **Color adaptation:** `adaptColorForDarkMode(color, type)` maps light colors to Notion-matching dark equivalents:
+  - Backgrounds: `#FFFFFF` → `#191919` (Notion's exact dark bg), `#F7F7F5` → `#1E1E1C`, etc.
+  - Accents: `#E8EDFF` → `#1E2340`, `#EEE8FA` → `#261E35`, etc.
+- **Embed pages:** Dynamically set `html, body` background to match widget's effective background — no white rectangle in Notion dark mode
+
 ## Embed System
 
 - Widgets are embedded as iframes; all config lives in the URL query string
@@ -108,8 +131,7 @@ src/
 - **Legacy format** (`?config=<base64>`) still supported for decoding
 - `EmbedScaleWrapper.tsx`: accepts `refWidth`/`refHeight` props (from `embedWidth`/`embedHeight` settings), scales via CSS transform using ResizeObserver. Scale range: **0.25–2.0** (scales both down and up)
 - Embed pages (`CalendarEmbedPage`, `ClockEmbedPage`) extract `embedWidth`/`embedHeight` from parsed settings and pass to `EmbedScaleWrapper`
-- Studio `CustomizationPanel` has Width/Height sliders in "Embed Size" section
-- URL encoding: `embedWidth` → `ew`, `embedHeight` → `eh` (omitted when equal to defaults)
+- URL encoding: `embedWidth` → `ew`, `embedHeight` → `eh`, `theme` → `tm` (omitted when equal to defaults)
 - `index.html` includes a script for iframe auto-height via `postMessage`/`ResizeObserver`
 
 ### Embed URL Base Domain
@@ -130,7 +152,7 @@ Vercel protects non-production deployments (preview, branch) with authentication
 
 - **Theme** (`theme.ts`): Apple-inspired tokens — 8px spacing grid, SF Pro font, cubic-bezier transitions, z-index layers, shadow presets
 - **Widget Tokens** (`widgetTokens.ts`): Responsive clamp() values for container sizing, typography, spacing — ensures widgets adapt from 200px to full width
-- **Colors** (`colors.ts`): Named widget colors (Ocean, Purple, etc.), background presets, gradient backgrounds, `getContrastColor()` for accessibility
+- **Colors** (`colors.ts`): Unified premium palette — Primary (#6E7FF2, #7C63B8, #E89A78), Background (#FFFFFF, #F7F7F5, #EEF1F5), Accent (#E8EDFF, #EEE8FA, #FBE9E1). 3 presets per category. `getContrastColor()` for accessibility
 - **Convention:** Styled-components with `$transientProps` to avoid DOM warnings
 
 ## Testing
@@ -206,6 +228,8 @@ Smoke tests print `[SMOKE]` tagged output to stdout, covering:
 - Test setup: `src/test/setup.ts`
 - Smoke test: `src/test/embed-size-smoke.test.ts`
 - Embed base URL: `.env.production` → `VITE_EMBED_BASE_URL`
+- Theme hook: `src/presentation/hooks/useResolvedTheme.ts`
+- Classic Calendar: `src/presentation/components/widgets/calendar/styles/ClassicCalendar.tsx`
 
 ## Documentation
 

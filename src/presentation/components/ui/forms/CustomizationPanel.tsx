@@ -255,6 +255,8 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   }
 
   const settings = widget.settings as CalendarSettings | ClockSettings;
+  const isClassicStyle = (widget.type === 'calendar' && (settings as CalendarSettings).style === 'classic') ||
+    (widget.type === 'clock' && (settings as ClockSettings).style === 'classic');
 
   return (
     <PanelContainer>
@@ -299,6 +301,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             />
           </FormGroup>
 
+          {!isClassicStyle && (
           <FormGroup>
             <Label>Accent Color</Label>
             <ColorPicker
@@ -308,6 +311,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
               showPresets={true}
             />
           </FormGroup>
+          )}
         </Section>
 
         <Section>
@@ -359,6 +363,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <Section>
             <SectionTitle>Clock</SectionTitle>
 
+            {!isClassicStyle && (
             <FormGroup>
               <Label>Font Size</Label>
               <Select
@@ -370,6 +375,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 <option value="large">Large</option>
               </Select>
             </FormGroup>
+            )}
 
             <FormGroup>
               <ToggleGroup>
