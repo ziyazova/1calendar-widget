@@ -125,9 +125,12 @@ export const ClockEmbedPage: React.FC = () => {
 
   const resolvedTheme = useResolvedTheme(settings.theme);
   const isDark = resolvedTheme === 'dark';
-  const effectiveBg = isDark
-    ? adaptColorForDarkMode(settings.backgroundColor, 'background')
-    : settings.backgroundColor;
+  const isFlipClock = settings.style === 'classic';
+  const effectiveBg = isFlipClock
+    ? 'transparent'
+    : isDark
+      ? adaptColorForDarkMode(settings.backgroundColor, 'background')
+      : settings.backgroundColor;
 
   if (loading) {
     return (
