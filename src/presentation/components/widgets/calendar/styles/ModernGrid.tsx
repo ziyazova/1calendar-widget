@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
@@ -15,11 +15,12 @@ const GridContainer = styled.div<{
   $showBorder: boolean;
   $accentColor: string;
   $textColor: string;
+  $debug?: boolean;
 }>`
   width: 100%;
-  min-width: ${WIDGET_CONTAINER.minWidth};
   max-width: ${WIDGET_CONTAINER.maxWidth};
-  max-height: ${WIDGET_CONTAINER.maxHeight};
+  ${({ $debug }) => $debug && `outline: 2px solid lime; outline-offset: -2px;`}
+  height: auto;
   padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
@@ -54,23 +55,13 @@ const GridContainer = styled.div<{
   }
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow:
       0 8px 25px rgba(0, 0, 0, 0.15),
       0 2px 8px rgba(0, 0, 0, 0.08);
     border-color: ${({ $accentColor }) => $accentColor};
   }
 
-  /* Adaptive layout */
-  @media (max-width: 480px) {
-    padding: 12px;
-    max-width: 100%;
-  }
-
-  @media (max-width: 360px) {
-    padding: 10px;
-    min-width: 180px;
-  }
 `;
 
 const CalendarHeader = styled.div`
@@ -106,8 +97,8 @@ const NavButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(28px, 8vw, 36px);
-  height: clamp(28px, 8vw, 36px);
+  width: 30px;
+  height: 30px;
   border: 2px solid ${({ $primaryColor }) => `${$primaryColor}60`};
   background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
@@ -118,13 +109,14 @@ const NavButton = styled.button<{
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 24px;
 
   &:hover {
     background: ${({ $primaryColor }) => $primaryColor};
     color: white;
     border-color: ${({ $primaryColor }) => $primaryColor};
-    transform: scale(1.05);
+    transform: scale(1.02);
     box-shadow:
       0 2px 6px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -135,8 +127,8 @@ const NavButton = styled.button<{
   }
 
   svg {
-    width: clamp(12px, 3.5vw, 18px);
-    height: clamp(12px, 3.5vw, 18px);
+    width: 16px;
+    height: 16px;
   }
 `;
 
@@ -154,9 +146,9 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: clamp(4px, 1.5vw, 10px) clamp(2px, 0.5vw, 6px);
+  padding: 4px 2px;
   text-align: center;
-  font-size: clamp(9px, 2.5vw, 13px);
+  font-size: 10px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};
@@ -197,7 +189,8 @@ const WeekDay = styled.div<{
 
 const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
-  grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
+  grid-template-columns: repeat(${({ $showWeekends }) => ($showWeekends ? 7 : 5)}, 1fr);
+  grid-template-rows: repeat(5, minmax(0, 1fr));
   gap: ${WIDGET_SPACING.gap};
   align-content: start;
 `;
@@ -209,7 +202,7 @@ const DayCell = styled.button<{
   $borderRadius: number;
   $textColor: string;
 }>`
-  padding: clamp(4px, 1.5vw, 10px);
+  padding: 5px;
   border: 1px solid ${({ $isToday, $primaryColor, $textColor }) => {
     if ($isToday) return $primaryColor;
     return `${$textColor}20`;
@@ -230,11 +223,10 @@ const DayCell = styled.button<{
   font-weight: ${({ $isToday }) => ($isToday ? '700' : '500')};
   position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: clamp(24px, 6vw, 36px);
+  min-height: 28px;
 
   &:hover:not(:disabled) {
     background: ${({ $isToday, $primaryColor }) => {
@@ -246,7 +238,7 @@ const DayCell = styled.button<{
       return $primaryColor;
     }};
     border-color: ${({ $primaryColor }) => $primaryColor};
-    transform: scale(1.05);
+    transform: scale(1.02);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
@@ -279,7 +271,18 @@ const weekDaysWorkdays = ['M', 'T', 'W', 'T', 'F'];
 
 export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [debug, setDebug] = useState(false);
   const textColor = getContrastColor(settings.backgroundColor);
+
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data === 'debug-on') setDebug(true);
+      if (e.data === 'debug-off') setDebug(false);
+      if (e.data === 'toggle-debug') setDebug(prev => !prev);
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
   const today = new Date();
 
   // Regular calendar logic
@@ -297,6 +300,7 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
 
   const days = [];
   const currentDay = new Date(firstDisplayDay);
+  // Render 5 calendar rows
   const totalDays = settings.showWeekends ? 35 : 25;
 
   for (let i = 0; i < totalDays; i++) {
@@ -329,6 +333,7 @@ export const ModernGrid: React.FC<ModernGridProps> = ({ settings }) => {
       $showBorder={settings.showBorder}
       $accentColor={settings.accentColor}
       $textColor={textColor}
+      $debug={debug}
     >
       <CalendarHeader>
         <NavButton

@@ -1,29 +1,36 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { Logger } from '../../../infrastructure/services/Logger';
 
-/** Default reference size of the widget - used to calculate scale */
-const DEFAULT_REF_WIDTH = 420;
-const DEFAULT_REF_HEIGHT = 380;
-const MIN_SCALE = 0.25;
-const MAX_SCALE = 2.0;
+const MIN_ZOOM = 0.5;
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ $debug?: boolean }>`
   width: 100%;
   height: 100%;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
+  ${({ $debug }) => $debug && `
+    outline: 3px dashed red;
+    outline-offset: -3px;
+  `}
 `;
 
-const ScaledInner = styled.div<{ $scale: number }>`
-  transform-origin: center center;
-  transform: scale(${({ $scale }) => $scale});
-  flex-shrink: 0;
+const DebugInfo = styled.div`
+  position: fixed;
+  top: 4px;
+  left: 4px;
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(0,0,0,0.8);
+  color: #0f0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  z-index: 9999;
+  line-height: 1.6;
+  pointer-events: none;
+  white-space: pre;
 `;
 
 interface EmbedScaleWrapperProps {
@@ -33,59 +40,101 @@ interface EmbedScaleWrapperProps {
 }
 
 /**
- * Wraps embed content and scales it to fit the viewport.
- * Scales both down and up within MIN_SCALE–MAX_SCALE bounds.
+ * Wraps embed content and shrinks it proportionally when the container
+ * is smaller than the widget's design size. Uses CSS zoom so the
+ * layout box and visual size stay in sync.
+ *
+ * ZoomBox shrink-wraps to the widget (display:inline-block) so its
+ * outline always matches the widget's outline — no extra space.
  */
 export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   children,
-  refWidth = DEFAULT_REF_WIDTH,
-  refHeight = DEFAULT_REF_HEIGHT,
+  refWidth = 280,
+  refHeight = 320,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  const [debugInfo, setDebugInfo] = useState('');
+  const [debug, setDebug] = useState(false);
 
-  Logger.debug('EmbedScaleWrapper', 'Render with ref size', { refWidth, refHeight });
-
+  // Listen for debug toggle from parent (simulator)
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    Logger.info('EmbedScaleWrapper', 'Mounting scale observer', { refWidth, refHeight });
-
-    const updateScale = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w <= 0 || h <= 0) return;
-
-      const scaleX = (w - 16) / refWidth;
-      const scaleY = (h - 16) / refHeight;
-      const rawScale = Math.min(scaleX, scaleY, MAX_SCALE);
-      const newScale = Math.max(MIN_SCALE, rawScale);
-
-      Logger.debug('EmbedScaleWrapper', 'Scale calculation', {
-        container: `${w}x${h}`,
-        ref: `${refWidth}x${refHeight}`,
-        scaleX: scaleX.toFixed(3),
-        scaleY: scaleY.toFixed(3),
-        finalScale: newScale.toFixed(3),
-      });
-
-      setScale(newScale);
+    const onMessage = (e: MessageEvent) => {
+      if (e.data === 'toggle-debug') setDebug(prev => !prev);
+      if (e.data === 'debug-on') setDebug(true);
+      if (e.data === 'debug-off') setDebug(false);
     };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
-    const rafId = requestAnimationFrame(updateScale);
-    const observer = new ResizeObserver(updateScale);
-    observer.observe(el);
+  const update = useCallback(() => {
+    const wrapper = wrapperRef.current;
+    const inner = innerRef.current;
+    if (!wrapper || !inner) return;
 
-    return () => {
-      cancelAnimationFrame(rafId);
-      observer.disconnect();
-    };
+    const availW = wrapper.clientWidth;
+    const availH = wrapper.clientHeight;
+    if (availW <= 0 || availH <= 0) return;
+
+    // Get the widget's natural (unzoomed) dimensions
+    const currentZoom = parseFloat(inner.style.zoom) || 1;
+    const naturalW = inner.offsetWidth / currentZoom;
+    const naturalH = inner.offsetHeight / currentZoom;
+    const contentW = naturalW > 0 ? naturalW : refWidth;
+    const contentH = naturalH > 0 ? naturalH : refHeight;
+
+    const zoomX = availW < contentW ? availW / contentW : 1;
+    const zoomY = availH < contentH ? availH / contentH : 1;
+    const newZoom = Math.max(MIN_ZOOM, Math.min(zoomX, zoomY));
+
+    setZoom(newZoom);
+
+    // Tell the parent frame the widget's minimum embed size
+    const minW = Math.ceil(contentW * MIN_ZOOM);
+    const minH = Math.ceil(contentH * MIN_ZOOM);
+    window.parent.postMessage({
+      type: 'embed-min-size',
+      minWidth: minW,
+      minHeight: minH,
+    }, '*');
+
+    setDebugInfo(
+      `Wrapper:    ${availW} × ${availH}\n` +
+      `ZoomBox:    ${inner.offsetWidth} × ${inner.offsetHeight}\n` +
+      `Natural:    ${Math.round(contentW)} × ${Math.round(contentH)}\n` +
+      `ZoomX:      ${zoomX.toFixed(3)}\n` +
+      `ZoomY:      ${zoomY.toFixed(3)}\n` +
+      `Zoom:       ${newZoom.toFixed(3)}\n` +
+      `Visual:     ${Math.round(contentW * newZoom)} × ${Math.round(contentH * newZoom)}`
+    );
   }, [refWidth, refHeight]);
 
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [update]);
+
   return (
-    <Wrapper ref={containerRef}>
-      <ScaledInner $scale={scale}>{children}</ScaledInner>
+    <Wrapper ref={wrapperRef} $debug={debug}>
+      {debug && <DebugInfo>{debugInfo}</DebugInfo>}
+      <div
+        ref={innerRef}
+        style={{
+          zoom,
+          display: 'inline-block',
+          boxSizing: 'border-box',
+          outline: debug ? '2px solid cyan' : 'none',
+        }}
+      >
+        {children}
+      </div>
     </Wrapper>
   );
 };

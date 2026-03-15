@@ -1,36 +1,39 @@
 /**
  * Unified tokens for adaptive widgets.
  * Use these for consistent layout across Calendar and Clock widgets.
+ *
+ * The embed wrapper uses CSS zoom for proportional shrinking,
+ * so these values target the widget's design width (280px).
  */
 
 // Container sizing — all widgets
 export const WIDGET_CONTAINER = {
   minWidth: '200px',
-  maxWidth: 'min(420px, 95vw)',
-  padding: 'clamp(12px, 4vw, 24px)',
-  minHeight: 'clamp(160px, 40vw, 220px)',
-  maxHeight: 'min(380px, 95vh)',
+  maxWidth: '280px',
+  padding: '14px',
+  minHeight: '160px',
+  maxHeight: '380px',
 } as const;
 
 // Clock-specific (slightly narrower)
 export const CLOCK_CONTAINER = {
-  maxWidth: 'min(360px, 95vw)',
-  padding: 'clamp(12px, 4vw, 24px)',
-  minHeight: 'clamp(160px, 40vw, 220px)',
+  maxWidth: '360px',
+  padding: '20px',
+  minHeight: '160px',
 } as const;
 
 // Typography
 export const WIDGET_TYPOGRAPHY = {
-  heading: 'clamp(14px, 4vw, 22px)',
-  body: 'clamp(12px, 2.8vw, 16px)',
-  small: 'clamp(10px, 2.2vw, 14px)',
+  heading: '17px',
+  body: '13px',
+  small: '11px',
 } as const;
 
 // Spacing
 export const WIDGET_SPACING = {
-  gap: 'clamp(2px, 1vw, 8px)',
-  gapMedium: 'clamp(4px, 1.5vw, 12px)',
-  margin: 'clamp(8px, 2vw, 16px)',
+  gap: '3px',
+  gapMedium: '6px',
+  margin: '10px',
 } as const;
 
 // Breakpoints

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notion Embed Simulator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f7f6f3;
+      padding: 40px;
+      color: #37352f;
+    }
+    h1 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #999; margin-bottom: 32px; }
+
+    .controls {
+      display: flex; gap: 16px; align-items: center;
+      margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .controls label { font-size: 13px; font-weight: 500; }
+    .controls input[type="range"] { width: 160px; }
+    .controls .value { font-size: 13px; color: #666; min-width: 42px; }
+    .controls button {
+      padding: 6px 14px; font-size: 13px; border-radius: 6px;
+      border: 1px solid #ddd; background: #fff; cursor: pointer;
+    }
+    .controls button:hover { background: #f0f0f0; }
+    .controls button.active { background: #37352f; color: #fff; border-color: #37352f; }
+
+    .presets { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .presets button {
+      padding: 4px 12px; font-size: 12px; border-radius: 4px;
+      border: 1px solid #e0e0e0; background: #fff; cursor: pointer;
+    }
+    .presets button:hover { background: #f0f0f0; }
+
+    .embed-container {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      resize: both;
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .embed-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .size-label {
+      position: absolute; bottom: 4px; right: 8px;
+      font-size: 11px; color: #999; pointer-events: none;
+      background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 3px;
+    }
+    .hint {
+      font-size: 12px; color: #aaa; margin-top: 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+    .grid-item h3 { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .grid-item .embed-container { resize: none; }
+
+    /* Debug legend */
+    .debug-legend {
+      display: none;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 10px 16px;
+      background: #1a1a2e;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #ccc;
+    }
+    .debug-legend.visible { display: flex; flex-wrap: wrap; }
+    .debug-legend .swatch {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border-radius: 2px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .debug-btn.active {
+      background: #e74c3c !important;
+      color: #fff !important;
+      border-color: #e74c3c !important;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Notion Embed Simulator</h1>
+  <p class="subtitle">Test how the calendar widget looks inside a Notion-style iframe at different sizes. Drag the bottom-right corner to resize.</p>
+
+  <div class="controls">
+    <label>Width:</label>
+    <input type="range" id="widthSlider" min="150" max="900" value="420" />
+    <span class="value" id="widthVal">420px</span>
+
+    <label>Height:</label>
+    <input type="range" id="heightSlider" min="150" max="700" value="380" />
+    <span class="value" id="heightVal">380px</span>
+
+    <label style="margin-left:16px;">Widget:</label>
+    <button class="widget-btn active" data-path="/embed/calendar">Calendar</button>
+    <button class="widget-btn" data-path="/embed/clock">Clock</button>
+
+    <button class="debug-btn" id="debugToggle" style="margin-left:16px;">Debug</button>
+  </div>
+
+  <div class="debug-legend" id="debugLegend">
+    <span><span class="swatch" style="border: 2px dashed red;"></span> Wrapper (flex container, 100%×100%)</span>
+    <span><span class="swatch" style="border: 2px solid cyan;"></span> ZoomBox (widget container, zoom applied)</span>
+    <span><span class="swatch" style="border: 2px solid lime;"></span> GridContainer (calendar card)</span>
+    <span>Top-left panel: live size & zoom values</span>
+  </div>
+
+  <div class="presets">
+    <strong style="font-size:12px; line-height:28px;">Presets:</strong>
+    <button data-w="150" data-h="150">150×150 (tiny)</button>
+    <button data-w="200" data-h="200">200×200 (min)</button>
+    <button data-w="280" data-h="320">280×320 (design)</button>
+    <button data-w="320" data-h="320">320×320 (Notion small)</button>
+    <button data-w="420" data-h="380">420×380 (default)</button>
+    <button data-w="500" data-h="400">500×400 (Notion medium)</button>
+    <button data-w="700" data-h="500">700×500 (Notion wide)</button>
+    <button data-w="800" data-h="600">800×600 (max)</button>
+  </div>
+
+  <div class="embed-container" id="mainEmbed" style="width: 420px; height: 380px;">
+    <iframe id="embedIframe" src="http://localhost:5173/embed/calendar"></iframe>
+    <span class="size-label" id="sizeLabel">420 × 380</span>
+  </div>
+  <p class="hint">↘ Drag the corner to resize freely, or use the sliders / presets above.</p>
+
+  <!-- Fixed-size comparison grid -->
+  <h1 style="margin-top:48px;">Size Comparison</h1>
+  <p class="subtitle">All common Notion embed sizes side by side.</p>
+  <div class="grid">
+    <div class="grid-item">
+      <h3>200 × 200 (minimum)</h3>
+      <div class="embed-container" style="width:200px; height:200px;">
+        <iframe class="grid-iframe" src="http://localhost:5173/embed/calendar"></iframe>
+      </div>
+    </div>
+    <div class="grid-item">
+      <h3>280 × 320 (design size)</h3>
+      <div class="embed-container" style="width:280px; height:320px;">
+        <iframe class="grid-iframe" src="http://localhost:5173/embed/calendar"></iframe>
+      </div>
+    </div>
+    <div class="grid-item">
+      <h3>320 × 320 (Notion small)</h3>
+      <div class="embed-container" style="width:320px; height:320px;">
+        <iframe class="grid-iframe" src="http://localhost:5173/embed/calendar"></iframe>
+      </div>
+    </div>
+    <div class="grid-item">
+      <h3>420 × 380 (default)</h3>
+      <div class="embed-container" style="width:420px; height:380px;">
+        <iframe class="grid-iframe" src="http://localhost:5173/embed/calendar"></iframe>
+      </div>
+    </div>
+    <div class="grid-item">
+      <h3>700 × 500 (wide)</h3>
+      <div class="embed-container" style="width:700px; height:500px;">
+        <iframe class="grid-iframe" src="http://localhost:5173/embed/calendar"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('mainEmbed');
+    const iframe = document.getElementById('embedIframe');
+    const sizeLabel = document.getElementById('sizeLabel');
+    const widthSlider = document.getElementById('widthSlider');
+    const heightSlider = document.getElementById('heightSlider');
+    const widthVal = document.getElementById('widthVal');
+    const heightVal = document.getElementById('heightVal');
+    const debugToggle = document.getElementById('debugToggle');
+    const debugLegend = document.getElementById('debugLegend');
+
+    let debugOn = false;
+
+    let embedMinW = 0;
+    let embedMinH = 0;
+
+    // Listen for min-size messages from the widget iframe
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'embed-min-size') {
+        embedMinW = e.data.minWidth || 0;
+        embedMinH = e.data.minHeight || 0;
+        container.style.minWidth = embedMinW + 'px';
+        container.style.minHeight = embedMinH + 'px';
+        // Update slider minimums to match
+        widthSlider.min = embedMinW;
+        heightSlider.min = embedMinH;
+      }
+    });
+
+    function updateSize(w, h) {
+      w = Math.max(w, embedMinW);
+      h = Math.max(h, embedMinH);
+      container.style.width = w + 'px';
+      container.style.height = h + 'px';
+      widthSlider.value = w;
+      heightSlider.value = h;
+      widthVal.textContent = w + 'px';
+      heightVal.textContent = h + 'px';
+      sizeLabel.textContent = w + ' × ' + h;
+    }
+
+    widthSlider.addEventListener('input', () => {
+      updateSize(+widthSlider.value, +heightSlider.value);
+    });
+    heightSlider.addEventListener('input', () => {
+      updateSize(+widthSlider.value, +heightSlider.value);
+    });
+
+    // Track manual drag-resize
+    new ResizeObserver(() => {
+      const w = Math.round(container.offsetWidth);
+      const h = Math.round(container.offsetHeight);
+      sizeLabel.textContent = w + ' × ' + h;
+      widthSlider.value = w;
+      heightSlider.value = h;
+      widthVal.textContent = w + 'px';
+      heightVal.textContent = h + 'px';
+    }).observe(container);
+
+    // Presets
+    document.querySelectorAll('.presets button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        updateSize(+btn.dataset.w, +btn.dataset.h);
+      });
+    });
+
+    // Widget toggle
+    document.querySelectorAll('.widget-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.widget-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        iframe.src = 'http://localhost:5173' + btn.dataset.path;
+        // Re-apply debug state to new iframe
+        if (debugOn) {
+          setTimeout(() => iframe.contentWindow.postMessage('debug-on', '*'), 500);
+        }
+      });
+    });
+
+    // Debug toggle
+    function sendDebugToAll(msg) {
+      iframe.contentWindow.postMessage(msg, '*');
+      document.querySelectorAll('.grid-iframe').forEach(f => {
+        f.contentWindow.postMessage(msg, '*');
+      });
+    }
+
+    debugToggle.addEventListener('click', () => {
+      debugOn = !debugOn;
+      debugToggle.classList.toggle('active', debugOn);
+      debugLegend.classList.toggle('visible', debugOn);
+      sendDebugToAll(debugOn ? 'debug-on' : 'debug-off');
+    });
+  </script>
+</body>
+</html>
