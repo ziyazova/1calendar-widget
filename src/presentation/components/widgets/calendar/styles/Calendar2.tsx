@@ -15,7 +15,7 @@ const OuterWrapper = styled.div`
 `;
 
 const ZoomWrapper = styled.div<{ $zoom: number }>`
-  width: 270px;
+  width: 256px;
   zoom: ${({ $zoom }) => $zoom};
 `;
 
@@ -26,7 +26,7 @@ const Container = styled.div<{
   $accentColor: string;
   $textColor: string;
 }>`
-  width: 270px;
+  width: 256px;
   padding: 14px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>

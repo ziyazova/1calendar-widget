@@ -21,6 +21,7 @@ const Inner = styled.div<{
   $textColor: string;
 }>`
   width: 100%;
+  max-width: 246px;
   padding: 4cqi;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>

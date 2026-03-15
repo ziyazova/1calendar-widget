@@ -7,7 +7,7 @@ import { getContrastColor } from '../../../../themes/colors';
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const weekDayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-const DESIGN_WIDTH = 300;
+const DESIGN_WIDTH = 256;
 const DESIGN_HEIGHT = 340;
 
 const SvgWrapper = styled.div`
