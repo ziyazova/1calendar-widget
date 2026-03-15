@@ -71,7 +71,7 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
         height="100%"
         viewBox={`0 0 ${refWidth} ${contentHeight}`}
         preserveAspectRatio="xMidYMid meet"
-        style={{ maxWidth: refWidth, maxHeight: contentHeight }}
+        style={{ maxHeight: contentHeight }}
       >
         <foreignObject width={refWidth} height={contentHeight}>
           <div

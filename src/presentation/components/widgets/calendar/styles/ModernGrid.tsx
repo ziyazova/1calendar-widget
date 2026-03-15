@@ -87,7 +87,7 @@ const NavButton = styled.button<{
   border: 1px solid ${({ $primaryColor }) => `${$primaryColor}60`};
   background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius, 8)}px;
+  border-radius: ${({ $borderRadius }) => Math.min(Math.round($borderRadius / 3) + 1, 10)}px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
@@ -137,7 +137,7 @@ const WeekDay = styled.div<{
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 6)}px;
+  border-radius: ${({ $borderRadius }) => Math.min(Math.round($borderRadius / 4) + 1, 8)}px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
@@ -201,7 +201,7 @@ const DayCell = styled.button<{
     if (!$isCurrentMonth) return `${$textColor}25`;
     return $textColor;
   }};
-  border-radius: ${({ $borderRadius }) => Math.min($borderRadius / 3, 6)}px;
+  border-radius: ${({ $borderRadius }) => Math.min(Math.round($borderRadius / 4) + 1, 8)}px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: ${WIDGET_TYPOGRAPHY.body};

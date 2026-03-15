@@ -6,7 +6,7 @@ export class CalendarSettings {
   public readonly showWeekends: boolean;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'modern-grid' | 'modern-weekly';
+  public readonly style: 'modern-grid' | 'modern-weekly' | 'calendar-1' | 'calendar-2' | 'calendar-3' | 'calendar-4' | 'calendar-5' | 'calendar-6' | 'calendar-7' | 'calendar-8' | 'calendar-9' | 'calendar-10' | 'calendar-11';
   public readonly embedWidth: number;
   public readonly embedHeight: number;
 

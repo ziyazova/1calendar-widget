@@ -78,7 +78,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       // Update widget with specific style
       let updatedWidget;
       if (type === 'calendar') {
-        const settings = new CalendarSettings({ style: style as 'modern-grid' | 'modern-weekly' });
+        const settings = new CalendarSettings({ style: style as CalendarSettings['style'] });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
       } else {
         const settings = new ClockSettings({ style: style as 'modern' | 'analog-classic' });
