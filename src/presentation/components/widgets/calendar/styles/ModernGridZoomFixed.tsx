@@ -56,7 +56,7 @@ const CalendarHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 `;
 
@@ -135,7 +135,7 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: 5px 2px;
+  padding: 2px 2px;
   text-align: center;
   font-size: 10px;
   font-weight: 700;
@@ -145,7 +145,7 @@ const WeekDay = styled.div<{
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-  border: 1px solid ${({ $accentColor }) => `${$accentColor}50`};
+  border: 1px solid ${({ $accentColor }) => `${$accentColor}35`};
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
