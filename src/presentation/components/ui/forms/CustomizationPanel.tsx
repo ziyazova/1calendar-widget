@@ -258,6 +258,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const calStyle = widget.type === 'calendar' ? (settings as CalendarSettings).style : '';
   const clkStyle = widget.type === 'clock' ? (settings as ClockSettings).style : '';
   const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || clkStyle === 'classic';
+  const isCollageStyle = calStyle === 'collage';
 
   return (
     <PanelContainer>
@@ -315,6 +316,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           )}
         </Section>
 
+        {!isCollageStyle && (
         <Section>
           <SectionTitle>Layout</SectionTitle>
 
@@ -359,6 +361,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </ToggleGroup>
           </FormGroup>
         </Section>
+        )}
 
         {widget.type === 'clock' && (
           <Section>

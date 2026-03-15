@@ -9,7 +9,7 @@ interface CollageCalendarProps {
   settings: CalendarSettings;
 }
 
-const DESIGN_WIDTH = 300;
+const DESIGN_WIDTH = 318;
 
 const OuterWrapper = styled.div`
   width: 100%;
@@ -38,7 +38,7 @@ const SceneWrapper = styled.div`
 /* White sheet positioned over the background image */
 const CalendarOverlay = styled.div<{ $backgroundColor: string }>`
   position: absolute;
-  top: 26.7%;
+  top: 23.8%;
   left: 14.4%;
   width: 64%;
   height: auto;
@@ -48,15 +48,16 @@ const CalendarOverlay = styled.div<{ $backgroundColor: string }>`
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   padding: 10px 10px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 `;
 
 /* ── Binder clip image ── */
 const ClipImage = styled.img`
   position: absolute;
-  top: -32px;
+  top: -29px;
   left: 50%;
   transform: translateX(-50%);
-  width: 69px;
+  width: 72px;
   height: auto;
   z-index: 10;
   pointer-events: none;
@@ -154,25 +155,29 @@ const DayCell = styled.div<{
   $textColor: string;
 }>`
   text-align: center;
-  padding: 4px 2px;
+  padding: 0 2px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: ${({ $isToday }) => $isToday ? '14px' : '11px'};
   font-weight: ${({ $isToday }) => $isToday ? '700' : '400'};
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: ${({ $isCurrentMonth, $isSunday, $primaryColor, $textColor }) => {
+  color: ${({ $isCurrentMonth, $isToday, $isSunday, $primaryColor, $textColor }) => {
     if (!$isCurrentMonth) return `${$textColor}12`;
+    if ($isToday) return $primaryColor;
     if ($isSunday) return $primaryColor;
     return $textColor;
   }};
   position: relative;
   cursor: default;
-  line-height: 1.5;
 `;
 
 /* ── Pushpin SVG ── */
 const PushpinWrapper = styled.div`
   position: absolute;
-  top: -10px;
-  right: -8px;
+  top: -13px;
+  right: -10px;
   width: 17px;
   height: 21px;
   transform: rotate(45deg);
