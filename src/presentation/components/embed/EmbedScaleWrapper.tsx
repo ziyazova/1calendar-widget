@@ -100,6 +100,12 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
       minHeight: minH,
     }, '*');
 
+    // Set min dimensions on the document so the iframe itself
+    // can't be smaller than the widget at MIN_ZOOM.
+    // Notion/browsers respect iframe content intrinsic size.
+    document.documentElement.style.minWidth = minW + 'px';
+    document.documentElement.style.minHeight = minH + 'px';
+
     setDebugInfo(
       `Wrapper:    ${availW} × ${availH}\n` +
       `ZoomBox:    ${inner.offsetWidth} × ${inner.offsetHeight}\n` +
