@@ -185,6 +185,7 @@ const StyleDot = styled.div<{ $color: string }>`
 const CALENDAR_STYLES = [
   { label: 'CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
   { label: 'Classic Calendar', value: 'classic', color: '#6E7FF2' },
+  { label: 'Collage', value: 'collage', color: '#a89e8e' },
 ];
 
 const ARCHIVE_STYLES = [

@@ -18,6 +18,7 @@ import {
   ModernGridZoom,
   ModernGridZoomFixed,
   ClassicCalendar,
+  CollageCalendar,
 } from './calendar/styles';
 
 interface CalendarWidgetProps {
@@ -58,6 +59,8 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({ widget }) => {
       return <ModernGridZoomFixed settings={settings} />;
     case 'classic':
       return <ClassicCalendar settings={settings} />;
+    case 'collage':
+      return <CollageCalendar settings={settings} />;
     case 'modern-grid':
     default:
       return <ModernGrid settings={settings} />;

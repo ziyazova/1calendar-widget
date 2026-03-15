@@ -36,11 +36,15 @@ const FlipContainer = styled.div`
 const FlipPanel = styled.div<{
   $bgColor: string;
   $borderRadius: number;
+  $showBorder: boolean;
+  $textColor: string;
 }>`
   flex: 1;
   aspect-ratio: 0.67 / 1;
   background: ${({ $bgColor }) => $bgColor};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
+  border: ${({ $showBorder, $textColor }) =>
+    $showBorder ? `1px solid ${$textColor}25` : 'none'};
   position: relative;
   display: flex;
   align-items: center;
@@ -126,6 +130,8 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
           <FlipPanel
             $bgColor={effectiveBg}
             $borderRadius={settings.borderRadius}
+            $showBorder={settings.showBorder}
+            $textColor={settings.primaryColor}
           >
             <FlipLine $color={pageBg} />
             <FlipNumber $color={settings.primaryColor}>
@@ -141,6 +147,8 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
           <FlipPanel
             $bgColor={effectiveBg}
             $borderRadius={settings.borderRadius}
+            $showBorder={settings.showBorder}
+            $textColor={settings.primaryColor}
           >
             <FlipLine $color={pageBg} />
             <FlipNumber $color={settings.primaryColor}>
