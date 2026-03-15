@@ -12,3 +12,4 @@ export { Calendar9 } from './Calendar9';
 export { Calendar10 } from './Calendar10';
 export { Calendar11 } from './Calendar11';
 export { ModernGridZoom } from './ModernGridZoom';
+export { ModernGridZoomFixed } from './ModernGridZoomFixed';

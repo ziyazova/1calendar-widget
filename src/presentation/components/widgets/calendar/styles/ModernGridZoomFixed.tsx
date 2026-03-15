@@ -14,7 +14,7 @@ const DESIGN_WIDTH = 256;
 const OuterWrapper = styled.div`
   width: 100%;
   height: 100%;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,7 +268,7 @@ const monthNames = [
 const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const weekDaysWorkdays = ['M', 'T', 'W', 'T', 'F'];
 
-export const ModernGridZoom: React.FC<ModernGridZoomProps> = ({ settings }) => {
+export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [debug, setDebug] = useState(false);
   const [zoom, setZoom] = useState(1);

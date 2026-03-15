@@ -220,7 +220,8 @@ const WIDGET_CATEGORIES = {
     icon: Calendar,
     styles: [
       { label: 'Modern Grid', value: 'modern-grid', color: '#667EEA' },
-      { label: 'Modern Grid — CSS Zoom (layout check)', value: 'modern-grid-zoom', color: '#e67e22' },
+      { label: 'Modern Grid — CSS Zoom', value: 'modern-grid-zoom', color: '#e67e22' },
+      { label: 'Modern Grid — CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
       { label: 'CSS Zoom (layout check)', value: 'calendar-2', color: '#e67e22' },
       { label: 'Container Query (layout check)', value: 'calendar-4', color: '#3498db' },
       { label: 'SVG ViewBox (layout check)', value: 'calendar-6', color: '#1abc9c' },
