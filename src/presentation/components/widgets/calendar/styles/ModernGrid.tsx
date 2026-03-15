@@ -24,7 +24,7 @@ const GridContainer = styled.div<{
   padding: ${WIDGET_CONTAINER.padding};
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
-    $showBorder ? `2px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
+    $showBorder ? `3px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   box-shadow:
@@ -38,21 +38,6 @@ const GridContainer = styled.div<{
   flex-direction: column;
   overflow: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(
-      90deg,
-      ${({ $accentColor }) => $accentColor} 0%,
-      ${({ $accentColor }) => `${$accentColor}80`} 100%
-    );
-    border-radius: ${({ $borderRadius }) => $borderRadius}px
-      ${({ $borderRadius }) => $borderRadius}px 0 0;
-  }
 
   &:hover {
     transform: translateY(-1px);

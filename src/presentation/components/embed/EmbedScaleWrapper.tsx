@@ -1,7 +1,5 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
-
-const MIN_ZOOM = 0.5;
 
 const Wrapper = styled.div<{ $debug?: boolean }>`
   width: 100%;
@@ -17,22 +15,6 @@ const Wrapper = styled.div<{ $debug?: boolean }>`
   `}
 `;
 
-const DebugInfo = styled.div`
-  position: fixed;
-  top: 4px;
-  left: 4px;
-  font-size: 10px;
-  font-family: monospace;
-  background: rgba(0,0,0,0.8);
-  color: #0f0;
-  padding: 6px 8px;
-  border-radius: 4px;
-  z-index: 9999;
-  line-height: 1.6;
-  pointer-events: none;
-  white-space: pre;
-`;
-
 interface EmbedScaleWrapperProps {
   children: React.ReactNode;
   refWidth?: number;
@@ -40,25 +22,24 @@ interface EmbedScaleWrapperProps {
 }
 
 /**
- * Wraps embed content and shrinks it proportionally when the container
- * is smaller than the widget's design size. Uses CSS zoom so the
- * layout box and visual size stay in sync.
+ * SVG viewBox-based scaling — same technique as github-widgetbox.
  *
- * ZoomBox shrink-wraps to the widget (display:inline-block) so its
- * outline always matches the widget's outline — no extra space.
+ * The widget renders at its natural design size inside an SVG foreignObject.
+ * The SVG viewBox + preserveAspectRatio handles all proportional scaling:
+ * - Container wider than widget → widget stays at design size, centered
+ * - Container smaller → widget shrinks proportionally, nothing clipped
+ *
+ * No JS zoom, no ResizeObserver, no postMessage. Pure SVG scaling.
  */
 export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
   children,
   refWidth = 280,
   refHeight = 320,
 }) => {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const [zoom, setZoom] = useState(1);
-  const [debugInfo, setDebugInfo] = useState('');
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(refHeight);
   const [debug, setDebug] = useState(false);
 
-  // Listen for debug toggle from parent (simulator)
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       if (e.data === 'toggle-debug') setDebug(prev => !prev);
@@ -69,78 +50,42 @@ export const EmbedScaleWrapper: React.FC<EmbedScaleWrapperProps> = ({
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
-  const update = useCallback(() => {
-    const wrapper = wrapperRef.current;
-    const inner = innerRef.current;
-    if (!wrapper || !inner) return;
-
-    const availW = wrapper.clientWidth;
-    const availH = wrapper.clientHeight;
-    if (availW <= 0 || availH <= 0) return;
-
-    // Get the widget's natural (unzoomed) dimensions
-    const currentZoom = parseFloat(inner.style.zoom) || 1;
-    const naturalW = inner.offsetWidth / currentZoom;
-    const naturalH = inner.offsetHeight / currentZoom;
-    const contentW = naturalW > 0 ? naturalW : refWidth;
-    const contentH = naturalH > 0 ? naturalH : refHeight;
-
-    const zoomX = availW < contentW ? availW / contentW : 1;
-    const zoomY = availH < contentH ? availH / contentH : 1;
-    const newZoom = Math.max(MIN_ZOOM, Math.min(zoomX, zoomY));
-
-    setZoom(newZoom);
-
-    // Tell the parent frame the widget's minimum embed size
-    const minW = Math.ceil(contentW * MIN_ZOOM);
-    const minH = Math.ceil(contentH * MIN_ZOOM);
-    window.parent.postMessage({
-      type: 'embed-min-size',
-      minWidth: minW,
-      minHeight: minH,
-    }, '*');
-
-    // Set min dimensions on the document so the iframe itself
-    // can't be smaller than the widget at MIN_ZOOM.
-    // Notion/browsers respect iframe content intrinsic size.
-    document.documentElement.style.minWidth = minW + 'px';
-    document.documentElement.style.minHeight = minH + 'px';
-
-    setDebugInfo(
-      `Wrapper:    ${availW} × ${availH}\n` +
-      `ZoomBox:    ${inner.offsetWidth} × ${inner.offsetHeight}\n` +
-      `Natural:    ${Math.round(contentW)} × ${Math.round(contentH)}\n` +
-      `ZoomX:      ${zoomX.toFixed(3)}\n` +
-      `ZoomY:      ${zoomY.toFixed(3)}\n` +
-      `Zoom:       ${newZoom.toFixed(3)}\n` +
-      `Visual:     ${Math.round(contentW * newZoom)} × ${Math.round(contentH * newZoom)}`
-    );
-  }, [refWidth, refHeight]);
-
+  // Measure actual content height once rendered
   useEffect(() => {
-    const el = wrapperRef.current;
+    const el = contentRef.current;
     if (!el) return;
-
-    update();
-    const observer = new ResizeObserver(update);
+    const measure = () => {
+      const h = el.scrollHeight;
+      if (h > 0) setContentHeight(h);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [update]);
+  }, []);
 
   return (
-    <Wrapper ref={wrapperRef} $debug={debug}>
-      {debug && <DebugInfo>{debugInfo}</DebugInfo>}
-      <div
-        ref={innerRef}
-        style={{
-          zoom,
-          display: 'inline-block',
-          boxSizing: 'border-box',
-          outline: debug ? '2px solid cyan' : 'none',
-        }}
+    <Wrapper $debug={debug}>
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${refWidth} ${contentHeight}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ maxWidth: refWidth, maxHeight: contentHeight }}
       >
-        {children}
-      </div>
+        <foreignObject width={refWidth} height={contentHeight}>
+          <div
+            ref={contentRef}
+            style={{
+              width: refWidth,
+              boxSizing: 'border-box',
+              outline: debug ? '2px solid cyan' : 'none',
+            }}
+          >
+            {children}
+          </div>
+        </foreignObject>
+      </svg>
     </Wrapper>
   );
 };

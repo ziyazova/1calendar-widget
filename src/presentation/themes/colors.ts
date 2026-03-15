@@ -2,27 +2,17 @@
 export const widgetColors = [
   '#667EEA', // Soft Blue
   '#764BA2', // Deep Purple
-  '#F093FB', // Pink Gradient
-  '#F8BBD9', // Light Pink
-  '#4FACFE', // Bright Blue
   '#43E97B', // Green
   '#FA709A', // Coral
   '#FEE140', // Yellow
-  '#A8E6CF', // Mint
-  '#FFB199', // Peach
 ] as const;
 
 export const colorNames = [
   'Ocean',
   'Purple',
-  'Magenta',
-  'Rose',
-  'Sky',
   'Emerald',
   'Coral',
   'Sunshine',
-  'Mint',
-  'Peach',
 ] as const;
 
 // Дополнительные нейтральные цвета для фона
@@ -137,10 +127,10 @@ export const getSuggestedColors = (backgroundColor: string) => {
 
   if (isLight) {
     // For light backgrounds, suggest darker colors
-    return colors.complementary.filter((_, index) => [0, 1, 4, 6].includes(index));
+    return colors.complementary.filter((_, index) => [0, 1, 3].includes(index));
   } else {
     // For dark backgrounds, suggest lighter colors
-    return colors.complementary.filter((_, index) => [2, 3, 5, 7, 8, 9].includes(index));
+    return colors.complementary.filter((_, index) => [2, 3, 4].includes(index));
   }
 };
 
