@@ -7,6 +7,7 @@ export class CalendarSettings {
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
   public readonly style: 'modern-grid' | 'modern-weekly' | 'calendar-1' | 'calendar-2' | 'calendar-3' | 'calendar-4' | 'calendar-5' | 'calendar-6' | 'calendar-7' | 'calendar-8' | 'calendar-9' | 'calendar-10' | 'calendar-11' | 'modern-grid-zoom' | 'modern-grid-zoom-fixed';
+  public readonly showDayBorders: boolean;
   public readonly embedWidth: number;
   public readonly embedHeight: number;
 
@@ -18,6 +19,7 @@ export class CalendarSettings {
     this.showWeekends = settings.showWeekends ?? true;
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
+    this.showDayBorders = settings.showDayBorders ?? true;
     this.style = settings.style || 'modern-grid';
     this.embedWidth = settings.embedWidth ?? 420;
     this.embedHeight = settings.embedHeight ?? 380;
@@ -41,6 +43,7 @@ export class CalendarSettings {
       showWeekends: this.showWeekends,
       borderRadius: this.borderRadius,
       showBorder: this.showBorder,
+      showDayBorders: this.showDayBorders,
       style: this.style,
       embedWidth: this.embedWidth,
       embedHeight: this.embedHeight,
@@ -56,6 +59,7 @@ export class CalendarSettings {
       showWeekends: changes.showWeekends ?? this.showWeekends,
       borderRadius: changes.borderRadius ?? this.borderRadius,
       showBorder: changes.showBorder ?? this.showBorder,
+      showDayBorders: changes.showDayBorders ?? this.showDayBorders,
       style: changes.style ?? this.style,
       embedWidth: changes.embedWidth ?? this.embedWidth,
       embedHeight: changes.embedHeight ?? this.embedHeight,

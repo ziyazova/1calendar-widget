@@ -2,69 +2,71 @@ import { widgetColors } from './colors';
 
 export const theme = {
   colors: {
-    // Primary Apple-inspired colors
-    primary: '#007AFF',
-    primaryDark: '#0056CC',
+    // Primary brand colors
+    primary: '#6C63FF',
+    primaryDark: '#5A52E0',
     secondary: '#5856D6',
     accent: '#FF3B30',
-    success: '#34C759',
-    warning: '#FF9500',
+    success: '#15803d',
+    warning: '#de6d02',
 
     // Widget colors
     widgets: widgetColors,
 
-    // Background system
+    // Background system — warm neutrals
     background: {
-      primary: '#ffffff',
-      secondary: '#f2f2f7',
-      tertiary: '#f8f9fa',
+      primary: '#faf9f7',
+      secondary: '#f5f3f0',
+      tertiary: '#edeae6',
       elevated: '#ffffff',
-      glass: 'rgba(255, 255, 255, 0.8)',
+      glass: 'rgba(255, 255, 255, 0.72)',
       dark: '#1c1c1e',
       darkSecondary: '#2c2c2e',
+      mesh: 'linear-gradient(135deg, #a8c0ff 0%, #c4a8ff 25%, #f0a8d0 50%, #ffb8c6 75%, #ffd4a8 100%)',
     },
 
     // Text system
     text: {
-      primary: '#1d1d1f',
-      secondary: '#6e6e73',
-      tertiary: '#8e8e93',
+      primary: '#1a1a1a',
+      secondary: '#5c5c5c',
+      tertiary: '#8a8a8a',
       inverse: '#ffffff',
-      accent: '#007AFF',
-      link: '#007AFF',
+      accent: '#6C63FF',
+      link: '#6C63FF',
     },
 
-    // Border system
+    // Border system — warm grays
     border: {
-      primary: '#d1d1d6',
-      secondary: '#e5e5ea',
-      tertiary: '#f2f2f7',
-      focus: '#007AFF',
+      primary: '#e8e5e1',
+      secondary: '#f0ede9',
+      tertiary: '#f5f3f0',
+      focus: '#6C63FF',
     },
 
     // Interactive states
     interactive: {
-      hover: 'rgba(0, 122, 255, 0.04)',
-      active: 'rgba(0, 122, 255, 0.08)',
-      focus: 'rgba(0, 122, 255, 0.15)',
+      hover: 'rgba(108, 99, 255, 0.04)',
+      active: 'rgba(108, 99, 255, 0.08)',
+      focus: 'rgba(108, 99, 255, 0.15)',
       disabled: 'rgba(60, 60, 67, 0.3)',
     },
 
     // Gradients
     gradients: {
-      primary: 'linear-gradient(135deg, #007AFF 0%, #5856D6 100%)',
+      primary: 'linear-gradient(135deg, #6C63FF 0%, #9F7AEA 100%)',
       hero: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      card: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-      glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+      card: 'linear-gradient(145deg, #ffffff 0%, #faf9f7 100%)',
+      glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)',
+      subtle: 'radial-gradient(at 27% 37%, rgba(108, 99, 255, 0.06) 0px, transparent 50%), radial-gradient(at 97% 21%, rgba(159, 122, 234, 0.04) 0px, transparent 50%)',
     },
   },
 
   // Typography - Apple San Francisco inspired
   typography: {
     fonts: {
-      primary: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+      primary: "'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
       mono: "'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
-      display: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
+      display: "'Geist', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
     },
 
     sizes: {
@@ -151,23 +153,23 @@ export const theme = {
     input: '0.75rem',    // 12px - Apple input radius
   },
 
-  // Shadows - Apple's elevation system
+  // Shadows — multi-layer with inset borders (Lovable-style)
   shadows: {
-    xs: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-    sm: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    xs: '0 0 0 0.5px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.05), inset 0 0 0 1px rgba(0,0,0,0.04)',
+    sm: '0 0 0 0.5px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.05), inset 0 -1px 0 0 rgba(0,0,0,0.06)',
+    md: '0 0 0 0.5px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.1), 0 10px 15px -3px rgba(0,0,0,0.08), inset 0 -1px 0 0 rgba(0,0,0,0.06)',
+    lg: '0 0 0 0.5px rgba(0,0,0,0.08), 0 10px 15px -3px rgba(0,0,0,0.08), 0 20px 25px -5px rgba(0,0,0,0.06), inset 0 -1px 0 0 rgba(0,0,0,0.06)',
+    xl: '0 0 0 0.5px rgba(0,0,0,0.08), 0 20px 25px -5px rgba(0,0,0,0.1), 0 25px 50px -12px rgba(0,0,0,0.06)',
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
 
-    // Apple-specific shadows
-    card: '0 4px 16px rgba(0, 0, 0, 0.12)',
-    button: '0 2px 8px rgba(0, 0, 0, 0.15)',
-    glass: '0 8px 32px rgba(0, 0, 0, 0.15)',
-    hero: '0 32px 64px rgba(0, 0, 0, 0.15)',
+    // Surface shadows
+    card: '0 0 0 0.5px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), inset 0 -1px 0 0 rgba(0,0,0,0.04)',
+    button: '0 0 0 0.5px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)',
+    glass: '0 0 0 0.5px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.1)',
+    hero: '0 32px 64px rgba(0, 0, 0, 0.12)',
 
     // Inner shadows
-    inset: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+    inset: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.04)',
   },
 
   // Breakpoints - Apple's responsive breakpoints
@@ -205,9 +207,10 @@ export const theme = {
     slow: '300ms cubic-bezier(0.4, 0, 0.2, 1)',
     bounce: '500ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
 
-    // Apple-specific
+    // Lovable-style
     apple: '0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    spring: '0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+    spring: '0.4s cubic-bezier(0.54, 1.5, 0.38, 1.11)',
+    elastic: '0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   },
 
   // Blur effects

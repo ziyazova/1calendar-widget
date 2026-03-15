@@ -7,24 +7,25 @@ interface ColorPickerProps {
   onColorChange: (color: string) => void;
   type?: 'primary' | 'background';
   label?: string;
+  showPresets?: boolean;
 }
 
 const ColorPickerContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: 8px;
 `;
 
 const ColorGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: 6px;
 `;
 
 const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
-  width: 40px;
-  height: 40px;
-  border-radius: ${({ theme }) => theme.radii.md};
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: 2px solid ${({ $selected, theme }) =>
     $selected ? theme.colors.primary : 'transparent'};
   background-color: ${({ $color }) => $color};
@@ -47,7 +48,7 @@ const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
     content: '';
     position: absolute;
     inset: 4px;
-    border-radius: ${({ theme }) => theme.radii.sm};
+    border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     pointer-events: none;
   }
@@ -56,14 +57,13 @@ const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
 const CustomColorRow = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  margin-top: 4px;
+  gap: 8px;
 `;
 
 const NativePickerButton = styled.label<{ $color: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: ${({ theme }) => theme.radii.md};
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background-color: ${({ $color }) => $color};
   border: 2px dashed ${({ theme }) => theme.colors.border.primary};
   cursor: pointer;
@@ -89,9 +89,9 @@ const NativePickerButton = styled.label<{ $color: string }>`
 
 const HexInput = styled.input`
   flex: 1;
-  height: 40px;
+  height: 32px;
   border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  border-radius: ${({ theme }) => theme.radii.md};
+  border-radius: 8px;
   padding: 0 10px;
   font-family: monospace;
   font-size: 13px;
@@ -112,6 +112,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   selectedColor,
   onColorChange,
   type = 'primary',
+  showPresets = true,
 }) => {
   const colorOptions = type === 'background' ? colors.backgrounds : colors.complementary;
   const [hexInput, setHexInput] = useState(selectedColor);
@@ -144,20 +145,22 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
   return (
     <ColorPickerContainer>
-      <ColorGrid>
-        {colorOptions.map((color) => (
-          <ColorOption
-            key={color.value}
-            $color={color.value}
-            $selected={selectedColor === color.value}
-            onClick={() => {
-              onColorChange(color.value);
-              setHexInput(color.value);
-            }}
-            title={color.name}
-          />
-        ))}
-      </ColorGrid>
+      {showPresets && (
+        <ColorGrid>
+          {colorOptions.map((color) => (
+            <ColorOption
+              key={color.value}
+              $color={color.value}
+              $selected={selectedColor === color.value}
+              onClick={() => {
+                onColorChange(color.value);
+                setHexInput(color.value);
+              }}
+              title={color.name}
+            />
+          ))}
+        </ColorGrid>
+      )}
 
       <CustomColorRow>
         <NativePickerButton $color={selectedColor}>

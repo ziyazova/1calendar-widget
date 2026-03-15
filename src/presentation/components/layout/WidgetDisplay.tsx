@@ -3,28 +3,26 @@ import styled, { keyframes } from 'styled-components';
 import { Widget } from '../../../domain/entities/Widget';
 import { CalendarWidget } from '../widgets/CalendarWidget';
 import { ClockWidget } from '../widgets/ClockWidget';
-import { Sparkles, Zap, Palette } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface WidgetDisplayProps {
   widget: Widget | null;
 }
 
-const floatingAnimation = keyframes`
-  0%, 100% {
-    transform: translateY(0px);
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
-  50% {
-    transform: translateY(-10px);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 `;
 
-const shimmerAnimation = keyframes`
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
+const float = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 `;
 
 const DisplayContainer = styled.div`
@@ -34,21 +32,7 @@ const DisplayContainer = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
-  background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.radii.card};
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: ${({ theme }) => theme.colors.gradients.card};
-    opacity: 0.3;
-    z-index: 0;
-  }
 `;
 
 const WidgetFrame = styled.div`
@@ -64,157 +48,50 @@ const WidgetFrame = styled.div`
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: ${({ theme }) => theme.spacing['12']};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  padding: 48px;
   position: relative;
   z-index: 1;
 `;
 
-const EmptyStateIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  margin: 0 auto ${({ theme }) => theme.spacing['6']};
+const EmptyIcon = styled.div`
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 20px;
   background: ${({ theme }) => theme.colors.gradients.primary};
-  border-radius: ${({ theme }) => theme.radii.xl};
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadows.button};
-  animation: ${floatingAnimation} 4s ease-in-out infinite;
-  
+  box-shadow: ${({ theme }) => theme.shadows.md};
+  animation: ${float} 4s ease-in-out infinite;
+
   svg {
     color: white;
   }
 `;
 
 const EmptyTitle = styled.h3`
-  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  font-size: 20px;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 ${({ theme }) => theme.spacing['3']} 0;
-  font-family: ${({ theme }) => theme.typography.fonts.display};
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
 `;
 
 const EmptyDescription = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 ${({ theme }) => theme.spacing['8']} 0;
-  max-width: 400px;
-  line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
-`;
-
-const FeatureList = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${({ theme }) => theme.spacing['6']};
-  margin-top: ${({ theme }) => theme.spacing['8']};
-  max-width: 600px;
-`;
-
-const FeatureItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing['3']};
-  padding: ${({ theme }) => theme.spacing['4']};
-  background: ${({ theme }) => theme.colors.background.glass};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  backdrop-filter: blur(${({ theme }) => theme.blur.sm});
-  transition: all ${({ theme }) => theme.transitions.apple};
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadows.md};
-  }
-`;
-
-const FeatureIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  background: ${({ theme }) => theme.colors.gradients.primary};
-  border-radius: ${({ theme }) => theme.radii.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  
-  svg {
-    color: white;
-  }
-`;
-
-const FeatureText = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
-const LoadingState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: ${({ theme }) => theme.spacing['12']};
-  position: relative;
-  z-index: 1;
-`;
-
-const LoadingSpinner = styled.div`
-  width: 60px;
-  height: 60px;
-  border: 3px solid ${({ theme }) => theme.colors.border.primary};
-  border-top: 3px solid ${({ theme }) => theme.colors.primary};
-  border-radius: ${({ theme }) => theme.radii.full};
-  animation: spin 1s linear infinite;
-  margin-bottom: ${({ theme }) => theme.spacing['4']};
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
-const LoadingText = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
-  background: linear-gradient(
-    90deg,
-    ${({ theme }) => theme.colors.text.secondary} 0%,
-    ${({ theme }) => theme.colors.text.primary} 50%,
-    ${({ theme }) => theme.colors.text.secondary} 100%
-  );
-  background-size: 200px 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: ${shimmerAnimation} 2s infinite;
+  max-width: 280px;
+  line-height: 1.5;
+  margin: 0 auto;
 `;
 
 const ErrorState = styled.div`
   text-align: center;
-  padding: ${({ theme }) => theme.spacing['12']};
-  color: ${({ theme }) => theme.colors.accent};
+  padding: 48px;
   position: relative;
   z-index: 1;
-`;
-
-const ErrorIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  margin: 0 auto ${({ theme }) => theme.spacing['4']};
-  background: ${({ theme }) => theme.colors.accent};
-  border-radius: ${({ theme }) => theme.radii.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &::before {
-    content: '!';
-    color: white;
-    font-size: ${({ theme }) => theme.typography.sizes['2xl']};
-    font-weight: ${({ theme }) => theme.typography.weights.bold};
-  }
 `;
 
 const WidgetContainer = styled.div`
@@ -224,22 +101,7 @@ const WidgetContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all ${({ theme }) => theme.transitions.apple};
-  
-  &.fade-in {
-    animation: fadeIn 0.5s ${({ theme }) => theme.transitions.apple};
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  animation: ${fadeIn} 0.4s cubic-bezier(0.54, 1.5, 0.38, 1.11);
 `;
 
 export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
@@ -247,36 +109,13 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
     return (
       <DisplayContainer>
         <EmptyState>
-          <EmptyStateIcon>
-            <Sparkles size={32} />
-          </EmptyStateIcon>
-          <EmptyTitle>Choose Your Widget</EmptyTitle>
+          <EmptyIcon>
+            <Sparkles size={24} />
+          </EmptyIcon>
+          <EmptyTitle>Choose a Widget</EmptyTitle>
           <EmptyDescription>
-            Select a widget from the sidebar to start customizing and see a live preview here
+            Select a widget from the sidebar to preview and customize
           </EmptyDescription>
-
-          <FeatureList>
-            <FeatureItem>
-              <FeatureIcon>
-                <Palette size={16} />
-              </FeatureIcon>
-              <FeatureText>Real-time Customization</FeatureText>
-            </FeatureItem>
-
-            <FeatureItem>
-              <FeatureIcon>
-                <Zap size={16} />
-              </FeatureIcon>
-              <FeatureText>Instant Preview</FeatureText>
-            </FeatureItem>
-
-            <FeatureItem>
-              <FeatureIcon>
-                <Sparkles size={16} />
-              </FeatureIcon>
-              <FeatureText>Apple-style Design</FeatureText>
-            </FeatureItem>
-          </FeatureList>
         </EmptyState>
       </DisplayContainer>
     );
@@ -291,10 +130,9 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
       default:
         return (
           <ErrorState>
-            <ErrorIcon />
-            <EmptyTitle>Widget Type Not Supported</EmptyTitle>
+            <EmptyTitle>Not Supported</EmptyTitle>
             <EmptyDescription>
-              The widget type "{widget.type}" is not yet implemented
+              Widget type "{widget.type}" is not yet implemented
             </EmptyDescription>
           </ErrorState>
         );
@@ -304,10 +142,10 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
   return (
     <DisplayContainer>
       <WidgetFrame>
-        <WidgetContainer className="fade-in">
+        <WidgetContainer>
           {renderWidget()}
         </WidgetContainer>
       </WidgetFrame>
     </DisplayContainer>
   );
-}; 
+};

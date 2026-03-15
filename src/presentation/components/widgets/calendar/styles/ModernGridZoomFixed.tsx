@@ -9,7 +9,7 @@ interface ModernGridZoomProps {
   settings: CalendarSettings;
 }
 
-const DESIGN_WIDTH = 256;
+const DESIGN_WIDTH = 268;
 
 const OuterWrapper = styled.div`
   width: 100%;
@@ -34,18 +34,15 @@ const GridContainer = styled.div<{
   $debug?: boolean;
 }>`
   width: 100%;
-  max-width: ${WIDGET_CONTAINER.maxWidth};
+  max-width: ${DESIGN_WIDTH}px;
   ${({ $debug }) => $debug && `outline: 2px solid lime; outline-offset: -2px;`}
   height: auto;
-  padding: ${WIDGET_CONTAINER.padding};
+  padding: 16px;
   background: ${({ $backgroundColor }) => $backgroundColor};
-  border: ${({ $showBorder, $accentColor }) =>
-    $showBorder ? `1px solid ${$accentColor}` : `1px solid ${$accentColor}40`};
+  border: ${({ $showBorder, $textColor }) =>
+    $showBorder ? `1px solid ${$textColor}30` : `1px solid ${$textColor}10`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   position: relative;
@@ -53,26 +50,18 @@ const GridContainer = styled.div<{
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      0 8px 25px rgba(0, 0, 0, 0.15),
-      0 2px 8px rgba(0, 0, 0, 0.08);
-    border-color: ${({ $accentColor }) => $accentColor};
-  }
 `;
 
 const CalendarHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: ${WIDGET_SPACING.margin};
+  margin-bottom: 10px;
   flex-shrink: 0;
 `;
 
 const MonthTitle = styled.h2<{ $textColor: string; $primaryColor: string }>`
-  font-size: ${WIDGET_TYPOGRAPHY.heading};
+  font-size: 17px;
   font-weight: 700;
   margin: 0;
   background: linear-gradient(
@@ -96,8 +85,8 @@ const NavButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border: 1px solid ${({ $primaryColor }) => `${$primaryColor}60`};
   background: ${({ $primaryColor }) => `${$primaryColor}15`};
   color: ${({ $primaryColor }) => $primaryColor};
@@ -128,14 +117,15 @@ const NavButton = styled.button<{
   svg {
     width: 16px;
     height: 16px;
+    stroke-width: 2.5;
   }
 `;
 
 const WeekDaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => $showWeekends ? 7 : 5}, 1fr);
-  gap: ${WIDGET_SPACING.gap};
-  margin-bottom: ${WIDGET_SPACING.gapMedium};
+  gap: 4px;
+  margin-bottom: 4px;
   flex-shrink: 0;
 `;
 
@@ -145,7 +135,7 @@ const WeekDay = styled.div<{
   $textColor: string;
   $primaryColor: string;
 }>`
-  padding: 4px 2px;
+  padding: 5px 2px;
   text-align: center;
   font-size: 10px;
   font-weight: 700;
@@ -160,29 +150,10 @@ const WeekDay = styled.div<{
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    background: ${({ $primaryColor }) => $primaryColor};
-    border-radius: 1px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
   &:hover {
     background: ${({ $primaryColor }) => `${$primaryColor}30`};
     color: ${({ $primaryColor }) => $primaryColor};
     border-color: ${({ $primaryColor }) => $primaryColor};
-
-    &::after {
-      opacity: 1;
-    }
   }
 `;
 
@@ -190,7 +161,7 @@ const DaysGrid = styled.div<{ $showWeekends: boolean }>`
   display: grid;
   grid-template-columns: repeat(${({ $showWeekends }) => ($showWeekends ? 7 : 5)}, 1fr);
   grid-template-rows: repeat(5, minmax(0, 1fr));
-  gap: ${WIDGET_SPACING.gap};
+  gap: 4px;
   align-content: start;
 `;
 
@@ -200,11 +171,13 @@ const DayCell = styled.button<{
   $primaryColor: string;
   $borderRadius: number;
   $textColor: string;
+  $showDayBorders: boolean;
 }>`
-  padding: 5px;
-  border: 1px solid ${({ $isToday, $primaryColor, $textColor }) => {
-    if ($isToday) return $primaryColor;
-    return `${$textColor}20`;
+  padding: 6px;
+  border: ${({ $isToday, $primaryColor, $textColor, $showDayBorders }) => {
+    if ($isToday) return `1px solid ${$primaryColor}`;
+    if (!$showDayBorders) return '1px solid transparent';
+    return `1px solid ${$textColor}15`;
   }};
   background: ${({ $isToday, $primaryColor }) => {
     if ($isToday) return $primaryColor;
@@ -401,6 +374,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
                 $primaryColor={settings.primaryColor}
                 $borderRadius={settings.borderRadius}
                 $textColor={textColor}
+                $showDayBorders={settings.showDayBorders}
                 disabled={!day.isCurrentMonth}
               >
                 {day.date.getDate()}

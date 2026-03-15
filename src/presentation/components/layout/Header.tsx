@@ -1,182 +1,109 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Copy, Sparkles } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 import { Widget } from '../../../domain/entities/Widget';
+
+type ViewMode = 'editor' | 'layout-check';
 
 interface HeaderProps {
   currentWidget: Widget | null;
   onCopyEmbedUrl: () => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
 const HeaderContainer = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['6']};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
-  background: ${({ theme }) => theme.colors.background.elevated};
-  height: 80px;
+  padding: 0 28px;
+  background: #ffffff;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.secondary};
+  height: 64px;
   position: relative;
   z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 
-const HeaderTitle = styled.div`
+const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['6']};
   margin-left: 300px;
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-left: 0;
   }
 `;
 
-const LogoContainer = styled.div`
+const TabGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['3']};
+  background: ${({ theme }) => theme.colors.background.tertiary};
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
 `;
 
-const LogoIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  background: ${({ theme }) => theme.colors.gradients.primary};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadows.button};
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: ${({ theme }) => theme.colors.gradients.glass};
-    opacity: 0.5;
-  }
-  
-  svg {
-    color: white;
-    z-index: 1;
-    position: relative;
-  }
-`;
-
-const LogoText = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const BrandName = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0;
-  font-family: ${({ theme }) => theme.typography.fonts.display};
-  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
-`;
-
-const BrandTagline = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0;
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-`;
-
-const WidgetInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing['1']};
-`;
-
-const WidgetTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0;
-  font-family: ${({ theme }) => theme.typography.fonts.display};
-`;
-
-const WidgetSubtitle = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing['4']};
-`;
-
-const PrimaryButton = styled.button<{ $copied?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${({ theme }) => theme.spacing['3']};
-  padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['6']};
-  min-height: 44px;
-  min-width: 160px;
-  background: ${({ theme, $copied }) => $copied ? theme.colors.success : theme.colors.primary};
-  color: ${({ theme }) => theme.colors.text.inverse};
+const Tab = styled.button<{ $active: boolean }>`
+  padding: 7px 18px;
+  height: 34px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.tertiary};
+  background: ${({ $active }) => $active ? '#ffffff' : 'transparent'};
   border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: 8px;
   cursor: pointer;
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  font-family: ${({ theme }) => theme.typography.fonts.primary};
-  transition: all ${({ theme }) => theme.transitions.apple};
-  box-shadow: ${({ theme }) => theme.shadows.button};
-  position: relative;
-  overflow: hidden;
-  
+  transition: all 0.15s ease;
+  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'};
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+`;
+
+const CopyButton = styled.button<{ $copied?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  height: 40px;
+  background: ${({ $copied }) => $copied ? '#15803d' : '#1a1a1a'};
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  letter-spacing: -0.01em;
+
   &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: ${({ theme }) => theme.shadows.lg};
+    background: ${({ $copied }) => $copied ? '#15803d' : '#333'};
   }
-  
-  &:active {
-    transform: translateY(0);
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
   }
-  
+
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
-    transform: none;
   }
-`;
 
-const ButtonTextWrap = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  min-width: 120px;
-  white-space: nowrap;
-`;
-
-const ButtonText = styled.span<{ $visible: boolean }>`
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: ${({ $visible }) => $visible ? 1 : 0};
-  transform: translateY(${({ $visible }) => $visible ? '0' : '10px'});
-  transition: opacity 0.25s ${({ theme }) => theme.transitions.apple},
-              transform 0.25s ${({ theme }) => theme.transitions.apple};
+  svg {
+    width: 15px;
+    height: 15px;
+  }
 `;
 
 export const Header: React.FC<HeaderProps> = ({
   currentWidget,
   onCopyEmbedUrl,
+  viewMode,
+  onViewModeChange,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -188,32 +115,27 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <HeaderContainer>
-      <HeaderTitle>
+      <HeaderLeft>
         {currentWidget && (
-          <WidgetInfo>
-            <WidgetTitle>
-              {currentWidget.type.charAt(0).toUpperCase()}{currentWidget.type.slice(1)} Widget
-            </WidgetTitle>
-            <WidgetSubtitle>
-              Customize and embed in your Notion pages
-            </WidgetSubtitle>
-          </WidgetInfo>
+          <TabGroup>
+            <Tab $active={viewMode === 'editor'} onClick={() => onViewModeChange('editor')}>
+              Editor
+            </Tab>
+            <Tab $active={viewMode === 'layout-check'} onClick={() => onViewModeChange('layout-check')}>
+              Layout Check
+            </Tab>
+          </TabGroup>
         )}
-      </HeaderTitle>
+      </HeaderLeft>
 
-      <HeaderActions>
-        <PrimaryButton
-          onClick={handleCopy}
-          disabled={!currentWidget}
-          $copied={copied}
-        >
-          <Copy size={18} />
-          <ButtonTextWrap>
-            <ButtonText $visible={!copied}>Copy Embed URL</ButtonText>
-            <ButtonText $visible={copied}>Copied!</ButtonText>
-          </ButtonTextWrap>
-        </PrimaryButton>
-      </HeaderActions>
+      <CopyButton
+        onClick={handleCopy}
+        disabled={!currentWidget}
+        $copied={copied}
+      >
+        {copied ? <Check /> : <Copy />}
+        {copied ? 'Copied!' : 'Copy Embed URL'}
+      </CopyButton>
     </HeaderContainer>
   );
-}; 
+};

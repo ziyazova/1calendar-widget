@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronRight, Calendar, Clock, Sparkles } from 'lucide-react';
+import { ChevronRight, Calendar, Clock, Archive } from 'lucide-react';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -14,122 +14,117 @@ const SidebarContainer = styled.aside`
   top: 0;
   width: 300px;
   height: 100vh;
-  background: ${({ theme }) => theme.colors.background.elevated};
-  border-right: 1px solid ${({ theme }) => theme.colors.border.primary};
+  background: #ffffff;
+  border-right: 1px solid ${({ theme }) => theme.colors.border.secondary};
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
-  backdrop-filter: blur(${({ theme }) => theme.blur.md});
-  -webkit-backdrop-filter: blur(${({ theme }) => theme.blur.md});
-  
+
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     transform: translateX(-100%);
-    transition: transform ${({ theme }) => theme.transitions.apple};
+    transition: transform 0.3s ease;
   }
 `;
 
 const SidebarHeader = styled.div`
-  padding: ${({ theme }) => theme.spacing['6']} ${({ theme }) => theme.spacing['6']};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
-  background: ${({ theme }) => theme.colors.gradients.card};
-`;
-
-const Logo = styled.div`
+  padding: 0 20px;
+  height: 56px;
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['3']};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.secondary};
 `;
 
-const LogoIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  background: ${({ theme }) => theme.colors.gradients.primary};
-  border-radius: ${({ theme }) => theme.radii.lg};
+const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: ${({ theme }) => theme.shadows.button};
-  
-  svg {
-    color: white;
-  }
+  gap: 10px;
 `;
+
+const PeachIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="48" cy="54" r="36" fill="#F8B898" stroke="#4a4a4a" strokeWidth="5" strokeLinecap="round"/>
+    <path d="M30 40 Q36 50 32 64" stroke="#4a4a4a" strokeWidth="4" strokeLinecap="round" fill="none"/>
+    <path d="M62 36 Q58 48 64 62" stroke="#4a4a4a" strokeWidth="4" strokeLinecap="round" fill="none"/>
+    <ellipse cx="70" cy="22" rx="10" ry="14" fill="#3a7d2c" stroke="#4a4a4a" strokeWidth="4" transform="rotate(-20 70 22)"/>
+  </svg>
+);
 
 const LogoText = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes.xl};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
-  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: 17px;
+  font-weight: 650;
+  color: #1a1a1a;
   margin: 0;
-  font-family: ${({ theme }) => theme.typography.fonts.display};
+  letter-spacing: -0.04em;
+
+  span {
+    color: #F4845F;
+  }
 `;
 
 const NavSection = styled.nav`
   flex: 1;
-  padding: ${({ theme }) => theme.spacing['6']} 0;
+  padding: 16px 0;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 3px;
   }
-  
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  
   &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.border.secondary};
-    border-radius: ${({ theme }) => theme.radii.full};
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
     background: ${({ theme }) => theme.colors.border.primary};
+    border-radius: 10px;
   }
 `;
 
-const SectionTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 ${({ theme }) => theme.spacing['4']} 0;
-  padding: 0 ${({ theme }) => theme.spacing['6']};
+const SectionLabel = styled.h2`
+  font-size: 11px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0 0 8px 0;
+  padding: 0 20px;
   text-transform: uppercase;
-  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.wide};
+  letter-spacing: 0.06em;
+
+  &:nth-of-type(n+2) {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid ${({ theme }) => theme.colors.border.secondary};
+  }
 `;
 
 const WidgetCategory = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing['2']};
+  margin-bottom: 4px;
 `;
 
 const CategoryHeader = styled.button<{ $expanded: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['3']};
-  padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['6']};
+  gap: 10px;
+  padding: 8px 20px;
   background: transparent;
   border: none;
   color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.apple};
-  border-radius: ${({ theme }) => theme.radii.md};
-  margin: 0 ${({ theme }) => theme.spacing['2']};
-  
-  &:focus {
-    outline: none;
-  }
-  
+  transition: background 0.15s ease;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+
   &:hover {
-    background: ${({ theme }) => theme.colors.interactive.hover};
-    transform: translateX(2px);
+    background: rgba(0, 0, 0, 0.025);
   }
-  
+
   .chevron {
     margin-left: auto;
-    transition: transform ${({ theme }) => theme.transitions.apple};
+    transition: transform 0.2s ease;
     transform: rotate(${({ $expanded }) => $expanded ? '90deg' : '0deg'});
-    opacity: 0.7;
+    opacity: 0.25;
+    width: 14px;
+    height: 14px;
   }
 `;
 
@@ -139,180 +134,172 @@ const CategoryIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme }) => theme.colors.background.glass};
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  backdrop-filter: blur(${({ theme }) => theme.blur.sm});
-  
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.background.tertiary};
+
   svg {
-    color: ${({ theme }) => theme.colors.text.primary};
+    color: ${({ theme }) => theme.colors.text.secondary};
+    width: 15px;
+    height: 15px;
   }
 `;
 
 const StylesList = styled.div<{ $expanded: boolean }>`
   max-height: ${({ $expanded }) => $expanded ? '500px' : '0'};
   overflow: hidden;
-  transition: max-height ${({ theme }) => theme.transitions.slow};
-  margin-left: ${({ theme }) => theme.spacing['12']};
-  margin-right: ${({ theme }) => theme.spacing['2']};
+  transition: max-height 0.25s ease;
+  padding: 0 12px 0 58px;
 `;
 
 const StyleItem = styled.button<{ $active: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing['3']};
-  padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['4']};
-  background: ${({ theme, $active }) =>
-    $active ? theme.colors.background.glass : 'transparent'};
-  color: ${({ theme, $active }) =>
-    $active ? theme.colors.text.primary : theme.colors.text.secondary};
-  border: ${({ theme, $active }) =>
-    $active ? `1px solid ${theme.colors.border.primary}` : '1px solid transparent'};
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme, $active }) => $active ? theme.typography.weights.semibold : theme.typography.weights.medium};
+  gap: 8px;
+  padding: 7px 10px;
+  background: ${({ $active }) => $active ? 'rgba(244, 132, 95, 0.08)' : 'transparent'};
+  color: ${({ $active }) => $active ? '#F4845F' : '#6b6b6b'};
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: ${({ $active }) => $active ? 500 : 400};
   cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.apple};
+  transition: all 0.15s ease;
   text-align: left;
-  margin-bottom: ${({ theme }) => theme.spacing['1']};
-  position: relative;
-  
-  &:focus {
-    outline: none;
-  }
-  
-  ${({ $active, theme }) => $active && `
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 3px;
-      height: 16px;
-      background: ${theme.colors.primary};
-      border-radius: 0 2px 2px 0;
-    }
-  `}
-  
+  margin-bottom: 2px;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+
   &:hover {
-    background: ${({ theme, $active }) =>
-    $active ? theme.colors.background.glass : theme.colors.interactive.hover};
-    transform: translateX(2px);
-    color: ${({ theme }) => theme.colors.text.primary};
+    background: ${({ $active }) => $active ? 'rgba(244, 132, 95, 0.08)' : 'rgba(0, 0, 0, 0.025)'};
+    color: ${({ $active }) => $active ? '#F4845F' : '#1a1a1a'};
   }
 `;
 
 const StyleDot = styled.div<{ $color: string }>`
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
   background: ${({ $color }) => $color};
-  border-radius: ${({ theme }) => theme.radii.full};
+  border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
-const WIDGET_CATEGORIES = {
-  calendar: {
-    label: 'Calendar',
-    icon: Calendar,
-    styles: [
-      { label: 'Modern Grid', value: 'modern-grid', color: '#667EEA' },
-      { label: 'Modern Grid — CSS Zoom', value: 'modern-grid-zoom', color: '#e67e22' },
-      { label: 'Modern Grid — CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
-      { label: 'CSS Zoom (layout check)', value: 'calendar-2', color: '#e67e22' },
-      { label: 'Container Query (layout check)', value: 'calendar-4', color: '#3498db' },
-      { label: 'SVG ViewBox (layout check)', value: 'calendar-6', color: '#1abc9c' },
-    ],
-  },
-  clock: {
-    label: 'Clock',
-    icon: Clock,
-    styles: [
-      { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
-      { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
-    ],
-  },
-} as const;
+const CALENDAR_STYLES = [
+  { label: 'CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
+];
+
+const ARCHIVE_STYLES = [
+  { label: 'Modern Grid', value: 'modern-grid', color: '#667EEA' },
+  { label: 'CSS Zoom (layout)', value: 'calendar-2', color: '#e67e22' },
+  { label: 'Container Query (layout)', value: 'calendar-4', color: '#3498db' },
+  { label: 'SVG ViewBox (layout)', value: 'calendar-6', color: '#1abc9c' },
+];
+
+const CLOCK_STYLES = [
+  { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
+  { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
+];
 
 export const Sidebar: React.FC<SidebarProps> = ({
   availableWidgets,
   currentWidget,
   onWidgetChange,
 }) => {
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['calendar']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['calendar']);
 
-  const toggleCategory = (categoryType: string) => {
-    setExpandedCategories(prev =>
-      prev.includes(categoryType)
-        ? prev.filter(cat => cat !== categoryType)
-        : [...prev, categoryType]
+  const toggle = (key: string) => {
+    setExpandedSections(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
     );
-  };
-
-  const handleStyleSelect = (widgetType: string, styleValue: string) => {
-    onWidgetChange(widgetType, styleValue);
-  };
-
-  const getWidgetIcon = (widgetType: string) => {
-    const category = WIDGET_CATEGORIES[widgetType as keyof typeof WIDGET_CATEGORIES];
-    if (!category) return <Calendar size={16} />;
-
-    const IconComponent = category.icon;
-    return <IconComponent size={16} />;
   };
 
   return (
     <SidebarContainer>
       <SidebarHeader>
-        <Logo>
-          <LogoIcon>
-            <Sparkles size={16} />
-          </LogoIcon>
-          <LogoText>Widget Studio</LogoText>
-        </Logo>
+        <LogoWrapper>
+          <PeachIcon />
+          <LogoText>Peachy <span>Studio</span></LogoText>
+        </LogoWrapper>
       </SidebarHeader>
 
       <NavSection>
-        <SectionTitle>Available Widgets</SectionTitle>
+        <SectionLabel>Widgets</SectionLabel>
 
-        {availableWidgets.map((widgetType) => {
-          const category = WIDGET_CATEGORIES[widgetType as keyof typeof WIDGET_CATEGORIES];
-          if (!category) return null;
+        {availableWidgets.includes('calendar') && (
+          <WidgetCategory>
+            <CategoryHeader
+              $expanded={expandedSections.includes('calendar')}
+              onClick={() => toggle('calendar')}
+            >
+              <CategoryIcon><Calendar /></CategoryIcon>
+              Calendar
+              <ChevronRight className="chevron" />
+            </CategoryHeader>
+            <StylesList $expanded={expandedSections.includes('calendar')}>
+              {CALENDAR_STYLES.map((s) => (
+                <StyleItem
+                  key={s.value}
+                  $active={currentWidget === `calendar-${s.value}`}
+                  onClick={() => onWidgetChange('calendar', s.value)}
+                >
+                  <StyleDot $color={s.color} />
+                  {s.label}
+                </StyleItem>
+              ))}
+            </StylesList>
+          </WidgetCategory>
+        )}
 
-          const isExpanded = expandedCategories.includes(widgetType);
+        {availableWidgets.includes('clock') && (
+          <WidgetCategory>
+            <CategoryHeader
+              $expanded={expandedSections.includes('clock')}
+              onClick={() => toggle('clock')}
+            >
+              <CategoryIcon><Clock /></CategoryIcon>
+              Clock
+              <ChevronRight className="chevron" />
+            </CategoryHeader>
+            <StylesList $expanded={expandedSections.includes('clock')}>
+              {CLOCK_STYLES.map((s) => (
+                <StyleItem
+                  key={s.value}
+                  $active={currentWidget === `clock-${s.value}`}
+                  onClick={() => onWidgetChange('clock', s.value)}
+                >
+                  <StyleDot $color={s.color} />
+                  {s.label}
+                </StyleItem>
+              ))}
+            </StylesList>
+          </WidgetCategory>
+        )}
 
-          return (
-            <WidgetCategory key={widgetType}>
-              <CategoryHeader
-                $expanded={isExpanded}
-                onClick={() => toggleCategory(widgetType)}
+        <SectionLabel>Archive</SectionLabel>
+
+        <WidgetCategory>
+          <CategoryHeader
+            $expanded={expandedSections.includes('archive')}
+            onClick={() => toggle('archive')}
+          >
+            <CategoryIcon><Archive /></CategoryIcon>
+            Layout Experiments
+            <ChevronRight className="chevron" />
+          </CategoryHeader>
+          <StylesList $expanded={expandedSections.includes('archive')}>
+            {ARCHIVE_STYLES.map((s) => (
+              <StyleItem
+                key={s.value}
+                $active={currentWidget === `calendar-${s.value}`}
+                onClick={() => onWidgetChange('calendar', s.value)}
               >
-                <CategoryIcon>
-                  {getWidgetIcon(widgetType)}
-                </CategoryIcon>
-                {category.label}
-                <ChevronRight size={16} className="chevron" />
-              </CategoryHeader>
-
-              <StylesList $expanded={isExpanded}>
-                {category.styles.map((style) => (
-                  <StyleItem
-                    key={style.value}
-                    $active={currentWidget === `${widgetType}-${style.value}`}
-                    onClick={() => handleStyleSelect(widgetType, style.value)}
-                  >
-                    <StyleDot $color={style.color} />
-                    {style.label}
-                  </StyleItem>
-                ))}
-              </StylesList>
-            </WidgetCategory>
-          );
-        })}
+                <StyleDot $color={s.color} />
+                {s.label}
+              </StyleItem>
+            ))}
+          </StylesList>
+        </WidgetCategory>
       </NavSection>
     </SidebarContainer>
   );
-}; 
+};

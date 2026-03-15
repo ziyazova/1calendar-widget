@@ -9,10 +9,13 @@ import { Sidebar } from '../components/ui/sidebar/Sidebar';
 import { Header } from '../components/layout/Header';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel } from '../components/ui/forms/CustomizationPanel';
+import { LayoutCheck } from '../components/layout/LayoutCheck';
 
 interface StudioPageProps {
   diContainer: DIContainer;
 }
+
+type ViewMode = 'editor' | 'layout-check';
 
 const StudioContainer = styled.div`
   display: flex;
@@ -24,22 +27,23 @@ const StudioContainer = styled.div`
 const WorkspaceContainer = styled.div`
   display: flex;
   flex: 1;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 64px);
 `;
 
 const ContentArea = styled.div`
   display: flex;
   flex: 1;
-  gap: ${({ theme }) => theme.spacing['8']};
-  padding: ${({ theme }) => theme.spacing['8']} ${({ theme }) => theme.spacing['8']} 0;
+  gap: 20px;
+  padding: 20px;
   overflow: hidden;
   margin-left: 300px;
-  height: calc(100vh - 80px);
-  
+  height: calc(100vh - 64px);
+
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-left: 0;
     flex-direction: column;
-    gap: ${({ theme }) => theme.spacing['6']};
+    gap: 16px;
+    padding: 16px;
   }
 `;
 
@@ -48,26 +52,35 @@ const WidgetArea = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.radii.card};
-  height: calc(100vh - 80px - 64px);
+  border-radius: 20px;
+  height: calc(100vh - 64px - 40px);
   position: relative;
   overflow: hidden;
+  background: #ffffff;
+  box-shadow: ${({ theme }) => theme.shadows.card};
+`;
+
+const LayoutCheckArea = styled.div`
+  flex: 1;
+  border-radius: 20px;
+  height: calc(100vh - 64px - 40px);
+  overflow: hidden;
+  background: ${({ theme }) => theme.colors.background.primary};
+  box-shadow: ${({ theme }) => theme.shadows.card};
 `;
 
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [currentWidget, setCurrentWidget] = useState<Widget | null>(null);
-  const [currentWidgetKey, setCurrentWidgetKey] = useState<string>('calendar-modern-grid');
+  const [currentWidgetKey, setCurrentWidgetKey] = useState<string>('calendar-modern-grid-zoom-fixed');
   const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('editor');
 
   useEffect(() => {
-    // Initialize with available widgets
     const types = diContainer.listAvailableWidgetsUseCase.execute();
     setAvailableWidgets(types);
 
-    // Create default calendar widget with modern-grid style
     if (types.includes('calendar')) {
-      createWidgetWithStyle('calendar', 'modern-grid');
+      createWidgetWithStyle('calendar', 'modern-grid-zoom-fixed');
     }
   }, [diContainer]);
 
@@ -75,7 +88,6 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     try {
       const widget = await diContainer.createWidgetUseCase.execute(type);
 
-      // Update widget with specific style
       let updatedWidget;
       if (type === 'calendar') {
         const settings = new CalendarSettings({ style: style as CalendarSettings['style'] });
@@ -96,7 +108,6 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     if (style) {
       await createWidgetWithStyle(type, style);
     } else {
-      // Fallback to basic widget creation
       try {
         const widget = await diContainer.createWidgetUseCase.execute(type);
         setCurrentWidget(widget);
@@ -128,7 +139,6 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
     navigator.clipboard.writeText(embedUrl)
       .then(() => {
-        // Show success feedback
         Logger.info('StudioPage', 'Embed URL copied to clipboard');
       })
       .catch((err) => Logger.error('StudioPage', 'Failed to copy embed URL', err));
@@ -139,6 +149,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       <Header
         currentWidget={currentWidget}
         onCopyEmbedUrl={handleCopyEmbedUrl}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       <WorkspaceContainer>
@@ -149,16 +161,24 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         />
 
         <ContentArea>
-          <WidgetArea>
-            <WidgetDisplay widget={currentWidget} />
-          </WidgetArea>
+          {viewMode === 'editor' ? (
+            <>
+              <WidgetArea>
+                <WidgetDisplay widget={currentWidget} />
+              </WidgetArea>
 
-          <CustomizationPanel
-            widget={currentWidget}
-            onSettingsChange={handleSettingsChange}
-          />
+              <CustomizationPanel
+                widget={currentWidget}
+                onSettingsChange={handleSettingsChange}
+              />
+            </>
+          ) : (
+            <LayoutCheckArea>
+              <LayoutCheck widget={currentWidget} />
+            </LayoutCheckArea>
+          )}
         </ContentArea>
       </WorkspaceContainer>
     </StudioContainer>
   );
-}; 
+};

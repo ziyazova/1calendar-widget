@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { theme } from './presentation/themes/theme';
 
 import { LandingPage } from './presentation/pages/LandingPage';
@@ -10,12 +10,26 @@ import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 
 import { DIContainer } from './infrastructure/di/DIContainer';
 
+const GlobalStyles = createGlobalStyle`
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: ${({ theme }) => theme.typography.fonts.primary};
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+`;
+
 function App() {
   const diContainer = DIContainer.getInstance();
 
   return (
     <ErrorBoundary>
       <ThemeProvider theme={theme}>
+        <GlobalStyles />
         <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
