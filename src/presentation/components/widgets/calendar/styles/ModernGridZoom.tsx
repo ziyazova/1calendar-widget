@@ -285,18 +285,22 @@ export const ModernGridZoom: React.FC<ModernGridZoomProps> = ({ settings }) => {
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
+  // Detect if running inside embed (iframe)
+  const isEmbed = window.location.pathname.includes('/embed/');
+
   // CSS Zoom scaling
   useEffect(() => {
     if (!outerRef.current) return;
+    const maxZoom = isEmbed ? 2.0 : 1.0;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
-        setZoom(Math.min(1, Math.max(0.25, parentWidth / DESIGN_WIDTH)));
+        setZoom(Math.min(maxZoom, Math.max(0.25, parentWidth / DESIGN_WIDTH)));
       }
     });
     ro.observe(outerRef.current);
     return () => ro.disconnect();
-  }, []);
+  }, [isEmbed]);
 
   const today = new Date();
   const year = currentDate.getFullYear();

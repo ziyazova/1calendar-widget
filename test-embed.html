@@ -21,12 +21,24 @@
     .controls label { font-size: 13px; font-weight: 500; }
     .controls input[type="range"] { width: 160px; }
     .controls .value { font-size: 13px; color: #666; min-width: 42px; }
-    .controls button {
+    .controls button, .controls select {
       padding: 6px 14px; font-size: 13px; border-radius: 6px;
       border: 1px solid #ddd; background: #fff; cursor: pointer;
     }
-    .controls button:hover { background: #f0f0f0; }
+    .controls button:hover, .controls select:hover { background: #f0f0f0; }
     .controls button.active { background: #37352f; color: #fff; border-color: #37352f; }
+    .controls select { padding-right: 24px; }
+
+    .current-style {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #667EEA;
+      color: #fff;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
 
     .presets { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .presets button {
@@ -98,7 +110,7 @@
 </head>
 <body>
 
-  <h1>Notion Embed Simulator</h1>
+  <h1>Notion Embed Simulator <span class="current-style" id="currentStyleLabel">Modern Grid</span></h1>
   <p class="subtitle">Test how the calendar widget looks inside a Notion-style iframe at different sizes. Drag the bottom-right corner to resize.</p>
 
   <div class="controls">
@@ -110,9 +122,14 @@
     <input type="range" id="heightSlider" min="150" max="700" value="380" />
     <span class="value" id="heightVal">380px</span>
 
-    <label style="margin-left:16px;">Widget:</label>
-    <button class="widget-btn active" data-path="/embed/calendar">Calendar</button>
-    <button class="widget-btn" data-path="/embed/clock">Clock</button>
+    <label style="margin-left:16px;">Style:</label>
+    <select id="styleSelect">
+      <option value="modern-grid" selected>Modern Grid</option>
+      <option value="modern-grid-zoom">Modern Grid — CSS Zoom</option>
+      <option value="calendar-2">CSS Zoom (layout check)</option>
+      <option value="calendar-4">Container Query (layout check)</option>
+      <option value="calendar-6">SVG ViewBox (layout check)</option>
+    </select>
 
     <button class="debug-btn" id="debugToggle" style="margin-left:16px;">Debug</button>
   </div>
@@ -127,7 +144,7 @@
     <strong style="font-size:12px; line-height:28px;">Presets:</strong>
     <button data-w="150" data-h="150">150×150 (tiny)</button>
     <button data-w="200" data-h="200">200×200 (min)</button>
-    <button data-w="280" data-h="320">280×320 (design)</button>
+    <button data-w="256" data-h="300">256×300 (design)</button>
     <button data-w="320" data-h="320">320×320 (Notion small)</button>
     <button data-w="420" data-h="380">420×380 (default)</button>
     <button data-w="500" data-h="400">500×400 (Notion medium)</button>
@@ -143,8 +160,8 @@
 
   <!-- Fixed-size comparison grid -->
   <h1 style="margin-top:48px;">Size Comparison</h1>
-  <p class="subtitle">All common Notion embed sizes side by side.</p>
-  <div class="grid">
+  <p class="subtitle">Same widget at common Notion embed sizes.</p>
+  <div class="grid" id="comparisonGrid">
     <div class="grid-item">
       <h3>200 × 200 (minimum)</h3>
       <div class="embed-container" style="width:200px; height:200px;">
@@ -152,8 +169,8 @@
       </div>
     </div>
     <div class="grid-item">
-      <h3>280 × 320 (design size)</h3>
-      <div class="embed-container" style="width:280px; height:320px;">
+      <h3>256 × 300 (design size)</h3>
+      <div class="embed-container" style="width:256px; height:300px;">
         <iframe class="grid-iframe" src="http://localhost:5173/embed/calendar"></iframe>
       </div>
     </div>
@@ -187,11 +204,37 @@
     const heightVal = document.getElementById('heightVal');
     const debugToggle = document.getElementById('debugToggle');
     const debugLegend = document.getElementById('debugLegend');
+    const styleSelect = document.getElementById('styleSelect');
+    const currentStyleLabel = document.getElementById('currentStyleLabel');
 
     let debugOn = false;
-
     let embedMinW = 0;
     let embedMinH = 0;
+
+    function makeEmbedUrl(style) {
+      const config = btoa(JSON.stringify({ style: style }));
+      return 'http://localhost:5173/embed/calendar?config=' + config;
+    }
+
+    function updateAllIframes(style) {
+      const url = makeEmbedUrl(style);
+      iframe.src = url;
+      document.querySelectorAll('.grid-iframe').forEach(f => {
+        f.src = url;
+      });
+      // Update label
+      const opt = styleSelect.options[styleSelect.selectedIndex];
+      currentStyleLabel.textContent = opt ? opt.textContent : style;
+      // Re-apply debug
+      if (debugOn) {
+        setTimeout(() => sendDebugToAll('debug-on'), 500);
+      }
+    }
+
+    // Style selector
+    styleSelect.addEventListener('change', () => {
+      updateAllIframes(styleSelect.value);
+    });
 
     // Listen for min-size messages from the widget iframe
     window.addEventListener('message', (e) => {
@@ -200,7 +243,6 @@
         embedMinH = e.data.minHeight || 0;
         container.style.minWidth = embedMinW + 'px';
         container.style.minHeight = embedMinH + 'px';
-        // Update slider minimums to match
         widthSlider.min = embedMinW;
         heightSlider.min = embedMinH;
       }
@@ -240,19 +282,6 @@
     document.querySelectorAll('.presets button').forEach(btn => {
       btn.addEventListener('click', () => {
         updateSize(+btn.dataset.w, +btn.dataset.h);
-      });
-    });
-
-    // Widget toggle
-    document.querySelectorAll('.widget-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.widget-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        iframe.src = 'http://localhost:5173' + btn.dataset.path;
-        // Re-apply debug state to new iframe
-        if (debugOn) {
-          setTimeout(() => iframe.contentWindow.postMessage('debug-on', '*'), 500);
-        }
       });
     });
 
