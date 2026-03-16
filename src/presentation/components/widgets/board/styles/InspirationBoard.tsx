@@ -33,7 +33,7 @@ const ScreenArea = styled.div`
   left: 5.5%;
   width: 74%;
   height: 53%;
-  border-radius: 2.8% / 1.8%;
+  border-radius: clamp(4px, 2.5%, 16px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
