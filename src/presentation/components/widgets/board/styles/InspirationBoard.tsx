@@ -10,7 +10,7 @@ interface InspirationBoardProps {
 // The whole camera scales as one unit from the container height
 const CameraFrame = styled.div`
   position: relative;
-  height: calc(80% - 26px);
+  height: 76%;
   aspect-ratio: 736 / 1308;
   margin: 0 auto;
 `;
@@ -31,8 +31,8 @@ const ScreenArea = styled.div`
   position: absolute;
   top: 3%;
   left: 5.5%;
-  width: 60%;
-  height: 46%;
+  width: 74%;
+  height: 53%;
   border-radius: 2.8% / 1.8%;
   overflow: hidden;
   display: flex;
