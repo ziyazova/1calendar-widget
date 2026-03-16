@@ -7,33 +7,34 @@ interface InspirationBoardProps {
   settings: BoardSettings;
 }
 
+// The whole camera scales as one unit from the container height
 const CameraFrame = styled.div`
   position: relative;
-  width: 100%;
+  height: 100%;
   aspect-ratio: 736 / 1308;
-  max-height: 100%;
+  margin: 0 auto;
+  overflow: hidden;
 `;
 
 const FrameImage = styled.img`
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: fill;
   display: block;
   pointer-events: none;
   user-select: none;
-  position: relative;
-  left: 20px;
-  top: 3px;
 `;
 
+// Screen area — all % relative to CameraFrame, scales together
 const ScreenArea = styled.div`
   position: absolute;
-  top: calc(3.2% - 1px);
-  left: 50%;
-  transform: translateX(calc(-50% - 10px));
-  width: 27.8%;
-  height: calc(52.7% + 4px);
-  border-radius: 16px;
+  top: 3%;
+  left: 5.5%;
+  width: 68%;
+  height: 49.5%;
+  border-radius: 2.8% / 1.8%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
