@@ -6,6 +6,7 @@ import { useResolvedTheme, adaptColorForDarkMode } from '../../hooks/useResolved
 import { AnalogClassicClock } from './clock/styles/AnalogClassicClock';
 import { ClassicClock } from './clock/styles/ClassicClock';
 import { ModernClock } from './clock/styles/ModernClock';
+import { FlowerClock } from './clock/styles/FlowerClock';
 
 interface ClockWidgetProps {
   widget: Widget;
@@ -33,6 +34,8 @@ export const ClockWidget: React.FC<ClockWidgetProps> = ({ widget }) => {
       return <AnalogClassicClock settings={effectiveSettings} time={time} textColor={textColor} />;
     case 'classic':
       return <ClassicClock settings={effectiveSettings} time={time} textColor={textColor} />;
+    case 'flower':
+      return <FlowerClock settings={effectiveSettings} time={time} textColor={textColor} />;
     case 'modern':
     default:
       return <ModernClock settings={effectiveSettings} time={time} textColor={textColor} />;

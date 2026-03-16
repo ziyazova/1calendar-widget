@@ -200,6 +200,7 @@ const CLOCK_STYLES = [
   { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
   { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
   { label: 'Clock', value: 'classic', color: '#6E7FF2' },
+  { label: 'Flower', value: 'flower', color: '#2d6a4f' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({

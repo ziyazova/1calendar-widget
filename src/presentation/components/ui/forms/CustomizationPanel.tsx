@@ -285,9 +285,10 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const settings = widget.settings as CalendarSettings | ClockSettings;
   const calStyle = widget.type === 'calendar' ? (settings as CalendarSettings).style : '';
   const clkStyle = widget.type === 'clock' ? (settings as ClockSettings).style : '';
-  const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'classic';
-  const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter';
+  const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'classic' || clkStyle === 'flower';
+  const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'flower';
   const isTypewriterStyle = calStyle === 'typewriter';
+  const isFlowerClockStyle = clkStyle === 'flower';
 
   return (
     <PanelContainer>
