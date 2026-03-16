@@ -7,7 +7,6 @@ import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
-import { useResolvedTheme, adaptColorForDarkMode } from '../hooks/useResolvedTheme';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
@@ -121,16 +120,10 @@ export const CalendarEmbedPage: React.FC = () => {
     }
   }, []);
 
-  const resolvedTheme = useResolvedTheme(settings.theme);
-  const isDark = resolvedTheme === 'dark';
-  const effectiveBg = isDark
-    ? adaptColorForDarkMode(settings.backgroundColor, 'background')
-    : settings.backgroundColor;
-
   if (loading) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles $bgColor={effectiveBg} />
+        <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <LoadingState>Loading calendar...</LoadingState>
@@ -143,7 +136,7 @@ export const CalendarEmbedPage: React.FC = () => {
   if (error || !widget) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles $bgColor={effectiveBg} />
+        <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <ErrorState>
@@ -159,12 +152,11 @@ export const CalendarEmbedPage: React.FC = () => {
   Logger.debug('CalendarEmbed', 'Rendering with embed size', {
     embedWidth: settings.embedWidth,
     embedHeight: settings.embedHeight,
-    theme: resolvedTheme,
   });
 
   return (
     <EmbedController>
-      <GlobalEmbedStyles $bgColor={effectiveBg} />
+      <GlobalEmbedStyles $bgColor="transparent" />
       <EmbedContainer>
         <EmbedScaleWrapper
           refWidth={settings.embedWidth}

@@ -6,7 +6,6 @@ import { Widget } from '../../domain/entities/Widget';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
-import { useResolvedTheme, adaptColorForDarkMode } from '../hooks/useResolvedTheme';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
@@ -120,16 +119,10 @@ export const BoardEmbedPage: React.FC = () => {
     }
   }, []);
 
-  const resolvedTheme = useResolvedTheme(settings.theme);
-  const isDark = resolvedTheme === 'dark';
-  const effectiveBg = isDark
-    ? adaptColorForDarkMode(settings.backgroundColor, 'background')
-    : settings.backgroundColor;
-
   if (loading) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles $bgColor={effectiveBg} />
+        <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <LoadingState>Loading board...</LoadingState>
         </EmbedContainer>
@@ -140,7 +133,7 @@ export const BoardEmbedPage: React.FC = () => {
   if (error || !widget) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles $bgColor={effectiveBg} />
+        <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <ErrorState>
             <h3>Error</h3>
@@ -153,7 +146,7 @@ export const BoardEmbedPage: React.FC = () => {
 
   return (
     <EmbedController>
-      <GlobalEmbedStyles $bgColor={effectiveBg} />
+      <GlobalEmbedStyles $bgColor="transparent" />
       <EmbedContainer>
         <BoardWidget widget={widget} />
       </EmbedContainer>
