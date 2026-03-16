@@ -236,6 +236,34 @@ const ToggleGroup = styled.div`
   gap: 8px;
 `;
 
+const TypewriterColorRow = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+  border: 2px solid ${({ $active, theme }) => $active ? theme.colors.primary : 'transparent'};
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.12s ease;
+  padding: 0;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const TYPEWRITER_COLORS = [
+  { value: 'blue', color: '#7a9bb5', label: 'Blue' },
+  { value: 'green', color: '#7ba88e', label: 'Green' },
+  { value: 'pink', color: '#c48a9a', label: 'Pink' },
+  { value: 'brown', color: '#8b7355', label: 'Brown' },
+  { value: 'beige', color: '#c4b39a', label: 'Beige' },
+] as const;
+
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   widget,
   onSettingsChange,
@@ -257,8 +285,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const settings = widget.settings as CalendarSettings | ClockSettings;
   const calStyle = widget.type === 'calendar' ? (settings as CalendarSettings).style : '';
   const clkStyle = widget.type === 'clock' ? (settings as ClockSettings).style : '';
-  const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || clkStyle === 'classic';
-  const isCollageStyle = calStyle === 'collage';
+  const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'classic';
+  const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter';
+  const isTypewriterStyle = calStyle === 'typewriter';
 
   return (
     <PanelContainer>
@@ -282,6 +311,26 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </FormGroup>
         </Section>
 
+        {isTypewriterStyle && (
+        <Section>
+          <SectionTitle>Typewriter</SectionTitle>
+          <FormGroup>
+            <Label>Color</Label>
+            <TypewriterColorRow>
+              {TYPEWRITER_COLORS.map((tc) => (
+                <TypewriterColorDot
+                  key={tc.value}
+                  $color={tc.color}
+                  $active={(settings as CalendarSettings).typewriterColor === tc.value}
+                  title={tc.label}
+                  onClick={() => onSettingsChange({ typewriterColor: tc.value })}
+                />
+              ))}
+            </TypewriterColorRow>
+          </FormGroup>
+        </Section>
+        )}
+
         <Section>
           <SectionTitle>Colors</SectionTitle>
 
@@ -294,6 +343,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             />
           </FormGroup>
 
+          {!isTypewriterStyle && (
           <FormGroup>
             <Label>Background</Label>
             <ColorPicker
@@ -302,6 +352,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
               type="background"
             />
           </FormGroup>
+          )}
 
           {!isClassicStyle && (
           <FormGroup>

@@ -15,3 +15,4 @@ export { ModernGridZoom } from './ModernGridZoom';
 export { ModernGridZoomFixed } from './ModernGridZoomFixed';
 export { ClassicCalendar } from './ClassicCalendar';
 export { CollageCalendar } from './CollageCalendar';
+export { TypewriterCalendar } from './TypewriterCalendar';

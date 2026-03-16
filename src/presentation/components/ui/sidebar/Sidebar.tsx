@@ -186,6 +186,7 @@ const CALENDAR_STYLES = [
   { label: 'CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
   { label: 'Classic Calendar', value: 'classic', color: '#6E7FF2' },
   { label: 'Collage', value: 'collage', color: '#a89e8e' },
+  { label: 'Typewriter', value: 'typewriter', color: '#7a9bb5' },
 ];
 
 const ARCHIVE_STYLES = [

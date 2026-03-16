@@ -6,11 +6,12 @@ export class CalendarSettings {
   public readonly showWeekends: boolean;
   public readonly borderRadius: number;
   public readonly showBorder: boolean;
-  public readonly style: 'modern-grid' | 'modern-weekly' | 'classic' | 'collage' | 'calendar-1' | 'calendar-2' | 'calendar-3' | 'calendar-4' | 'calendar-5' | 'calendar-6' | 'calendar-7' | 'calendar-8' | 'calendar-9' | 'calendar-10' | 'calendar-11' | 'modern-grid-zoom' | 'modern-grid-zoom-fixed';
+  public readonly style: 'modern-grid' | 'modern-weekly' | 'classic' | 'collage' | 'typewriter' | 'calendar-1' | 'calendar-2' | 'calendar-3' | 'calendar-4' | 'calendar-5' | 'calendar-6' | 'calendar-7' | 'calendar-8' | 'calendar-9' | 'calendar-10' | 'calendar-11' | 'modern-grid-zoom' | 'modern-grid-zoom-fixed';
   public readonly showDayBorders: boolean;
   public readonly embedWidth: number;
   public readonly embedHeight: number;
   public readonly theme: 'auto' | 'light' | 'dark';
+  public readonly typewriterColor: 'blue' | 'green' | 'pink' | 'brown' | 'beige';
 
   constructor(settings: Partial<CalendarSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -25,6 +26,7 @@ export class CalendarSettings {
     this.embedWidth = settings.embedWidth ?? 420;
     this.embedHeight = settings.embedHeight ?? 380;
     this.theme = settings.theme || 'auto';
+    this.typewriterColor = settings.typewriterColor || 'blue';
   }
 
   public static fromJson(json: string): CalendarSettings {
@@ -50,6 +52,7 @@ export class CalendarSettings {
       embedWidth: this.embedWidth,
       embedHeight: this.embedHeight,
       theme: this.theme,
+      typewriterColor: this.typewriterColor,
     });
   }
 
@@ -67,6 +70,7 @@ export class CalendarSettings {
       embedWidth: changes.embedWidth ?? this.embedWidth,
       embedHeight: changes.embedHeight ?? this.embedHeight,
       theme: changes.theme ?? this.theme,
+      typewriterColor: changes.typewriterColor ?? this.typewriterColor,
     });
   }
 } 
