@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRive } from '@rive-app/react-canvas';
 import { ClockSettings } from '../../../../../domain/value-objects/ClockSettings';
 import { ClockWidgetContainer } from './ClockCommonStyles';
 import styled, { keyframes } from 'styled-components';
@@ -26,6 +27,8 @@ const TimeDisplay = styled.div<{
   color: ${({ $textColor }) => $textColor};
   user-select: none;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 `;
 
 const ColonSpan = styled.span`
@@ -49,6 +52,14 @@ const DateLine = styled.div<{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+  z-index: 1;
+`;
+
+const RiveWrapper = styled.div`
+  width: 60%;
+  aspect-ratio: 1;
+  margin-top: 4px;
 `;
 
 interface DreamyClockProps {
@@ -59,6 +70,27 @@ interface DreamyClockProps {
 
 export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textColor }) => {
   const [isHovered, setIsHovered] = React.useState(false);
+
+  const { rive, RiveComponent } = useRive({
+    src: '/dreamy-dino.riv',
+    stateMachines: 'State Machine 1',
+    autoplay: true,
+    artboard: 'Artboard',
+  });
+
+  React.useEffect(() => {
+    if (rive) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const r = rive as any;
+        if ('disableArtboardBackground' in r) {
+          r.disableArtboardBackground = true;
+        } else if (r.artboard?.nativeArtboard) {
+          r.artboard.nativeArtboard.backgroundColor = 0x00000000;
+        }
+      } catch { /* ignore */ }
+    }
+  }, [rive]);
 
   const hours = settings.format24h
     ? time.getHours().toString().padStart(2, '0')
@@ -80,7 +112,7 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
       $showBorder={settings.showBorder}
       $textColor={textColor}
       $style={settings.style}
-      style={{ maxWidth: '288px' }}
+      style={{ maxWidth: '288px', overflow: 'visible', minHeight: '78px', padding: '10px 20px' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -102,6 +134,10 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
           {weekday}, {month} {day}
         </DateLine>
       )}
+
+      <RiveWrapper>
+        <RiveComponent style={{ background: 'transparent' }} />
+      </RiveWrapper>
     </ClockWidgetContainer>
   );
 };

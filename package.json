@@ -16,6 +16,7 @@
     "test:smoke": "vitest run src/test/embed-size-smoke.test.ts"
   },
   "dependencies": {
+    "@rive-app/react-canvas": "^4.27.1",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
