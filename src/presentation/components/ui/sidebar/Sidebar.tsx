@@ -38,16 +38,11 @@ const SidebarHeader = styled.div`
 const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 `;
 
 const PeachIcon = () => (
-  <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="48" cy="54" r="36" fill="#F8B898" stroke="#4a4a4a" strokeWidth="5" strokeLinecap="round"/>
-    <path d="M30 40 Q36 50 32 64" stroke="#4a4a4a" strokeWidth="4" strokeLinecap="round" fill="none"/>
-    <path d="M62 36 Q58 48 64 62" stroke="#4a4a4a" strokeWidth="4" strokeLinecap="round" fill="none"/>
-    <ellipse cx="70" cy="22" rx="10" ry="14" fill="#3a7d2c" stroke="#4a4a4a" strokeWidth="4" transform="rotate(-20 70 22)"/>
-  </svg>
+  <img src="/studio-logo.png" alt="Logo" width="40" height="40" style={{ objectFit: 'contain' }} />
 );
 
 const LogoText = styled.h1`

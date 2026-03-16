@@ -16,7 +16,7 @@ const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: ${({ $bgColor }) => $bgColor};
+    background: transparent;
   }
   #root {
     width: 100%;

@@ -12,13 +12,15 @@ const DESIGN_WIDTH = 340;
 const DESIGN_HEIGHT = 604;
 
 // Outer wrapper fills the container, measures it, and scales content
-const ScaleWrapper = styled.div`
+const ScaleWrapper = styled.div<{ $bg: string }>`
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background: ${({ $bg }) => $bg};
+  transition: background 0.2s ease;
 `;
 
 // Fixed design-size container, scaled via transform
@@ -141,7 +143,7 @@ export const InspirationBoard: React.FC<InspirationBoardProps> = ({ settings }) 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [scale, setScale] = useState(1);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { imageUrls, primaryColor } = settings;
+  const { imageUrls, primaryColor, backgroundColor } = settings;
 
   useEffect(() => {
     setCurrentSlide(0);
@@ -175,7 +177,7 @@ export const InspirationBoard: React.FC<InspirationBoardProps> = ({ settings }) 
   }, [imageUrls.length]);
 
   return (
-    <ScaleWrapper ref={wrapperRef}>
+    <ScaleWrapper ref={wrapperRef} $bg={backgroundColor}>
       <CameraFrame $scale={scale}>
         <FrameImage src="/camera-frame.png" alt="" />
         <ScreenArea>

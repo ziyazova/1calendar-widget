@@ -70,6 +70,11 @@ const HeaderRight = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-right: 290px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-right: 0;
+  }
 `;
 
 const CopyButton = styled.button<{ $copied?: boolean }>`
@@ -136,19 +141,22 @@ export const Header: React.FC<HeaderProps> = ({
                 Layout Check
               </Tab>
             </TabGroup>
-            <CopyButton
-              onClick={handleCopy}
-              disabled={!currentWidget}
-              $copied={copied}
-            >
-              {copied ? <Check /> : <Copy />}
-              {copied ? 'Copied!' : 'Copy Embed URL'}
-            </CopyButton>
           </>
         )}
       </HeaderLeft>
 
-      <HeaderRight />
+      <HeaderRight>
+        {currentWidget && (
+          <CopyButton
+            onClick={handleCopy}
+            disabled={!currentWidget}
+            $copied={copied}
+          >
+            {copied ? <Check /> : <Copy />}
+            {copied ? 'Copied!' : 'Copy Embed URL'}
+          </CopyButton>
+        )}
+      </HeaderRight>
     </HeaderContainer>
   );
 };

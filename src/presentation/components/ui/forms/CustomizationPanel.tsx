@@ -441,21 +441,6 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
       </PanelHeader>
 
       <PanelContent>
-        <Section>
-          <SectionTitle>Appearance</SectionTitle>
-          <FormGroup>
-            <Label>Theme</Label>
-            <Select
-              value={(settings as CalendarSettings).theme || 'auto'}
-              onChange={(e) => onSettingsChange({ theme: e.target.value as 'auto' | 'light' | 'dark' })}
-            >
-              <option value="auto">Auto (System)</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </Select>
-          </FormGroup>
-        </Section>
-
         {isTypewriterStyle && (
         <Section>
           <SectionTitle>Typewriter</SectionTitle>
@@ -476,6 +461,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
         </Section>
         )}
 
+        {!isBoard && (
         <Section>
           <SectionTitle>Colors</SectionTitle>
 
@@ -511,8 +497,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </FormGroup>
           )}
         </Section>
+        )}
 
-        {!isCollageStyle && (
+        {!isCollageStyle && !isBoard && (
         <Section>
           <SectionTitle>Layout</SectionTitle>
 
