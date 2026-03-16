@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
 import { getContrastColor } from '../../../../themes/colors';
 import { WIDGET_CONTAINER, WIDGET_TYPOGRAPHY, WIDGET_SPACING } from '../../../../themes/widgetTokens';
-import { useResolvedTheme, adaptColorForDarkMode } from '../../../../hooks/useResolvedTheme';
 
 interface ModernGridZoomProps {
   settings: CalendarSettings;
@@ -247,10 +246,6 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
   const [debug, setDebug] = useState(false);
   const [zoom, setZoom] = useState(1);
   const outerRef = useRef<HTMLDivElement>(null);
-  const resolvedTheme = useResolvedTheme(settings.theme);
-  const isDark = resolvedTheme === 'dark';
-  const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
-  const effectiveAccent = isDark ? adaptColorForDarkMode(settings.accentColor, 'accent') : settings.accentColor;
   const textColor = getContrastColor(settings.backgroundColor);
 
   useEffect(() => {
@@ -324,10 +319,10 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
     <OuterWrapper ref={outerRef}>
       <ZoomWrapper $zoom={zoom}>
         <GridContainer
-          $backgroundColor={effectiveBg}
+          $backgroundColor={settings.backgroundColor}
           $borderRadius={settings.borderRadius}
           $showBorder={settings.showBorder}
-          $accentColor={effectiveAccent}
+          $accentColor={settings.accentColor}
           $textColor={textColor}
           $debug={debug}
         >
@@ -360,7 +355,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
             {(settings.showWeekends ? weekDays : weekDaysWorkdays).map((day, index) => (
               <WeekDay
                 key={index}
-                $accentColor={effectiveAccent}
+                $accentColor={settings.accentColor}
                 $borderRadius={settings.borderRadius}
                 $textColor={textColor}
                 $primaryColor={settings.primaryColor}

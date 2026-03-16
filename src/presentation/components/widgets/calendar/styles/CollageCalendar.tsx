@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { CalendarSettings } from '../../../../../domain/value-objects/CalendarSettings';
 import { getContrastColor } from '../../../../themes/colors';
-import { useResolvedTheme, adaptColorForDarkMode } from '../../../../hooks/useResolvedTheme';
 
 interface CollageCalendarProps {
   settings: CalendarSettings;
@@ -209,9 +208,6 @@ export const CollageCalendar: React.FC<CollageCalendarProps> = ({ settings }) =>
   const [currentDate, setCurrentDate] = useState(new Date());
   const [zoom, setZoom] = useState(1);
   const outerRef = useRef<HTMLDivElement>(null);
-  const resolvedTheme = useResolvedTheme(settings.theme);
-  const isDark = resolvedTheme === 'dark';
-  const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
   const textColor = getContrastColor(settings.backgroundColor);
 
   const isEmbed = window.location.pathname.includes('/embed/');
@@ -267,7 +263,7 @@ export const CollageCalendar: React.FC<CollageCalendarProps> = ({ settings }) =>
     <OuterWrapper ref={outerRef}>
       <ZoomWrapper $zoom={zoom}>
         <SceneWrapper>
-          <CalendarOverlay $backgroundColor={effectiveBg}>
+          <CalendarOverlay $backgroundColor={settings.backgroundColor}>
             <ClipImage src="/collage-clip.png" alt="" />
             {/* Month + Year header */}
             <HeaderRow>

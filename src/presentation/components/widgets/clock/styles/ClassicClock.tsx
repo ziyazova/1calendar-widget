@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { ClockSettings } from '../../../../../domain/value-objects/ClockSettings';
-import { useResolvedTheme, adaptColorForDarkMode, NOTION_DARK_BG } from '../../../../hooks/useResolvedTheme';
 
 interface ClassicClockProps {
   settings: ClockSettings;
@@ -93,10 +92,6 @@ const DAY_NAMES = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRID
 export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) => {
   const [zoom, setZoom] = useState(1);
   const outerRef = useRef<HTMLDivElement>(null);
-  const resolvedTheme = useResolvedTheme(settings.theme);
-  const isDark = resolvedTheme === 'dark';
-  const pageBg = isDark ? NOTION_DARK_BG : '#ffffff';
-  const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
 
   const isEmbed = window.location.pathname.includes('/embed/');
 
@@ -128,12 +123,12 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
       <ZoomWrapper $zoom={zoom}>
         <FlipContainer>
           <FlipPanel
-            $bgColor={effectiveBg}
+            $bgColor={settings.backgroundColor}
             $borderRadius={settings.borderRadius}
             $showBorder={settings.showBorder}
             $textColor={settings.primaryColor}
           >
-            <FlipLine $color={pageBg} />
+            <FlipLine $color="transparent" />
             <FlipNumber $color={settings.primaryColor}>
               {hours}
             </FlipNumber>
@@ -145,12 +140,12 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
           </FlipPanel>
 
           <FlipPanel
-            $bgColor={effectiveBg}
+            $bgColor={settings.backgroundColor}
             $borderRadius={settings.borderRadius}
             $showBorder={settings.showBorder}
             $textColor={settings.primaryColor}
           >
-            <FlipLine $color={pageBg} />
+            <FlipLine $color="transparent" />
             <FlipNumber $color={settings.primaryColor}>
               {minutes}
             </FlipNumber>

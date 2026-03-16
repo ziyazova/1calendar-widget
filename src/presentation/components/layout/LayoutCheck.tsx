@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { Sun, Moon } from 'lucide-react';
 import { Widget } from '../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../domain/value-objects/ClockSettings';
@@ -183,9 +184,49 @@ const PresetButton = styled.button`
   }
 `;
 
-const EmbedContainer = styled.div`
-  background: #fff;
+const ThemeToggle = styled.div`
+  display: flex;
+  border-radius: 6px;
   border: 1px solid ${({ theme }) => theme.colors.border.primary};
+  overflow: hidden;
+  margin-left: 8px;
+`;
+
+const ThemeToggleButton = styled.button<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: ${({ $active }) => $active ? '#1d1d1f' : '#fff'};
+  color: ${({ $active }) => $active ? '#fff' : '#666'};
+
+  &:hover {
+    background: ${({ $active }) => $active ? '#1d1d1f' : '#f5f5f5'};
+  }
+
+  &:first-child {
+    border-right: 1px solid ${({ theme }) => theme.colors.border.primary};
+  }
+`;
+
+const darkContainerStyles = css`
+  background: #191919;
+  border-color: #333;
+`;
+
+const lightContainerStyles = css`
+  background: #fff;
+`;
+
+const EmbedContainer = styled.div<{ $dark?: boolean }>`
+  ${({ $dark }) => $dark ? darkContainerStyles : lightContainerStyles};
+  border: 1px solid ${({ theme, $dark }) => $dark ? '#333' : theme.colors.border.primary};
   border-radius: 8px;
   overflow: hidden;
   resize: both;
@@ -200,14 +241,14 @@ const EmbedIframe = styled.iframe`
   display: block;
 `;
 
-const SizeLabel = styled.span`
+const SizeLabel = styled.span<{ $dark?: boolean }>`
   position: absolute;
   bottom: 4px;
   right: 8px;
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  color: ${({ $dark }) => $dark ? '#999' : '#999'};
   pointer-events: none;
-  background: rgba(255,255,255,0.85);
+  background: ${({ $dark }) => $dark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)'};
   padding: 2px 6px;
   border-radius: 3px;
   font-variant-numeric: tabular-nums;
@@ -248,11 +289,38 @@ const GridItemLabel = styled.h4`
   margin: 0 0 8px 0;
 `;
 
-const GridEmbedContainer = styled.div`
-  background: #fff;
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
+const GridEmbedContainer = styled.div<{ $dark?: boolean }>`
+  ${({ $dark }) => $dark ? darkContainerStyles : lightContainerStyles};
+  border: 1px solid ${({ theme, $dark }) => $dark ? '#333' : theme.colors.border.primary};
   border-radius: 8px;
   overflow: hidden;
+`;
+
+const HoverTooltip = styled.div`
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 11px;
+  font-family: monospace;
+  padding: 6px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 10;
+  line-height: 1.6;
+  backdrop-filter: blur(8px);
+  white-space: pre-line;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+`;
+
+const HoverableGridItem = styled.div`
+  position: relative;
+
+  &:hover ${HoverTooltip} {
+    opacity: 1;
+  }
 `;
 
 const EmptyState = styled.div`
@@ -313,6 +381,7 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
   const [height, setHeight] = useState(380);
   const [style, setStyle] = useState(defaultStyle);
   const [debug, setDebug] = useState(false);
+  const [simDark, setSimDark] = useState(false);
   const [displaySize, setDisplaySize] = useState('420 x 380');
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -419,6 +488,15 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
           ))}
         </ControlSelect>
 
+        <ThemeToggle>
+          <ThemeToggleButton $active={!simDark} onClick={() => setSimDark(false)}>
+            <Sun size={13} /> Light
+          </ThemeToggleButton>
+          <ThemeToggleButton $active={simDark} onClick={() => setSimDark(true)}>
+            <Moon size={13} /> Dark
+          </ThemeToggleButton>
+        </ThemeToggle>
+
         <DebugButton $active={debug} onClick={() => setDebug(!debug)}>
           Debug
         </DebugButton>
@@ -441,10 +519,11 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
 
       <EmbedContainer
         ref={containerRef}
+        $dark={simDark}
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <EmbedIframe ref={iframeRef} src={embedUrl} />
-        <SizeLabel>{displaySize}</SizeLabel>
+        <SizeLabel $dark={simDark}>{displaySize}</SizeLabel>
       </EmbedContainer>
       <Hint>Drag the corner to resize freely, or use the sliders / presets above.</Hint>
 
@@ -452,17 +531,24 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
       <ComparisonSubtitle>Same widget at common Notion embed sizes.</ComparisonSubtitle>
 
       <ComparisonGrid>
-        {COMPARISON_SIZES.map((size, i) => (
-          <GridItem key={size.label}>
-            <GridItemLabel>{size.label}</GridItemLabel>
-            <GridEmbedContainer style={{ width: `${Math.min(size.w, 680)}px`, height: `${size.h}px` }}>
-              <EmbedIframe
-                ref={(el) => { if (el) gridIframesRef.current[i] = el; }}
-                src={embedUrl}
-              />
-            </GridEmbedContainer>
-          </GridItem>
-        ))}
+        {COMPARISON_SIZES.map((size, i) => {
+          const scaleX = (Math.min(size.w, 680) / (widgetType === 'board' ? 340 : (widget?.settings as any)?.embedWidth || 420)).toFixed(2);
+          const scaleY = (size.h / (widgetType === 'board' ? 604 : (widget?.settings as any)?.embedHeight || 380)).toFixed(2);
+          return (
+            <HoverableGridItem key={size.label}>
+              <GridItemLabel>{size.label}</GridItemLabel>
+              <GridEmbedContainer $dark={simDark} style={{ width: `${Math.min(size.w, 680)}px`, height: `${size.h}px` }}>
+                <EmbedIframe
+                  ref={(el) => { if (el) gridIframesRef.current[i] = el; }}
+                  src={embedUrl}
+                />
+              </GridEmbedContainer>
+              <HoverTooltip>
+                {`Container: ${Math.min(size.w, 680)}×${size.h}px\nWidget: ${currentStyleLabel}\nType: ${widgetType}\nScale: ${scaleX}x / ${scaleY}y\nTheme: ${simDark ? 'Dark' : 'Light'}`}
+              </HoverTooltip>
+            </HoverableGridItem>
+          );
+        })}
       </ComparisonGrid>
     </Container>
   );
