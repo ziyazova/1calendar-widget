@@ -15,6 +15,10 @@ export class Widget {
     return new Widget(id, 'clock', settings);
   }
 
+  static createBoard(id: string, settings: any): Widget {
+    return new Widget(id, 'board', settings);
+  }
+
   updateSettings(newSettings: Record<string, any>): Widget {
     const mergedSettings = { ...this.settings, ...newSettings };
     return new Widget(this.id, this.type, mergedSettings);

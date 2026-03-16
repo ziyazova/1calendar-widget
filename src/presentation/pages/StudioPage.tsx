@@ -5,6 +5,9 @@ import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
+import { BoardSettings } from '../../domain/value-objects/BoardSettings';
+
+type AnySettings = Partial<CalendarSettings | ClockSettings | BoardSettings>;
 import { Sidebar } from '../components/ui/sidebar/Sidebar';
 import { Header } from '../components/layout/Header';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
@@ -148,6 +151,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       if (type === 'calendar') {
         const settings = new CalendarSettings({ style: style as CalendarSettings['style'] });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
+      } else if (type === 'board') {
+        const settings = new BoardSettings({ layout: style as BoardSettings['layout'] });
+        updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
       } else {
         const settings = new ClockSettings({ style: style as 'modern' | 'analog-classic' });
         updatedWidget = await diContainer.updateWidgetUseCase.execute(widget.id, settings);
@@ -174,7 +180,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
   };
 
-  const handleSettingsChange = async (newSettings: Partial<CalendarSettings | ClockSettings>) => {
+  const handleSettingsChange = async (newSettings: AnySettings) => {
     if (!currentWidget) return;
 
     try {

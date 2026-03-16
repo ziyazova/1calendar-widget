@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
+import { BoardSettings } from '../../../../domain/value-objects/BoardSettings';
 import { ColorPicker } from '../ColorPicker';
 
 interface CustomizationPanelProps {
   widget: Widget | null;
-  onSettingsChange: (settings: Partial<CalendarSettings | ClockSettings>) => void;
+  onSettingsChange: (settings: Partial<CalendarSettings | ClockSettings | BoardSettings>) => void;
 }
 
 const PanelContainer = styled.div`
@@ -264,10 +265,152 @@ const TYPEWRITER_COLORS = [
   { value: 'beige', color: '#c4b39a', label: 'Beige' },
 ] as const;
 
+const ImageUrlInput = styled.input`
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid ${({ theme }) => theme.colors.border.primary};
+  border-radius: 8px;
+  background: #ffffff;
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: 12px;
+  font-family: inherit;
+  transition: border-color 0.12s ease;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.text.tertiary};
+  }
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.text.tertiary};
+  }
+`;
+
+const AddButton = styled.button`
+  width: 100%;
+  height: 34px;
+  border: 1px dashed ${({ theme }) => theme.colors.border.primary};
+  border-radius: 8px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  margin-top: 8px;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+const ImageList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+`;
+
+const ImageItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: ${({ theme }) => theme.colors.background.secondary};
+  border-radius: 6px;
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const ImageThumb = styled.img`
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+`;
+
+const ImageUrl = styled.span`
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const RemoveButton = styled.button`
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+  padding: 0;
+
+  &:hover {
+    background: rgba(0,0,0,0.05);
+    color: #ef4444;
+  }
+`;
+
+const LayoutOption = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.border.primary};
+  background: ${({ $active, theme }) => $active ? `${theme.colors.primary}10` : '#fff'};
+  color: ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.text.secondary};
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s ease;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const LayoutOptions = styled.div`
+  display: flex;
+  gap: 6px;
+`;
+
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   widget,
   onSettingsChange,
 }) => {
+  const [imageUrlInput, setImageUrlInput] = React.useState('');
+
+  const handleAddImage = () => {
+    if (!widget || widget.type !== 'board' || !imageUrlInput.trim()) return;
+    const boardSettings = widget.settings as BoardSettings;
+    if (boardSettings.imageUrls.length >= 8) return;
+    onSettingsChange({ imageUrls: [...boardSettings.imageUrls, imageUrlInput.trim()] });
+    setImageUrlInput('');
+  };
+
+  const handleRemoveImage = (index: number) => {
+    if (!widget || widget.type !== 'board') return;
+    const boardSettings = widget.settings as BoardSettings;
+    const newUrls = boardSettings.imageUrls.filter((_, i) => i !== index);
+    onSettingsChange({ imageUrls: newUrls });
+  };
+
   if (!widget) {
     return (
       <PanelContainer>
@@ -282,7 +425,8 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     );
   }
 
-  const settings = widget.settings as CalendarSettings | ClockSettings;
+  const settings = widget.settings as CalendarSettings | ClockSettings | BoardSettings;
+  const isBoard = widget.type === 'board';
   const calStyle = widget.type === 'calendar' ? (settings as CalendarSettings).style : '';
   const clkStyle = widget.type === 'clock' ? (settings as ClockSettings).style : '';
   const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'classic' || clkStyle === 'flower' || clkStyle === 'dreamy';
@@ -413,6 +557,38 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </ToggleGroup>
           </FormGroup>
         </Section>
+        )}
+
+        {isBoard && (
+          <Section>
+            <SectionTitle>Images</SectionTitle>
+            <FormGroup>
+              <ImageUrlInput
+                type="text"
+                placeholder="Paste image URL (i.pinimg.com, imgur...)"
+                value={imageUrlInput}
+                onChange={(e) => setImageUrlInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddImage(); }}
+              />
+              <AddButton
+                onClick={handleAddImage}
+                disabled={(settings as BoardSettings).imageUrls.length >= 8 || !imageUrlInput.trim()}
+              >
+                + Add Image ({(settings as BoardSettings).imageUrls.length}/8)
+              </AddButton>
+              {(settings as BoardSettings).imageUrls.length > 0 && (
+                <ImageList>
+                  {(settings as BoardSettings).imageUrls.map((url, i) => (
+                    <ImageItem key={i}>
+                      <ImageThumb src={url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      <ImageUrl>{url.split('/').pop() || url}</ImageUrl>
+                      <RemoveButton onClick={() => handleRemoveImage(i)}>&times;</RemoveButton>
+                    </ImageItem>
+                  ))}
+                </ImageList>
+              )}
+            </FormGroup>
+          </Section>
         )}
 
         {widget.type === 'clock' && (

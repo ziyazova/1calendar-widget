@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronRight, Calendar, Clock, Archive } from 'lucide-react';
+import { ChevronRight, Calendar, Clock, Archive, Image } from 'lucide-react';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -202,6 +202,10 @@ const CLOCK_STYLES = [
   { label: 'Dreamy', value: 'dreamy', color: '#A78BFA' },
 ];
 
+const BOARD_STYLES = [
+  { label: 'Inspiration Board', value: 'grid', color: '#E91E63' },
+];
+
 const CLOCK_ARCHIVE_STYLES = [
   { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
   { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
@@ -273,6 +277,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={s.value}
                   $active={currentWidget === `clock-${s.value}`}
                   onClick={() => onWidgetChange('clock', s.value)}
+                >
+                  <StyleDot $color={s.color} />
+                  {s.label}
+                </StyleItem>
+              ))}
+            </StylesList>
+          </WidgetCategory>
+        )}
+
+        {availableWidgets.includes('board') && (
+          <WidgetCategory>
+            <CategoryHeader
+              $expanded={expandedSections.includes('board')}
+              onClick={() => toggle('board')}
+            >
+              <CategoryIcon><Image /></CategoryIcon>
+              Board
+              <ChevronRight className="chevron" />
+            </CategoryHeader>
+            <StylesList $expanded={expandedSections.includes('board')}>
+              {BOARD_STYLES.map((s) => (
+                <StyleItem
+                  key={s.value}
+                  $active={currentWidget === `board-${s.value}`}
+                  onClick={() => onWidgetChange('board', s.value)}
                 >
                   <StyleDot $color={s.color} />
                   {s.label}

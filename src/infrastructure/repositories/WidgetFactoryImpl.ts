@@ -2,6 +2,7 @@ import { Widget } from '../../domain/entities/Widget';
 import { WidgetFactory } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
+import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { Logger } from '../services/Logger';
 
 export class WidgetFactoryImpl implements WidgetFactory {
@@ -16,6 +17,11 @@ export class WidgetFactoryImpl implements WidgetFactory {
         return Widget.createClock(
           this.generateId(),
           new ClockSettings(settings)
+        );
+      case 'board':
+        return Widget.createBoard(
+          this.generateId(),
+          new BoardSettings(settings)
         );
       default:
         throw new Error(`Unsupported widget type: ${type}`);
@@ -48,13 +54,25 @@ export class WidgetFactoryImpl implements WidgetFactory {
           fontSize: 'medium',
           style: 'modern',
         };
+      case 'board':
+        return {
+          primaryColor: '#667EEA',
+          backgroundColor: '#FFFFFF',
+          accentColor: '#F1F5F9',
+          borderRadius: 12,
+          showBorder: true,
+          imageUrls: [],
+          layout: 'grid',
+          columns: 2,
+          gap: 8,
+        };
       default:
         return {};
     }
   }
 
   getSupportedTypes(): string[] {
-    return ['calendar', 'clock'];
+    return ['calendar', 'clock', 'board'];
   }
 
   private generateId(): string {

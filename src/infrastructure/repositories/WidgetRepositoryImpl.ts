@@ -2,6 +2,7 @@ import { Widget } from '../../domain/entities/Widget';
 import { WidgetRepository } from '../../domain/repositories/WidgetRepository';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
+import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { UrlCodecService } from '../services/url-codec/UrlCodecService';
 import { Logger } from '../services/Logger';
 
@@ -52,6 +53,8 @@ export class WidgetRepositoryImpl implements WidgetRepository {
           return Widget.createCalendar('url-calendar', new CalendarSettings(settings));
         case 'clock':
           return Widget.createClock('url-clock', new ClockSettings(settings));
+        case 'board':
+          return Widget.createBoard('url-board', new BoardSettings(settings));
         default:
           return null;
       }
@@ -86,6 +89,7 @@ export class WidgetRepositoryImpl implements WidgetRepository {
   private inferTypeFromUrl(url: string): string {
     if (url.includes('/embed/calendar')) return 'calendar';
     if (url.includes('/embed/clock')) return 'clock';
+    if (url.includes('/embed/board')) return 'board';
     return 'calendar'; // default
   }
 } 

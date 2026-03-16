@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { Widget } from '../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../domain/value-objects/CalendarSettings';
+import { ClockSettings } from '../../../domain/value-objects/ClockSettings';
+import { BoardSettings } from '../../../domain/value-objects/BoardSettings';
 
 interface LayoutCheckProps {
   widget: Widget | null;
@@ -260,13 +262,21 @@ const EmptyState = styled.div`
   font-size: 14px;
 `;
 
-const STYLES = [
-  { value: 'modern-grid', label: 'Modern Grid' },
-  { value: 'modern-grid-zoom-fixed', label: 'Modern Grid — CSS Zoom Fixed' },
-  { value: 'modern-grid-zoom', label: 'Modern Grid — CSS Zoom' },
-  { value: 'calendar-2', label: 'CSS Zoom (layout check)' },
-  { value: 'calendar-4', label: 'Container Query (layout check)' },
-  { value: 'calendar-6', label: 'SVG ViewBox (layout check)' },
+const CALENDAR_STYLES = [
+  { value: 'modern-grid-zoom-fixed', label: 'CSS Zoom Fixed' },
+  { value: 'classic', label: 'Classic Calendar' },
+  { value: 'collage', label: 'Collage' },
+  { value: 'typewriter', label: 'Typewriter' },
+];
+
+const CLOCK_STYLES = [
+  { value: 'classic', label: 'Clock' },
+  { value: 'flower', label: 'Flower' },
+  { value: 'dreamy', label: 'Dreamy' },
+];
+
+const BOARD_STYLES = [
+  { value: 'grid', label: 'Inspiration Board' },
 ];
 
 const PRESET_SIZES = [
@@ -288,16 +298,20 @@ const COMPARISON_SIZES = [
   { w: 700, h: 500, label: '700 x 500 (wide)' },
 ];
 
-function makeEmbedUrl(style: string): string {
+function makeEmbedUrl(widgetType: 'calendar' | 'clock' | 'board', style: string): string {
   const config = btoa(JSON.stringify({ style }));
   const base = window.location.origin;
-  return `${base}/embed/calendar?config=${config}`;
+  return `${base}/embed/${widgetType}?config=${config}`;
 }
 
 export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
+  const widgetType: 'calendar' | 'clock' | 'board' = widget?.type === 'clock' ? 'clock' : widget?.type === 'board' ? 'board' : 'calendar';
+  const styles = widgetType === 'clock' ? CLOCK_STYLES : widgetType === 'board' ? BOARD_STYLES : CALENDAR_STYLES;
+  const defaultStyle = widgetType === 'clock' ? 'classic' : widgetType === 'board' ? 'grid' : 'modern-grid-zoom-fixed';
+
   const [width, setWidth] = useState(420);
   const [height, setHeight] = useState(380);
-  const [style, setStyle] = useState('modern-grid');
+  const [style, setStyle] = useState(defaultStyle);
   const [debug, setDebug] = useState(false);
   const [displaySize, setDisplaySize] = useState('420 x 380');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -309,10 +323,16 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
     if (widget && widget.type === 'calendar') {
       const s = (widget.settings as CalendarSettings).style;
       if (s) setStyle(s);
+    } else if (widget && widget.type === 'clock') {
+      const s = (widget.settings as ClockSettings).style;
+      if (s) setStyle(s);
+    } else if (widget && widget.type === 'board') {
+      const s = (widget.settings as BoardSettings).layout;
+      if (s) setStyle(s);
     }
   }, [widget]);
 
-  const embedUrl = makeEmbedUrl(style);
+  const embedUrl = makeEmbedUrl(widgetType, style);
 
   const sendDebugToAll = useCallback((msg: string) => {
     try { iframeRef.current?.contentWindow?.postMessage(msg, '*'); } catch {}
@@ -353,7 +373,7 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
     }
   };
 
-  const currentStyleLabel = STYLES.find(s => s.value === style)?.label || style;
+  const currentStyleLabel = styles.find(s => s.value === style)?.label || style;
 
   if (!widget) {
     return (
@@ -394,7 +414,7 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
 
         <ControlLabel>Style:</ControlLabel>
         <ControlSelect value={style} onChange={(e) => setStyle(e.target.value)}>
-          {STYLES.map(s => (
+          {styles.map(s => (
             <option key={s.value} value={s.value}>{s.label}</option>
           ))}
         </ControlSelect>

@@ -6,6 +6,7 @@ import { LandingPage } from './presentation/pages/LandingPage';
 import { StudioPage } from './presentation/pages/StudioPage';
 import { CalendarEmbedPage } from './presentation/pages/CalendarEmbedPage';
 import { ClockEmbedPage } from './presentation/pages/ClockEmbedPage';
+import { BoardEmbedPage } from './presentation/pages/BoardEmbedPage';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 
 import { DIContainer } from './infrastructure/di/DIContainer';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
             <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
             <Route path="/embed/clock" element={<ClockEmbedPage />} />
+            <Route path="/embed/board" element={<BoardEmbedPage />} />
             <Route path="*" element={<LandingPage />} />
           </Routes>
         </Router>

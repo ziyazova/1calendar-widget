@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { Widget } from '../../../domain/entities/Widget';
 import { CalendarWidget } from '../widgets/CalendarWidget';
 import { ClockWidget } from '../widgets/ClockWidget';
+import { BoardWidget } from '../widgets/BoardWidget';
 
 interface WidgetDisplayProps {
   widget: Widget | null;
@@ -102,6 +103,8 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
         return <CalendarWidget widget={widget} />;
       case 'clock':
         return <ClockWidget widget={widget} />;
+      case 'board':
+        return <BoardWidget widget={widget} />;
       default:
         return (
           <ErrorState>

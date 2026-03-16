@@ -31,6 +31,12 @@ export class CompactUrlCodec {
     // Theme
     theme: 'tm',
 
+    // Board специфичные (bi, bl, bc, bg)
+    imageUrls: 'bi',
+    layout: 'bl',
+    columns: 'bc',
+    gap: 'bg',
+
     // Weather специфичные (w+символ)
     temperatureUnit: 'wu',
     showFeelsLike: 'wf',
@@ -70,6 +76,11 @@ export class CompactUrlCodec {
     showHumidity: true,
     location: 'New York',
 
+    // Board
+    layout: 'grid',
+    columns: 2,
+    gap: 8,
+
     // Embed size (calendar defaults; clock overrides at decode)
     embedWidth: 420,
     embedHeight: 380,
@@ -89,7 +100,7 @@ export class CompactUrlCodec {
     const compact: Record<string, any> = {};
 
     // Добавляем тип виджета одним символом
-    const typeMap: Record<string, string> = { calendar: 'c', clock: 'k', weather: 'w' };
+    const typeMap: Record<string, string> = { calendar: 'c', clock: 'k', weather: 'w', board: 'b' };
     compact._ = typeMap[widgetType] || widgetType;
 
     // Обрабатываем каждое поле
@@ -99,6 +110,13 @@ export class CompactUrlCodec {
 
       // Пропускаем дефолтные значения
       if (this.DEFAULTS[key] === value) continue;
+
+      // Массивы (например imageUrls) — кодируем как JSON
+      if (Array.isArray(value)) {
+        if (value.length === 0) continue;
+        compact[shortKey] = JSON.stringify(value);
+        continue;
+      }
 
       // Специальная обработка цветов
       if (key.includes('Color')) {
@@ -161,7 +179,7 @@ export class CompactUrlCodec {
       const compact = JSON.parse(json);
 
       // Восстанавливаем тип виджета
-      const typeReverseMap: Record<string, string> = { c: 'calendar', k: 'clock', w: 'weather' };
+      const typeReverseMap: Record<string, string> = { c: 'calendar', k: 'clock', w: 'weather', b: 'board' };
       const widgetType = typeReverseMap[compact._] || compact._;
       delete compact._;
 
@@ -171,6 +189,14 @@ export class CompactUrlCodec {
       for (const [shortKey, value] of Object.entries(compact)) {
         const longKey = this.REVERSE_MAP[shortKey];
         if (!longKey) continue;
+
+        // Восстанавливаем массивы (например imageUrls)
+        if (typeof value === 'string' && value.startsWith('[')) {
+          try {
+            settings[longKey] = JSON.parse(value);
+            continue;
+          } catch { /* fall through */ }
+        }
 
         // Восстанавливаем цвета
         if (longKey.includes('Color')) {
