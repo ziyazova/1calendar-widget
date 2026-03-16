@@ -41,7 +41,7 @@ const ClockFace = styled.div`
   left: 50%;
   width: 74%;
   height: 74%;
-  transform: translate(-50%, calc(-50% + 9px));
+  transform: translate(-50%, calc(-50% + 11px));
 `;
 
 /* Hour numbers */
