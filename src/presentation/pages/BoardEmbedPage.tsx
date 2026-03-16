@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Logger } from '../../infrastructure/services/Logger';
 import { BoardWidget } from '../components/widgets/BoardWidget';
-import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
 import { Widget } from '../../domain/entities/Widget';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
@@ -99,7 +98,6 @@ export const BoardEmbedPage: React.FC = () => {
           Logger.info('BoardEmbed', 'Loaded settings', {
             embedWidth: s.embedWidth,
             embedHeight: s.embedHeight,
-            layout: s.layout,
             imageCount: s.imageUrls.length,
             theme: s.theme,
           });
@@ -133,9 +131,7 @@ export const BoardEmbedPage: React.FC = () => {
       <EmbedController>
         <GlobalEmbedStyles $bgColor={effectiveBg} />
         <EmbedContainer>
-          <EmbedScaleWrapper>
-            <LoadingState>Loading board...</LoadingState>
-          </EmbedScaleWrapper>
+          <LoadingState>Loading board...</LoadingState>
         </EmbedContainer>
       </EmbedController>
     );
@@ -146,33 +142,20 @@ export const BoardEmbedPage: React.FC = () => {
       <EmbedController>
         <GlobalEmbedStyles $bgColor={effectiveBg} />
         <EmbedContainer>
-          <EmbedScaleWrapper>
-            <ErrorState>
-              <h3>Error</h3>
-              <p>{error || 'Failed to load board widget'}</p>
-            </ErrorState>
-          </EmbedScaleWrapper>
+          <ErrorState>
+            <h3>Error</h3>
+            <p>{error || 'Failed to load board widget'}</p>
+          </ErrorState>
         </EmbedContainer>
       </EmbedController>
     );
   }
 
-  Logger.debug('BoardEmbed', 'Rendering with embed size', {
-    embedWidth: settings.embedWidth,
-    embedHeight: settings.embedHeight,
-    theme: resolvedTheme,
-  });
-
   return (
     <EmbedController>
       <GlobalEmbedStyles $bgColor={effectiveBg} />
       <EmbedContainer>
-        <EmbedScaleWrapper
-          refWidth={settings.embedWidth}
-          refHeight={settings.embedHeight}
-        >
-          <BoardWidget widget={widget} />
-        </EmbedScaleWrapper>
+        <BoardWidget widget={widget} />
       </EmbedContainer>
     </EmbedController>
   );
