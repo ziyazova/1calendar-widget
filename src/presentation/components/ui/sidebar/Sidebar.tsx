@@ -197,10 +197,14 @@ const ARCHIVE_STYLES = [
 ];
 
 const CLOCK_STYLES = [
-  { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
-  { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
   { label: 'Clock', value: 'classic', color: '#6E7FF2' },
   { label: 'Flower', value: 'flower', color: '#2d6a4f' },
+  { label: 'Dreamy', value: 'dreamy', color: '#A78BFA' },
+];
+
+const CLOCK_ARCHIVE_STYLES = [
+  { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
+  { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -295,6 +299,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={s.value}
                 $active={currentWidget === `calendar-${s.value}`}
                 onClick={() => onWidgetChange('calendar', s.value)}
+              >
+                <StyleDot $color={s.color} />
+                {s.label}
+              </StyleItem>
+            ))}
+          </StylesList>
+        </WidgetCategory>
+
+        <WidgetCategory>
+          <CategoryHeader
+            $expanded={expandedSections.includes('clock-archive')}
+            onClick={() => toggle('clock-archive')}
+          >
+            <CategoryIcon><Archive /></CategoryIcon>
+            Clock Archive
+            <ChevronRight className="chevron" />
+          </CategoryHeader>
+          <StylesList $expanded={expandedSections.includes('clock-archive')}>
+            {CLOCK_ARCHIVE_STYLES.map((s) => (
+              <StyleItem
+                key={s.value}
+                $active={currentWidget === `clock-${s.value}`}
+                onClick={() => onWidgetChange('clock', s.value)}
               >
                 <StyleDot $color={s.color} />
                 {s.label}

@@ -22,6 +22,7 @@ export class CompactUrlCodec {
     format24h: 'kf',
     showDate: 'kd',
     fontSize: 'kz',
+    clockFrame: 'kc',
 
     // Embed size
     embedWidth: 'ew',

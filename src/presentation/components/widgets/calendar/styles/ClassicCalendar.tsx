@@ -224,7 +224,7 @@ export const ClassicCalendar: React.FC<ClassicCalendarProps> = ({ settings }) =>
   const isDark = resolvedTheme === 'dark';
   const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
   const effectiveAccent = isDark ? adaptColorForDarkMode(settings.accentColor, 'accent') : settings.accentColor;
-  const textColor = getContrastColor(effectiveBg);
+  const textColor = getContrastColor(settings.backgroundColor);
 
   const isEmbed = window.location.pathname.includes('/embed/');
 

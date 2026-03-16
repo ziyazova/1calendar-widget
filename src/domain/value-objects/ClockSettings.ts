@@ -8,7 +8,8 @@ export class ClockSettings {
   public readonly showBorder: boolean;
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
-  public readonly style: 'modern' | 'analog-classic' | 'classic' | 'flower';
+  public readonly style: 'modern' | 'analog-classic' | 'classic' | 'flower' | 'dreamy';
+  public readonly clockFrame: 'flower' | 'alarm';
   public readonly embedWidth: number;
   public readonly embedHeight: number;
   public readonly theme: 'auto' | 'light' | 'dark';
@@ -24,6 +25,7 @@ export class ClockSettings {
     this.showDate = settings.showDate ?? true;
     this.fontSize = settings.fontSize || 'medium';
     this.style = settings.style || 'modern';
+    this.clockFrame = settings.clockFrame || 'flower';
     this.embedWidth = settings.embedWidth ?? 360;
     this.embedHeight = settings.embedHeight ?? 360;
     this.theme = settings.theme || 'auto';
@@ -50,6 +52,7 @@ export class ClockSettings {
       showDate: this.showDate,
       fontSize: this.fontSize,
       style: this.style,
+      clockFrame: this.clockFrame,
       embedWidth: this.embedWidth,
       embedHeight: this.embedHeight,
       theme: this.theme,
@@ -68,6 +71,7 @@ export class ClockSettings {
       showDate: changes.showDate ?? this.showDate,
       fontSize: changes.fontSize ?? this.fontSize,
       style: changes.style ?? this.style,
+      clockFrame: changes.clockFrame ?? this.clockFrame,
       embedWidth: changes.embedWidth ?? this.embedWidth,
       embedHeight: changes.embedHeight ?? this.embedHeight,
       theme: changes.theme ?? this.theme,

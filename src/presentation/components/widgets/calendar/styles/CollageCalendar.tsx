@@ -212,7 +212,7 @@ export const CollageCalendar: React.FC<CollageCalendarProps> = ({ settings }) =>
   const resolvedTheme = useResolvedTheme(settings.theme);
   const isDark = resolvedTheme === 'dark';
   const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
-  const textColor = getContrastColor(effectiveBg);
+  const textColor = getContrastColor(settings.backgroundColor);
 
   const isEmbed = window.location.pathname.includes('/embed/');
 

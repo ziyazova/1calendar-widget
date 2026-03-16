@@ -7,6 +7,7 @@ import { AnalogClassicClock } from './clock/styles/AnalogClassicClock';
 import { ClassicClock } from './clock/styles/ClassicClock';
 import { ModernClock } from './clock/styles/ModernClock';
 import { FlowerClock } from './clock/styles/FlowerClock';
+import { DreamyClock } from './clock/styles/DreamyClock';
 
 interface ClockWidgetProps {
   widget: Widget;
@@ -18,7 +19,7 @@ export const ClockWidget: React.FC<ClockWidgetProps> = ({ widget }) => {
   const resolvedTheme = useResolvedTheme(settings.theme);
   const isDark = resolvedTheme === 'dark';
   const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
-  const textColor = getContrastColor(effectiveBg);
+  const textColor = getContrastColor(settings.backgroundColor);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -36,6 +37,8 @@ export const ClockWidget: React.FC<ClockWidgetProps> = ({ widget }) => {
       return <ClassicClock settings={effectiveSettings} time={time} textColor={textColor} />;
     case 'flower':
       return <FlowerClock settings={effectiveSettings} time={time} textColor={textColor} />;
+    case 'dreamy':
+      return <DreamyClock settings={effectiveSettings} time={time} textColor={textColor} />;
     case 'modern':
     default:
       return <ModernClock settings={effectiveSettings} time={time} textColor={textColor} />;

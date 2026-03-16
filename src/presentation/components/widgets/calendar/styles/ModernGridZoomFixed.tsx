@@ -251,7 +251,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
   const isDark = resolvedTheme === 'dark';
   const effectiveBg = isDark ? adaptColorForDarkMode(settings.backgroundColor, 'background') : settings.backgroundColor;
   const effectiveAccent = isDark ? adaptColorForDarkMode(settings.accentColor, 'accent') : settings.accentColor;
-  const textColor = getContrastColor(effectiveBg);
+  const textColor = getContrastColor(settings.backgroundColor);
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {

@@ -285,7 +285,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const settings = widget.settings as CalendarSettings | ClockSettings;
   const calStyle = widget.type === 'calendar' ? (settings as CalendarSettings).style : '';
   const clkStyle = widget.type === 'clock' ? (settings as ClockSettings).style : '';
-  const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'classic' || clkStyle === 'flower';
+  const isClassicStyle = calStyle === 'classic' || calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'classic' || clkStyle === 'flower' || clkStyle === 'dreamy';
   const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'flower';
   const isTypewriterStyle = calStyle === 'typewriter';
   const isFlowerClockStyle = clkStyle === 'flower';
@@ -419,6 +419,19 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <Section>
             <SectionTitle>Clock</SectionTitle>
 
+            {isFlowerClockStyle && (
+            <FormGroup>
+              <Label>Clock Frame</Label>
+              <Select
+                value={(settings as ClockSettings).clockFrame}
+                onChange={(e) => onSettingsChange({ clockFrame: e.target.value as 'flower' | 'alarm' })}
+              >
+                <option value="flower">Flower</option>
+                <option value="alarm">Alarm Clock</option>
+              </Select>
+            </FormGroup>
+            )}
+
             {!isClassicStyle && (
             <FormGroup>
               <Label>Font Size</Label>
@@ -445,6 +458,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                   />
                 </Toggle>
 
+                {!isFlowerClockStyle && (
                 <Toggle>
                   <ToggleText>24 Hour Format</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).format24h} />
@@ -454,7 +468,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                     onChange={(e) => onSettingsChange({ format24h: e.target.checked })}
                   />
                 </Toggle>
+                )}
 
+                {!isFlowerClockStyle && (
                 <Toggle>
                   <ToggleText>Show Date</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
@@ -464,6 +480,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                     onChange={(e) => onSettingsChange({ showDate: e.target.checked })}
                   />
                 </Toggle>
+                )}
               </ToggleGroup>
             </FormGroup>
           </Section>

@@ -8,8 +8,6 @@ interface FlowerClockProps {
   textColor: string;
 }
 
-const DESIGN_SIZE = 300;
-
 const OuterWrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -19,29 +17,50 @@ const OuterWrapper = styled.div`
   justify-content: center;
 `;
 
-const ZoomWrapper = styled.div<{ $zoom: number }>`
-  width: ${DESIGN_SIZE}px;
-  height: ${DESIGN_SIZE * (1614 / 1698)}px;
+const ZoomWrapper = styled.div<{ $zoom: number; $designSize: number; $aspectRatio: number }>`
+  width: ${({ $designSize }) => $designSize}px;
+  height: ${({ $designSize, $aspectRatio }) => $designSize / $aspectRatio}px;
   zoom: ${({ $zoom }) => $zoom};
 `;
 
-const SceneWrapper = styled.div`
+const FRAME_CONFIG = {
+  flower: {
+    image: '/flower-clock-green.png',
+    aspectRatio: 1698 / 1614,
+    designSize: 300,
+    faceSize: '74%',
+    faceOffsetX: 0,
+    faceOffsetY: 11,
+  },
+  alarm: {
+    image: '/alarm-clock-frame.png',
+    aspectRatio: 1215 / 1650,
+    designSize: 206,
+    faceSize: '62%',
+    faceOffsetX: 2,
+    faceOffsetY: 28,
+  },
+} as const;
+
+const SceneWrapper = styled.div<{ $frame: 'flower' | 'alarm'; $designSize: number }>`
   position: relative;
-  width: ${DESIGN_SIZE}px;
-  aspect-ratio: ${1698 / 1614};
-  background-image: url('/flower-clock-green.png');
-  background-size: 100% 100%;
+  width: ${({ $designSize }) => $designSize}px;
+  margin-top: ${({ $frame }) => $frame === 'alarm' ? '-40px' : '0'};
+  aspect-ratio: ${({ $frame }) => FRAME_CONFIG[$frame].aspectRatio};
+  background-image: url('${({ $frame }) => FRAME_CONFIG[$frame].image}');
+  background-size: contain;
   background-repeat: no-repeat;
+  background-position: center;
 `;
 
-/* Clock face overlay — positioned at center of the flower frame */
-const ClockFace = styled.div`
+/* Clock face overlay — positioned at center of the frame */
+const ClockFace = styled.div<{ $faceSize: string; $offsetX: number; $offsetY: number }>`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 74%;
-  height: 74%;
-  transform: translate(-50%, calc(-50% + 11px));
+  width: ${({ $faceSize }) => $faceSize};
+  height: ${({ $faceSize }) => $faceSize};
+  transform: translate(calc(-50% + ${({ $offsetX }) => $offsetX}px), calc(-50% + ${({ $offsetY }) => $offsetY}px));
 `;
 
 /* Hour numbers */
@@ -109,6 +128,8 @@ const HOUR_NUMBERS = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textColor }) => {
   const [zoom, setZoom] = useState(1);
   const outerRef = useRef<HTMLDivElement>(null);
+  const frame = settings.clockFrame || 'flower';
+  const frameConfig = FRAME_CONFIG[frame];
 
   const isEmbed = window.location.pathname.includes('/embed/');
 
@@ -118,7 +139,7 @@ export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textCo
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
-        setZoom(Math.min(maxZoom, Math.max(0.25, parentWidth / DESIGN_SIZE)));
+        setZoom(Math.min(maxZoom, Math.max(0.25, parentWidth / frameConfig.designSize)));
       }
     });
     ro.observe(outerRef.current);
@@ -146,9 +167,9 @@ export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textCo
 
   return (
     <OuterWrapper ref={outerRef}>
-      <ZoomWrapper $zoom={zoom}>
-        <SceneWrapper>
-          <ClockFace>
+      <ZoomWrapper $zoom={zoom} $designSize={frameConfig.designSize} $aspectRatio={frameConfig.aspectRatio}>
+        <SceneWrapper $frame={frame} $designSize={frameConfig.designSize}>
+          <ClockFace $faceSize={frameConfig.faceSize} $offsetX={frameConfig.faceOffsetX} $offsetY={frameConfig.faceOffsetY}>
             {/* Hour numbers */}
             {HOUR_NUMBERS.map((num, i) => (
               <HourNumber
