@@ -57,9 +57,10 @@ const DateLine = styled.div<{
 `;
 
 const RiveWrapper = styled.div`
-  width: 60%;
+  width: 120%;
   aspect-ratio: 1;
-  margin-top: 4px;
+  margin-top: -10px;
+  margin-bottom: -40px;
 `;
 
 interface DreamyClockProps {
