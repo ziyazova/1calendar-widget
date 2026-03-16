@@ -7,7 +7,6 @@ import { Widget } from '../../domain/entities/Widget';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
-import { useResolvedTheme, NOTION_DARK_BG } from '../hooks/useResolvedTheme';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
@@ -123,13 +122,10 @@ export const ClockEmbedPage: React.FC = () => {
     }
   }, []);
 
-  const notionTheme = useResolvedTheme('auto');
-  const containerBg = notionTheme === 'dark' ? NOTION_DARK_BG : 'transparent';
-
   if (loading) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles $bgColor={containerBg} />
+        <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <LoadingState>Loading clock...</LoadingState>
@@ -142,7 +138,7 @@ export const ClockEmbedPage: React.FC = () => {
   if (error || !widget) {
     return (
       <EmbedController>
-        <GlobalEmbedStyles $bgColor={containerBg} />
+        <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <EmbedScaleWrapper>
             <ErrorState>
@@ -162,7 +158,7 @@ export const ClockEmbedPage: React.FC = () => {
 
   return (
     <EmbedController>
-      <GlobalEmbedStyles $bgColor={containerBg} />
+      <GlobalEmbedStyles $bgColor="transparent" />
       <EmbedContainer>
         <EmbedScaleWrapper
           refWidth={settings.embedWidth}
