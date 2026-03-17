@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronRight, Calendar, CalendarDays, Clock, Archive, Image, LayoutGrid, Type, Flower2, Sparkles, Grid, AlarmClock, Brush, Layers } from 'lucide-react';
+import { ChevronRight, Calendar, Clock, Archive, Image } from 'lucide-react';
+import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES, ARCHIVE_STYLES, CLOCK_ARCHIVE_STYLES } from '../widgetConfig';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -201,34 +202,6 @@ const StyleItem = styled.button<{ $active: boolean }>`
   }
 `;
 
-const CALENDAR_STYLES = [
-  { label: 'Core', value: 'modern-grid-zoom-fixed', icon: Calendar },
-  { label: 'Soft', value: 'classic', icon: CalendarDays },
-  { label: 'Paper', value: 'collage', icon: LayoutGrid },
-  { label: 'Editorial', value: 'typewriter', icon: Type },
-];
-
-const ARCHIVE_STYLES = [
-  { label: 'Modern Grid', value: 'modern-grid', icon: Grid },
-  { label: 'CSS Zoom', value: 'calendar-2', icon: Calendar },
-  { label: 'Container Query', value: 'calendar-4', icon: Calendar },
-  { label: 'SVG ViewBox', value: 'calendar-6', icon: Calendar },
-];
-
-const CLOCK_STYLES = [
-  { label: 'Duo', value: 'classic', icon: Clock },
-  { label: 'Bloom', value: 'flower', icon: Flower2 },
-  { label: 'Alarm', value: 'dreamy', icon: Sparkles },
-];
-
-const BOARD_STYLES = [
-  { label: 'Moodboard', value: 'grid', icon: Image },
-];
-
-const CLOCK_ARCHIVE_STYLES = [
-  { label: 'Buddy', value: 'modern', icon: Brush },
-  { label: 'Analog Classic', value: 'analog-classic', icon: AlarmClock },
-];
 
 export const Sidebar: React.FC<SidebarProps> = ({
   availableWidgets,

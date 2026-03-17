@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { X, GripVertical, Calendar, CalendarDays, LayoutGrid, Type, Clock, Flower2, Sparkles, Image, Palette, SlidersHorizontal } from 'lucide-react';
+import { X, GripVertical, Image, Palette, SlidersHorizontal } from 'lucide-react';
+import { getWidgetBadgeLabel } from '../widgetConfig';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
@@ -122,9 +123,10 @@ const Select = styled.select`
   width: 100%;
   height: 36px;
   padding: 0 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
   color: #1F1F1F;
   font-size: 13px;
   font-weight: 400;
@@ -158,7 +160,8 @@ const Slider = styled.input`
   flex: 1;
   height: 4px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
   outline: none;
   -webkit-appearance: none;
   margin: 0;
@@ -222,7 +225,8 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
   border-radius: 11px;
   background: ${({ $checked }) => $checked
     ? 'linear-gradient(135deg, #3384F4, #5BA0F7)'
-    : 'rgba(0, 0, 0, 0.12)'};
+    : 'rgba(0, 0, 0, 0.08)'};
+  box-shadow: ${({ $checked }) => $checked ? 'none' : '0 0.5px 1px rgba(0, 0, 0, 0.04)'};
   position: relative;
   transition: background 0.25s ease;
   flex-shrink: 0;
@@ -274,30 +278,62 @@ const ToggleGroup = styled.div`
 
 const TypewriterColorRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  min-height: 26px;
+  align-items: center;
+  padding: 2px 0 0 5px;
 `;
 
 const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 30%;
   background: ${({ $color }) => $color};
-  border: 2px solid ${({ $active, theme }) => $active ? theme.colors.primary : 'transparent'};
+  border: 1.5px solid transparent;
+  box-shadow: ${({ $active, $color }) => {
+    const darkBorder = `0 0 0 0.5px color-mix(in srgb, ${$color} 83%, #000)`;
+    return $active
+      ? `0 0 0 1.5px #fff, 0 0 0 2.5px rgba(51,132,244,0.5), ${darkBorder}`
+      : darkBorder;
+  }};
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.12s ease;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
   padding: 0;
 
-  &:hover {
-    transform: scale(1.1);
+  &:active {
+    transform: scale(0.9);
+  }
+
+  &:focus {
+    outline: none;
   }
 `;
 
+const FLOWER_CLOCK_COLORS: Record<string, { value: string; color: string; label: string }[]> = {
+  flower: [
+    { value: 'green', color: '#A8CEBA', label: 'Green' },
+    { value: 'pink', color: '#DEB0BC', label: 'Pink' },
+    { value: 'blue', color: '#A3C4D9', label: 'Blue' },
+  ],
+  alarm: [
+    { value: 'red', color: '#D4A0A0', label: 'Red' },
+    { value: 'mint', color: '#A0C4B8', label: 'Mint' },
+    { value: 'cream', color: '#D9CEBD', label: 'Cream' },
+  ],
+  vintage: [
+    { value: 'gold', color: '#C4B088', label: 'Gold' },
+    { value: 'silver', color: '#B8BCC0', label: 'Silver' },
+    { value: 'walnut', color: '#A08060', label: 'Walnut' },
+  ],
+};
+
 const TYPEWRITER_COLORS = [
-  { value: 'blue', color: '#7a9bb5', label: 'Blue' },
-  { value: 'green', color: '#7ba88e', label: 'Green' },
-  { value: 'pink', color: '#c48a9a', label: 'Pink' },
-  { value: 'brown', color: '#8b7355', label: 'Brown' },
-  { value: 'beige', color: '#c4b39a', label: 'Beige' },
+  { value: 'blue', color: '#A3C4D9', label: 'Blue' },
+  { value: 'green', color: '#A8CEBA', label: 'Green' },
+  { value: 'pink', color: '#DEB0BC', label: 'Pink' },
+  { value: 'brown', color: '#BBA88A', label: 'Brown' },
+  { value: 'beige', color: '#D9CEBD', label: 'Beige' },
 ] as const;
 
 const ImageHint = styled.p`
@@ -477,25 +513,88 @@ const RemoveButton = styled.button`
 
 const LayoutOption = styled.button<{ $active: boolean }>`
   flex: 1;
-  padding: 8px 0;
-  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.border.primary};
-  background: ${({ $active, theme }) => $active ? `${theme.colors.primary}10` : '#fff'};
-  color: ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.text.secondary};
-  border-radius: 8px;
+  height: 36px;
+  border: none;
+  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.04)' : 'rgba(0, 0, 0, 0.03)'};
+  box-shadow: ${({ $active }) => $active ? '0 0 0 1px rgba(51, 132, 244, 0.3)' : '0 0.5px 1px rgba(0, 0, 0, 0.04)'};
+  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
+  border-radius: 10px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.12s ease;
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 1px rgba(51, 132, 244, 0.3);
+    background: rgba(51, 132, 244, 0.04);
+    color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
   }
 `;
 
 const LayoutOptions = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 6px;
+`;
+
+const InlineRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+`;
+
+const InlineLabel = styled.span`
+  font-size: 12px;
+  font-weight: 400;
+  color: #1F1F1F;
+  letter-spacing: -0.01em;
+`;
+
+const CompactOptions = styled.div`
+  width: 96px;
+  height: 27px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.08);
+  border: none;
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+`;
+
+const CompactSlider = styled.div<{ $activeIndex: number }>`
+  position: absolute;
+  top: 2px;
+  left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 45px - 2px)'};
+  width: 45px;
+  height: 23px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+`;
+
+const CompactOption = styled.button<{ $active: boolean }>`
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  line-height: 21px;
 `;
 
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
@@ -556,29 +655,14 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     dragCounter.current = 0;
   };
 
-  const getWidgetInfo = (): { icon: React.FC; label: string } | null => {
+  const getWidgetInfo = () => {
     if (!widget) return null;
-    if (widget.type === 'calendar') {
-      const s = (widget.settings as CalendarSettings).style;
-      const map: Record<string, { icon: React.FC; label: string }> = {
-        'modern-grid-zoom-fixed': { icon: Calendar, label: 'Calendar \u2009·\u2009 Core' },
-        'classic': { icon: CalendarDays, label: 'Calendar \u2009·\u2009 Soft' },
-        'collage': { icon: LayoutGrid, label: 'Calendar \u2009·\u2009 Paper' },
-        'typewriter': { icon: Type, label: 'Calendar \u2009·\u2009 Editorial' },
-      };
-      return map[s] || { icon: Calendar, label: 'Calendar' };
-    }
-    if (widget.type === 'clock') {
-      const s = (widget.settings as ClockSettings).style;
-      const map: Record<string, { icon: React.FC; label: string }> = {
-        'classic': { icon: Clock, label: 'Clock \u2009·\u2009 Duo' },
-        'flower': { icon: Flower2, label: 'Clock \u2009·\u2009 Bloom' },
-        'dreamy': { icon: Sparkles, label: 'Clock \u2009·\u2009 Alarm' },
-      };
-      return map[s] || { icon: Clock, label: 'Clock' };
-    }
-    if (widget.type === 'board') return { icon: Image, label: 'Canvas \u2009·\u2009 Moodboard' };
-    return null;
+    const style = widget.type === 'calendar'
+      ? (widget.settings as CalendarSettings).style
+      : widget.type === 'clock'
+        ? (widget.settings as ClockSettings).style
+        : widget.type === 'board' ? 'grid' : '';
+    return getWidgetBadgeLabel(widget.type, style);
   };
 
   if (!widget) {
@@ -603,6 +687,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'flower';
   const isTypewriterStyle = calStyle === 'typewriter';
   const isFlowerClockStyle = clkStyle === 'flower';
+  const isDuoClockStyle = clkStyle === 'classic';
 
   return (
     <PanelContainer>
@@ -617,11 +702,52 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
       </PanelHeader>
 
       <PanelContent>
-        {isTypewriterStyle && (
+        {isFlowerClockStyle && (
+          <Section>
+            <SectionTitle>Style</SectionTitle>
+
+            <FormGroup>
+              <LayoutOptions>
+                <LayoutOption
+                  $active={(settings as ClockSettings).clockFrame === 'flower'}
+                  onClick={() => onSettingsChange({ clockFrame: 'flower' })}
+                >
+                  Bloom
+                </LayoutOption>
+                <LayoutOption
+                  $active={(settings as ClockSettings).clockFrame === 'alarm'}
+                  onClick={() => onSettingsChange({ clockFrame: 'alarm' })}
+                >
+                  Retro
+                </LayoutOption>
+                <LayoutOption
+                  $active={(settings as ClockSettings).clockFrame === 'vintage'}
+                  onClick={() => onSettingsChange({ clockFrame: 'vintage' })}
+                >
+                  Vintage
+                </LayoutOption>
+              </LayoutOptions>
+            </FormGroup>
+          </Section>
+        )}
+
+        {!isBoard && (
         <Section>
-          <SectionTitle>Typewriter</SectionTitle>
+          <SectionTitle>Color</SectionTitle>
+
+          {isTypewriterStyle ? (
+          <>
           <FormGroup>
-            <Label>Color</Label>
+            <Label>Primary</Label>
+            <ColorPicker
+              selectedColor={settings.primaryColor}
+              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
+              type="primary"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Body</Label>
             <TypewriterColorRow>
               {TYPEWRITER_COLORS.map((tc) => (
                 <TypewriterColorDot
@@ -634,13 +760,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
               ))}
             </TypewriterColorRow>
           </FormGroup>
-        </Section>
-        )}
-
-        {!isBoard && (
-        <Section>
-          <SectionTitle>Colors</SectionTitle>
-
+          </>
+          ) : isFlowerClockStyle ? (
+          <>
           <FormGroup>
             <Label>Primary</Label>
             <ColorPicker
@@ -650,16 +772,40 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             />
           </FormGroup>
 
-          {!isTypewriterStyle && (
           <FormGroup>
-            <Label>Background</Label>
+            <Label>Body</Label>
+            <TypewriterColorRow>
+              {(FLOWER_CLOCK_COLORS[(settings as ClockSettings).clockFrame] || FLOWER_CLOCK_COLORS.flower).map((tc) => (
+                <TypewriterColorDot
+                  key={tc.value}
+                  $color={tc.color}
+                  $active={(settings as ClockSettings).clockColor === tc.value}
+                  title={tc.label}
+                  onClick={() => onSettingsChange({ clockColor: tc.value })}
+                />
+              ))}
+            </TypewriterColorRow>
+          </FormGroup>
+          </>
+          ) : (
+          <>
+          <FormGroup>
+            <Label>Primary</Label>
+            <ColorPicker
+              selectedColor={settings.primaryColor}
+              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
+              type="primary"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Body</Label>
             <ColorPicker
               selectedColor={settings.backgroundColor}
               onColorChange={(color) => onSettingsChange({ backgroundColor: color })}
               type="background"
             />
           </FormGroup>
-          )}
 
           {!isClassicStyle && (
           <FormGroup>
@@ -672,12 +818,63 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             />
           </FormGroup>
           )}
+          </>
+          )}
+        </Section>
+        )}
+
+        {isCollageStyle && widget.type === 'calendar' && (
+        <Section>
+          <SectionTitle>Layout</SectionTitle>
+          <FormGroup>
+            <Toggle as="div">
+              <ToggleText>Week start</ToggleText>
+              <CompactOptions>
+                <CompactSlider $activeIndex={(settings as CalendarSettings).weekStart === 'monday' ? 0 : 1} />
+                <CompactOption
+                  $active={(settings as CalendarSettings).weekStart === 'monday'}
+                  onClick={() => onSettingsChange({ weekStart: 'monday' })}
+                >
+                  Mon
+                </CompactOption>
+                <CompactOption
+                  $active={(settings as CalendarSettings).weekStart === 'sunday'}
+                  onClick={() => onSettingsChange({ weekStart: 'sunday' })}
+                >
+                  Sun
+                </CompactOption>
+              </CompactOptions>
+            </Toggle>
+          </FormGroup>
         </Section>
         )}
 
         {!isCollageStyle && !isBoard && (
         <Section>
           <SectionTitle>Layout</SectionTitle>
+
+          {widget.type === 'calendar' && (
+          <FormGroup>
+            <Toggle as="div">
+              <ToggleText>Week start</ToggleText>
+              <CompactOptions>
+                <CompactSlider $activeIndex={(settings as CalendarSettings).weekStart === 'monday' ? 0 : 1} />
+                <CompactOption
+                  $active={(settings as CalendarSettings).weekStart === 'monday'}
+                  onClick={() => onSettingsChange({ weekStart: 'monday' })}
+                >
+                  Mon
+                </CompactOption>
+                <CompactOption
+                  $active={(settings as CalendarSettings).weekStart === 'sunday'}
+                  onClick={() => onSettingsChange({ weekStart: 'sunday' })}
+                >
+                  Sun
+                </CompactOption>
+              </CompactOptions>
+            </Toggle>
+          </FormGroup>
+          )}
 
           <FormGroup>
             <Label>Corners</Label>
@@ -719,7 +916,36 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
               )}
             </ToggleGroup>
           </FormGroup>
+
         </Section>
+        )}
+
+        {isBoard && (
+          <Section>
+            <SectionTitle>Style</SectionTitle>
+            <FormGroup>
+              <LayoutOptions>
+                <LayoutOption
+                  $active={true}
+                  onClick={() => {}}
+                >
+                  Grid
+                </LayoutOption>
+                <LayoutOption
+                  $active={false}
+                  onClick={() => {}}
+                >
+                  Masonry
+                </LayoutOption>
+                <LayoutOption
+                  $active={false}
+                  onClick={() => {}}
+                >
+                  Carousel
+                </LayoutOption>
+              </LayoutOptions>
+            </FormGroup>
+          </Section>
         )}
 
         {isBoard && (
@@ -778,20 +1004,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
         {widget.type === 'clock' && (
           <Section>
-            <SectionTitle>Clock</SectionTitle>
-
-            {isFlowerClockStyle && (
-            <FormGroup>
-              <Label>Frame</Label>
-              <Select
-                value={(settings as ClockSettings).clockFrame}
-                onChange={(e) => onSettingsChange({ clockFrame: e.target.value as 'flower' | 'alarm' })}
-              >
-                <option value="flower">Flower</option>
-                <option value="alarm">Alarm Clock</option>
-              </Select>
-            </FormGroup>
-            )}
+            <SectionTitle>Style</SectionTitle>
 
             {!isClassicStyle && (
             <FormGroup>
@@ -807,8 +1020,32 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </FormGroup>
             )}
 
+            {!isFlowerClockStyle && (
+            <FormGroup>
+              <Toggle as="div">
+                <ToggleText>Format</ToggleText>
+                <CompactOptions>
+                  <CompactSlider $activeIndex={(settings as ClockSettings).format24h ? 1 : 0} />
+                  <CompactOption
+                    $active={!(settings as ClockSettings).format24h}
+                    onClick={() => onSettingsChange({ format24h: false })}
+                  >
+                    12h
+                  </CompactOption>
+                  <CompactOption
+                    $active={(settings as ClockSettings).format24h}
+                    onClick={() => onSettingsChange({ format24h: true })}
+                  >
+                    24h
+                  </CompactOption>
+                </CompactOptions>
+              </Toggle>
+            </FormGroup>
+            )}
+
             <FormGroup>
               <ToggleGroup>
+                {!isDuoClockStyle && (
                 <Toggle>
                   <ToggleText>Seconds</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showSeconds} />
@@ -818,22 +1055,11 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                     onChange={(e) => onSettingsChange({ showSeconds: e.target.checked })}
                   />
                 </Toggle>
-
-                {!isFlowerClockStyle && (
-                <Toggle>
-                  <ToggleText>24h format</ToggleText>
-                  <ToggleSwitch $checked={(settings as ClockSettings).format24h} />
-                  <HiddenCheckbox
-                    type="checkbox"
-                    checked={(settings as ClockSettings).format24h}
-                    onChange={(e) => onSettingsChange({ format24h: e.target.checked })}
-                  />
-                </Toggle>
                 )}
 
                 {!isFlowerClockStyle && (
                 <Toggle>
-                  <ToggleText>Date</ToggleText>
+                  <ToggleText>{isDuoClockStyle ? 'Weekdays' : 'Date'}</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
                   <HiddenCheckbox
                     type="checkbox"

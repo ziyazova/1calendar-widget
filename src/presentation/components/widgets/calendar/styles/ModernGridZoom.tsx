@@ -291,7 +291,7 @@ export const ModernGridZoom: React.FC<ModernGridZoomProps> = ({ settings }) => {
   // CSS Zoom scaling
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;

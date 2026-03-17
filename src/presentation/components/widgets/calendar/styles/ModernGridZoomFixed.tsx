@@ -184,9 +184,9 @@ const DayCell = styled.button<{
     if ($isToday) return $primaryColor;
     return 'transparent';
   }};
-  color: ${({ $isCurrentMonth, $isToday, $textColor }) => {
-    if ($isToday) return '#FFFFFF';
-    if (!$isCurrentMonth) return `${$textColor}25`;
+  color: ${({ $isCurrentMonth, $isToday, $primaryColor, $textColor }) => {
+    if ($isToday) return getContrastColor($primaryColor);
+    if (!$isCurrentMonth) return `${$textColor}30`;
     return $textColor;
   }};
   border-radius: ${({ $borderRadius }) => Math.min(Math.round($borderRadius / 4) + 1, 8)}px;
@@ -207,7 +207,7 @@ const DayCell = styled.button<{
       return `${$primaryColor}25`;
     }};
     color: ${({ $isToday, $primaryColor }) => {
-      if ($isToday) return '#FFFFFF';
+      if ($isToday) return getContrastColor($primaryColor);
       return $primaryColor;
     }};
     border-color: ${({ $primaryColor }) => $primaryColor};
@@ -239,7 +239,8 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const weekDaysSun = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const weekDaysMon = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const weekDaysWorkdays = ['M', 'T', 'W', 'T', 'F'];
 
 export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings }) => {
@@ -265,7 +266,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
   // CSS Zoom scaling
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
@@ -282,8 +283,15 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
   const firstDayOfMonth = new Date(year, month, 1);
   const firstDisplayDay = new Date(firstDayOfMonth);
 
+  const startOnMonday = settings.weekStart === 'monday';
   if (settings.showWeekends) {
-    firstDisplayDay.setDate(firstDisplayDay.getDate() - firstDisplayDay.getDay());
+    if (startOnMonday) {
+      const day = firstDisplayDay.getDay();
+      const offset = day === 0 ? -6 : 1 - day;
+      firstDisplayDay.setDate(firstDisplayDay.getDate() + offset);
+    } else {
+      firstDisplayDay.setDate(firstDisplayDay.getDate() - firstDisplayDay.getDay());
+    }
   } else {
     const mondayOffset = firstDisplayDay.getDay() === 0 ? -6 : 1 - firstDisplayDay.getDay();
     firstDisplayDay.setDate(firstDisplayDay.getDate() + mondayOffset);
@@ -354,7 +362,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
           </CalendarHeader>
 
           <WeekDaysGrid $showWeekends={settings.showWeekends}>
-            {(settings.showWeekends ? weekDays : weekDaysWorkdays).map((day, index) => (
+            {(settings.showWeekends ? (startOnMonday ? weekDaysMon : weekDaysSun) : weekDaysWorkdays).map((day, index) => (
               <WeekDay
                 key={index}
                 $accentColor={settings.accentColor}

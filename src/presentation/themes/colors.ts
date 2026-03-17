@@ -1,40 +1,40 @@
 // Более современная и комплементарная палитра цветов
 export const widgetColors = [
-  '#1F1F1F', // Charcoal
-  '#5B7CF7', // Blue
-  '#E8836B', // Coral
+  '#37352F', // Default
+  '#2F80ED', // Blue
+  '#EB5757', // Red
 ] as const;
 
 export const colorNames = [
-  'Charcoal',
+  'Default',
   'Blue',
-  'Coral',
+  'Red',
 ] as const;
 
-// Background presets
+// Background presets — soft Notion-like tints
 export const backgroundColors = [
   '#FFFFFF', // White
-  '#F5F5F4', // Stone
-  '#1F1F1F', // Dark
+  '#F7F6F3', // Notion Light
+  '#191919', // Notion Dark
 ] as const;
 
 export const backgroundNames = [
   'White',
-  'Stone',
+  'Light',
   'Dark',
 ] as const;
 
-// Accent presets
+// Accent presets — soft transparent Notion-like
 export const accentColors = [
-  '#F0F0EE', // Warm Mist
-  '#E8EDFF', // Blue Tint
-  '#FBE9E1', // Peach Blush
+  '#EDF3EC', // Light Green
+  '#E8EDFF', // Light Blue
+  '#FDEBEC', // Light Pink
 ] as const;
 
 export const accentNames = [
-  'Mist',
-  'Blue Tint',
-  'Peach',
+  'Green',
+  'Blue',
+  'Pink',
 ] as const;
 
 // Apple-style градиенты для фонов
@@ -126,6 +126,22 @@ export const getContrastColor = (backgroundColor: string): string => {
 
   const luminance = getLuminance(backgroundColor);
   return luminance > 0.5 ? '#000000' : '#FFFFFF';
+};
+
+// Returns primaryColor for text, but swaps to contrast color if primary ≈ background.
+// Set enforce=false to disable and always return primaryColor as-is.
+export const getEffectiveTextColor = (
+  primaryColor: string,
+  backgroundColor: string,
+  enforce: boolean = true,
+): string => {
+  if (!enforce) return primaryColor;
+  const primaryLum = getLuminance(primaryColor);
+  const bgLum = getLuminance(backgroundColor);
+  if (Math.abs(primaryLum - bgLum) < 0.15) {
+    return getContrastColor(backgroundColor);
+  }
+  return primaryColor;
 };
 
 // Get suggested colors based on background

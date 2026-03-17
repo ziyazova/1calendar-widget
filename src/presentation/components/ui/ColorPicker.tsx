@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
-import { X, Pipette } from 'lucide-react';
-import { colors } from '../../themes/colors';
+import { X, Pipette, Pencil } from 'lucide-react';
+import { colors, getContrastColor } from '../../themes/colors';
 
 interface ColorPickerProps {
   selectedColor: string;
@@ -58,27 +58,51 @@ const ColorPickerContainer = styled.div`
 const FigmaColorRow = styled.div`
   display: flex;
   align-items: center;
-  height: 26px;
-  border-radius: 6px;
+  height: 30px;
+  border-radius: 10px;
   border: none;
-  background: transparent;
-  padding: 0;
-  overflow: hidden;
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  padding: 0 10px 0 5px;
 `;
 
 const ColorSwatch = styled.div<{ $color: string }>`
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 30%;
   background-color: ${({ $color }) => $color};
   cursor: pointer;
   flex-shrink: 0;
   margin: 4px 6px 4px 0;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transition: border-color 0.12s ease;
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: all 0.15s ease;
+  position: relative;
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(0,0,0,0.15);
+  }
+
+  &:hover .swatch-icon {
+    opacity: 1;
+  }
+`;
+
+const SwatchIcon = styled.div<{ $light: boolean }>`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border-radius: 30%;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+
+  svg {
+    width: 11px;
+    height: 11px;
+    color: ${({ $light }) => $light ? '#1F1F1F' : '#F9F9F8'};
   }
 `;
 
@@ -89,7 +113,7 @@ const HexInput = styled.input`
   border-radius: 0;
   padding: 0 8px 0 0;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
   color: #6B6B6B;
   background: transparent;
@@ -107,38 +131,33 @@ const HexInput = styled.input`
 
 const PresetGroup = styled.div`
   display: flex;
-  gap: 4px;
+  gap: 6px;
   margin-left: auto;
 `;
 
 const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border: 1.5px solid ${({ $selected }) =>
-    $selected ? 'rgba(0,0,0,0.25)' : 'transparent'};
+  width: 17px;
+  height: 17px;
+  border-radius: 30%;
+  border: 1.5px solid transparent;
+  box-shadow: ${({ $selected, $color }) => {
+    const darkBorder = `0 0 0 0.5px color-mix(in srgb, ${$color} 88%, #000)`;
+    return $selected
+      ? `0 0 0 1.5px #fff, 0 0 0 2.5px rgba(51,132,244,0.5), ${darkBorder}`
+      : darkBorder;
+  }};
   background-color: ${({ $color }) => $color};
   cursor: pointer;
-  transition: all 0.12s ease;
-  position: relative;
+  transition: all 0.15s ease;
   flex-shrink: 0;
   padding: 0;
 
-  &:hover {
-    transform: scale(1.1);
+  &:active {
+    transform: scale(0.9);
   }
 
   &:focus {
     outline: none;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 3px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    pointer-events: none;
   }
 `;
 
@@ -154,7 +173,7 @@ const PickerPopup = styled.div`
   position: fixed;
   width: 240px;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 1060;
   padding: 12px;
@@ -187,7 +206,7 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0;
 
   &:hover {
@@ -204,7 +223,7 @@ const CloseButton = styled.button`
 const SaturationCanvas = styled.canvas`
   width: 216px;
   height: 180px;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: default;
   display: block;
 `;
@@ -212,7 +231,7 @@ const SaturationCanvas = styled.canvas`
 const HueSliderTrack = styled.div`
   width: 216px;
   height: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: linear-gradient(to right,
     #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
   );
@@ -261,7 +280,7 @@ const EyedropperButton = styled.button`
   width: 28px;
   height: 28px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
+  border-radius: 10px;
   background: #f8f8f8;
   color: #6B6B6B;
   cursor: pointer;
@@ -286,7 +305,7 @@ const EyedropperButton = styled.button`
 const PickerColorPreview = styled.div<{ $color: string }>`
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: 30%;
   background: ${({ $color }) => $color};
   border: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
@@ -297,7 +316,7 @@ const PickerHexInput = styled.input`
   min-width: 0;
   height: 28px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0 8px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
@@ -484,7 +503,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             }
             setOpen(!open);
           }}
-        />
+        >
+          <SwatchIcon className="swatch-icon" $light={getContrastColor(hexInput) === '#000000'}>
+            <Pencil />
+          </SwatchIcon>
+        </ColorSwatch>
         <HexInput
           ref={hexRef}
           value={hexInput.replace('#', '')}

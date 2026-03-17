@@ -271,7 +271,7 @@ const PresetButton = styled.button`
 
 /* ── Embed Area ── */
 
-const EmbedArea = styled.div`
+const EmbedArea = styled.div<{ $dark?: boolean }>`
   flex: 1;
   display: flex;
   align-items: flex-start;
@@ -281,12 +281,14 @@ const EmbedArea = styled.div`
   position: relative;
   overflow: hidden;
   min-height: 0;
+  background: ${({ $dark }) => $dark ? '#191919' : 'transparent'};
+  transition: background 0.3s ease;
 `;
 
-const DotGrid = styled.div`
+const DotGrid = styled.div<{ $dark?: boolean }>`
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.16) 1px, transparent 1px);
+  background-image: radial-gradient(circle, ${({ $dark }) => $dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.16)'} 1px, transparent 1px);
   background-size: 24px 24px;
   pointer-events: none;
 `;
@@ -527,8 +529,8 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
         ))}
       </PresetsRow>
 
-      <EmbedArea>
-        <DotGrid />
+      <EmbedArea $dark={simDark}>
+        <DotGrid $dark={simDark} />
         <EmbedContainer
           ref={containerRef}
           $dark={simDark}

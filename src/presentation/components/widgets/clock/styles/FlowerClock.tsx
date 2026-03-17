@@ -17,10 +17,11 @@ const OuterWrapper = styled.div`
   justify-content: center;
 `;
 
-const ZoomWrapper = styled.div<{ $zoom: number; $designSize: number; $aspectRatio: number }>`
+const ZoomWrapper = styled.div<{ $zoom: number; $designSize: number }>`
   width: ${({ $designSize }) => $designSize}px;
-  height: ${({ $designSize, $aspectRatio }) => $designSize / $aspectRatio}px;
+  height: ${({ $designSize }) => $designSize}px;
   zoom: ${({ $zoom }) => $zoom};
+  position: relative;
 `;
 
 const FRAME_CONFIG = {
@@ -40,19 +41,29 @@ const FRAME_CONFIG = {
     faceOffsetX: 2,
     faceOffsetY: 28,
   },
+  vintage: {
+    image: '/vintage-clock-frame.png',
+    aspectRatio: 1 / 1,
+    designSize: 280,
+    faceSize: '70%',
+    faceOffsetX: 0,
+    faceOffsetY: 0,
+  },
 } as const;
 
 type FrameType = keyof typeof FRAME_CONFIG;
 
-const SceneWrapper = styled.div<{ $frame: FrameType; $designSize: number }>`
-  position: relative;
+const SceneWrapper = styled.div<{ $frame: FrameType; $designSize: number; $offsetX: number; $offsetY: number }>`
+  position: absolute;
   width: ${({ $designSize }) => $designSize}px;
-  margin-top: ${({ $frame }) => $frame === 'alarm' ? '-40px' : '0px'};
   aspect-ratio: ${({ $frame }) => FRAME_CONFIG[$frame].aspectRatio};
   background-image: url('${({ $frame }) => FRAME_CONFIG[$frame].image}');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% - ${({ $offsetX }) => $offsetX}px), calc(-50% - ${({ $offsetY }) => $offsetY}px));
 `;
 
 /* Clock face overlay — positioned at center of the frame */
@@ -138,7 +149,7 @@ export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textCo
 
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
@@ -171,8 +182,8 @@ export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textCo
 
   return (
     <OuterWrapper ref={outerRef}>
-      <ZoomWrapper $zoom={zoom} $designSize={frameConfig.designSize} $aspectRatio={frameConfig.aspectRatio}>
-        <SceneWrapper $frame={frame} $designSize={frameConfig.designSize}>
+      <ZoomWrapper $zoom={zoom} $designSize={frameConfig.designSize}>
+        <SceneWrapper $frame={frame} $designSize={frameConfig.designSize} $offsetX={frameConfig.faceOffsetX} $offsetY={frameConfig.faceOffsetY}>
           <ClockFace $faceSize={frameConfig.faceSize} $offsetX={frameConfig.faceOffsetX} $offsetY={frameConfig.faceOffsetY}>
             {/* Hour numbers */}
             {HOUR_NUMBERS.map((num, i) => (

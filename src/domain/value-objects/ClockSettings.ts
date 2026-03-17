@@ -9,16 +9,17 @@ export class ClockSettings {
   public readonly showDate: boolean;
   public readonly fontSize: 'small' | 'medium' | 'large';
   public readonly style: 'modern' | 'analog-classic' | 'classic' | 'flower' | 'dreamy';
-  public readonly clockFrame: 'flower' | 'alarm';
+  public readonly clockFrame: 'flower' | 'alarm' | 'vintage';
   public readonly embedWidth: number;
   public readonly embedHeight: number;
   public readonly theme: 'auto' | 'light' | 'dark';
+  public readonly clockColor: string;
 
   constructor(settings: Partial<ClockSettings> = {}) {
-    this.primaryColor = settings.primaryColor || '#667EEA';
+    this.primaryColor = settings.primaryColor || (settings.style === 'dreamy' ? '#1F1F1F' : '#667EEA');
     this.backgroundColor = settings.backgroundColor || '#ffffff';
     this.accentColor = settings.accentColor || '#f1f5f9';
-    this.showSeconds = settings.showSeconds ?? true;
+    this.showSeconds = settings.showSeconds ?? (settings.style === 'dreamy' ? false : true);
     this.format24h = settings.format24h ?? true;
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? true;
@@ -29,6 +30,7 @@ export class ClockSettings {
     this.embedWidth = settings.embedWidth ?? 360;
     this.embedHeight = settings.embedHeight ?? 360;
     this.theme = settings.theme || 'auto';
+    this.clockColor = settings.clockColor || 'green';
   }
 
   public static fromJson(json: string): ClockSettings {
@@ -56,6 +58,7 @@ export class ClockSettings {
       embedWidth: this.embedWidth,
       embedHeight: this.embedHeight,
       theme: this.theme,
+      clockColor: this.clockColor,
     });
   }
 
@@ -75,6 +78,7 @@ export class ClockSettings {
       embedWidth: changes.embedWidth ?? this.embedWidth,
       embedHeight: changes.embedHeight ?? this.embedHeight,
       theme: changes.theme ?? this.theme,
+      clockColor: changes.clockColor ?? this.clockColor,
     });
   }
 } 

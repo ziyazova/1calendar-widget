@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { ClockSettings } from '../../../../../domain/value-objects/ClockSettings';
+import { getEffectiveTextColor } from '../../../../themes/colors';
 
 interface ClassicClockProps {
   settings: ClockSettings;
@@ -97,7 +98,7 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
 
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
@@ -118,6 +119,8 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
   const leftLabel = settings.format24h ? '' : ampm;
   const rightLabel = settings.showDate ? dayName : '';
 
+  const effectiveTextColor = getEffectiveTextColor(settings.primaryColor, settings.backgroundColor);
+
   return (
     <OuterWrapper ref={outerRef}>
       <ZoomWrapper $zoom={zoom}>
@@ -126,14 +129,14 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
             $bgColor={settings.backgroundColor}
             $borderRadius={settings.borderRadius}
             $showBorder={settings.showBorder}
-            $textColor={settings.primaryColor}
+            $textColor={effectiveTextColor}
           >
             <FlipLine $color="transparent" />
-            <FlipNumber $color={settings.primaryColor}>
+            <FlipNumber $color={effectiveTextColor}>
               {hours}
             </FlipNumber>
             {leftLabel && (
-              <PanelLabel $color={settings.primaryColor} $align="left">
+              <PanelLabel $color={effectiveTextColor} $align="left">
                 {leftLabel}
               </PanelLabel>
             )}
@@ -143,14 +146,14 @@ export const ClassicClock: React.FC<ClassicClockProps> = ({ settings, time }) =>
             $bgColor={settings.backgroundColor}
             $borderRadius={settings.borderRadius}
             $showBorder={settings.showBorder}
-            $textColor={settings.primaryColor}
+            $textColor={effectiveTextColor}
           >
             <FlipLine $color="transparent" />
-            <FlipNumber $color={settings.primaryColor}>
+            <FlipNumber $color={effectiveTextColor}>
               {minutes}
             </FlipNumber>
             {rightLabel && (
-              <PanelLabel $color={settings.primaryColor} $align="right">
+              <PanelLabel $color={effectiveTextColor} $align="right">
                 {rightLabel}
               </PanelLabel>
             )}

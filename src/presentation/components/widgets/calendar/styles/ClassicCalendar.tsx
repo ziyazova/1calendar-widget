@@ -29,14 +29,15 @@ const GridContainer = styled.div<{
   $backgroundColor: string;
   $borderRadius: number;
   $showBorder: boolean;
+  $primaryColor: string;
   $textColor: string;
 }>`
   width: 100%;
   max-width: ${DESIGN_WIDTH}px;
   height: auto;
   background: ${({ $backgroundColor }) => $backgroundColor};
-  border: ${({ $showBorder, $textColor }) =>
-    $showBorder ? `1px solid ${$textColor}20` : 'none'};
+  border: ${({ $showBorder, $primaryColor }) =>
+    $showBorder ? `1.5px solid ${$primaryColor}40` : `1px solid ${$primaryColor}20`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -154,9 +155,10 @@ const DayCell = styled.button<{
   $showDayBorders: boolean;
 }>`
   padding: 6px;
-  border: ${({ $isToday, $textColor, $showDayBorders }) => {
+  border: ${({ $isToday, $primaryColor, $textColor, $showDayBorders }) => {
+    if ($isToday) return `1px solid ${$primaryColor}`;
     if (!$showDayBorders) return '1px solid transparent';
-    return `1px solid ${$textColor}10`;
+    return `1px solid ${$textColor}15`;
   }};
   background: ${({ $isToday, $primaryColor }) => {
     if ($isToday) return `${$primaryColor}30`;
@@ -174,7 +176,7 @@ const DayCell = styled.button<{
       })();
       return lum > 0.7 ? $textColor : $primaryColor;
     }
-    if (!$isCurrentMonth) return `${$textColor}25`;
+    if (!$isCurrentMonth) return `${$textColor}38`;
     return $textColor;
   }};
   border-radius: ${({ $borderRadius }) => Math.min(Math.round($borderRadius / 4) + 1, 8)}px;
@@ -212,7 +214,8 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const weekDaysSun = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const weekDaysMon = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const weekDaysWorkdays = ['M', 'T', 'W', 'T', 'F'];
 
 export const ClassicCalendar: React.FC<ClassicCalendarProps> = ({ settings }) => {
@@ -225,7 +228,7 @@ export const ClassicCalendar: React.FC<ClassicCalendarProps> = ({ settings }) =>
 
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
@@ -242,8 +245,15 @@ export const ClassicCalendar: React.FC<ClassicCalendarProps> = ({ settings }) =>
   const firstDayOfMonth = new Date(year, month, 1);
   const firstDisplayDay = new Date(firstDayOfMonth);
 
+  const startOnMonday = settings.weekStart === 'monday';
   if (settings.showWeekends) {
-    firstDisplayDay.setDate(firstDisplayDay.getDate() - firstDisplayDay.getDay());
+    if (startOnMonday) {
+      const day = firstDisplayDay.getDay();
+      const offset = day === 0 ? -6 : 1 - day;
+      firstDisplayDay.setDate(firstDisplayDay.getDate() + offset);
+    } else {
+      firstDisplayDay.setDate(firstDisplayDay.getDate() - firstDisplayDay.getDay());
+    }
   } else {
     const mondayOffset = firstDisplayDay.getDay() === 0 ? -6 : 1 - firstDisplayDay.getDay();
     firstDisplayDay.setDate(firstDisplayDay.getDate() + mondayOffset);
@@ -275,6 +285,7 @@ export const ClassicCalendar: React.FC<ClassicCalendarProps> = ({ settings }) =>
           $backgroundColor={settings.backgroundColor}
           $borderRadius={settings.borderRadius}
           $showBorder={settings.showBorder}
+          $primaryColor={settings.primaryColor}
           $textColor={textColor}
         >
           <HeaderBar
@@ -296,7 +307,7 @@ export const ClassicCalendar: React.FC<ClassicCalendarProps> = ({ settings }) =>
 
           <CalendarBody>
             <WeekDaysGrid $showWeekends={settings.showWeekends}>
-              {(settings.showWeekends ? weekDays : weekDaysWorkdays).map((day, index) => (
+              {(settings.showWeekends ? (startOnMonday ? weekDaysMon : weekDaysSun) : weekDaysWorkdays).map((day, index) => (
                 <WeekDay key={index}>
                   {day}
                 </WeekDay>

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useRive } from '@rive-app/react-canvas';
 import { ClockSettings } from '../../../../../domain/value-objects/ClockSettings';
 import styled, { keyframes } from 'styled-components';
+import { getEffectiveTextColor } from '../../../../themes/colors';
 
 const DESIGN_WIDTH = 288;
 
@@ -55,7 +56,7 @@ const Container = styled.div<{
   padding: 10px 20px;
   background: ${({ $backgroundColor }) => $backgroundColor};
   border: ${({ $showBorder, $accentColor }) =>
-    $showBorder ? `1px solid ${$accentColor}30` : 'none'};
+    $showBorder ? `1.5px solid ${$accentColor}40` : `1px solid ${$accentColor}20`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
@@ -92,6 +93,15 @@ const TimeDisplay = styled.div<{
 const ColonSpan = styled.span`
   animation: ${colonPulse} 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   display: inline-block;
+`;
+
+const PeriodSpan = styled.span`
+  font-size: 0.3em;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  margin-left: 3px;
+  opacity: 0.4;
+  vertical-align: baseline;
 `;
 
 const DateLine = styled.div<{
@@ -138,7 +148,7 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
 
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
@@ -180,7 +190,9 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
   const month = time.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
   const day = time.getDate();
 
-  const period = !settings.format24h ? ` ${time.getHours() >= 12 ? 'PM' : 'AM'}` : '';
+  const period = !settings.format24h ? (time.getHours() >= 12 ? 'PM' : 'AM') : '';
+
+  const effectiveTextColor = getEffectiveTextColor(settings.primaryColor, settings.backgroundColor);
 
   const targetHue = hexToHue(settings.primaryColor);
   const hueRotation = targetHue - DINO_BASE_HUE;
@@ -197,7 +209,7 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <TimeDisplay $fontSize={settings.fontSize} $textColor={textColor}>
+          <TimeDisplay $fontSize={settings.fontSize} $textColor={effectiveTextColor}>
             {hours}
             <ColonSpan>:</ColonSpan>
             {minutes}
@@ -207,11 +219,11 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
                 {seconds}
               </>
             )}
-            {period}
+            {period && <PeriodSpan>{period}</PeriodSpan>}
           </TimeDisplay>
 
           {settings.showDate && (
-            <DateLine $textColor={textColor} $isHovered={isHovered}>
+            <DateLine $textColor={effectiveTextColor} $isHovered={isHovered}>
               {weekday}, {month} {day}
             </DateLine>
           )}

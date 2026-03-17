@@ -12,6 +12,7 @@ export class CalendarSettings {
   public readonly embedHeight: number;
   public readonly theme: 'auto' | 'light' | 'dark';
   public readonly typewriterColor: 'blue' | 'green' | 'pink' | 'brown' | 'beige';
+  public readonly weekStart: 'sunday' | 'monday';
 
   constructor(settings: Partial<CalendarSettings> = {}) {
     this.primaryColor = settings.primaryColor || '#667EEA';
@@ -21,12 +22,13 @@ export class CalendarSettings {
     this.showWeekends = settings.showWeekends ?? true;
     this.borderRadius = settings.borderRadius ?? 12;
     this.showBorder = settings.showBorder ?? false;
-    this.showDayBorders = settings.showDayBorders ?? true;
+    this.showDayBorders = settings.showDayBorders ?? (settings.style === 'classic' ? false : true);
     this.style = settings.style || 'modern-grid';
     this.embedWidth = settings.embedWidth ?? 420;
     this.embedHeight = settings.embedHeight ?? 380;
     this.theme = settings.theme || 'auto';
     this.typewriterColor = settings.typewriterColor || 'blue';
+    this.weekStart = settings.weekStart || 'monday';
   }
 
   public static fromJson(json: string): CalendarSettings {
@@ -53,6 +55,7 @@ export class CalendarSettings {
       embedHeight: this.embedHeight,
       theme: this.theme,
       typewriterColor: this.typewriterColor,
+      weekStart: this.weekStart,
     });
   }
 
@@ -71,6 +74,7 @@ export class CalendarSettings {
       embedHeight: changes.embedHeight ?? this.embedHeight,
       theme: changes.theme ?? this.theme,
       typewriterColor: changes.typewriterColor ?? this.typewriterColor,
+      weekStart: changes.weekStart ?? this.weekStart,
     });
   }
 } 

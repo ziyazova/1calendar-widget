@@ -65,20 +65,20 @@ const HeaderRow = styled.div`
   padding: 0 2px 6px;
 `;
 
-const MonthName = styled.h2<{ $textColor: string }>`
+const MonthName = styled.h2<{ $color: string }>`
   font-size: 14px;
   font-weight: 700;
   margin: 0;
-  color: ${({ $textColor }) => $textColor};
+  color: ${({ $color }) => $color};
   font-family: 'Courier New', Courier, monospace;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 `;
 
-const YearText = styled.span<{ $textColor: string }>`
+const YearText = styled.span<{ $color: string }>`
   font-size: 14px;
   font-weight: 700;
-  color: ${({ $textColor }) => $textColor};
+  color: ${({ $color }) => $color};
   font-family: 'Courier New', Courier, monospace;
 `;
 
@@ -157,7 +157,7 @@ const DayCell = styled.div<{
   align-items: center;
   justify-content: center;
   font-size: ${({ $isToday }) => $isToday ? '13px' : '10px'};
-  font-weight: ${({ $isToday }) => $isToday ? '700' : '400'};
+  font-weight: ${({ $isToday, $isSunday }) => ($isToday || $isSunday) ? '700' : '400'};
   font-family: 'Courier New', Courier, monospace;
   color: ${({ $isCurrentMonth, $isToday, $isSunday, $primaryColor, $textColor }) => {
     if (!$isCurrentMonth) return `${$textColor}12`;
@@ -187,7 +187,8 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const weekDaysFull = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const weekDaysSun = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const weekDaysMon = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 const weekDaysWork = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
 
 export const TypewriterCalendar: React.FC<TypewriterCalendarProps> = ({ settings }) => {
@@ -200,7 +201,7 @@ export const TypewriterCalendar: React.FC<TypewriterCalendarProps> = ({ settings
 
   useEffect(() => {
     if (!outerRef.current) return;
-    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const maxZoom = isEmbed ? 2.0 : 1.2;
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const parentWidth = entry.contentRect.width;
@@ -217,8 +218,15 @@ export const TypewriterCalendar: React.FC<TypewriterCalendarProps> = ({ settings
   const firstDayOfMonth = new Date(year, month, 1);
   const firstDisplayDay = new Date(firstDayOfMonth);
 
+  const startOnMonday = settings.weekStart === 'monday';
   if (settings.showWeekends) {
-    firstDisplayDay.setDate(firstDisplayDay.getDate() - firstDisplayDay.getDay());
+    if (startOnMonday) {
+      const day = firstDisplayDay.getDay();
+      const offset = day === 0 ? -6 : 1 - day;
+      firstDisplayDay.setDate(firstDisplayDay.getDate() + offset);
+    } else {
+      firstDisplayDay.setDate(firstDisplayDay.getDate() - firstDisplayDay.getDay());
+    }
   } else {
     const mondayOffset = firstDisplayDay.getDay() === 0 ? -6 : 1 - firstDisplayDay.getDay();
     firstDisplayDay.setDate(firstDisplayDay.getDate() + mondayOffset);
@@ -243,7 +251,7 @@ export const TypewriterCalendar: React.FC<TypewriterCalendarProps> = ({ settings
     currentDay.setDate(currentDay.getDate() + 1);
   }
 
-  const weekDaysArr = settings.showWeekends ? weekDaysFull : weekDaysWork;
+  const weekDaysArr = settings.showWeekends ? (startOnMonday ? weekDaysMon : weekDaysSun) : weekDaysWork;
 
   return (
     <OuterWrapper ref={outerRef}>
@@ -252,10 +260,10 @@ export const TypewriterCalendar: React.FC<TypewriterCalendarProps> = ({ settings
           <CalendarOverlay $backgroundColor={settings.backgroundColor}>
             {/* Month + Year header */}
             <HeaderRow>
-              <MonthName $textColor={textColor}>
+              <MonthName $color={settings.primaryColor}>
                 {monthNames[month]}
               </MonthName>
-              <YearText $textColor={textColor}>
+              <YearText $color={settings.primaryColor}>
                 {year}
               </YearText>
             </HeaderRow>
