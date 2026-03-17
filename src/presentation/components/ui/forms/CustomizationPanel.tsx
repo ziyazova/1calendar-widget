@@ -559,9 +559,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     if (widget.type === 'calendar') {
       const s = (widget.settings as CalendarSettings).style;
       const map: Record<string, { icon: React.FC; label: string }> = {
-        'modern-grid-zoom-fixed': { icon: Calendar, label: 'Calendar \u2009·\u2009 Core' },
-        'classic': { icon: CalendarDays, label: 'Calendar \u2009·\u2009 Soft' },
-        'collage': { icon: LayoutGrid, label: 'Calendar \u2009·\u2009 Grid' },
+        'modern-grid-zoom-fixed': { icon: Calendar, label: 'Calendar \u2009·\u2009 Default' },
+        'classic': { icon: CalendarDays, label: 'Calendar \u2009·\u2009 Classic' },
+        'collage': { icon: LayoutGrid, label: 'Calendar \u2009·\u2009 Collage' },
         'typewriter': { icon: Type, label: 'Calendar \u2009·\u2009 Typewriter' },
       };
       return map[s] || { icon: Calendar, label: 'Calendar' };
@@ -569,8 +569,8 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     if (widget.type === 'clock') {
       const s = (widget.settings as ClockSettings).style;
       const map: Record<string, { icon: React.FC; label: string }> = {
-        'classic': { icon: Clock, label: 'Clock \u2009·\u2009 Minimal' },
-        'flower': { icon: Flower2, label: 'Clock \u2009·\u2009 Flow' },
+        'classic': { icon: Clock, label: 'Clock \u2009·\u2009 Classic' },
+        'flower': { icon: Flower2, label: 'Clock \u2009·\u2009 Flower' },
         'dreamy': { icon: Sparkles, label: 'Clock \u2009·\u2009 Dreamy' },
       };
       return map[s] || { icon: Clock, label: 'Clock' };
@@ -601,7 +601,6 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'flower';
   const isTypewriterStyle = calStyle === 'typewriter';
   const isFlowerClockStyle = clkStyle === 'flower';
-  const isMinimalClockStyle = clkStyle === 'classic';
 
   return (
     <PanelContainer>
@@ -638,7 +637,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
         {!isBoard && (
         <Section>
-          <SectionTitle>Appearance</SectionTitle>
+          <SectionTitle>Colors</SectionTitle>
 
           <FormGroup>
             <Label>Primary</Label>
@@ -679,7 +678,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <SectionTitle>Layout</SectionTitle>
 
           <FormGroup>
-            <Label>Corners</Label>
+            <Label>Radius</Label>
             <SliderRow>
               <Slider
                 type="range"
@@ -696,7 +695,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <FormGroup>
             <ToggleGroup>
               <Toggle>
-                <ToggleText>Outline</ToggleText>
+                <ToggleText>Border</ToggleText>
                 <ToggleSwitch $checked={settings.showBorder} />
                 <HiddenCheckbox
                   type="checkbox"
@@ -707,7 +706,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
               {widget.type === 'calendar' && (
                 <Toggle>
-                  <ToggleText>Day grid</ToggleText>
+                  <ToggleText>Day borders</ToggleText>
                   <ToggleSwitch $checked={(settings as CalendarSettings).showDayBorders} />
                   <HiddenCheckbox
                     type="checkbox"
@@ -808,9 +807,8 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
             <FormGroup>
               <ToggleGroup>
-                {!isMinimalClockStyle && (
                 <Toggle>
-                  <ToggleText>Show seconds</ToggleText>
+                  <ToggleText>Seconds</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showSeconds} />
                   <HiddenCheckbox
                     type="checkbox"
@@ -818,11 +816,10 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                     onChange={(e) => onSettingsChange({ showSeconds: e.target.checked })}
                   />
                 </Toggle>
-                )}
 
                 {!isFlowerClockStyle && (
                 <Toggle>
-                  <ToggleText>24-hour time</ToggleText>
+                  <ToggleText>24h format</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).format24h} />
                   <HiddenCheckbox
                     type="checkbox"
@@ -834,7 +831,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
                 {!isFlowerClockStyle && (
                 <Toggle>
-                  <ToggleText>Show date</ToggleText>
+                  <ToggleText>Date</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
                   <HiddenCheckbox
                     type="checkbox"
