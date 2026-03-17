@@ -6,6 +6,7 @@ import { Widget } from '../../domain/entities/Widget';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
+import { useResolvedTheme, NOTION_DARK_BG } from '../hooks/useResolvedTheme';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {

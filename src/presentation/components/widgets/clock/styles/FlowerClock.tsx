@@ -42,10 +42,12 @@ const FRAME_CONFIG = {
   },
 } as const;
 
-const SceneWrapper = styled.div<{ $frame: 'flower' | 'alarm'; $designSize: number }>`
+type FrameType = keyof typeof FRAME_CONFIG;
+
+const SceneWrapper = styled.div<{ $frame: FrameType; $designSize: number }>`
   position: relative;
   width: ${({ $designSize }) => $designSize}px;
-  margin-top: ${({ $frame }) => $frame === 'alarm' ? '-40px' : '0'};
+  margin-top: ${({ $frame }) => $frame === 'alarm' ? '-40px' : '0px'};
   aspect-ratio: ${({ $frame }) => FRAME_CONFIG[$frame].aspectRatio};
   background-image: url('${({ $frame }) => FRAME_CONFIG[$frame].image}');
   background-size: contain;
@@ -123,6 +125,7 @@ const CenterDot = styled.div<{ $color: string }>`
   z-index: 10;
 `;
 
+
 const HOUR_NUMBERS = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
 export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textColor }) => {
@@ -149,6 +152,7 @@ export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textCo
   const hours = time.getHours() % 12;
   const minutes = time.getMinutes();
   const seconds = time.getSeconds();
+
 
   // Track cumulative rotation to avoid snap-back at 59→0
   const totalRotationsRef = useRef(0);

@@ -1,12 +1,69 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useRive } from '@rive-app/react-canvas';
 import { ClockSettings } from '../../../../../domain/value-objects/ClockSettings';
-import { ClockWidgetContainer } from './ClockCommonStyles';
 import styled, { keyframes } from 'styled-components';
+
+const DESIGN_WIDTH = 288;
+
+// Dino base hue is ~100 (green). Calculate rotation to match primaryColor.
+function hexToHue(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  if (d === 0) return 0;
+  let h = 0;
+  if (max === r) h = ((g - b) / d) % 6;
+  else if (max === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  return ((h * 60) + 360) % 360;
+}
+
+const DINO_BASE_HUE = 100; // green
 
 const colonPulse = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
+`;
+
+const OuterWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ZoomWrapper = styled.div<{ $zoom: number }>`
+  width: ${DESIGN_WIDTH}px;
+  zoom: ${({ $zoom }) => $zoom};
+`;
+
+const Container = styled.div<{
+  $backgroundColor: string;
+  $borderRadius: number;
+  $showBorder: boolean;
+  $accentColor: string;
+  $textColor: string;
+}>`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px;
+  background: ${({ $backgroundColor }) => $backgroundColor};
+  border: ${({ $showBorder, $accentColor }) =>
+    $showBorder ? `1px solid ${$accentColor}30` : 'none'};
+  border-radius: ${({ $borderRadius }) => $borderRadius}px;
+  color: ${({ $textColor }) => $textColor};
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
 `;
 
 const TimeDisplay = styled.div<{
@@ -29,6 +86,7 @@ const TimeDisplay = styled.div<{
   line-height: 1;
   position: relative;
   z-index: 1;
+  margin-top: 20px;
 `;
 
 const ColonSpan = styled.span`
@@ -47,7 +105,7 @@ const DateLine = styled.div<{
   letter-spacing: 0.2em;
   font-weight: 400;
   color: ${({ $textColor, $isHovered }) =>
-    $isHovered ? $textColor : `${$textColor}60`};
+    $isHovered ? `${$textColor}90` : `${$textColor}35`};
   transition: color 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
@@ -56,11 +114,13 @@ const DateLine = styled.div<{
   z-index: 1;
 `;
 
-const RiveWrapper = styled.div`
-  width: 120%;
-  aspect-ratio: 1;
+const RiveWrapper = styled.div<{ $hue: number }>`
+  width: 165%;
+  height: 110px;
   margin-top: -10px;
-  margin-bottom: -40px;
+  margin-bottom: -20px;
+  overflow: hidden;
+  filter: hue-rotate(${({ $hue }) => $hue}deg);
 `;
 
 interface DreamyClockProps {
@@ -70,7 +130,24 @@ interface DreamyClockProps {
 }
 
 export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textColor }) => {
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const outerRef = useRef<HTMLDivElement>(null);
+
+  const isEmbed = window.location.pathname.includes('/embed/');
+
+  useEffect(() => {
+    if (!outerRef.current) return;
+    const maxZoom = isEmbed ? 2.0 : 1.0;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const parentWidth = entry.contentRect.width;
+        setZoom(Math.min(maxZoom, Math.max(0.25, parentWidth / DESIGN_WIDTH)));
+      }
+    });
+    ro.observe(outerRef.current);
+    return () => ro.disconnect();
+  }, [isEmbed]);
 
   const { rive, RiveComponent } = useRive({
     src: '/dreamy-dino.riv',
@@ -105,40 +182,45 @@ export const DreamyClock: React.FC<DreamyClockProps> = ({ settings, time, textCo
 
   const period = !settings.format24h ? ` ${time.getHours() >= 12 ? 'PM' : 'AM'}` : '';
 
+  const targetHue = hexToHue(settings.primaryColor);
+  const hueRotation = targetHue - DINO_BASE_HUE;
+
   return (
-    <ClockWidgetContainer
-      $backgroundColor={settings.backgroundColor}
-      $accentColor={settings.accentColor}
-      $borderRadius={settings.borderRadius}
-      $showBorder={settings.showBorder}
-      $textColor={textColor}
-      $style={settings.style}
-      style={{ maxWidth: '288px', overflow: 'visible', minHeight: '78px', padding: '10px 20px' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <TimeDisplay $fontSize={settings.fontSize} $textColor={textColor}>
-        {hours}
-        <ColonSpan>:</ColonSpan>
-        {minutes}
-        {settings.showSeconds && (
-          <>
+    <OuterWrapper ref={outerRef}>
+      <ZoomWrapper $zoom={zoom}>
+        <Container
+          $backgroundColor={settings.backgroundColor}
+          $accentColor={settings.accentColor}
+          $borderRadius={settings.borderRadius}
+          $showBorder={settings.showBorder}
+          $textColor={textColor}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <TimeDisplay $fontSize={settings.fontSize} $textColor={textColor}>
+            {hours}
             <ColonSpan>:</ColonSpan>
-            {seconds}
-          </>
-        )}
-        {period}
-      </TimeDisplay>
+            {minutes}
+            {settings.showSeconds && (
+              <>
+                <ColonSpan>:</ColonSpan>
+                {seconds}
+              </>
+            )}
+            {period}
+          </TimeDisplay>
 
-      {settings.showDate && (
-        <DateLine $textColor={textColor} $isHovered={isHovered}>
-          {weekday}, {month} {day}
-        </DateLine>
-      )}
+          {settings.showDate && (
+            <DateLine $textColor={textColor} $isHovered={isHovered}>
+              {weekday}, {month} {day}
+            </DateLine>
+          )}
 
-      <RiveWrapper>
-        <RiveComponent style={{ background: 'transparent' }} />
-      </RiveWrapper>
-    </ClockWidgetContainer>
+          <RiveWrapper $hue={hueRotation}>
+            <RiveComponent style={{ background: 'transparent' }} />
+          </RiveWrapper>
+        </Container>
+      </ZoomWrapper>
+    </OuterWrapper>
   );
 };
