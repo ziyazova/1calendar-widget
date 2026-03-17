@@ -29,6 +29,7 @@ const GridContainer = styled.div<{
   $backgroundColor: string;
   $borderRadius: number;
   $showBorder: boolean;
+  $primaryColor: string;
   $accentColor: string;
   $textColor: string;
   $debug?: boolean;
@@ -39,8 +40,8 @@ const GridContainer = styled.div<{
   height: auto;
   padding: 16px;
   background: ${({ $backgroundColor }) => $backgroundColor};
-  border: ${({ $showBorder, $textColor }) =>
-    $showBorder ? `1px solid ${$textColor}30` : `1px solid ${$textColor}10`};
+  border: ${({ $showBorder, $primaryColor }) =>
+    $showBorder ? `1.5px solid ${$primaryColor}40` : `1px solid ${$primaryColor}20`};
   border-radius: ${({ $borderRadius }) => $borderRadius}px;
   color: ${({ $textColor }) => $textColor};
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -322,6 +323,7 @@ export const ModernGridZoomFixed: React.FC<ModernGridZoomProps> = ({ settings })
           $backgroundColor={settings.backgroundColor}
           $borderRadius={settings.borderRadius}
           $showBorder={settings.showBorder}
+          $primaryColor={settings.primaryColor}
           $accentColor={settings.accentColor}
           $textColor={textColor}
           $debug={debug}

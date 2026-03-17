@@ -96,7 +96,7 @@ const Section = styled.div`
 const SectionTitle = styled.h3`
   font-size: 11px;
   font-weight: 600;
-  color: #9A9A9A;
+  color: #ABABAB;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 18px 0;
@@ -161,6 +161,8 @@ const Slider = styled.input`
   background: rgba(0, 0, 0, 0.06);
   outline: none;
   -webkit-appearance: none;
+  margin: 0;
+  padding: 0;
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -559,23 +561,23 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     if (widget.type === 'calendar') {
       const s = (widget.settings as CalendarSettings).style;
       const map: Record<string, { icon: React.FC; label: string }> = {
-        'modern-grid-zoom-fixed': { icon: Calendar, label: 'Calendar \u2009·\u2009 Default' },
-        'classic': { icon: CalendarDays, label: 'Calendar \u2009·\u2009 Classic' },
-        'collage': { icon: LayoutGrid, label: 'Calendar \u2009·\u2009 Collage' },
-        'typewriter': { icon: Type, label: 'Calendar \u2009·\u2009 Typewriter' },
+        'modern-grid-zoom-fixed': { icon: Calendar, label: 'Calendar \u2009·\u2009 Core' },
+        'classic': { icon: CalendarDays, label: 'Calendar \u2009·\u2009 Soft' },
+        'collage': { icon: LayoutGrid, label: 'Calendar \u2009·\u2009 Paper' },
+        'typewriter': { icon: Type, label: 'Calendar \u2009·\u2009 Editorial' },
       };
       return map[s] || { icon: Calendar, label: 'Calendar' };
     }
     if (widget.type === 'clock') {
       const s = (widget.settings as ClockSettings).style;
       const map: Record<string, { icon: React.FC; label: string }> = {
-        'classic': { icon: Clock, label: 'Clock \u2009·\u2009 Classic' },
-        'flower': { icon: Flower2, label: 'Clock \u2009·\u2009 Flower' },
-        'dreamy': { icon: Sparkles, label: 'Clock \u2009·\u2009 Dreamy' },
+        'classic': { icon: Clock, label: 'Clock \u2009·\u2009 Duo' },
+        'flower': { icon: Flower2, label: 'Clock \u2009·\u2009 Bloom' },
+        'dreamy': { icon: Sparkles, label: 'Clock \u2009·\u2009 Alarm' },
       };
       return map[s] || { icon: Clock, label: 'Clock' };
     }
-    if (widget.type === 'board') return { icon: Image, label: 'Board \u2009·\u2009 Moodboard' };
+    if (widget.type === 'board') return { icon: Image, label: 'Canvas \u2009·\u2009 Moodboard' };
     return null;
   };
 
@@ -678,7 +680,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <SectionTitle>Layout</SectionTitle>
 
           <FormGroup>
-            <Label>Radius</Label>
+            <Label>Corners</Label>
             <SliderRow>
               <Slider
                 type="range"
@@ -695,7 +697,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <FormGroup>
             <ToggleGroup>
               <Toggle>
-                <ToggleText>Border</ToggleText>
+                <ToggleText>Widget border</ToggleText>
                 <ToggleSwitch $checked={settings.showBorder} />
                 <HiddenCheckbox
                   type="checkbox"
@@ -706,7 +708,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
               {widget.type === 'calendar' && (
                 <Toggle>
-                  <ToggleText>Day borders</ToggleText>
+                  <ToggleText>Day grid</ToggleText>
                   <ToggleSwitch $checked={(settings as CalendarSettings).showDayBorders} />
                   <HiddenCheckbox
                     type="checkbox"

@@ -1,40 +1,40 @@
 // Более современная и комплементарная палитра цветов
 export const widgetColors = [
-  '#6E7FF2', // Soft Indigo
-  '#7C63B8', // Muted Purple
-  '#E89A78', // Warm Peach
+  '#1F1F1F', // Charcoal
+  '#5B7CF7', // Blue
+  '#E8836B', // Coral
 ] as const;
 
 export const colorNames = [
-  'Indigo',
-  'Purple',
-  'Peach',
+  'Charcoal',
+  'Blue',
+  'Coral',
 ] as const;
 
 // Background presets
 export const backgroundColors = [
-  '#FFFFFF', // Pure White
-  '#F7F7F5', // Warm Gray
-  '#EEF1F5', // Cool Gray
+  '#FFFFFF', // White
+  '#F5F5F4', // Stone
+  '#1F1F1F', // Dark
 ] as const;
 
 export const backgroundNames = [
   'White',
-  'Warm',
-  'Cool',
+  'Stone',
+  'Dark',
 ] as const;
 
 // Accent presets
 export const accentColors = [
-  '#E8EDFF', // Soft Indigo
-  '#EEE8FA', // Soft Purple
-  '#FBE9E1', // Soft Peach
+  '#F0F0EE', // Warm Mist
+  '#E8EDFF', // Blue Tint
+  '#FBE9E1', // Peach Blush
 ] as const;
 
 export const accentNames = [
-  'Indigo Mist',
-  'Lavender',
-  'Peach Blush',
+  'Mist',
+  'Blue Tint',
+  'Peach',
 ] as const;
 
 // Apple-style градиенты для фонов

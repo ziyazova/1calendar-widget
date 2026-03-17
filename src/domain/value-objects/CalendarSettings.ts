@@ -20,7 +20,7 @@ export class CalendarSettings {
     this.defaultView = settings.defaultView || 'month';
     this.showWeekends = settings.showWeekends ?? true;
     this.borderRadius = settings.borderRadius ?? 12;
-    this.showBorder = settings.showBorder ?? true;
+    this.showBorder = settings.showBorder ?? false;
     this.showDayBorders = settings.showDayBorders ?? true;
     this.style = settings.style || 'modern-grid';
     this.embedWidth = settings.embedWidth ?? 420;

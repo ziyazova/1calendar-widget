@@ -59,21 +59,21 @@ const FigmaColorRow = styled.div`
   display: flex;
   align-items: center;
   height: 26px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: none;
-  background: rgba(0, 0, 0, 0.04);
-  padding: 0 6px 0 0;
+  background: transparent;
+  padding: 0;
   overflow: hidden;
 `;
 
 const ColorSwatch = styled.div<{ $color: string }>`
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
   background-color: ${({ $color }) => $color};
   cursor: pointer;
   flex-shrink: 0;
-  margin: 4px 6px;
+  margin: 4px 6px 4px 0;
   border: 1px solid rgba(0, 0, 0, 0.08);
   transition: border-color 0.12s ease;
 
@@ -89,18 +89,19 @@ const HexInput = styled.input`
   border-radius: 0;
   padding: 0 8px 0 0;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   color: #6B6B6B;
   background: transparent;
   outline: none;
   flex-shrink: 0;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   text-align: left;
+  transition: color 0.15s ease;
 
   &:focus {
-    color: #1F1F1F;
+    color: #6B6B6B;
   }
 `;
 

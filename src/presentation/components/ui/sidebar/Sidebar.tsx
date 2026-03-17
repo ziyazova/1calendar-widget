@@ -71,7 +71,7 @@ const NavSection = styled.nav`
 
 const SectionLabel = styled.h2`
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: #9A9A9A;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -202,10 +202,10 @@ const StyleItem = styled.button<{ $active: boolean }>`
 `;
 
 const CALENDAR_STYLES = [
-  { label: 'Default', value: 'modern-grid-zoom-fixed', icon: Calendar },
-  { label: 'Classic', value: 'classic', icon: CalendarDays },
-  { label: 'Collage', value: 'collage', icon: LayoutGrid },
-  { label: 'Typewriter', value: 'typewriter', icon: Type },
+  { label: 'Core', value: 'modern-grid-zoom-fixed', icon: Calendar },
+  { label: 'Soft', value: 'classic', icon: CalendarDays },
+  { label: 'Paper', value: 'collage', icon: LayoutGrid },
+  { label: 'Editorial', value: 'typewriter', icon: Type },
 ];
 
 const ARCHIVE_STYLES = [
@@ -216,9 +216,9 @@ const ARCHIVE_STYLES = [
 ];
 
 const CLOCK_STYLES = [
-  { label: 'Classic', value: 'classic', icon: Clock },
-  { label: 'Flower', value: 'flower', icon: Flower2 },
-  { label: 'Dreamy', value: 'dreamy', icon: Sparkles },
+  { label: 'Duo', value: 'classic', icon: Clock },
+  { label: 'Bloom', value: 'flower', icon: Flower2 },
+  { label: 'Alarm', value: 'dreamy', icon: Sparkles },
 ];
 
 const BOARD_STYLES = [
@@ -226,7 +226,7 @@ const BOARD_STYLES = [
 ];
 
 const CLOCK_ARCHIVE_STYLES = [
-  { label: 'Modern Digital', value: 'modern', icon: Brush },
+  { label: 'Buddy', value: 'modern', icon: Brush },
   { label: 'Analog Classic', value: 'analog-classic', icon: AlarmClock },
 ];
 
@@ -316,7 +316,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => toggle('board')}
             >
               <CategoryIcon><Image /></CategoryIcon>
-              Board
+              Canvas
               <ChevronRight className="chevron" />
             </CategoryHeader>
             <StylesList $expanded={expandedSections.includes('board')}>
