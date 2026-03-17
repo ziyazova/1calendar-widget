@@ -202,9 +202,9 @@ const StyleItem = styled.button<{ $active: boolean }>`
 `;
 
 const CALENDAR_STYLES = [
-  { label: 'Default', value: 'modern-grid-zoom-fixed', icon: Calendar },
-  { label: 'Classic', value: 'classic', icon: CalendarDays },
-  { label: 'Collage', value: 'collage', icon: LayoutGrid },
+  { label: 'Core', value: 'modern-grid-zoom-fixed', icon: Calendar },
+  { label: 'Soft', value: 'classic', icon: CalendarDays },
+  { label: 'Grid', value: 'collage', icon: LayoutGrid },
   { label: 'Typewriter', value: 'typewriter', icon: Type },
 ];
 
@@ -216,8 +216,8 @@ const ARCHIVE_STYLES = [
 ];
 
 const CLOCK_STYLES = [
-  { label: 'Classic', value: 'classic', icon: Clock },
-  { label: 'Flower', value: 'flower', icon: Flower2 },
+  { label: 'Minimal', value: 'classic', icon: Clock },
+  { label: 'Flow', value: 'flower', icon: Flower2 },
   { label: 'Dreamy', value: 'dreamy', icon: Sparkles },
 ];
 
