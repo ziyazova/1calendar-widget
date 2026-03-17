@@ -88,9 +88,9 @@ export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {
     return (
       <DisplayContainer>
         <EmptyState>
-          <EmptyTitle>Choose a Widget</EmptyTitle>
+          <EmptyTitle>Nothing here yet</EmptyTitle>
           <EmptyDescription>
-            Select a widget from the sidebar to preview and customize
+            Pick a widget from the sidebar to get started
           </EmptyDescription>
         </EmptyState>
       </DisplayContainer>

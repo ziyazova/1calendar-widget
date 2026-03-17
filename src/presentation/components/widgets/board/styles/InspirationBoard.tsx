@@ -12,15 +12,13 @@ const DESIGN_WIDTH = 340;
 const DESIGN_HEIGHT = 604;
 
 // Outer wrapper fills the container, measures it, and scales content
-const ScaleWrapper = styled.div<{ $bg: string }>`
+const ScaleWrapper = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: ${({ $bg }) => $bg};
-  transition: background 0.2s ease;
 `;
 
 // Fixed design-size container, scaled via transform
@@ -177,7 +175,7 @@ export const InspirationBoard: React.FC<InspirationBoardProps> = ({ settings }) 
   }, [imageUrls.length]);
 
   return (
-    <ScaleWrapper ref={wrapperRef} $bg={backgroundColor}>
+    <ScaleWrapper ref={wrapperRef}>
       <CameraFrame $scale={scale}>
         <FrameImage src="/camera-frame.png" alt="" />
         <ScreenArea>

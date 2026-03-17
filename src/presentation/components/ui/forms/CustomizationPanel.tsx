@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
+import { X, GripVertical } from 'lucide-react';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
@@ -17,28 +18,29 @@ const PanelContainer = styled.div`
   position: fixed;
   right: 0;
   top: 0;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  border-left: 1px solid ${({ theme }) => theme.colors.border.primary};
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
   z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 
 const PanelHeader = styled.div`
-  height: 72px;
+  height: 56px;
   display: flex;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 `;
 
 const PanelTitle = styled.h2`
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colors.text.primary};
+  line-height: 22px;
+  color: #1a1a2e;
   margin: 0;
   letter-spacing: -0.02em;
 `;
@@ -54,67 +56,68 @@ const PanelContent = styled.div`
 `;
 
 const Section = styled.div`
-  padding: 24px 0;
+  padding: 22px 0;
 
   &:first-child {
-    padding-top: 20px;
+    padding-top: 18px;
   }
 
   & + & {
-    border-top: 1px solid ${({ theme }) => theme.colors.border.primary};
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 `;
 
 const SectionTitle = styled.h3`
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 20px 0;
+  color: #94a3b8;
+  margin: 0 0 18px 0;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 `;
 
 const FormGroup = styled.div`
   & + & {
-    margin-top: 20px;
+    margin-top: 16px;
   }
 `;
 
 const Label = styled.label`
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: #64748b;
   margin-bottom: 10px;
-  letter-spacing: -0.006em;
+  letter-spacing: -0.01em;
 `;
 
 const Select = styled.select`
   width: 100%;
-  height: 34px;
+  height: 36px;
   padding: 0 12px;
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  border-radius: 8px;
-  background: #ffffff;
-  color: ${({ theme }) => theme.colors.text.primary};
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #334155;
   font-size: 13px;
   font-weight: 400;
   font-family: inherit;
-  transition: border-color 0.12s ease;
+  transition: all 0.15s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23aeaeb2' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 10px center;
   background-repeat: no-repeat;
   background-size: 14px;
   padding-right: 32px;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.text.tertiary};
+    border-color: rgba(99, 102, 241, 0.3);
   }
 
   &:focus {
     outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
 `;
 
@@ -126,26 +129,27 @@ const SliderRow = styled.div`
 
 const Slider = styled.input`
   flex: 1;
-  height: 3px;
-  border-radius: 2px;
-  background: ${({ theme }) => theme.colors.border.primary};
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
   outline: none;
   -webkit-appearance: none;
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #ffffff;
-    border: 2px solid ${({ theme }) => theme.colors.primary};
+    border: 2px solid #6366f1;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: transform 0.12s ease;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+    transition: all 0.15s ease;
   }
 
   &::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
   }
 
   &::-webkit-slider-thumb:active {
@@ -154,9 +158,9 @@ const Slider = styled.input`
 `;
 
 const SliderValue = styled.span`
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-weight: 400;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   min-width: 32px;
   text-align: right;
@@ -177,32 +181,34 @@ const Toggle = styled.label`
 `;
 
 const ToggleText = styled.span`
-  font-size: 14px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.006em;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: -0.01em;
 `;
 
 const ToggleSwitch = styled.div<{ $checked: boolean }>`
-  width: 36px;
-  height: 20px;
-  border-radius: 10px;
-  background: ${({ $checked, theme }) => $checked ? theme.colors.primary : '#d1d1d6'};
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: ${({ $checked }) => $checked
+    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+    : 'rgba(0, 0, 0, 0.12)'};
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.25s ease;
   flex-shrink: 0;
 
   &::after {
     content: '';
     position: absolute;
     top: 2px;
-    left: ${({ $checked }) => $checked ? '18px' : '2px'};
-    width: 16px;
-    height: 16px;
+    left: ${({ $checked }) => $checked ? '20px' : '2px'};
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    transition: left 0.2s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 `;
 
@@ -265,78 +271,145 @@ const TYPEWRITER_COLORS = [
   { value: 'beige', color: '#c4b39a', label: 'Beige' },
 ] as const;
 
+const ImageHint = styled.p`
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+`;
+
+const ImageInputRow = styled.div`
+  display: flex;
+  gap: 6px;
+`;
+
 const ImageUrlInput = styled.input`
-  width: 100%;
+  flex: 1;
   height: 34px;
   padding: 0 12px;
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
-  border-radius: 8px;
-  background: #ffffff;
-  color: ${({ theme }) => theme.colors.text.primary};
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #334155;
   font-size: 12px;
   font-family: inherit;
-  transition: border-color 0.12s ease;
+  transition: all 0.15s ease;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.text.tertiary};
+    border-color: rgba(99, 102, 241, 0.3);
   }
   &:focus {
     outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
   &::placeholder {
-    color: ${({ theme }) => theme.colors.text.tertiary};
+    color: #94a3b8;
   }
 `;
 
 const AddButton = styled.button`
-  width: 100%;
   height: 34px;
-  border: 1px dashed ${({ theme }) => theme.colors.border.primary};
-  border-radius: 8px;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 13px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.12s ease;
-  margin-top: 8px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
-    color: ${({ theme }) => theme.colors.primary};
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 
   &:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
+`;
+
+const ImageCounter = styled.span`
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 6px;
+  display: block;
+  font-variant-numeric: tabular-nums;
 `;
 
 const ImageList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   margin-top: 12px;
 `;
 
-const ImageItem = styled.div`
+const ImageItem = styled.div<{ $dragging?: boolean; $dragOver?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: ${({ theme }) => theme.colors.background.secondary};
-  border-radius: 6px;
+  gap: 6px;
+  padding: 5px 6px;
+  background: ${({ $dragging, $dragOver }) =>
+    $dragging ? 'rgba(99, 102, 241, 0.06)' :
+    $dragOver ? 'rgba(99, 102, 241, 0.04)' :
+    'rgba(0, 0, 0, 0.02)'};
+  border-radius: 8px;
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: #64748b;
+  transition: background 0.12s ease, opacity 0.12s ease, border-color 0.12s ease;
+  opacity: ${({ $dragging }) => $dragging ? 0.5 : 1};
+  border: 1px solid ${({ $dragOver }) => $dragOver ? 'rgba(99, 102, 241, 0.2)' : 'transparent'};
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+`;
+
+const DragHandle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: #c8cdd3;
+  flex-shrink: 0;
+  padding: 2px 0;
+  transition: color 0.12s ease;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &:hover {
+    color: #94a3b8;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 `;
 
 const ImageThumb = styled.img`
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 `;
 
 const ImageUrl = styled.span`
@@ -344,26 +417,32 @@ const ImageUrl = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 `;
 
 const RemoveButton = styled.button`
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: none;
   background: transparent;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  font-size: 14px;
+  color: #94a3b8;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 6px;
   flex-shrink: 0;
   padding: 0;
+  transition: all 0.15s ease;
 
   &:hover {
-    background: rgba(0,0,0,0.05);
+    background: rgba(239, 68, 68, 0.08);
     color: #ef4444;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
   }
 `;
 
@@ -394,7 +473,10 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   widget,
   onSettingsChange,
 }) => {
-  const [imageUrlInput, setImageUrlInput] = React.useState('');
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const dragCounter = useRef(0);
 
   const handleAddImage = () => {
     if (!widget || widget.type !== 'board' || !imageUrlInput.trim()) return;
@@ -411,15 +493,49 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     onSettingsChange({ imageUrls: newUrls });
   };
 
+  const handleDragStart = (index: number) => {
+    setDragIdx(index);
+  };
+
+  const handleDragEnter = (index: number) => {
+    dragCounter.current++;
+    setDragOverIdx(index);
+  };
+
+  const handleDragLeave = () => {
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setDragOverIdx(null);
+    }
+  };
+
+  const handleDrop = (dropIndex: number) => {
+    if (dragIdx === null || dragIdx === dropIndex || !widget || widget.type !== 'board') return;
+    const boardSettings = widget.settings as BoardSettings;
+    const newUrls = [...boardSettings.imageUrls];
+    const [moved] = newUrls.splice(dragIdx, 1);
+    newUrls.splice(dropIndex, 0, moved);
+    onSettingsChange({ imageUrls: newUrls });
+    setDragIdx(null);
+    setDragOverIdx(null);
+    dragCounter.current = 0;
+  };
+
+  const handleDragEnd = () => {
+    setDragIdx(null);
+    setDragOverIdx(null);
+    dragCounter.current = 0;
+  };
+
   if (!widget) {
     return (
       <PanelContainer>
         <PanelHeader>
-          <PanelTitle>Customize</PanelTitle>
+          <PanelTitle>Design</PanelTitle>
         </PanelHeader>
         <EmptyState>
-          <h3>No Widget Selected</h3>
-          <p>Choose a widget from the sidebar to customize</p>
+          <h3>Nothing selected</h3>
+          <p>Pick a widget to get started</p>
         </EmptyState>
       </PanelContainer>
     );
@@ -437,7 +553,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   return (
     <PanelContainer>
       <PanelHeader>
-        <PanelTitle>Customize</PanelTitle>
+        <PanelTitle>Design</PanelTitle>
       </PanelHeader>
 
       <PanelContent>
@@ -466,7 +582,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <SectionTitle>Colors</SectionTitle>
 
           <FormGroup>
-            <Label>Primary Color</Label>
+            <Label>Primary</Label>
             <ColorPicker
               selectedColor={settings.primaryColor}
               onColorChange={(color) => onSettingsChange({ primaryColor: color })}
@@ -487,7 +603,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
           {!isClassicStyle && (
           <FormGroup>
-            <Label>Accent Color</Label>
+            <Label>Accent</Label>
             <ColorPicker
               selectedColor={settings.accentColor}
               onColorChange={(color) => onSettingsChange({ accentColor: color })}
@@ -504,7 +620,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <SectionTitle>Layout</SectionTitle>
 
           <FormGroup>
-            <Label>Border Radius</Label>
+            <Label>Radius</Label>
             <SliderRow>
               <Slider
                 type="range"
@@ -521,7 +637,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <FormGroup>
             <ToggleGroup>
               <Toggle>
-                <ToggleText>Show Border</ToggleText>
+                <ToggleText>Border</ToggleText>
                 <ToggleSwitch $checked={settings.showBorder} />
                 <HiddenCheckbox
                   type="checkbox"
@@ -532,7 +648,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
               {widget.type === 'calendar' && (
                 <Toggle>
-                  <ToggleText>Show Day Borders</ToggleText>
+                  <ToggleText>Day borders</ToggleText>
                   <ToggleSwitch $checked={(settings as CalendarSettings).showDayBorders} />
                   <HiddenCheckbox
                     type="checkbox"
@@ -549,27 +665,49 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
         {isBoard && (
           <Section>
             <SectionTitle>Images</SectionTitle>
+            <ImageHint>
+              Paste direct image links from Pinterest, Imgur, Unsplash or any public URL
+            </ImageHint>
             <FormGroup>
-              <ImageUrlInput
-                type="text"
-                placeholder="Paste image URL (i.pinimg.com, imgur...)"
-                value={imageUrlInput}
-                onChange={(e) => setImageUrlInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleAddImage(); }}
-              />
-              <AddButton
-                onClick={handleAddImage}
-                disabled={(settings as BoardSettings).imageUrls.length >= 8 || !imageUrlInput.trim()}
-              >
-                + Add Image ({(settings as BoardSettings).imageUrls.length}/8)
-              </AddButton>
+              <ImageInputRow>
+                <ImageUrlInput
+                  type="text"
+                  placeholder="https://..."
+                  value={imageUrlInput}
+                  onChange={(e) => setImageUrlInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddImage(); }}
+                />
+                <AddButton
+                  onClick={handleAddImage}
+                  disabled={(settings as BoardSettings).imageUrls.length >= 8 || !imageUrlInput.trim()}
+                >
+                  Add
+                </AddButton>
+              </ImageInputRow>
+              <ImageCounter>{(settings as BoardSettings).imageUrls.length} / 8</ImageCounter>
               {(settings as BoardSettings).imageUrls.length > 0 && (
                 <ImageList>
                   {(settings as BoardSettings).imageUrls.map((url, i) => (
-                    <ImageItem key={i}>
+                    <ImageItem
+                      key={`${i}-${url}`}
+                      $dragging={dragIdx === i}
+                      $dragOver={dragOverIdx === i && dragIdx !== i}
+                      draggable
+                      onDragStart={() => handleDragStart(i)}
+                      onDragEnter={() => handleDragEnter(i)}
+                      onDragLeave={handleDragLeave}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => handleDrop(i)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <DragHandle>
+                        <GripVertical />
+                      </DragHandle>
                       <ImageThumb src={url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                       <ImageUrl>{url.split('/').pop() || url}</ImageUrl>
-                      <RemoveButton onClick={() => handleRemoveImage(i)}>&times;</RemoveButton>
+                      <RemoveButton onClick={() => handleRemoveImage(i)} title="Remove">
+                        <X />
+                      </RemoveButton>
                     </ImageItem>
                   ))}
                 </ImageList>
@@ -584,7 +722,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
             {isFlowerClockStyle && (
             <FormGroup>
-              <Label>Clock Frame</Label>
+              <Label>Frame</Label>
               <Select
                 value={(settings as ClockSettings).clockFrame}
                 onChange={(e) => onSettingsChange({ clockFrame: e.target.value as 'flower' | 'alarm' })}
@@ -597,7 +735,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
             {!isClassicStyle && (
             <FormGroup>
-              <Label>Font Size</Label>
+              <Label>Size</Label>
               <Select
                 value={(settings as ClockSettings).fontSize}
                 onChange={(e) => onSettingsChange({ fontSize: e.target.value as 'small' | 'medium' | 'large' })}
@@ -612,7 +750,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             <FormGroup>
               <ToggleGroup>
                 <Toggle>
-                  <ToggleText>Show Seconds</ToggleText>
+                  <ToggleText>Seconds</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showSeconds} />
                   <HiddenCheckbox
                     type="checkbox"
@@ -623,7 +761,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
                 {!isFlowerClockStyle && (
                 <Toggle>
-                  <ToggleText>24 Hour Format</ToggleText>
+                  <ToggleText>24h format</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).format24h} />
                   <HiddenCheckbox
                     type="checkbox"
@@ -635,7 +773,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
                 {!isFlowerClockStyle && (
                 <Toggle>
-                  <ToggleText>Show Date</ToggleText>
+                  <ToggleText>Date</ToggleText>
                   <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
                   <HiddenCheckbox
                     type="checkbox"

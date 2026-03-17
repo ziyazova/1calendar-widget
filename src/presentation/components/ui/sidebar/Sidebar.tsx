@@ -14,8 +14,9 @@ const SidebarContainer = styled.aside`
   top: 0;
   width: 270px;
   height: 100vh;
-  background: #fafafa;
-  border-right: 1px solid ${({ theme }) => theme.colors.border.primary};
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
@@ -27,34 +28,33 @@ const SidebarContainer = styled.aside`
 `;
 
 const SidebarHeader = styled.div`
-  padding: 0 24px;
-  height: 72px;
+  padding: 0 21px;
+  height: 56px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
-  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
 const LogoWrapper = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 6px;
 `;
 
 const PeachIcon = () => (
-  <img src="/studio-logo.png" alt="Logo" width="40" height="40" style={{ objectFit: 'contain' }} />
+  <img src="/studio-logo.png" alt="Logo" width="32" height="32" style={{ objectFit: 'contain', marginBottom: '-4px' }} />
 );
 
 const LogoText = styled.h1`
-  font-size: 21px;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 28px;
-  color: ${({ theme }) => theme.colors.text.primary};
+  line-height: 22px;
+  color: #1a1a2e;
   margin: 0;
   letter-spacing: -0.02em;
 
   span {
-    color: ${({ theme }) => theme.colors.text.secondary};
+    color: #94a3b8;
     font-weight: 400;
   }
 `;
@@ -70,18 +70,18 @@ const NavSection = styled.nav`
 `;
 
 const SectionLabel = styled.h2`
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: #94a3b8;
   margin: 0 0 12px 0;
   padding: 0 24px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 
   &:nth-of-type(n+2) {
     margin-top: 28px;
     padding-top: 20px;
-    border-top: 1px solid ${({ theme }) => theme.colors.border.primary};
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 `;
 
@@ -89,51 +89,55 @@ const WidgetCategory = styled.div`
   margin-bottom: 4px;
 `;
 
-const CategoryHeader = styled.button<{ $expanded: boolean }>`
-  width: 100%;
+const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
+  width: calc(100% - 24px);
+  margin: 0 12px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 24px;
+  padding: 8px 12px;
   background: transparent;
   border: none;
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: 15px;
+  border-radius: 8px;
+  color: ${({ $muted }) => $muted ? '#64748b' : '#334155'};
+  font-size: 14px;
   font-weight: 500;
   line-height: 22px;
   cursor: pointer;
-  transition: background 0.12s ease;
+  transition: all 0.15s ease;
   font-family: inherit;
   letter-spacing: -0.01em;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.025);
+    background: rgba(99, 102, 241, 0.04);
+    color: ${({ $muted }) => $muted ? '#475569' : '#1a1a2e'};
   }
 
   .chevron {
     margin-left: auto;
     transition: transform 0.2s ease;
     transform: rotate(${({ $expanded }) => $expanded ? '90deg' : '0deg'});
-    opacity: 0.18;
+    opacity: 0.25;
     width: 12px;
     height: 12px;
   }
 `;
 
-const CategoryIcon = styled.div`
-  width: 30px;
-  height: 30px;
+const CategoryIcon = styled.div<{ $muted?: boolean }>`
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+  border-radius: 10px;
+  background: ${({ $muted }) => $muted
+    ? 'rgba(0, 0, 0, 0.04)'
+    : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08))'};
 
   svg {
-    color: ${({ theme }) => theme.colors.text.secondary};
-    width: 15px;
-    height: 15px;
+    color: ${({ $muted }) => $muted ? '#94a3b8' : '#6366f1'};
+    width: 16px;
+    height: 16px;
   }
 `;
 
@@ -141,7 +145,7 @@ const StylesList = styled.div<{ $expanded: boolean }>`
   max-height: ${({ $expanded }) => $expanded ? '500px' : '0'};
   overflow: hidden;
   transition: max-height 0.2s ease;
-  padding: 4px 16px 0 66px;
+  padding: 4px 12px 0 12px;
 `;
 
 const StyleItem = styled.button<{ $active: boolean }>`
@@ -149,37 +153,39 @@ const StyleItem = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
-  background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.04)' : 'transparent'};
-  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.secondary};
+  padding: 7px 10px 7px 44px;
+  background: ${({ $active }) => $active ? 'rgba(99, 102, 241, 0.04)' : 'transparent'};
+  color: ${({ $active }) => $active ? '#4f46e5' : '#64748b'};
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: ${({ $active }) => $active ? 500 : 400};
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
   text-align: left;
-  margin-bottom: 2px;
+  margin-bottom: 5px;
   font-family: inherit;
-  letter-spacing: -0.006em;
+  letter-spacing: -0.01em;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.04);
-    color: ${({ theme }) => theme.colors.text.primary};
+    background: rgba(99, 102, 241, 0.04);
+    color: #4f46e5;
   }
+
 `;
 
 const StyleDot = styled.div<{ $color: string }>`
   width: 6px;
   height: 6px;
   background: ${({ $color }) => $color};
+  opacity: 0.45;
   border-radius: 50%;
   flex-shrink: 0;
 `;
 
 const CALENDAR_STYLES = [
-  { label: 'CSS Zoom Fixed', value: 'modern-grid-zoom-fixed', color: '#d35400' },
-  { label: 'Classic Calendar', value: 'classic', color: '#6E7FF2' },
+  { label: 'Default', value: 'modern-grid-zoom-fixed', color: '#d35400' },
+  { label: 'Classic', value: 'classic', color: '#6E7FF2' },
   { label: 'Collage', value: 'collage', color: '#a89e8e' },
   { label: 'Typewriter', value: 'typewriter', color: '#7a9bb5' },
 ];
@@ -198,7 +204,7 @@ const CLOCK_STYLES = [
 ];
 
 const BOARD_STYLES = [
-  { label: 'Inspiration Board', value: 'grid', color: '#E91E63' },
+  { label: 'Moodboard', value: 'grid', color: '#E91E63' },
 ];
 
 const CLOCK_ARCHIVE_STYLES = [
@@ -311,9 +317,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <WidgetCategory>
           <CategoryHeader
             $expanded={expandedSections.includes('archive')}
+            $muted
             onClick={() => toggle('archive')}
           >
-            <CategoryIcon><Archive /></CategoryIcon>
+            <CategoryIcon $muted><Archive /></CategoryIcon>
             Layout Experiments
             <ChevronRight className="chevron" />
           </CategoryHeader>
@@ -334,9 +341,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <WidgetCategory>
           <CategoryHeader
             $expanded={expandedSections.includes('clock-archive')}
+            $muted
             onClick={() => toggle('clock-archive')}
           >
-            <CategoryIcon><Archive /></CategoryIcon>
+            <CategoryIcon $muted><Archive /></CategoryIcon>
             Clock Archive
             <ChevronRight className="chevron" />
           </CategoryHeader>
