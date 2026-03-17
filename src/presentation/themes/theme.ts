@@ -3,21 +3,22 @@ import { widgetColors } from './colors';
 export const theme = {
   colors: {
     // Primary brand colors
-    primary: '#6C63FF',
-    primaryDark: '#5A52E0',
-    secondary: '#5856D6',
-    accent: '#F4845F',
+    primary: '#14181F',
+    primaryDark: '#0F1218',
+    secondary: '#EEEFF1',
+    accent: '#3384F4',
     success: '#15803d',
     warning: '#de6d02',
+    destructive: '#DC2828',
 
     // Widget colors
     widgets: widgetColors,
 
-    // Background system — cool neutrals
+    // Background system
     background: {
-      primary: '#f8f8f8',
-      secondary: '#f2f2f2',
-      tertiary: '#ebebeb',
+      primary: '#F3F4F6',
+      secondary: '#EEEFF1',
+      tertiary: '#EBEDEF',
       elevated: '#ffffff',
       glass: 'rgba(255, 255, 255, 0.72)',
       dark: '#1c1c1e',
@@ -27,37 +28,37 @@ export const theme = {
 
     // Text system
     text: {
-      primary: '#1d1d1f',
-      secondary: '#6e6e73',
-      tertiary: '#aeaeb2',
+      primary: '#1F1F1F',
+      secondary: '#6B6B6B',
+      tertiary: '#9A9A9A',
       inverse: '#ffffff',
-      accent: '#6C63FF',
-      link: '#6C63FF',
+      accent: '#3384F4',
+      link: '#3384F4',
     },
 
-    // Border system — neutral grays
+    // Border system
     border: {
-      primary: '#e5e5e7',
-      secondary: '#f0f0f0',
-      tertiary: '#f5f5f5',
-      focus: '#6C63FF',
+      primary: '#E3E5E8',
+      secondary: '#EEEFF1',
+      tertiary: '#F3F4F6',
+      focus: '#3384F4',
     },
 
     // Interactive states
     interactive: {
       hover: 'rgba(0, 0, 0, 0.03)',
       active: 'rgba(0, 0, 0, 0.05)',
-      focus: 'rgba(108, 99, 255, 0.12)',
+      focus: 'rgba(51, 132, 244, 0.12)',
       disabled: 'rgba(60, 60, 67, 0.18)',
     },
 
     // Gradients
     gradients: {
-      primary: 'linear-gradient(135deg, #6C63FF 0%, #9F7AEA 100%)',
-      hero: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      primary: 'linear-gradient(135deg, #3384F4 0%, #5BA0F7 100%)',
+      hero: 'linear-gradient(135deg, #3384F4 0%, #1a6dd4 100%)',
       card: 'linear-gradient(145deg, #ffffff 0%, #faf9f7 100%)',
       glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)',
-      subtle: 'radial-gradient(at 27% 37%, rgba(108, 99, 255, 0.04) 0px, transparent 50%), radial-gradient(at 97% 21%, rgba(159, 122, 234, 0.03) 0px, transparent 50%)',
+      subtle: 'radial-gradient(at 27% 37%, rgba(51, 132, 244, 0.04) 0px, transparent 50%), radial-gradient(at 97% 21%, rgba(51, 132, 244, 0.03) 0px, transparent 50%)',
     },
   },
 
@@ -65,7 +66,7 @@ export const theme = {
   typography: {
     fonts: {
       primary: "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
-      mono: "'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
+      mono: "'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace",
       display: "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif",
     },
 

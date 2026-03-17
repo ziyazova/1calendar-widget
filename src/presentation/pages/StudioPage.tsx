@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Copy, Check, Pencil, LayoutGrid } from 'lucide-react';
+import { Copy, Check, Pencil, LayoutGrid, Grip } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -23,7 +23,7 @@ type ViewMode = 'editor' | 'layout-check';
 const StudioContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #f8fafc;
+  background: #F3F4F6;
   font-family: ${({ theme }) => theme.typography.fonts.primary};
 `;
 
@@ -58,31 +58,9 @@ const WidgetArea = styled.div`
   height: 100vh;
   position: relative;
   overflow: hidden;
+
 `;
 
-const LiquidBlob = styled.div<{ $size: number; $color: string; $delay?: string }>`
-  position: absolute;
-  width: ${({ $size }) => $size}px;
-  height: ${({ $size }) => $size}px;
-  background: ${({ $color }) => $color};
-  border-radius: 50%;
-  filter: blur(0px);
-  animation: blob 12s ease-in-out infinite;
-  animation-delay: ${({ $delay }) => $delay || '0s'};
-  pointer-events: none;
-
-  @keyframes blob {
-    0%, 100% {
-      transform: translate(0, 0) scale(1);
-    }
-    33% {
-      transform: translate(30px, -40px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-  }
-`;
 
 const DotGrid = styled.div`
   position: absolute;
@@ -93,7 +71,8 @@ const DotGrid = styled.div`
 `;
 
 const ZoomableWidget = styled.div<{ $zoom: number }>`
-  transform: scale(${({ $zoom }) => $zoom});
+  --zoom: ${({ $zoom }) => $zoom};
+  transform: scale(var(--zoom)) translateY(-48px);
   transform-origin: center center;
   transition: transform 0.15s ease;
   width: 100%;
@@ -101,13 +80,20 @@ const ZoomableWidget = styled.div<{ $zoom: number }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.08)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
+  animation: appear 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+
+  @keyframes appear {
+    from { opacity: 0; transform: scale(var(--zoom)) translateY(-44px); }
+    to { opacity: 1; transform: scale(var(--zoom)) translateY(-48px); }
+  }
 `;
 
 /* ── Floating Toolbar (Figma-style) ── */
 
 const FloatingToolbar = styled.div`
   position: absolute;
-  bottom: 24px;
+  bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -117,7 +103,7 @@ const FloatingToolbar = styled.div`
   backdrop-filter: blur(24px);
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 10;
 `;
@@ -126,7 +112,7 @@ const ToolbarDivider = styled.div`
   width: 1px;
   height: 28px;
   background: rgba(0, 0, 0, 0.08);
-  margin: 0 6px;
+  margin: 0 8px;
 `;
 
 const Tooltip = styled.span`
@@ -134,11 +120,11 @@ const Tooltip = styled.span`
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #1a1a2e;
+  background: #1F1F1F;
   color: #fff;
   font-size: 11px;
   font-weight: 500;
-  padding: 5px 10px;
+  padding: 4px 12px;
   border-radius: 8px;
   white-space: nowrap;
   pointer-events: none;
@@ -154,7 +140,7 @@ const Tooltip = styled.span`
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: #1a1a2e;
+    border-top-color: #1F1F1F;
   }
 `;
 
@@ -169,12 +155,12 @@ const ToolbarButton = styled.button<{ $active?: boolean }>`
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
-  background: ${({ $active }) => $active ? 'rgba(99, 102, 241, 0.12)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#6366f1' : '#64748b'};
+  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.12)' : 'transparent'};
+  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
 
   &:hover {
-    background: ${({ $active }) => $active ? 'rgba(99, 102, 241, 0.15)' : 'rgba(0, 0, 0, 0.05)'};
-    color: ${({ $active }) => $active ? '#6366f1' : '#334155'};
+    background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.15)' : 'rgba(0, 0, 0, 0.05)'};
+    color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
   }
 
   &:hover ${Tooltip} {
@@ -193,97 +179,136 @@ const ToolbarButton = styled.button<{ $active?: boolean }>`
 `;
 
 
-const ZoomControl = styled.div`
+const TopRightControls = styled.div`
   position: absolute;
   top: 16px;
   right: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  padding: 3px;
   z-index: 10;
 `;
 
+const ZoomControl = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  height: 36px;
+  padding: 0 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+`;
+
 const ZoomSlider = styled.input`
-  width: 80px;
+  width: 100px;
   height: 3px;
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.12);
   outline: none;
   -webkit-appearance: none;
   margin: 0 4px;
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid #6366f1;
+    background: #3384F4;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 4px rgba(51, 132, 244, 0.3);
+    transition: transform 0.1s ease;
+  }
+
+  &::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
   }
 `;
 
+const ZoomValueDivider = styled.div`
+  width: 1px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 0 4px 0 8px;
+`;
+
 const ZoomValue = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
   font-size: 12px;
   font-weight: 500;
-  color: #1a1a2e;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  color: #6B6B6B;
   font-variant-numeric: tabular-nums;
-  min-width: 44px;
+  min-width: 42px;
+  text-align: center;
   user-select: none;
+  padding: 0 4px;
 `;
 
 const ZoomLabel = styled.span`
-  font-size: 14px;
-  font-weight: 600;
-  color: #64748b;
+  font-size: 16px;
+  font-weight: 400;
+  color: #6B6B6B;
   user-select: none;
   cursor: pointer;
-  padding: 5px 8px;
-  border-radius: 8px;
+  padding: 0 10px;
   transition: color 0.15s ease;
+  line-height: 36px;
 
   &:hover {
-    color: #334155;
+    color: #1F1F1F;
+  }
+`;
+
+const GridToggle = styled.button<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
   }
 `;
 
 const EmbedUrlGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 `;
 
 const EmbedUrlInput = styled.input`
   width: 180px;
   height: 32px;
-  padding: 0 10px;
+  padding: 0 12px;
   border: none;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.04);
   font-size: 11px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
-  color: #64748b;
+  color: #6B6B6B;
   letter-spacing: -0.01em;
   outline: none;
 
   &:focus {
     background: rgba(0, 0, 0, 0.06);
-    color: #334155;
+    color: #1F1F1F;
   }
 
   &::selection {
-    background: rgba(99, 102, 241, 0.2);
+    background: rgba(51, 132, 244, 0.2);
   }
 `;
 
@@ -291,11 +316,11 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   height: 32px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -305,7 +330,7 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   flex-shrink: 0;
   background: ${({ $copied }) => $copied
     ? 'rgba(34, 197, 94, 0.12)'
-    : 'linear-gradient(135deg, #6366f1, #8b5cf6)'};
+    : 'linear-gradient(135deg, #3384F4, #5BA0F7)'};
   color: ${({ $copied }) => $copied ? '#16a34a' : '#fff'};
 
   &:hover {
@@ -313,7 +338,7 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
     transform: translateY(-1px);
     box-shadow: ${({ $copied }) => $copied
       ? 'none'
-      : '0 2px 8px rgba(99, 102, 241, 0.3)'};
+      : '0 2px 8px rgba(51, 132, 244, 0.3)'};
   }
 
   &:active {
@@ -330,7 +355,7 @@ const LayoutCheckArea = styled.div`
   flex: 1;
   height: 100vh;
   overflow: hidden;
-  background: #f8fafc;
+  background: #F3F4F6;
   position: relative;
 `;
 
@@ -340,6 +365,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
   const [studioZoom, setStudioZoom] = useState(1.0);
+  const [showGrid, setShowGrid] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -431,9 +457,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           {viewMode === 'editor' ? (
             <>
               <WidgetArea>
-                <DotGrid />
+                {showGrid && <DotGrid />}
 
-                <ZoomableWidget $zoom={studioZoom}>
+                <ZoomableWidget key={currentWidgetKey} $zoom={studioZoom}>
                   <WidgetDisplay widget={currentWidget} />
                 </ZoomableWidget>
 
@@ -470,19 +496,25 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   </FloatingToolbar>
                 )}
 
-                <ZoomControl>
-                  <ZoomLabel onClick={() => setStudioZoom(Math.max(0.5, studioZoom - 0.1))}>−</ZoomLabel>
-                  <ZoomSlider
-                    type="range"
-                    min="0.5"
-                    max="2.0"
-                    step="0.1"
-                    value={studioZoom}
-                    onChange={(e) => setStudioZoom(parseFloat(e.target.value))}
-                  />
-                  <ZoomLabel onClick={() => setStudioZoom(Math.min(2.0, studioZoom + 0.1))}>+</ZoomLabel>
-                  <ZoomValue>{Math.round(studioZoom * 100)}%</ZoomValue>
-                </ZoomControl>
+                <TopRightControls>
+                  <ZoomControl>
+                    <ZoomLabel onClick={() => setStudioZoom(Math.max(0.5, +(studioZoom - 0.1).toFixed(1)))}>−</ZoomLabel>
+                    <ZoomSlider
+                      type="range"
+                      min="0.5"
+                      max="2.0"
+                      step="0.1"
+                      value={studioZoom}
+                      onChange={(e) => setStudioZoom(parseFloat(e.target.value))}
+                    />
+                    <ZoomLabel onClick={() => setStudioZoom(Math.min(2.0, +(studioZoom + 0.1).toFixed(1)))}>+</ZoomLabel>
+                    <ZoomValueDivider />
+                    <ZoomValue>{Math.round(studioZoom * 100)}%</ZoomValue>
+                  </ZoomControl>
+                  <GridToggle $active={showGrid} onClick={() => setShowGrid(!showGrid)}>
+                    <Grip />
+                  </GridToggle>
+                </TopRightControls>
               </WidgetArea>
 
               <CustomizationPanel

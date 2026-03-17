@@ -51,7 +51,7 @@ function hsvToHex(h: number, s: number, v: number): string {
 const ColorPickerContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   position: relative;
 `;
 
@@ -59,9 +59,10 @@ const FigmaColorRow = styled.div`
   display: flex;
   align-items: center;
   height: 26px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
-  background: #f1f1f1;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0 6px 0 0;
   overflow: hidden;
 `;
 
@@ -72,7 +73,7 @@ const ColorSwatch = styled.div<{ $color: string }>`
   background-color: ${({ $color }) => $color};
   cursor: pointer;
   flex-shrink: 0;
-  margin: 5px 6px 5px 5px;
+  margin: 4px 6px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   transition: border-color 0.12s ease;
 
@@ -86,11 +87,11 @@ const HexInput = styled.input`
   height: 28px;
   border: none;
   border-radius: 0;
-  padding: 0 10px;
+  padding: 0 8px 0 0;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
-  color: #333;
+  color: #6B6B6B;
   background: transparent;
   outline: none;
   flex-shrink: 0;
@@ -99,7 +100,7 @@ const HexInput = styled.input`
   text-align: left;
 
   &:focus {
-    color: #1a1a2e;
+    color: #1F1F1F;
   }
 `;
 
@@ -158,7 +159,7 @@ const PickerPopup = styled.div`
   padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   overflow: hidden;
 `;
 
@@ -171,7 +172,7 @@ const PickerHeader = styled.div`
 const PickerTitle = styled.span`
   font-size: 12px;
   font-weight: 600;
-  color: #334155;
+  color: #1F1F1F;
   letter-spacing: -0.01em;
 `;
 
@@ -180,17 +181,17 @@ const CloseButton = styled.button`
   height: 24px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: #9A9A9A;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0;
 
   &:hover {
     background: rgba(0, 0, 0, 0.05);
-    color: #64748b;
+    color: #6B6B6B;
   }
 
   svg {
@@ -210,7 +211,7 @@ const SaturationCanvas = styled.canvas`
 const HueSliderTrack = styled.div`
   width: 216px;
   height: 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: linear-gradient(to right,
     #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
   );
@@ -259,9 +260,9 @@ const EyedropperButton = styled.button`
   width: 28px;
   height: 28px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
+  border-radius: 8px;
   background: #f8f8f8;
-  color: #64748b;
+  color: #6B6B6B;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -272,7 +273,7 @@ const EyedropperButton = styled.button`
 
   &:hover {
     background: #f0f0f0;
-    color: #334155;
+    color: #1F1F1F;
   }
 
   svg {
@@ -284,7 +285,7 @@ const EyedropperButton = styled.button`
 const PickerColorPreview = styled.div<{ $color: string }>`
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: ${({ $color }) => $color};
   border: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
@@ -295,21 +296,21 @@ const PickerHexInput = styled.input`
   min-width: 0;
   height: 28px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0 8px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
-  color: #333;
+  color: #1F1F1F;
   background: #f8f8f8;
   outline: none;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 
   &:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-    color: #1a1a2e;
+    border-color: #3384F4;
+    box-shadow: 0 0 0 2px rgba(51, 132, 244, 0.1);
+    color: #1F1F1F;
   }
 `;
 

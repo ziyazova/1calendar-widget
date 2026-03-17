@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronRight, Calendar, Clock, Archive, Image } from 'lucide-react';
+import { ChevronRight, Calendar, CalendarDays, Clock, Archive, Image, LayoutGrid, Type, Flower2, Sparkles, Grid, AlarmClock, Brush, Layers } from 'lucide-react';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -14,9 +14,9 @@ const SidebarContainer = styled.aside`
   top: 0;
   width: 270px;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.6);
+  background: #ffffff;
   backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
@@ -28,40 +28,40 @@ const SidebarContainer = styled.aside`
 `;
 
 const SidebarHeader = styled.div`
-  padding: 0 21px;
-  height: 56px;
+  padding: 0 22px;
+  height: 64px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: none;
 `;
 
 const LogoWrapper = styled.div`
   display: flex;
-  align-items: flex-end;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
 `;
 
 const PeachIcon = () => (
-  <img src="/studio-logo.png" alt="Logo" width="32" height="32" style={{ objectFit: 'contain', marginBottom: '-4px' }} />
+  <img src="/PeachyLogo.png" alt="Logo" width="22" height="22" style={{ objectFit: 'contain', marginTop: '-1px' }} />
 );
 
 const LogoText = styled.h1`
   font-size: 16px;
   font-weight: 600;
   line-height: 22px;
-  color: #1a1a2e;
+  color: #1F1F1F;
   margin: 0;
   letter-spacing: -0.02em;
 
   span {
-    color: #94a3b8;
+    color: #9A9A9A;
     font-weight: 400;
   }
 `;
 
 const NavSection = styled.nav`
   flex: 1;
-  padding: 20px 0;
+  padding: 16px 0;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
@@ -70,28 +70,29 @@ const NavSection = styled.nav`
 `;
 
 const SectionLabel = styled.h2`
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  color: #94a3b8;
-  margin: 0 0 12px 0;
-  padding: 0 24px;
+  color: #9A9A9A;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
+  margin: 0 0 18px 0;
+  padding: 0 24px;
+  letter-spacing: -0.01em;
 
   &:nth-of-type(n+2) {
-    margin-top: 28px;
-    padding-top: 20px;
+    margin-top: 24px;
+    padding-top: 24px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 `;
 
 const WidgetCategory = styled.div`
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 `;
 
 const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
-  width: calc(100% - 24px);
-  margin: 0 12px;
+  width: calc(100% - 32px);
+  margin: 0 16px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -99,7 +100,7 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
   background: transparent;
   border: none;
   border-radius: 8px;
-  color: ${({ $muted }) => $muted ? '#64748b' : '#334155'};
+  color: ${({ $muted }) => $muted ? '#6B6B6B' : '#1F1F1F'};
   font-size: 14px;
   font-weight: 500;
   line-height: 22px;
@@ -109,8 +110,8 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
   letter-spacing: -0.01em;
 
   &:hover {
-    background: rgba(99, 102, 241, 0.04);
-    color: ${({ $muted }) => $muted ? '#475569' : '#1a1a2e'};
+    background: rgba(51, 132, 244, 0.04);
+    color: ${({ $muted }) => $muted ? '#1F1F1F' : '#1F1F1F'};
   }
 
   .chevron {
@@ -129,23 +130,43 @@ const CategoryIcon = styled.div<{ $muted?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 12px;
   background: ${({ $muted }) => $muted
     ? 'rgba(0, 0, 0, 0.04)'
-    : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08))'};
+    : 'linear-gradient(135deg, rgba(51, 132, 244, 0.08), rgba(91, 160, 247, 0.08))'};
 
   svg {
-    color: ${({ $muted }) => $muted ? '#94a3b8' : '#6366f1'};
+    color: ${({ $muted }) => $muted ? '#9A9A9A' : '#3384F4'};
     width: 16px;
     height: 16px;
   }
 `;
 
 const StylesList = styled.div<{ $expanded: boolean }>`
-  max-height: ${({ $expanded }) => $expanded ? '500px' : '0'};
+  display: grid;
+  grid-template-rows: ${({ $expanded }) => $expanded ? '1fr' : '0fr'};
   overflow: hidden;
-  transition: max-height 0.2s ease;
-  padding: 4px 12px 0 12px;
+  transition: grid-template-rows 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  padding: 0 16px;
+  margin-left: 36px;
+  position: relative;
+
+  > div {
+    min-height: 0;
+    padding-top: 4px;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 12px;
+    width: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    opacity: ${({ $expanded }) => $expanded ? 1 : 0};
+    transition: opacity 0.2s ease;
+  }
 `;
 
 const StyleItem = styled.button<{ $active: boolean }>`
@@ -153,9 +174,9 @@ const StyleItem = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px 7px 44px;
-  background: ${({ $active }) => $active ? 'rgba(99, 102, 241, 0.04)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#4f46e5' : '#64748b'};
+  padding: 8px 12px;
+  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
+  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
   border: none;
   border-radius: 8px;
   font-size: 13px;
@@ -163,53 +184,50 @@ const StyleItem = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
   font-family: inherit;
   letter-spacing: -0.01em;
 
   &:hover {
-    background: rgba(99, 102, 241, 0.04);
-    color: #4f46e5;
+    background: rgba(51, 132, 244, 0.04);
+    color: #3384F4;
   }
 
-`;
-
-const StyleDot = styled.div<{ $color: string }>`
-  width: 6px;
-  height: 6px;
-  background: ${({ $color }) => $color};
-  opacity: 0.45;
-  border-radius: 50%;
-  flex-shrink: 0;
+  svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
 `;
 
 const CALENDAR_STYLES = [
-  { label: 'Default', value: 'modern-grid-zoom-fixed', color: '#d35400' },
-  { label: 'Classic', value: 'classic', color: '#6E7FF2' },
-  { label: 'Collage', value: 'collage', color: '#a89e8e' },
-  { label: 'Typewriter', value: 'typewriter', color: '#7a9bb5' },
+  { label: 'Default', value: 'modern-grid-zoom-fixed', icon: Calendar },
+  { label: 'Classic', value: 'classic', icon: CalendarDays },
+  { label: 'Collage', value: 'collage', icon: LayoutGrid },
+  { label: 'Typewriter', value: 'typewriter', icon: Type },
 ];
 
 const ARCHIVE_STYLES = [
-  { label: 'Modern Grid', value: 'modern-grid', color: '#667EEA' },
-  { label: 'CSS Zoom (layout)', value: 'calendar-2', color: '#e67e22' },
-  { label: 'Container Query (layout)', value: 'calendar-4', color: '#3498db' },
-  { label: 'SVG ViewBox (layout)', value: 'calendar-6', color: '#1abc9c' },
+  { label: 'Modern Grid', value: 'modern-grid', icon: Grid },
+  { label: 'CSS Zoom', value: 'calendar-2', icon: Calendar },
+  { label: 'Container Query', value: 'calendar-4', icon: Calendar },
+  { label: 'SVG ViewBox', value: 'calendar-6', icon: Calendar },
 ];
 
 const CLOCK_STYLES = [
-  { label: 'Clock', value: 'classic', color: '#6E7FF2' },
-  { label: 'Flower', value: 'flower', color: '#2d6a4f' },
-  { label: 'Dreamy', value: 'dreamy', color: '#A78BFA' },
+  { label: 'Classic', value: 'classic', icon: Clock },
+  { label: 'Flower', value: 'flower', icon: Flower2 },
+  { label: 'Dreamy', value: 'dreamy', icon: Sparkles },
 ];
 
 const BOARD_STYLES = [
-  { label: 'Moodboard', value: 'grid', color: '#E91E63' },
+  { label: 'Moodboard', value: 'grid', icon: Image },
 ];
 
 const CLOCK_ARCHIVE_STYLES = [
-  { label: 'Modern Digital', value: 'modern', color: '#43E97B' },
-  { label: 'Analog Classic', value: 'analog-classic', color: '#FA709A' },
+  { label: 'Modern Digital', value: 'modern', icon: Brush },
+  { label: 'Analog Classic', value: 'analog-classic', icon: AlarmClock },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -248,16 +266,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <ChevronRight className="chevron" />
             </CategoryHeader>
             <StylesList $expanded={expandedSections.includes('calendar')}>
-              {CALENDAR_STYLES.map((s) => (
-                <StyleItem
-                  key={s.value}
-                  $active={currentWidget === `calendar-${s.value}`}
-                  onClick={() => onWidgetChange('calendar', s.value)}
-                >
-                  <StyleDot $color={s.color} />
-                  {s.label}
-                </StyleItem>
-              ))}
+              <div>
+                {CALENDAR_STYLES.map((s) => (
+                  <StyleItem
+                    key={s.value}
+                    $active={currentWidget === `calendar-${s.value}`}
+                    onClick={() => onWidgetChange('calendar', s.value)}
+                  >
+                    <s.icon />
+                    {s.label}
+                  </StyleItem>
+                ))}
+              </div>
             </StylesList>
           </WidgetCategory>
         )}
@@ -273,16 +293,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <ChevronRight className="chevron" />
             </CategoryHeader>
             <StylesList $expanded={expandedSections.includes('clock')}>
-              {CLOCK_STYLES.map((s) => (
-                <StyleItem
-                  key={s.value}
-                  $active={currentWidget === `clock-${s.value}`}
-                  onClick={() => onWidgetChange('clock', s.value)}
-                >
-                  <StyleDot $color={s.color} />
-                  {s.label}
-                </StyleItem>
-              ))}
+              <div>
+                {CLOCK_STYLES.map((s) => (
+                  <StyleItem
+                    key={s.value}
+                    $active={currentWidget === `clock-${s.value}`}
+                    onClick={() => onWidgetChange('clock', s.value)}
+                  >
+                    <s.icon />
+                    {s.label}
+                  </StyleItem>
+                ))}
+              </div>
             </StylesList>
           </WidgetCategory>
         )}
@@ -298,16 +320,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <ChevronRight className="chevron" />
             </CategoryHeader>
             <StylesList $expanded={expandedSections.includes('board')}>
-              {BOARD_STYLES.map((s) => (
-                <StyleItem
-                  key={s.value}
-                  $active={currentWidget === `board-${s.value}`}
-                  onClick={() => onWidgetChange('board', s.value)}
-                >
-                  <StyleDot $color={s.color} />
-                  {s.label}
-                </StyleItem>
-              ))}
+              <div>
+                {BOARD_STYLES.map((s) => (
+                  <StyleItem
+                    key={s.value}
+                    $active={currentWidget === `board-${s.value}`}
+                    onClick={() => onWidgetChange('board', s.value)}
+                  >
+                    <s.icon />
+                    {s.label}
+                  </StyleItem>
+                ))}
+              </div>
             </StylesList>
           </WidgetCategory>
         )}
@@ -325,16 +349,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <ChevronRight className="chevron" />
           </CategoryHeader>
           <StylesList $expanded={expandedSections.includes('archive')}>
-            {ARCHIVE_STYLES.map((s) => (
-              <StyleItem
-                key={s.value}
-                $active={currentWidget === `calendar-${s.value}`}
-                onClick={() => onWidgetChange('calendar', s.value)}
-              >
-                <StyleDot $color={s.color} />
-                {s.label}
-              </StyleItem>
-            ))}
+            <div>
+              {ARCHIVE_STYLES.map((s) => (
+                <StyleItem
+                  key={s.value}
+                  $active={currentWidget === `calendar-${s.value}`}
+                  onClick={() => onWidgetChange('calendar', s.value)}
+                >
+                  <s.icon />
+                  {s.label}
+                </StyleItem>
+              ))}
+            </div>
           </StylesList>
         </WidgetCategory>
 
@@ -349,16 +375,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <ChevronRight className="chevron" />
           </CategoryHeader>
           <StylesList $expanded={expandedSections.includes('clock-archive')}>
-            {CLOCK_ARCHIVE_STYLES.map((s) => (
-              <StyleItem
-                key={s.value}
-                $active={currentWidget === `clock-${s.value}`}
-                onClick={() => onWidgetChange('clock', s.value)}
-              >
-                <StyleDot $color={s.color} />
-                {s.label}
-              </StyleItem>
-            ))}
+            <div>
+              {CLOCK_ARCHIVE_STYLES.map((s) => (
+                <StyleItem
+                  key={s.value}
+                  $active={currentWidget === `clock-${s.value}`}
+                  onClick={() => onWidgetChange('clock', s.value)}
+                >
+                  <s.icon />
+                  {s.label}
+                </StyleItem>
+              ))}
+            </div>
           </StylesList>
         </WidgetCategory>
       </NavSection>

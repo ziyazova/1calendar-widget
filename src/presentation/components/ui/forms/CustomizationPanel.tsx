@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { X, GripVertical } from 'lucide-react';
+import { X, GripVertical, Calendar, CalendarDays, LayoutGrid, Type, Clock, Flower2, Sparkles, Image, Palette, SlidersHorizontal } from 'lucide-react';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
@@ -18,31 +18,55 @@ const PanelContainer = styled.div`
   position: fixed;
   right: 0;
   top: 0;
-  background: rgba(255, 255, 255, 0.6);
+  background: #ffffff;
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
   z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 
 const PanelHeader = styled.div`
-  height: 56px;
+  min-height: 64px;
   display: flex;
-  align-items: center;
-  padding: 0 24px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-bottom: none;
 `;
 
 const PanelTitle = styled.h2`
   font-size: 16px;
   font-weight: 600;
   line-height: 22px;
-  color: #1a1a2e;
+  color: #1F1F1F;
   margin: 0;
   letter-spacing: -0.02em;
+`;
+
+const WidgetBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  width: fit-content;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: rgba(51, 132, 244, 0.6);
+    flex-shrink: 0;
+  }
+`;
+
+const WidgetBadgeText = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  color: #3384F4;
+  letter-spacing: -0.01em;
 `;
 
 const PanelContent = styled.div`
@@ -56,24 +80,27 @@ const PanelContent = styled.div`
 `;
 
 const Section = styled.div`
-  padding: 22px 0;
+  padding: 16px 0 0;
 
   &:first-child {
-    padding-top: 18px;
+    padding-top: 16px;
   }
 
   & + & {
+    margin-top: 24px;
+    padding-top: 24px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 `;
 
 const SectionTitle = styled.h3`
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  color: #94a3b8;
-  margin: 0 0 18px 0;
+  color: #9A9A9A;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
+  margin: 0 0 18px 0;
+  letter-spacing: -0.01em;
 `;
 
 const FormGroup = styled.div`
@@ -85,9 +112,9 @@ const FormGroup = styled.div`
 const Label = styled.label`
   display: block;
   font-size: 12px;
-  font-weight: 500;
-  color: #64748b;
-  margin-bottom: 10px;
+  font-weight: 400;
+  color: #1F1F1F;
+  margin-bottom: 8px;
   letter-spacing: -0.01em;
 `;
 
@@ -96,9 +123,9 @@ const Select = styled.select`
   height: 36px;
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.8);
-  color: #334155;
+  color: #1F1F1F;
   font-size: 13px;
   font-weight: 400;
   font-family: inherit;
@@ -111,13 +138,13 @@ const Select = styled.select`
   padding-right: 32px;
 
   &:hover {
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: rgba(51, 132, 244, 0.3);
   }
 
   &:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #3384F4;
+    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
 `;
 
@@ -141,15 +168,15 @@ const Slider = styled.input`
     height: 16px;
     border-radius: 50%;
     background: #ffffff;
-    border: 2px solid #6366f1;
+    border: 2px solid #3384F4;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+    box-shadow: 0 2px 6px rgba(51, 132, 244, 0.25);
     transition: all 0.15s ease;
   }
 
   &::-webkit-slider-thumb:hover {
     transform: scale(1.15);
-    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 3px 10px rgba(51, 132, 244, 0.35);
   }
 
   &::-webkit-slider-thumb:active {
@@ -159,7 +186,7 @@ const Slider = styled.input`
 
 const SliderValue = styled.span`
   font-size: 12px;
-  color: #64748b;
+  color: #6B6B6B;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   min-width: 32px;
@@ -182,8 +209,8 @@ const Toggle = styled.label`
 
 const ToggleText = styled.span`
   font-size: 12px;
-  font-weight: 500;
-  color: #64748b;
+  font-weight: 400;
+  color: #1F1F1F;
   letter-spacing: -0.01em;
 `;
 
@@ -192,7 +219,7 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
   height: 22px;
   border-radius: 11px;
   background: ${({ $checked }) => $checked
-    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+    ? 'linear-gradient(135deg, #3384F4, #5BA0F7)'
     : 'rgba(0, 0, 0, 0.12)'};
   position: relative;
   transition: background 0.25s ease;
@@ -245,7 +272,7 @@ const ToggleGroup = styled.div`
 
 const TypewriterColorRow = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 12px;
 `;
 
 const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
@@ -273,7 +300,7 @@ const TYPEWRITER_COLORS = [
 
 const ImageHint = styled.p`
   font-size: 11px;
-  color: #94a3b8;
+  color: #6B6B6B;
   margin: 0 0 12px 0;
   line-height: 1.5;
   letter-spacing: -0.01em;
@@ -281,7 +308,7 @@ const ImageHint = styled.p`
 
 const ImageInputRow = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
 `;
 
 const ImageUrlInput = styled.input`
@@ -289,32 +316,32 @@ const ImageUrlInput = styled.input`
   height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.8);
-  color: #334155;
+  color: #1F1F1F;
   font-size: 12px;
   font-family: inherit;
   transition: all 0.15s ease;
 
   &:hover {
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: rgba(51, 132, 244, 0.3);
   }
   &:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #3384F4;
+    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
   &::placeholder {
-    color: #94a3b8;
+    color: #6B6B6B;
   }
 `;
 
 const AddButton = styled.button`
   height: 34px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3384F4, #5BA0F7);
   color: #fff;
   font-size: 12px;
   font-weight: 500;
@@ -327,7 +354,7 @@ const AddButton = styled.button`
   &:hover {
     opacity: 0.9;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px rgba(51, 132, 244, 0.3);
   }
 
   &:active {
@@ -344,9 +371,9 @@ const AddButton = styled.button`
 
 const ImageCounter = styled.span`
   font-size: 11px;
-  color: #94a3b8;
+  color: #6B6B6B;
   font-weight: 500;
-  margin-top: 6px;
+  margin-top: 8px;
   display: block;
   font-variant-numeric: tabular-nums;
 `;
@@ -361,18 +388,18 @@ const ImageList = styled.div`
 const ImageItem = styled.div<{ $dragging?: boolean; $dragOver?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 6px;
+  gap: 8px;
+  padding: 4px 8px;
   background: ${({ $dragging, $dragOver }) =>
-    $dragging ? 'rgba(99, 102, 241, 0.06)' :
-    $dragOver ? 'rgba(99, 102, 241, 0.04)' :
+    $dragging ? 'rgba(51, 132, 244, 0.06)' :
+    $dragOver ? 'rgba(51, 132, 244, 0.04)' :
     'rgba(0, 0, 0, 0.02)'};
   border-radius: 8px;
   font-size: 11px;
-  color: #64748b;
+  color: #6B6B6B;
   transition: background 0.12s ease, opacity 0.12s ease, border-color 0.12s ease;
   opacity: ${({ $dragging }) => $dragging ? 0.5 : 1};
-  border: 1px solid ${({ $dragOver }) => $dragOver ? 'rgba(99, 102, 241, 0.2)' : 'transparent'};
+  border: 1px solid ${({ $dragOver }) => $dragOver ? 'rgba(51, 132, 244, 0.2)' : 'transparent'};
 
   &:hover {
     background: rgba(0, 0, 0, 0.04);
@@ -386,7 +413,7 @@ const DragHandle = styled.div`
   cursor: grab;
   color: #c8cdd3;
   flex-shrink: 0;
-  padding: 2px 0;
+  padding: 4px 0;
   transition: color 0.12s ease;
 
   &:active {
@@ -394,7 +421,7 @@ const DragHandle = styled.div`
   }
 
   &:hover {
-    color: #94a3b8;
+    color: #6B6B6B;
   }
 
   svg {
@@ -406,7 +433,7 @@ const DragHandle = styled.div`
 const ImageThumb = styled.img`
   width: 30px;
   height: 30px;
-  border-radius: 6px;
+  border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -425,12 +452,12 @@ const RemoveButton = styled.button`
   height: 24px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: #6B6B6B;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 8px;
   flex-shrink: 0;
   padding: 0;
   transition: all 0.15s ease;
@@ -452,7 +479,7 @@ const LayoutOption = styled.button<{ $active: boolean }>`
   border: 1px solid ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.border.primary};
   background: ${({ $active, theme }) => $active ? `${theme.colors.primary}10` : '#fff'};
   color: ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.text.secondary};
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -466,7 +493,7 @@ const LayoutOption = styled.button<{ $active: boolean }>`
 
 const LayoutOptions = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
 `;
 
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
@@ -527,6 +554,31 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     dragCounter.current = 0;
   };
 
+  const getWidgetInfo = (): { icon: React.FC; label: string } | null => {
+    if (!widget) return null;
+    if (widget.type === 'calendar') {
+      const s = (widget.settings as CalendarSettings).style;
+      const map: Record<string, { icon: React.FC; label: string }> = {
+        'modern-grid-zoom-fixed': { icon: Calendar, label: 'Calendar \u2009·\u2009 Default' },
+        'classic': { icon: CalendarDays, label: 'Calendar \u2009·\u2009 Classic' },
+        'collage': { icon: LayoutGrid, label: 'Calendar \u2009·\u2009 Collage' },
+        'typewriter': { icon: Type, label: 'Calendar \u2009·\u2009 Typewriter' },
+      };
+      return map[s] || { icon: Calendar, label: 'Calendar' };
+    }
+    if (widget.type === 'clock') {
+      const s = (widget.settings as ClockSettings).style;
+      const map: Record<string, { icon: React.FC; label: string }> = {
+        'classic': { icon: Clock, label: 'Clock \u2009·\u2009 Classic' },
+        'flower': { icon: Flower2, label: 'Clock \u2009·\u2009 Flower' },
+        'dreamy': { icon: Sparkles, label: 'Clock \u2009·\u2009 Dreamy' },
+      };
+      return map[s] || { icon: Clock, label: 'Clock' };
+    }
+    if (widget.type === 'board') return { icon: Image, label: 'Board \u2009·\u2009 Moodboard' };
+    return null;
+  };
+
   if (!widget) {
     return (
       <PanelContainer>
@@ -554,6 +606,12 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     <PanelContainer>
       <PanelHeader>
         <PanelTitle>Design</PanelTitle>
+        {getWidgetInfo() && (
+          <WidgetBadge>
+            {React.createElement(getWidgetInfo()!.icon)}
+            <WidgetBadgeText>{getWidgetInfo()!.label}</WidgetBadgeText>
+          </WidgetBadge>
+        )}
       </PanelHeader>
 
       <PanelContent>
