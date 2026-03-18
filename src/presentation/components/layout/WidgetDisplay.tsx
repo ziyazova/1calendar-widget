@@ -80,7 +80,7 @@ const WidgetContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: ${fadeIn} 0.25s ease;
+  animation: ${fadeIn} 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
 `;
 
 export const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget }) => {

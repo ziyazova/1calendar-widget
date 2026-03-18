@@ -4,6 +4,8 @@ import { theme } from './presentation/themes/theme';
 
 import { LandingPage } from './presentation/pages/LandingPage';
 import { StudioPage } from './presentation/pages/StudioPage';
+import { WidgetStudioPage } from './presentation/pages/WidgetStudioPage';
+import { TemplatesPage } from './presentation/pages/TemplatesPage';
 import { CalendarEmbedPage } from './presentation/pages/CalendarEmbedPage';
 import { ClockEmbedPage } from './presentation/pages/ClockEmbedPage';
 import { BoardEmbedPage } from './presentation/pages/BoardEmbedPage';
@@ -34,7 +36,9 @@ function App() {
         <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/widgets" element={<WidgetStudioPage />} />
             <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
+            <Route path="/templates" element={<TemplatesPage />} />
             <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
             <Route path="/embed/clock" element={<ClockEmbedPage />} />
             <Route path="/embed/board" element={<BoardEmbedPage />} />

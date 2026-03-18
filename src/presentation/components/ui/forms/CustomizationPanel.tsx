@@ -25,7 +25,7 @@ const PanelContainer = styled.div`
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: none;
   z-index: ${({ theme }) => theme.zIndex.sticky};
 `;
 

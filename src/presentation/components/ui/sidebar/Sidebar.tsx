@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components';
 import { ChevronRight, Calendar, Clock, Archive, Image } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES, ARCHIVE_STYLES, CLOCK_ARCHIVE_STYLES } from '../widgetConfig';
 
@@ -7,6 +8,8 @@ interface SidebarProps {
   availableWidgets: string[];
   currentWidget: string;
   onWidgetChange: (type: string, style?: string) => void;
+  onLogoClick?: () => void;
+  logoPressed?: boolean;
 }
 
 const SidebarContainer = styled.aside`
@@ -17,7 +20,7 @@ const SidebarContainer = styled.aside`
   height: 100vh;
   background: #ffffff;
   backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: none;
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
@@ -29,35 +32,43 @@ const SidebarContainer = styled.aside`
 `;
 
 const SidebarHeader = styled.div`
-  padding: 0 22px;
+  padding: 0 24px;
   height: 64px;
   display: flex;
   align-items: center;
+  gap: 10px;
   border-bottom: none;
 `;
 
-const LogoWrapper = styled.div`
+const logoAppear = keyframes`
+  from { transform: scale(0.96); }
+  to { transform: scale(1); }
+`;
+
+const LogoWrapper = styled.div<{ $pressed?: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: ${({ $pressed }) => $pressed ? 'none' : logoAppear} 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform: ${({ $pressed }) => $pressed ? 'scale(0.94)' : 'scale(1)'};
+
+  &:hover {
+    opacity: 0.7;
+  }
 `;
 
-const PeachIcon = () => (
-  <img src="/PeachyLogo.png" alt="Logo" width="22" height="22" style={{ objectFit: 'contain', marginTop: '-1px' }} />
-);
-
-const LogoText = styled.h1`
+const LogoText = styled.span`
   font-size: 16px;
   font-weight: 600;
-  line-height: 22px;
   color: #1F1F1F;
-  margin: 0;
   letter-spacing: -0.02em;
+`;
 
-  span {
-    color: #9A9A9A;
-    font-weight: 400;
-  }
+const LogoSub = styled.span`
+  font-weight: 400;
+  color: #9A9A9A;
 `;
 
 const NavSection = styled.nav`
@@ -207,7 +218,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   availableWidgets,
   currentWidget,
   onWidgetChange,
+  onLogoClick,
+  logoPressed,
 }) => {
+  const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>(['calendar']);
 
   const toggle = (key: string) => {
@@ -219,9 +233,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <SidebarContainer>
       <SidebarHeader>
-        <LogoWrapper>
-          <PeachIcon />
-          <LogoText>Peachy <span>Studio</span></LogoText>
+        <LogoWrapper $pressed={logoPressed} onClick={() => onLogoClick ? onLogoClick() : navigate('/')}>
+          <img src="/PeachyLogo.png" alt="Logo" width="22" height="22" style={{ objectFit: 'contain' }} />
+          <LogoText>Peachy <LogoSub>Studio</LogoSub></LogoText>
         </LogoWrapper>
       </SidebarHeader>
 

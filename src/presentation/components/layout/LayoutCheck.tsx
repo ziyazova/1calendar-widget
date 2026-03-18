@@ -16,14 +16,55 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   overflow: hidden;
-  background: #F3F4F6;
+  background: #ffffff;
 `;
 
-const TopBar = styled.div`
-  padding: 24px 24px 0;
+const RightPanel = styled.div`
+  width: 290px;
+  height: 100vh;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+`;
+
+const PanelHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 24px 8px;
+`;
+
+const PanelContent = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 32px;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+`;
+
+const PanelSection = styled.div`
+  padding: 12px 0 0;
+
+  & + & {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+`;
+
+const PanelSectionTitle = styled.h3`
+  font-size: 11px;
+  font-weight: 600;
+  color: #ABABAB;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px 0;
 `;
 
 const HeaderRow = styled.div`
@@ -72,10 +113,9 @@ const HeaderActions = styled.div`
 
 const ControlsRow = styled.div`
   display: flex;
-  gap: 24px;
-  align-items: center;
-  padding: 0 24px 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
   flex-shrink: 0;
 `;
 
@@ -218,7 +258,7 @@ const DebugLegend = styled.div<{ $visible: boolean }>`
   display: ${({ $visible }) => $visible ? 'flex' : 'none'};
   gap: 16px;
   align-items: center;
-  margin: 0 24px 12px;
+  margin: 16px 0 0;
   padding: 12px 16px;
   background: #1F1F1F;
   border-radius: 12px;
@@ -243,7 +283,7 @@ const Swatch = styled.span<{ $border: string }>`
 const PresetsRow = styled.div`
   display: flex;
   gap: 4px;
-  padding: 0 24px 16px;
+  padding: 16px 0;
   flex-wrap: wrap;
   align-items: center;
   flex-shrink: 0;
@@ -281,8 +321,21 @@ const EmbedArea = styled.div<{ $dark?: boolean }>`
   position: relative;
   overflow: hidden;
   min-height: 0;
-  background: ${({ $dark }) => $dark ? '#191919' : 'transparent'};
+  background: ${({ $dark }) => $dark ? '#191919' : '#F8F8F7'};
+  border-radius: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  margin: 12px 0 20px 0;
   transition: background 0.3s ease;
+`;
+
+const EmbedTopRight = styled.div`
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
 `;
 
 const DotGrid = styled.div<{ $dark?: boolean }>`
@@ -457,80 +510,21 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
 
   return (
     <Container>
-      <TopBar>
-        <HeaderRow>
-          <Title>
-            Embed Preview
-            <StyleBadge>{currentStyleLabel}</StyleBadge>
-          </Title>
-          <HeaderActions>
-            <ThemeToggle>
-              <ThemeToggleButton $active={!simDark} onClick={() => setSimDark(false)}>
-                <Sun /> Light
-              </ThemeToggleButton>
-              <ThemeToggleButton $active={simDark} onClick={() => setSimDark(true)}>
-                <Moon /> Dark
-              </ThemeToggleButton>
-            </ThemeToggle>
-            <DebugButton $active={debug} onClick={() => setDebug(!debug)} title="Debug overlay">
-              <Bug />
-            </DebugButton>
-          </HeaderActions>
-        </HeaderRow>
-        <Subtitle>Resize the frame to test how your widget adapts</Subtitle>
-      </TopBar>
-
-      <ControlsRow>
-        <ControlGroup>
-          <ControlLabel>W</ControlLabel>
-          <ControlSlider
-            type="range"
-            min="150"
-            max="900"
-            value={width}
-            onChange={(e) => applySize(parseInt(e.target.value), height)}
-          />
-          <ControlValue>{width}px</ControlValue>
-        </ControlGroup>
-
-        <ControlGroup>
-          <ControlLabel>H</ControlLabel>
-          <ControlSlider
-            type="range"
-            min="150"
-            max="700"
-            value={height}
-            onChange={(e) => applySize(width, parseInt(e.target.value))}
-          />
-          <ControlValue>{height}px</ControlValue>
-        </ControlGroup>
-
-        <ControlGroup>
-          <ControlLabel>Widget</ControlLabel>
-          <ControlSelect value={style} onChange={(e) => setStyle(e.target.value)}>
-            {styles.map(s => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </ControlSelect>
-        </ControlGroup>
-      </ControlsRow>
-
-      <DebugLegend $visible={debug}>
-        <span><Swatch $border="2px dashed red" /> Wrapper</span>
-        <span><Swatch $border="2px solid cyan" /> SVG foreignObject</span>
-        <span><Swatch $border="2px solid lime" /> GridContainer</span>
-      </DebugLegend>
-
-      <PresetsRow>
-        {PRESET_SIZES.map(p => (
-          <PresetButton key={p.label} onClick={() => applySize(p.w, p.h)}>
-            {p.label}
-          </PresetButton>
-        ))}
-      </PresetsRow>
-
       <EmbedArea $dark={simDark}>
         <DotGrid $dark={simDark} />
+        <EmbedTopRight>
+          <ThemeToggle>
+            <ThemeToggleButton $active={!simDark} onClick={() => setSimDark(false)}>
+              <Sun /> Light
+            </ThemeToggleButton>
+            <ThemeToggleButton $active={simDark} onClick={() => setSimDark(true)}>
+              <Moon /> Dark
+            </ThemeToggleButton>
+          </ThemeToggle>
+          <DebugButton $active={debug} onClick={() => setDebug(!debug)} title="Debug overlay">
+            <Bug />
+          </DebugButton>
+        </EmbedTopRight>
         <EmbedContainer
           ref={containerRef}
           $dark={simDark}
@@ -540,6 +534,69 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
           <SizeLabel $dark={simDark}>{displaySize}</SizeLabel>
         </EmbedContainer>
       </EmbedArea>
+
+      <RightPanel>
+        <PanelHeader>
+          <Title>Preview</Title>
+          <Subtitle>Test how your widget adapts</Subtitle>
+        </PanelHeader>
+
+        <PanelContent>
+          <PanelSection>
+            <PanelSectionTitle>Widget</PanelSectionTitle>
+            <ControlGroup>
+              <ControlSelect value={style} onChange={(e) => setStyle(e.target.value)}>
+                {styles.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </ControlSelect>
+            </ControlGroup>
+          </PanelSection>
+
+          <PanelSection>
+            <PanelSectionTitle>Size</PanelSectionTitle>
+            <ControlsRow>
+              <ControlGroup>
+                <ControlLabel>W</ControlLabel>
+                <ControlSlider
+                  type="range"
+                  min="150"
+                  max="900"
+                  value={width}
+                  onChange={(e) => applySize(parseInt(e.target.value), height)}
+                />
+                <ControlValue>{width}px</ControlValue>
+              </ControlGroup>
+
+              <ControlGroup>
+                <ControlLabel>H</ControlLabel>
+                <ControlSlider
+                  type="range"
+                  min="150"
+                  max="700"
+                  value={height}
+                  onChange={(e) => applySize(width, parseInt(e.target.value))}
+                />
+                <ControlValue>{height}px</ControlValue>
+              </ControlGroup>
+            </ControlsRow>
+
+            <PresetsRow>
+              {PRESET_SIZES.map(p => (
+                <PresetButton key={p.label} onClick={() => applySize(p.w, p.h)}>
+                  {p.label}
+                </PresetButton>
+              ))}
+            </PresetsRow>
+          </PanelSection>
+
+          <DebugLegend $visible={debug}>
+            <span><Swatch $border="2px dashed red" /> Wrapper</span>
+            <span><Swatch $border="2px solid cyan" /> SVG foreignObject</span>
+            <span><Swatch $border="2px solid lime" /> GridContainer</span>
+          </DebugLegend>
+        </PanelContent>
+      </RightPanel>
     </Container>
   );
 };

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components';
 import { Copy, Check, Pencil, LayoutGrid, Grip } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
@@ -20,11 +21,13 @@ interface StudioPageProps {
 
 type ViewMode = 'editor' | 'layout-check';
 
-const StudioContainer = styled.div`
+const StudioContainer = styled.div<{ $transitioning?: boolean }>`
   display: flex;
   min-height: 100vh;
-  background: #F3F4F6;
+  background: #ffffff;
   font-family: ${({ theme }) => theme.typography.fonts.primary};
+  opacity: ${({ $transitioning }) => $transitioning ? 0 : 1};
+  transition: opacity 0.4s ease;
 `;
 
 const WorkspaceContainer = styled.div`
@@ -38,7 +41,7 @@ const ContentArea = styled.div<{ $fullWidth?: boolean }>`
   flex: 1;
   gap: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   margin-left: 270px;
   margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '290px'};
   height: 100vh;
@@ -50,6 +53,17 @@ const ContentArea = styled.div<{ $fullWidth?: boolean }>`
   }
 `;
 
+const widgetAreaAppear = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
 const WidgetArea = styled.div`
   flex: 1;
   display: flex;
@@ -58,9 +72,32 @@ const WidgetArea = styled.div`
   height: 100vh;
   position: relative;
   overflow: hidden;
-
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+    #F8F8F7;
+  border-radius: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: none;
+  margin: 12px 0 20px 0;
+  animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 `;
 
+
+const TransitionOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 9998;
+  animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+`;
 
 const DotGrid = styled.div`
   position: absolute;
@@ -181,8 +218,8 @@ const ToolbarButton = styled.button<{ $active?: boolean }>`
 
 const TopRightControls = styled.div`
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 32px;
+  right: 32px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -355,7 +392,7 @@ const LayoutCheckArea = styled.div`
   flex: 1;
   height: 100vh;
   overflow: hidden;
-  background: #F3F4F6;
+  background: #ffffff;
   position: relative;
 `;
 
@@ -365,8 +402,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [availableWidgets, setAvailableWidgets] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
   const [studioZoom, setStudioZoom] = useState(1.0);
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogoClick = useCallback(() => {
+    setTransitioning(true);
+    setTimeout(() => navigate('/'), 400);
+  }, [navigate]);
 
   useEffect(() => {
     const types = diContainer.listAvailableWidgetsUseCase.execute();
@@ -445,12 +489,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   };
 
   return (
-    <StudioContainer>
+    <StudioContainer $transitioning={transitioning}>
       <WorkspaceContainer>
         <Sidebar
           availableWidgets={availableWidgets}
           currentWidget={currentWidgetKey}
           onWidgetChange={handleWidgetChange}
+          onLogoClick={handleLogoClick}
+          logoPressed={transitioning}
         />
 
         <ContentArea $fullWidth={viewMode === 'layout-check'}>
