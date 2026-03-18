@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
 
 type Category = 'all' | 'planners' | 'dashboards' | 'trackers' | 'journals' | 'finance' | 'productivity' | 'health' | 'goals';
@@ -253,8 +253,17 @@ const FooterText = styled.span`
 
 export const TemplatesPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const catParam = searchParams.get('cat');
   const [activeCategory, setActiveCategory] = useState<Category>('all');
   const [activeSub, setActiveSub] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (catParam) {
+      const match = CATEGORIES.find(c => c.key === catParam || c.label.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-') === catParam);
+      if (match) setActiveCategory(match.key);
+    }
+  }, [catParam]);
 
   const filtered = TEMPLATES.filter(t => {
     if (activeCategory !== 'all' && !t.category.includes(activeCategory)) return false;

@@ -1,8 +1,337 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import { ArrowRight, Calendar, Clock, Image, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
+
+/* ── Debug Mode ── */
+const DebugStyles = createGlobalStyle`
+  * {
+    outline: 1px solid rgba(255, 0, 0, 0.1) !important;
+  }
+  *:hover {
+    outline: 2px solid rgba(0, 120, 255, 0.4) !important;
+  }
+  [data-debug-selected="true"] {
+    outline: 3px solid rgba(0, 120, 255, 0.9) !important;
+    box-shadow: 0 0 0 6px rgba(0, 120, 255, 0.12) !important;
+  }
+`;
+
+const DebugTooltip = styled.div<{ $locked?: boolean }>`
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  background: ${({ $locked }) => $locked ? 'rgba(0, 80, 255, 0.92)' : 'rgba(0, 0, 0, 0.88)'};
+  color: #fff;
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  padding: 10px 14px;
+  border-radius: 10px;
+  z-index: 99999;
+  pointer-events: ${({ $locked }) => $locked ? 'auto' : 'none'};
+  max-width: 600px;
+  max-height: 200px;
+  overflow-y: auto;
+  line-height: 1.7;
+  backdrop-filter: blur(12px);
+  user-select: text;
+  cursor: ${({ $locked }) => $locked ? 'text' : 'default'};
+  word-break: break-all;
+
+  span {
+    display: block;
+  }
+`;
+
+const DebugCopyBtn = styled.button`
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'SF Mono', monospace;
+  flex-shrink: 0;
+  &:hover { background: rgba(255,255,255,0.3); }
+`;
+
+const DebugUnlockBtn = styled.button`
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'SF Mono', monospace;
+  flex-shrink: 0;
+  &:hover { background: rgba(255,255,255,0.3); }
+`;
+
+const DebugBadge = styled.button`
+  position: fixed;
+  top: 70px;
+  right: 16px;
+  background: #FF3B30;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  z-index: 99999;
+  font-family: 'SF Mono', monospace;
+  cursor: pointer;
+  &:hover { background: #cc2a22; }
+`;
+
+const DebugToggle = styled.button<{ $on: boolean }>`
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: ${({ $on }) => $on ? '#FF3B30' : 'rgba(0,0,0,0.06)'};
+  color: ${({ $on }) => $on ? '#fff' : '#999'};
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  &:hover { background: ${({ $on }) => $on ? '#cc2a22' : 'rgba(0,0,0,0.1)'}; }
+`;
+
+function useDebugMode() {
+  const [enabled, setEnabled] = useState(false);
+  const [info, setInfo] = useState('');
+  const [locked, setLocked] = useState(false);
+  const selectedRef = useRef<HTMLElement | null>(null);
+  const secondRef = useRef<HTMLElement | null>(null);
+  const [measureMode, setMeasureMode] = useState(false);
+  const [measureInfo, setMeasureInfo] = useState('');
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        setEnabled(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const getInfo = (el: HTMLElement) => {
+      const tag = el.tagName.toLowerCase();
+      const cls = el.className?.toString().split(/\s+/).find(c => c.startsWith('sc-')) || '';
+      const dataName = (el as any)?.dataset?.debugName || '';
+
+      // Walk up to find UX name from data-ux attribute
+      let uxName = '';
+      let walk: HTMLElement | null = el;
+      while (walk && !uxName) {
+        uxName = walk.dataset?.ux || '';
+        walk = walk.parentElement;
+      }
+
+      const rect = el.getBoundingClientRect();
+      const w = Math.round(rect.width);
+      const h = Math.round(rect.height);
+      const s = window.getComputedStyle(el);
+
+      const parts: string[] = [];
+
+      // Name
+      parts.push(uxName ? `[${uxName}]` : (dataName || `<${tag}${cls ? `.${cls}` : ''}>`));
+
+      // Size
+      parts.push(`${w}×${h}px`);
+
+      // Padding (individual sides if different)
+      const pt = s.paddingTop, pr = s.paddingRight, pb = s.paddingBottom, pl = s.paddingLeft;
+      if (pt !== '0px' || pr !== '0px' || pb !== '0px' || pl !== '0px') {
+        if (pt === pr && pr === pb && pb === pl) {
+          parts.push(`pad: ${pt}`);
+        } else if (pt === pb && pl === pr) {
+          parts.push(`pad: ${pt} ${pr}`);
+        } else {
+          parts.push(`pad: ${pt} ${pr} ${pb} ${pl}`);
+        }
+      }
+
+      // Margin
+      const mt = s.marginTop, mr = s.marginRight, mb = s.marginBottom, ml = s.marginLeft;
+      if (mt !== '0px' || mr !== '0px' || mb !== '0px' || ml !== '0px') {
+        if (mt === mr && mr === mb && mb === ml) {
+          parts.push(`margin: ${mt}`);
+        } else if (mt === mb && ml === mr) {
+          parts.push(`margin: ${mt} ${mr}`);
+        } else {
+          const m = [mt, mr, mb, ml].filter(v => v !== '0px');
+          parts.push(`margin: ${mt} ${mr} ${mb} ${ml}`);
+        }
+      }
+
+      // Gap
+      if (s.gap !== 'normal' && s.gap !== '' && s.gap !== '0px') parts.push(`gap: ${s.gap}`);
+
+      // Border radius
+      if (s.borderRadius !== '0px' && s.borderRadius !== '') parts.push(`radius: ${s.borderRadius}`);
+
+      // Border
+      if (s.borderWidth !== '0px' && s.borderStyle !== 'none') {
+        parts.push(`border: ${s.borderWidth} ${s.borderColor}`);
+      }
+
+      // Typography
+      if (el.childNodes.length > 0 && el.textContent?.trim()) {
+        parts.push(`font: ${s.fontSize}/${s.fontWeight}`);
+        if (s.lineHeight !== 'normal') parts.push(`lh: ${s.lineHeight}`);
+        if (s.letterSpacing !== 'normal' && s.letterSpacing !== '0px') parts.push(`ls: ${s.letterSpacing}`);
+        parts.push(`color: ${s.color}`);
+      }
+
+      // Background
+      if (s.backgroundColor !== 'rgba(0, 0, 0, 0)' && s.backgroundColor !== 'transparent') {
+        parts.push(`bg: ${s.backgroundColor}`);
+      }
+
+      // Display/layout
+      if (s.display === 'flex' || s.display === 'grid') {
+        parts.push(`display: ${s.display}`);
+        if (s.flexDirection && s.flexDirection !== 'row') parts.push(`dir: ${s.flexDirection}`);
+        if (s.alignItems && s.alignItems !== 'normal') parts.push(`align: ${s.alignItems}`);
+        if (s.justifyContent && s.justifyContent !== 'normal') parts.push(`justify: ${s.justifyContent}`);
+      }
+
+      // Overflow
+      if (s.overflow !== 'visible' && s.overflow !== '') parts.push(`overflow: ${s.overflow}`);
+
+      // Opacity
+      if (s.opacity !== '1') parts.push(`opacity: ${s.opacity}`);
+
+      // Transform
+      if (s.transform !== 'none' && s.transform !== '') parts.push(`transform: ${s.transform.slice(0, 40)}`);
+
+      // Distance to siblings
+      const prev = el.previousElementSibling as HTMLElement;
+      const next = el.nextElementSibling as HTMLElement;
+      if (prev) {
+        const prevRect = prev.getBoundingClientRect();
+        const distTop = Math.round(rect.top - prevRect.bottom);
+        if (distTop !== 0) parts.push(`↑ prev: ${distTop}px`);
+      }
+      if (next) {
+        const nextRect = next.getBoundingClientRect();
+        const distBottom = Math.round(nextRect.top - rect.bottom);
+        if (distBottom !== 0) parts.push(`↓ next: ${distBottom}px`);
+      }
+
+      // Distance to parent edges
+      const parent = el.parentElement;
+      if (parent) {
+        const pRect = parent.getBoundingClientRect();
+        const toTop = Math.round(rect.top - pRect.top);
+        const toLeft = Math.round(rect.left - pRect.left);
+        const toRight = Math.round(pRect.right - rect.right);
+        const toBottom = Math.round(pRect.bottom - rect.bottom);
+        parts.push(`in parent: ↑${toTop} →${toRight} ↓${toBottom} ←${toLeft}`);
+      }
+
+      return parts.filter(Boolean).join(' · ');
+    };
+
+    const handleMove = (e: MouseEvent) => {
+      if (locked) return;
+      const el = e.target as HTMLElement;
+      if (!el) return;
+      setInfo(getInfo(el));
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      if (!enabled) return;
+      const el = e.target as HTMLElement;
+      if (!el) return;
+      if (el.closest('[data-debug-ui]')) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (measureMode && selectedRef.current) {
+        // Second click — measure distance
+        if (secondRef.current) secondRef.current.removeAttribute('data-debug-selected');
+        el.setAttribute('data-debug-selected', 'true');
+        secondRef.current = el;
+        const r1 = selectedRef.current.getBoundingClientRect();
+        const r2 = el.getBoundingClientRect();
+        const dx = Math.round(r2.left - r1.right);
+        const dy = Math.round(r2.top - r1.bottom);
+        const dxCenter = Math.round((r2.left + r2.width/2) - (r1.left + r1.width/2));
+        const dyCenter = Math.round((r2.top + r2.height/2) - (r1.top + r1.height/2));
+        const gapH = Math.round(Math.max(0, r2.left - r1.right, r1.left - r2.right));
+        const gapV = Math.round(Math.max(0, r2.top - r1.bottom, r1.top - r2.bottom));
+        setMeasureInfo(
+          `📏 Gap H: ${gapH}px · Gap V: ${gapV}px · ΔX center: ${dxCenter}px · ΔY center: ${dyCenter}px · Edge→Edge H: ${dx}px · Edge→Edge V: ${dy}px`
+        );
+        setLocked(true);
+        return;
+      }
+
+      // First click — select element
+      if (selectedRef.current) selectedRef.current.removeAttribute('data-debug-selected');
+      if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
+      el.setAttribute('data-debug-selected', 'true');
+      selectedRef.current = el;
+      setMeasureInfo('');
+      const text = getInfo(el);
+      setInfo(text);
+      setLocked(true);
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('click', handleClick, true);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, [enabled, locked]);
+
+  const toggle = useCallback(() => {
+    setEnabled(prev => {
+      if (prev) {
+        if (selectedRef.current) { selectedRef.current.removeAttribute('data-debug-selected'); selectedRef.current = null; }
+        if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
+        setMeasureMode(false);
+        setMeasureInfo('');
+      }
+      return !prev;
+    });
+    setLocked(false);
+  }, []);
+  const unlock = useCallback(() => {
+    if (selectedRef.current) { selectedRef.current.removeAttribute('data-debug-selected'); selectedRef.current = null; }
+    if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
+    setLocked(false);
+    setMeasureInfo('');
+  }, []);
+  const copyInfo = useCallback(() => {
+    navigator.clipboard.writeText(info);
+  }, [info]);
+  const toggleMeasure = useCallback(() => {
+    setMeasureMode(prev => !prev);
+    if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
+    setMeasureInfo('');
+  }, []);
+  return { enabled, info, toggle, locked, unlock, copyInfo, measureMode, toggleMeasure, measureInfo };
+}
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(24px); }
@@ -110,7 +439,7 @@ const useRotatingWord = () => {
 const Hero = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 100px 48px 120px;
+  padding: 100px 48px 88px;
   text-align: center;
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 
@@ -218,18 +547,31 @@ const scrollLeft = keyframes`
 `;
 
 const TemplatesGallery = styled.section`
-  padding: 0 0 80px;
-  margin-top: -32px;
+  padding: 40px 0 80px;
   background: #ffffff;
+  position: relative;
 `;
 
 const TemplatesMarqueeWrap = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 48px;
-  overflow: hidden;
-  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+
+  &::-webkit-scrollbar { display: none; }
+  scrollbar-width: none;
+
+  &[data-scrolled="false"] {
+    mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
+  }
+
+  &[data-scrolled="true"] {
+    mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  }
 
   @media (max-width: 768px) {
     padding: 0 24px;
@@ -272,17 +614,38 @@ const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean 
   display: flex;
   gap: 28px;
   padding: 10px 0;
-  width: max-content;
-  animation: ${scrollLeft} ${({ $duration }) => $duration}s linear infinite;
-  animation-direction: ${({ $reverse }) => $reverse ? 'reverse' : 'normal'};
-  margin-bottom: 16px;
-
-  &:hover {
-    animation-play-state: paused;
-  }
 
   &:last-child {
     margin-bottom: 0;
+  }
+`;
+
+const TemplatesScrollHint = styled.div`
+  position: absolute;
+  right: 106px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: all 0.2s;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: #1F1F1F;
+  }
+
+  &:hover {
+    background: #333;
+    transform: translateY(-50%);
   }
 `;
 
@@ -292,20 +655,16 @@ const TemplateCardWrap = styled.div`
 `;
 
 const TemplateCard = styled.div`
-  width: 275px;
-  height: 207px;
+  width: 252px;
+  height: 200px;
   position: relative;
   border-radius: 24px;
   overflow: hidden;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-
   ${TemplateCardWrap}:hover & img {
-    transform: scale(1.18);
+    transform: scale(1.15);
   }
 `;
 
@@ -446,7 +805,7 @@ const TrustLine = styled.p`
 const WidgetsSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 48px 80px;
+  padding: 0 48px 60px;
 
   @media (max-width: 768px) {
     padding: 0 24px 60px;
@@ -539,17 +898,16 @@ const BrowseAllButton = styled.button`
   padding: 8px 20px;
   font-size: 13px;
   font-weight: 500;
-  color: #1F1F1F;
-  background: none;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #fff;
+  background: #1F1F1F;
+  border: none;
   border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.2s;
 
   &:hover {
-    background: #f5f5f5;
-    border-color: rgba(0, 0, 0, 0.2);
+    background: #333;
   }
 `;
 
@@ -873,6 +1231,339 @@ const FeatureDesc = styled.p`
   letter-spacing: -0.01em;
 `;
 
+/* ── Feature Cards (stacked) ── */
+const FeatureCardsSection = styled.section`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px 40px;
+
+  @media (max-width: 768px) {
+    padding: 0 24px 60px;
+  }
+`;
+
+const FeatureStack = styled.div`
+  position: relative;
+  height: 810px;
+`;
+
+const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: number; $activeIdx: number }>`
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ $index, $activeIdx, $total }) => {
+    const behind = ($index - $activeIdx + $total) % $total;
+    return behind === 0
+      ? '0 16px 48px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.03)'
+      : '0 12px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.03)';
+  }};
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 644px;
+  z-index: ${({ $index, $activeIdx, $total }) => {
+    // circular distance behind active
+    const behind = ($index - $activeIdx + $total) % $total;
+    return behind === 0 ? $total + 1 : $total - behind;
+  }};
+  top: ${({ $index, $activeIdx, $total }) => {
+    const behind = ($index - $activeIdx + $total) % $total;
+    const base = ($total - 1) * 52;
+    return `${base - behind * 52}px`;
+  }};
+  transform: ${({ $index, $activeIdx, $total }) => {
+    const behind = ($index - $activeIdx + $total) % $total;
+    if (behind === 0) return 'scale(1)';
+    const scaleVal = 1 - behind * 0.04;
+    return `scale(${scaleVal})`;
+  }};
+  margin-left: ${({ $index, $activeIdx, $total }) => {
+    const behind = ($index - $activeIdx + $total) % $total;
+    return `${behind * 20}px`;
+  }};
+  margin-right: ${({ $index, $activeIdx, $total }) => {
+    const behind = ($index - $activeIdx + $total) % $total;
+    return `${behind * 20}px`;
+  }};
+  opacity: ${({ $index, $activeIdx, $total }) => {
+    const behind = ($index - $activeIdx + $total) % $total;
+    return behind === 0 ? 1 : 1 - behind * 0.06;
+  }};
+  transition: top 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1), margin 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+    box-shadow: ${({ $index, $activeIdx, $total }) => {
+      const behind = ($index - $activeIdx + $total) % $total;
+      return behind === 0 ? '0 20px 56px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06)' : '0 16px 40px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04)';
+    }};
+    top: ${({ $index, $activeIdx, $total }) => {
+      const behind = ($index - $activeIdx + $total) % $total;
+      const base = ($total - 1) * 52;
+      if (behind === 0) return `${base}px`;
+      return `${base - behind * 52 - 14}px`;
+    }};
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 28px;
+    gap: 24px;
+    height: auto;
+  }
+`;
+
+const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
+  padding: 10px 16px;
+  background: ${({ $color, $intensity = 0.05 }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.4})`;
+  }};
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border-bottom: 1px solid ${({ $color, $intensity = 0.05 }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.3})`;
+  }};
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #CDCDCD;
+`;
+
+const FeatureTabIcon = styled.span`
+  font-size: 16px;
+`;
+
+const FeatureTabTitle = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  letter-spacing: -0.01em;
+`;
+
+const FeatureTabActions = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #aaa;
+  font-size: 14px;
+`;
+
+const FeatureCardBody = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  padding: 28px 40px 0;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 24px 28px;
+    gap: 24px;
+  }
+`;
+
+const FeatureCardText = styled.div`
+  flex: 0 0 40%;
+`;
+
+const FeatureCardTitle = styled.h3`
+  font-size: 24px;
+  font-weight: 600;
+  color: #111;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+  line-height: 1.3;
+`;
+
+const FeatureCardDesc = styled.p`
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  letter-spacing: -0.01em;
+`;
+
+const FeatureCardImage = styled.div`
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  margin: 28px 40px 40px 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transform: scale(1.1);
+  }
+`;
+
+const FEATURE_CARDS = [
+  {
+    tab: 'Design',
+    icon: '🎨',
+    color: '#F59E0B',
+    title: 'Pixel-perfect design',
+    desc: 'Every widget is crafted with Apple-level attention to detail. Clean typography, balanced spacing, and premium color palettes.',
+    image: '/widget-calendar.png',
+  },
+  {
+    tab: 'Embed',
+    icon: '🔗',
+    color: '#3B82F6',
+    title: 'One-click embed',
+    desc: 'Copy the URL, paste into Notion. No accounts, no databases, no tracking. Everything is encoded in the URL.',
+    image: '/template-main.png',
+  },
+  {
+    tab: 'Themes',
+    icon: '🌙',
+    color: '#8B5CF6',
+    title: 'Dark mode that just works',
+    desc: 'Auto theme detection means your widgets adapt to Notion\'s light and dark mode seamlessly. No manual switching.',
+    image: '/widget-clock2.png',
+  },
+  {
+    tab: 'Pricing',
+    icon: '✨',
+    color: '#10B981',
+    title: 'Free forever',
+    desc: 'All widgets are completely free. No sign-up, no premium tier, no limits. Just beautiful tools for your workspace.',
+    image: '/widget-calendar2.png',
+  },
+];
+
+/* ── Categories Marquee ── */
+const CategoriesSection = styled.section`
+  padding: 0 0 80px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const CategoriesTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: ${scrollLeft} ${({ $duration }) => $duration}s linear infinite;
+  animation-direction: ${({ $reverse }) => $reverse ? 'reverse' : 'normal'};
+
+  &:hover {
+    animation-play-state: paused;
+  }
+`;
+
+const CategoryChip = styled.div<{ $color: string }>`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.04)`;
+  }};
+  border: 1px solid ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.06)`;
+  }};
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    background: ${({ $color }) => $color};
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    background: ${({ $color }) => {
+      const hex = $color.replace('#', '');
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, 0.08)`;
+    }};
+    transform: scale(1.04);
+    color: #444;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+`;
+
+const CategoriesWrap = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+
+  @media (max-width: 768px) {
+    padding: 0 24px;
+  }
+`;
+
+const CATEGORY_CHIPS_ROW1 = [
+  { label: 'Planners', color: '#F59E0B' },
+  { label: 'Dashboards', color: '#3B82F6' },
+  { label: 'Trackers', color: '#8B5CF6' },
+  { label: 'Journals', color: '#EC4899' },
+  { label: 'Finance', color: '#10B981' },
+  { label: 'Productivity', color: '#6366F1' },
+  { label: 'Health & Wellness', color: '#F97316' },
+  { label: 'Goals', color: '#14B8A6' },
+  { label: 'Widget Studio', color: '#3B82F6' },
+];
+
+const CATEGORY_CHIPS_ROW2 = [
+  { label: 'Weekly Planner', color: '#F59E0B' },
+  { label: 'Life OS', color: '#A855F7' },
+  { label: 'Budget Tracker', color: '#22C55E' },
+  { label: 'Habit Tracker', color: '#3B82F6' },
+  { label: 'Mood Journal', color: '#F43F5E' },
+  { label: 'Student Planner', color: '#8B5CF6' },
+  { label: 'Project Roadmap', color: '#06B6D4' },
+  { label: 'Reading List', color: '#6366F1' },
+  { label: 'Meal Planner', color: '#10B981' },
+];
+
 /* ── Testimonials (dark marquee) ── */
 const scrollUp = keyframes`
   0% { transform: translateY(0); }
@@ -893,8 +1584,11 @@ const TestimonialsSection = styled.section`
 
 const TestimonialsTitle = styled.h2`
   font-size: 36px;
-  font-weight: 600;
-  color: #1F1F1F;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6E3FF3, #3B82F6, #EC4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   letter-spacing: -0.03em;
   text-align: center;
   margin: 0 0 48px;
@@ -1099,6 +1793,10 @@ export const LandingPage: React.FC = () => {
   const logoRef = useRef<HTMLDivElement>(null);
   const testimonialsRef = useRef<HTMLElement>(null);
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [templateScrolled, setTemplateScrolled] = useState(false);
+  const templateWrapRef = useRef<HTMLDivElement>(null);
+  const debug = useDebugMode();
   const { word: rotatingWord, nextWord, state: wordState } = useRotatingWord();
   const measureRef = useRef<HTMLSpanElement>(null);
   const [textWidth, setTextWidth] = useState(0);
@@ -1125,12 +1823,46 @@ export const LandingPage: React.FC = () => {
 
   return (
     <Page>
+      {debug.enabled && <DebugStyles />}
+      {debug.enabled && <DebugBadge data-debug-ui onClick={debug.toggle}>DEBUG ON</DebugBadge>}
+      {debug.enabled && (
+        <DebugBadge data-debug-ui onClick={debug.toggleMeasure} style={{ top: 100, background: debug.measureMode ? '#3B82F6' : '#666' }}>
+          📏 {debug.measureMode ? 'MEASURE ON' : 'MEASURE'}
+        </DebugBadge>
+      )}
+      {debug.enabled && debug.info && (
+        <DebugTooltip $locked={debug.locked} data-debug-ui>
+          <span>{debug.info.split(' · ').map((part, i) => {
+            let color = '#e2e8f0';
+            if (part.startsWith('[')) color = '#7dd3fc';
+            else if (part.includes('×')) color = '#a78bfa';
+            else if (part.startsWith('pad') || part.startsWith('margin') || part.startsWith('gap') || part.startsWith('in parent') || part.startsWith('↑') || part.startsWith('↓')) color = '#86efac';
+            else if (part.startsWith('radius') || part.startsWith('border')) color = '#fca5a5';
+            else if (part.startsWith('font') || part.startsWith('lh') || part.startsWith('ls') || part.startsWith('color')) color = '#fde68a';
+            else if (part.startsWith('bg')) color = '#c4b5fd';
+            else if (part.startsWith('display') || part.startsWith('dir') || part.startsWith('align') || part.startsWith('justify') || part.startsWith('overflow')) color = '#93c5fd';
+            return <span key={i} style={{ color }}>{part}{i < debug.info.split(' · ').length - 1 ? ' · ' : ''}</span>;
+          })}</span>
+          {debug.measureInfo && (
+            <span style={{ display: 'block', marginTop: 6, padding: '6px 0', borderTop: '1px solid rgba(255,255,255,0.15)', color: '#86efac' }}>
+              {debug.measureInfo}
+            </span>
+          )}
+          {debug.locked && (
+            <span style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+              <DebugCopyBtn data-debug-ui onClick={debug.copyInfo}>Copy</DebugCopyBtn>
+              <DebugUnlockBtn data-debug-ui onClick={debug.unlock}>✕</DebugUnlockBtn>
+            </span>
+          )}
+        </DebugTooltip>
+      )}
+      <DebugToggle $on={debug.enabled} onClick={debug.toggle} data-debug-ui>⚙</DebugToggle>
       <TopNav logoPressed={transitioning} onLogoClick={() => navigate('/')} />
       <PageContent $transitioning={transitioning}>
 
-      <Hero>
+      <Hero data-ux="Hero">
 {/*        <Badge>For Notion</Badge> */}
-        <Title>
+        <Title data-ux="Hero Title">
           Make Notion work<br />
           <RotatingLine $width={textWidth}>
             <MeasureSpan ref={measureRef}>{measureText}</MeasureSpan>
@@ -1142,7 +1874,7 @@ export const LandingPage: React.FC = () => {
             </RotatingWordWrap>
           </RotatingLine>{'\u00A0\u00A0'}for you.
         </Title>
-        <HeroSubtitle>
+        <HeroSubtitle data-ux="Hero Subtitle">
           Templates and widgets that turn it into a clear, structured system
           for life, work, business, and study.
         </HeroSubtitle>
@@ -1155,20 +1887,74 @@ export const LandingPage: React.FC = () => {
 {/*        <TrustLine>Trusted by 11,000+ users worldwide</TrustLine> */}
       </Hero>
 
+      {/* ── Categories Marquee ── */}
+      <CategoriesWrap>
+        <CategoriesSection data-ux="Categories Marquee">
+          <CategoriesTrack $duration={50}>
+            {[...CATEGORY_CHIPS_ROW1, ...CATEGORY_CHIPS_ROW1, ...CATEGORY_CHIPS_ROW1].map((c, i) => (
+              <CategoryChip key={`cr1-${i}`} $color={c.color} onClick={() => c.label === 'Widget Studio' ? navigate('/widgets') : navigate(`/templates?cat=${c.label.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`)}>{c.label}</CategoryChip>
+            ))}
+          </CategoriesTrack>
+          <CategoriesTrack $duration={55} $reverse>
+            {[...CATEGORY_CHIPS_ROW2, ...CATEGORY_CHIPS_ROW2, ...CATEGORY_CHIPS_ROW2].map((c, i) => (
+              <CategoryChip key={`cr2-${i}`} $color={c.color} onClick={() => navigate(`/templates?cat=${c.label.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`)}>{c.label}</CategoryChip>
+            ))}
+          </CategoriesTrack>
+        </CategoriesSection>
+      </CategoriesWrap>
+
+      <FeatureCardsSection data-ux="Feature Cards Section">
+        <FeatureStack data-ux="Feature Stack">
+          {FEATURE_CARDS.map((f, i) => (
+            <FeatureCard
+              key={i}
+              $active={activeFeature === i}
+              $index={i}
+              $total={FEATURE_CARDS.length}
+              $activeIdx={activeFeature}
+              onClick={() => setActiveFeature(i === activeFeature ? (i + 1) % FEATURE_CARDS.length : i)}
+            >
+              <FeatureCardTab $color={f.color} $intensity={0.46 - ((i - activeFeature + FEATURE_CARDS.length) % FEATURE_CARDS.length) * 0.1} data-ux="Feature Card Tab">
+                <FeatureTabIcon>{f.icon}</FeatureTabIcon>
+                <FeatureTabTitle>{f.tab}</FeatureTabTitle>
+                <FeatureTabActions>⋯</FeatureTabActions>
+              </FeatureCardTab>
+              <FeatureCardBody data-ux="Feature Card Body">
+                <FeatureCardText>
+                  <FeatureCardTitle>{f.title}</FeatureCardTitle>
+                  <FeatureCardDesc>{f.desc}</FeatureCardDesc>
+                </FeatureCardText>
+                <FeatureCardImage>
+                  <img src={f.image} alt={f.title} />
+                </FeatureCardImage>
+              </FeatureCardBody>
+            </FeatureCard>
+          ))}
+        </FeatureStack>
+      </FeatureCardsSection>
+
       {/* ── Templates Gallery ── */}
-      <TemplatesGallery>
+      <TemplatesGallery data-ux="Templates Gallery">
         <BestsellersHeader style={{ maxWidth: 1200, margin: '0 auto 20px', padding: '0 48px', position: 'relative', zIndex: 2 }}>
           <BestsellersHeaderLeft>
-            <BestsellersTitle>Top templates</BestsellersTitle>
+            <BestsellersTitle data-ux="Section Title">Top templates</BestsellersTitle>
             <BestsellersSubtitle>Top picks from our community</BestsellersSubtitle>
           </BestsellersHeaderLeft>
           <BrowseAllButton onClick={() => navigate('/templates')}>Explore all</BrowseAllButton>
         </BestsellersHeader>
-        <TemplatesMarqueeWrap>
+        <TemplatesMarqueeWrap
+          data-ux="Marquee Wrap"
+          data-scrolled={templateScrolled ? 'true' : 'false'}
+          ref={templateWrapRef}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            setTemplateScrolled(el.scrollLeft > 10);
+          }}
+        >
           <TemplateMarqueeTrack $duration={60}>
-            {[...TEMPLATE_ROW_1, ...TEMPLATE_ROW_1, ...TEMPLATE_ROW_1].map((t, i) => (
+            {[...TEMPLATE_ROW_1, ...TEMPLATE_ROW_1].map((t, i) => (
               <TemplateCardWrap key={`tr1-${i}`} onClick={() => navigate('/templates')}>
-                <TemplateCard>
+                <TemplateCard data-ux="Template Card">
                   <TemplateCardImage src={t.image} alt={t.title} />
                 </TemplateCard>
                 <TemplateCardMeta>
@@ -1182,13 +1968,18 @@ export const LandingPage: React.FC = () => {
             ))}
           </TemplateMarqueeTrack>
         </TemplatesMarqueeWrap>
+        <TemplatesScrollHint onClick={() => {
+          if (templateWrapRef.current) templateWrapRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+        }}>
+          <ArrowRight />
+        </TemplatesScrollHint>
       </TemplatesGallery>
 
       {/* ── Widgets ── */}
-      <WidgetsSection>
+      <WidgetsSection data-ux="Widgets Section">
         <BestsellersHeader>
           <BestsellersHeaderLeft>
-            <BestsellersTitle>Featured widgets</BestsellersTitle>
+            <BestsellersTitle data-ux="Section Title">Featured widgets</BestsellersTitle>
             <BestsellersSubtitle>Embed into Notion in seconds</BestsellersSubtitle>
           </BestsellersHeaderLeft>
           <BrowseAllButton onClick={() => navigate('/widgets')}>Explore all</BrowseAllButton>
@@ -1196,7 +1987,7 @@ export const LandingPage: React.FC = () => {
         <WidgetGrid>
           {WIDGET_DATA.map((w, i) => (
             <WidgetCardWrap key={i} onClick={() => navigate('/widgets')}>
-              <WidgetCardBox>
+              <WidgetCardBox data-ux="Widget Card Image">
                 <WidgetCardImage src={w.image} alt={w.title} />
               </WidgetCardBox>
               <TemplateCardMeta>
@@ -1207,10 +1998,8 @@ export const LandingPage: React.FC = () => {
         </WidgetGrid>
       </WidgetsSection>
 
-
-
       {/* ── Testimonials ── */}
-      <TestimonialsSection>
+      <TestimonialsSection data-ux="Testimonials Section">
         <TestimonialsTitle>Loved by 10,000+ users</TestimonialsTitle>
         <TestimonialsSubtitle>See what people are saying about Peachy</TestimonialsSubtitle>
         <MarqueeContainer>
@@ -1270,7 +2059,7 @@ export const LandingPage: React.FC = () => {
         </MarqueeContainer>
       </TestimonialsSection>
 
-      <CTASection>
+      <CTASection data-ux="CTA Section">
         <CTATitle>Ready to level up?</CTATitle>
         <CTASubtitle>Explore templates or build your own widgets — no sign up needed.</CTASubtitle>
         <ButtonRow>
