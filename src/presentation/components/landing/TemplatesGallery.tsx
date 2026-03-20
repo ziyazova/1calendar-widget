@@ -9,7 +9,7 @@ const TemplatesGallerySection = styled.section`
   position: relative;
 
   @media (max-width: 768px) {
-    padding: 32px 0 60px;
+    padding: 0 0 60px;
   }
 `;
 
@@ -35,7 +35,7 @@ const TemplatesMarqueeWrap = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 0 24px;
+    padding: 0 16px;
   }
 `;
 
@@ -117,6 +117,10 @@ const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean 
   &:last-child {
     margin-bottom: 0;
   }
+
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
 `;
 
 const TemplatesScrollHint = styled.div`
@@ -168,6 +172,12 @@ const TemplateCard = styled.div`
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
   ${TemplateCardWrap}:hover & img {
     transform: scale(1.22);
+  }
+
+  @media (max-width: 768px) {
+    width: 160px;
+    height: 126px;
+    border-radius: 16px;
   }
 `;
 

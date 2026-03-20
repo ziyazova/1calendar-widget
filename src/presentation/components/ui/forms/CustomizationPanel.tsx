@@ -8,11 +8,14 @@ import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../../../domain/value-objects/BoardSettings';
 import { ColorPicker } from '../ColorPicker';
 
+export type PanelSection = 'style' | 'content' | 'color' | 'layout' | null;
+
 interface CustomizationPanelProps {
   widget: Widget | null;
   onSettingsChange: (settings: Partial<CalendarSettings | ClockSettings | BoardSettings>) => void;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
+  visibleSection?: PanelSection;
 }
 
 const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
@@ -120,6 +123,26 @@ const SectionTitle = styled.h3`
   letter-spacing: -0.01em;
 `;
 
+const MobilePanelContent = styled.div`
+  padding: 0 20px 24px;
+  animation: fadeIn 0.2s ease;
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  ${SectionTitle} {
+    display: none;
+  }
+
+  ${Section} {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: none;
+  }
+`;
+
 const FormGroup = styled.div`
   & + & {
     margin-top: 16px;
@@ -133,6 +156,8 @@ const Label = styled.label`
   color: #1F1F1F;
   margin-bottom: 8px;
   letter-spacing: -0.01em;
+
+  @media (max-width: 768px) { font-size: 13px; }
 `;
 
 const Select = styled.select`
@@ -144,6 +169,8 @@ const Select = styled.select`
   background: rgba(0, 0, 0, 0.03);
   box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
   color: #1F1F1F;
+
+  @media (max-width: 768px) { height: 40px; font-size: 13px; }
   font-size: 13px;
   font-weight: 400;
   font-family: inherit;
@@ -203,6 +230,16 @@ const Slider = styled.input`
   &::-webkit-slider-thumb:active {
     transform: scale(0.95);
   }
+
+  @media (max-width: 768px) {
+    touch-action: none;
+    height: 6px;
+
+    &::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+    }
+  }
 `;
 
 const SliderValue = styled.span`
@@ -223,6 +260,10 @@ const Toggle = styled.label`
   border-radius: 4px;
   transition: opacity 0.12s ease;
 
+  @media (max-width: 768px) {
+    padding: 6px 0;
+  }
+
   &:hover {
     opacity: 0.8;
   }
@@ -233,6 +274,8 @@ const ToggleText = styled.span`
   font-weight: 400;
   color: #1F1F1F;
   letter-spacing: -0.01em;
+
+  @media (max-width: 768px) { font-size: 13px; }
 `;
 
 const ToggleSwitch = styled.div<{ $checked: boolean }>`
@@ -258,6 +301,18 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
     background: #ffffff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (max-width: 768px) {
+    width: 46px;
+    height: 26px;
+    border-radius: 13px;
+
+    &::after {
+      width: 22px;
+      height: 22px;
+      left: ${({ $checked }) => $checked ? '22px' : '2px'};
+    }
   }
 `;
 
@@ -297,7 +352,7 @@ const TypewriterColorRow = styled.div`
   gap: 8px;
   min-height: 26px;
   align-items: center;
-  padding: 2px 0 0 5px;
+  padding: 2px 0 0 0;
 `;
 
 const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
@@ -323,6 +378,11 @@ const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
 
   &:focus {
     outline: none;
+  }
+
+  @media (max-width: 768px) {
+    width: 26px;
+    height: 26px;
   }
 `;
 
@@ -547,6 +607,8 @@ const LayoutOption = styled.button<{ $active: boolean }>`
     background: rgba(51, 132, 244, 0.04);
     color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
   }
+
+  @media (max-width: 768px) { height: 40px; font-size: 13px; }
 `;
 
 const LayoutOptions = styled.div`
@@ -580,6 +642,8 @@ const CompactOptions = styled.div`
   display: flex;
   align-items: center;
   flex-shrink: 0;
+
+  @media (max-width: 768px) { width: 108px; height: 32px; }
 `;
 
 const CompactSlider = styled.div<{ $activeIndex: number }>`
@@ -587,12 +651,17 @@ const CompactSlider = styled.div<{ $activeIndex: number }>`
   top: 2px;
   left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 45px - 2px)'};
   width: 45px;
-  height: 23px;
+  height: calc(100% - 4px);
   border-radius: 12px;
   background: #ffffff;
   border: none;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @media (max-width: 768px) {
+    width: 52px;
+    left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 52px - 2px)'};
+  }
 `;
 
 const CompactOption = styled.button<{ $active: boolean }>`
@@ -611,6 +680,8 @@ const CompactOption = styled.button<{ $active: boolean }>`
   transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   line-height: 21px;
+
+  @media (max-width: 768px) { font-size: 13px; }
 `;
 
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
@@ -618,6 +689,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   onSettingsChange,
   mobileOpen,
   onMobileClose,
+  visibleSection,
 }) => {
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -707,23 +779,13 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const isFlowerClockStyle = clkStyle === 'flower';
   const isDuoClockStyle = clkStyle === 'classic';
 
-  return (
-    <PanelContainer $mobileOpen={mobileOpen}>
-      <PanelHeader>
-        <PanelTitle>Design</PanelTitle>
-        {getWidgetInfo() && (
-          <WidgetBadge>
-            {React.createElement(getWidgetInfo()!.icon)}
-            <WidgetBadgeText>{getWidgetInfo()!.label}</WidgetBadgeText>
-          </WidgetBadge>
-        )}
-      </PanelHeader>
-
-      <PanelContent>
-        {isFlowerClockStyle && (
+  const Wrapper = visibleSection ? MobilePanelContent : PanelContent;
+  const panelContent = (
+      <Wrapper>
+        {/* ── 1. Style (flower clock or board only) ── */}
+        {(!visibleSection || visibleSection === 'style') && isFlowerClockStyle && (
           <Section>
             <SectionTitle>Style</SectionTitle>
-
             <FormGroup>
               <LayoutOptions>
                 <LayoutOption
@@ -749,196 +811,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </Section>
         )}
 
-        {!isBoard && (
-        <Section>
-          <SectionTitle>Color</SectionTitle>
-
-          {isTypewriterStyle ? (
-          <>
-          <FormGroup>
-            <Label>Primary</Label>
-            <ColorPicker
-              selectedColor={settings.primaryColor}
-              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
-              type="primary"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Body</Label>
-            <TypewriterColorRow>
-              {TYPEWRITER_COLORS.map((tc) => (
-                <TypewriterColorDot
-                  key={tc.value}
-                  $color={tc.color}
-                  $active={(settings as CalendarSettings).typewriterColor === tc.value}
-                  title={tc.label}
-                  onClick={() => onSettingsChange({ typewriterColor: tc.value })}
-                />
-              ))}
-            </TypewriterColorRow>
-          </FormGroup>
-          </>
-          ) : isFlowerClockStyle ? (
-          <>
-          <FormGroup>
-            <Label>Primary</Label>
-            <ColorPicker
-              selectedColor={settings.primaryColor}
-              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
-              type="primary"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Body</Label>
-            <TypewriterColorRow>
-              {(FLOWER_CLOCK_COLORS[(settings as ClockSettings).clockFrame] || FLOWER_CLOCK_COLORS.flower).map((tc) => (
-                <TypewriterColorDot
-                  key={tc.value}
-                  $color={tc.color}
-                  $active={(settings as ClockSettings).clockColor === tc.value}
-                  title={tc.label}
-                  onClick={() => onSettingsChange({ clockColor: tc.value })}
-                />
-              ))}
-            </TypewriterColorRow>
-          </FormGroup>
-          </>
-          ) : (
-          <>
-          <FormGroup>
-            <Label>Primary</Label>
-            <ColorPicker
-              selectedColor={settings.primaryColor}
-              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
-              type="primary"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Body</Label>
-            <ColorPicker
-              selectedColor={settings.backgroundColor}
-              onColorChange={(color) => onSettingsChange({ backgroundColor: color })}
-              type="background"
-            />
-          </FormGroup>
-
-          {!isClassicStyle && (
-          <FormGroup>
-            <Label>Accent</Label>
-            <ColorPicker
-              selectedColor={settings.accentColor}
-              onColorChange={(color) => onSettingsChange({ accentColor: color })}
-              type="accent"
-              showPresets={true}
-            />
-          </FormGroup>
-          )}
-          </>
-          )}
-        </Section>
-        )}
-
-        {isCollageStyle && widget.type === 'calendar' && (
-        <Section>
-          <SectionTitle>Layout</SectionTitle>
-          <FormGroup>
-            <Toggle as="div">
-              <ToggleText>Week start</ToggleText>
-              <CompactOptions>
-                <CompactSlider $activeIndex={(settings as CalendarSettings).weekStart === 'monday' ? 0 : 1} />
-                <CompactOption
-                  $active={(settings as CalendarSettings).weekStart === 'monday'}
-                  onClick={() => onSettingsChange({ weekStart: 'monday' })}
-                >
-                  Mon
-                </CompactOption>
-                <CompactOption
-                  $active={(settings as CalendarSettings).weekStart === 'sunday'}
-                  onClick={() => onSettingsChange({ weekStart: 'sunday' })}
-                >
-                  Sun
-                </CompactOption>
-              </CompactOptions>
-            </Toggle>
-          </FormGroup>
-        </Section>
-        )}
-
-        {!isCollageStyle && !isBoard && (
-        <Section>
-          <SectionTitle>Layout</SectionTitle>
-
-          {widget.type === 'calendar' && (
-          <FormGroup>
-            <Toggle as="div">
-              <ToggleText>Week start</ToggleText>
-              <CompactOptions>
-                <CompactSlider $activeIndex={(settings as CalendarSettings).weekStart === 'monday' ? 0 : 1} />
-                <CompactOption
-                  $active={(settings as CalendarSettings).weekStart === 'monday'}
-                  onClick={() => onSettingsChange({ weekStart: 'monday' })}
-                >
-                  Mon
-                </CompactOption>
-                <CompactOption
-                  $active={(settings as CalendarSettings).weekStart === 'sunday'}
-                  onClick={() => onSettingsChange({ weekStart: 'sunday' })}
-                >
-                  Sun
-                </CompactOption>
-              </CompactOptions>
-            </Toggle>
-          </FormGroup>
-          )}
-
-          <FormGroup>
-            <Label>Corners</Label>
-            <SliderRow>
-              <Slider
-                type="range"
-                min="0"
-                max="24"
-                step="2"
-                value={settings.borderRadius}
-                onChange={(e) => onSettingsChange({ borderRadius: parseInt(e.target.value) })}
-              />
-              <SliderValue>{settings.borderRadius}px</SliderValue>
-            </SliderRow>
-          </FormGroup>
-
-          <FormGroup>
-            <ToggleGroup>
-              <Toggle>
-                <ToggleText>Widget border</ToggleText>
-                <ToggleSwitch $checked={settings.showBorder} />
-                <HiddenCheckbox
-                  type="checkbox"
-                  checked={settings.showBorder}
-                  onChange={(e) => onSettingsChange({ showBorder: e.target.checked })}
-                />
-              </Toggle>
-
-              {widget.type === 'calendar' && (
-                <Toggle>
-                  <ToggleText>Day grid</ToggleText>
-                  <ToggleSwitch $checked={(settings as CalendarSettings).showDayBorders} />
-                  <HiddenCheckbox
-                    type="checkbox"
-                    checked={(settings as CalendarSettings).showDayBorders}
-                    onChange={(e) => onSettingsChange({ showDayBorders: e.target.checked })}
-                  />
-                </Toggle>
-              )}
-            </ToggleGroup>
-          </FormGroup>
-
-        </Section>
-        )}
-
-        {isBoard && (
+        {(!visibleSection || visibleSection === 'style') && isBoard && (
           <Section>
             <SectionTitle>Style</SectionTitle>
             <FormGroup>
@@ -966,9 +839,118 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </Section>
         )}
 
-        {isBoard && (
-          <Section>
-            <SectionTitle>Images</SectionTitle>
+        {/* ── 2. Content (always present) ── */}
+        {(!visibleSection || visibleSection === 'content') && <Section>
+          <SectionTitle>Content</SectionTitle>
+
+          {widget.type === 'calendar' && (
+          <>
+            <FormGroup>
+              <Toggle as="div">
+                <ToggleText>Week start</ToggleText>
+                <CompactOptions>
+                  <CompactSlider $activeIndex={(settings as CalendarSettings).weekStart === 'monday' ? 0 : 1} />
+                  <CompactOption
+                    $active={(settings as CalendarSettings).weekStart === 'monday'}
+                    onClick={() => onSettingsChange({ weekStart: 'monday' })}
+                  >
+                    Mon
+                  </CompactOption>
+                  <CompactOption
+                    $active={(settings as CalendarSettings).weekStart === 'sunday'}
+                    onClick={() => onSettingsChange({ weekStart: 'sunday' })}
+                  >
+                    Sun
+                  </CompactOption>
+                </CompactOptions>
+              </Toggle>
+            </FormGroup>
+
+            <FormGroup>
+              <Toggle>
+                <ToggleText>Day grid</ToggleText>
+                <ToggleSwitch $checked={(settings as CalendarSettings).showDayBorders} />
+                <HiddenCheckbox
+                  type="checkbox"
+                  checked={(settings as CalendarSettings).showDayBorders}
+                  onChange={(e) => onSettingsChange({ showDayBorders: e.target.checked })}
+                />
+              </Toggle>
+            </FormGroup>
+          </>
+          )}
+
+          {widget.type === 'clock' && (
+          <>
+            {!isFlowerClockStyle && (
+            <FormGroup>
+              <Toggle as="div">
+                <ToggleText>Format</ToggleText>
+                <CompactOptions>
+                  <CompactSlider $activeIndex={(settings as ClockSettings).format24h ? 1 : 0} />
+                  <CompactOption
+                    $active={!(settings as ClockSettings).format24h}
+                    onClick={() => onSettingsChange({ format24h: false })}
+                  >
+                    12h
+                  </CompactOption>
+                  <CompactOption
+                    $active={(settings as ClockSettings).format24h}
+                    onClick={() => onSettingsChange({ format24h: true })}
+                  >
+                    24h
+                  </CompactOption>
+                </CompactOptions>
+              </Toggle>
+            </FormGroup>
+            )}
+
+            {!isDuoClockStyle && (
+            <FormGroup>
+              <Toggle>
+                <ToggleText>Seconds</ToggleText>
+                <ToggleSwitch $checked={(settings as ClockSettings).showSeconds} />
+                <HiddenCheckbox
+                  type="checkbox"
+                  checked={(settings as ClockSettings).showSeconds}
+                  onChange={(e) => onSettingsChange({ showSeconds: e.target.checked })}
+                />
+              </Toggle>
+            </FormGroup>
+            )}
+
+            {!isFlowerClockStyle && (
+            <FormGroup>
+              <Toggle>
+                <ToggleText>{isDuoClockStyle ? 'Weekdays' : 'Date'}</ToggleText>
+                <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
+                <HiddenCheckbox
+                  type="checkbox"
+                  checked={(settings as ClockSettings).showDate}
+                  onChange={(e) => onSettingsChange({ showDate: e.target.checked })}
+                />
+              </Toggle>
+            </FormGroup>
+            )}
+
+            {!isClassicStyle && (
+            <FormGroup>
+              <Label>Size</Label>
+              <Select
+                value={(settings as ClockSettings).fontSize}
+                onChange={(e) => onSettingsChange({ fontSize: e.target.value as 'small' | 'medium' | 'large' })}
+              >
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </Select>
+            </FormGroup>
+            )}
+          </>
+          )}
+
+          {isBoard && (
+          <>
             <ImageHint>
               Paste direct image links from Pinterest, Imgur, Unsplash or any public URL
             </ImageHint>
@@ -1017,80 +999,155 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 </ImageList>
               )}
             </FormGroup>
-          </Section>
+          </>
+          )}
+        </Section>}
+
+        {/* ── 3. Color (hide for board) ── */}
+        {(!visibleSection || visibleSection === 'color') && !isBoard && (
+        <Section>
+          <SectionTitle>Color</SectionTitle>
+
+          {isTypewriterStyle ? (
+          <>
+          <FormGroup>
+            <Label>Primary</Label>
+            <ColorPicker
+              selectedColor={settings.primaryColor}
+              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
+              type="primary"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Background</Label>
+            <TypewriterColorRow>
+              {TYPEWRITER_COLORS.map((tc) => (
+                <TypewriterColorDot
+                  key={tc.value}
+                  $color={tc.color}
+                  $active={(settings as CalendarSettings).typewriterColor === tc.value}
+                  title={tc.label}
+                  onClick={() => onSettingsChange({ typewriterColor: tc.value })}
+                />
+              ))}
+            </TypewriterColorRow>
+          </FormGroup>
+          </>
+          ) : isFlowerClockStyle ? (
+          <>
+          <FormGroup>
+            <Label>Primary</Label>
+            <ColorPicker
+              selectedColor={settings.primaryColor}
+              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
+              type="primary"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Background</Label>
+            <TypewriterColorRow>
+              {(FLOWER_CLOCK_COLORS[(settings as ClockSettings).clockFrame] || FLOWER_CLOCK_COLORS.flower).map((tc) => (
+                <TypewriterColorDot
+                  key={tc.value}
+                  $color={tc.color}
+                  $active={(settings as ClockSettings).clockColor === tc.value}
+                  title={tc.label}
+                  onClick={() => onSettingsChange({ clockColor: tc.value })}
+                />
+              ))}
+            </TypewriterColorRow>
+          </FormGroup>
+          </>
+          ) : (
+          <>
+          <FormGroup>
+            <Label>Primary</Label>
+            <ColorPicker
+              selectedColor={settings.primaryColor}
+              onColorChange={(color) => onSettingsChange({ primaryColor: color })}
+              type="primary"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Background</Label>
+            <ColorPicker
+              selectedColor={settings.backgroundColor}
+              onColorChange={(color) => onSettingsChange({ backgroundColor: color })}
+              type="background"
+            />
+          </FormGroup>
+
+          {!isClassicStyle && (
+          <FormGroup>
+            <Label>Accent</Label>
+            <ColorPicker
+              selectedColor={settings.accentColor}
+              onColorChange={(color) => onSettingsChange({ accentColor: color })}
+              type="accent"
+              showPresets={true}
+            />
+          </FormGroup>
+          )}
+          </>
+          )}
+        </Section>
         )}
 
-        {widget.type === 'clock' && (
-          <Section>
-            <SectionTitle>Style</SectionTitle>
+        {/* ── 4. Layout (hide for board, hide for collage-only styles) ── */}
+        {(!visibleSection || visibleSection === 'layout') && !isCollageStyle && !isBoard && (
+        <Section>
+          <SectionTitle>Layout</SectionTitle>
 
-            {!isClassicStyle && (
-            <FormGroup>
-              <Label>Size</Label>
-              <Select
-                value={(settings as ClockSettings).fontSize}
-                onChange={(e) => onSettingsChange({ fontSize: e.target.value as 'small' | 'medium' | 'large' })}
-              >
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-              </Select>
-            </FormGroup>
-            )}
+          <FormGroup>
+            <Label>Corners</Label>
+            <SliderRow>
+              <Slider
+                type="range"
+                min="0"
+                max="24"
+                step="2"
+                value={settings.borderRadius}
+                onChange={(e) => onSettingsChange({ borderRadius: parseInt(e.target.value) })}
+              />
+              <SliderValue>{settings.borderRadius}px</SliderValue>
+            </SliderRow>
+          </FormGroup>
 
-            {!isFlowerClockStyle && (
-            <FormGroup>
-              <Toggle as="div">
-                <ToggleText>Format</ToggleText>
-                <CompactOptions>
-                  <CompactSlider $activeIndex={(settings as ClockSettings).format24h ? 1 : 0} />
-                  <CompactOption
-                    $active={!(settings as ClockSettings).format24h}
-                    onClick={() => onSettingsChange({ format24h: false })}
-                  >
-                    12h
-                  </CompactOption>
-                  <CompactOption
-                    $active={(settings as ClockSettings).format24h}
-                    onClick={() => onSettingsChange({ format24h: true })}
-                  >
-                    24h
-                  </CompactOption>
-                </CompactOptions>
-              </Toggle>
-            </FormGroup>
-            )}
-
-            <FormGroup>
-              <ToggleGroup>
-                {!isDuoClockStyle && (
-                <Toggle>
-                  <ToggleText>Seconds</ToggleText>
-                  <ToggleSwitch $checked={(settings as ClockSettings).showSeconds} />
-                  <HiddenCheckbox
-                    type="checkbox"
-                    checked={(settings as ClockSettings).showSeconds}
-                    onChange={(e) => onSettingsChange({ showSeconds: e.target.checked })}
-                  />
-                </Toggle>
-                )}
-
-                {!isFlowerClockStyle && (
-                <Toggle>
-                  <ToggleText>{isDuoClockStyle ? 'Weekdays' : 'Date'}</ToggleText>
-                  <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
-                  <HiddenCheckbox
-                    type="checkbox"
-                    checked={(settings as ClockSettings).showDate}
-                    onChange={(e) => onSettingsChange({ showDate: e.target.checked })}
-                  />
-                </Toggle>
-                )}
-              </ToggleGroup>
-            </FormGroup>
-          </Section>
+          <FormGroup>
+            <Toggle>
+              <ToggleText>Widget border</ToggleText>
+              <ToggleSwitch $checked={settings.showBorder} />
+              <HiddenCheckbox
+                type="checkbox"
+                checked={settings.showBorder}
+                onChange={(e) => onSettingsChange({ showBorder: e.target.checked })}
+              />
+            </Toggle>
+          </FormGroup>
+        </Section>
         )}
-      </PanelContent>
+      </Wrapper>
+  );
+
+  if (visibleSection) {
+    return panelContent;
+  }
+
+  return (
+    <PanelContainer $mobileOpen={mobileOpen}>
+      <PanelHeader>
+        <PanelTitle>Design</PanelTitle>
+        {getWidgetInfo() && (
+          <WidgetBadge>
+            {React.createElement(getWidgetInfo()!.icon)}
+            <WidgetBadgeText>{getWidgetInfo()!.label}</WidgetBadgeText>
+          </WidgetBadge>
+        )}
+      </PanelHeader>
+      {panelContent}
     </PanelContainer>
   );
 };

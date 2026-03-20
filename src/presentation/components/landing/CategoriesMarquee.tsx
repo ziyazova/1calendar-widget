@@ -92,27 +92,19 @@ const CategoryChip = styled.div<{ $color: string }>`
 `;
 
 const CATEGORY_CHIPS_ROW1 = [
-  { label: 'Planners', color: '#F59E0B' },
-  { label: 'Dashboards', color: '#3B82F6' },
-  { label: 'Trackers', color: '#8B5CF6' },
-  { label: 'Journals', color: '#EC4899' },
-  { label: 'Finance', color: '#10B981' },
-  { label: 'Productivity', color: '#6366F1' },
+  { label: 'Life Planners', color: '#F59E0B' },
+  { label: 'Productivity Systems', color: '#6366F1' },
   { label: 'Health & Wellness', color: '#F97316' },
-  { label: 'Goals', color: '#14B8A6' },
   { label: 'Widget Studio', color: '#3B82F6' },
+  { label: 'Student Planner', color: '#8B5CF6' },
 ];
 
 const CATEGORY_CHIPS_ROW2 = [
-  { label: 'Weekly Planner', color: '#F59E0B' },
-  { label: 'Life OS', color: '#A855F7' },
-  { label: 'Budget Tracker', color: '#22C55E' },
-  { label: 'Habit Tracker', color: '#3B82F6' },
-  { label: 'Mood Journal', color: '#F43F5E' },
   { label: 'Student Planner', color: '#8B5CF6' },
-  { label: 'Project Roadmap', color: '#06B6D4' },
-  { label: 'Reading List', color: '#6366F1' },
-  { label: 'Meal Planner', color: '#10B981' },
+  { label: 'Widget Studio', color: '#3B82F6' },
+  { label: 'Life Planners', color: '#F59E0B' },
+  { label: 'Health & Wellness', color: '#F97316' },
+  { label: 'Productivity Systems', color: '#6366F1' },
 ];
 
 interface CategoriesMarqueeProps {

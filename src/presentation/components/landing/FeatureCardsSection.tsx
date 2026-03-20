@@ -38,7 +38,8 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   flex-direction: column;
   background: #ffffff;
   border-radius: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: none;
   box-shadow: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
     return behind === 0
@@ -108,7 +109,10 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     margin-right: 0 !important;
     opacity: 1 !important;
     scroll-snap-align: start;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+    overflow: clip;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
   }
 `;
 
@@ -130,7 +134,6 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
     const b = parseInt(hex.slice(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.4})`;
   }};
-  border-radius: 24px 24px 0 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -241,14 +244,6 @@ const FEATURE_CARDS = [
     title: 'Dark mode that just works',
     desc: 'Auto theme detection means your widgets adapt to Notion\'s light and dark mode seamlessly. No manual switching.',
     image: '/widget-clock2.png',
-  },
-  {
-    tab: 'Pricing',
-    icon: '\u{2728}',
-    color: '#10B981',
-    title: 'Free forever',
-    desc: 'All widgets are completely free. No sign-up, no premium tier, no limits. Just beautiful tools for your workspace.',
-    image: '/widget-calendar2.png',
   },
 ];
 

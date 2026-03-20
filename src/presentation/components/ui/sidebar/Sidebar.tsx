@@ -326,59 +326,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </WidgetCategory>
         )}
 
-        <SectionLabel>Archive</SectionLabel>
-
-        <WidgetCategory>
-          <CategoryHeader
-            $expanded={expandedSections.includes('archive')}
-            $muted
-            onClick={() => toggle('archive')}
-          >
-            <CategoryIcon $muted><Archive /></CategoryIcon>
-            Layout Experiments
-            <ChevronRight className="chevron" />
-          </CategoryHeader>
-          <StylesList $expanded={expandedSections.includes('archive')}>
-            <div>
-              {ARCHIVE_STYLES.map((s) => (
-                <StyleItem
-                  key={s.value}
-                  $active={currentWidget === `calendar-${s.value}`}
-                  onClick={() => onWidgetChange('calendar', s.value)}
-                >
-                  <s.icon />
-                  {s.label}
-                </StyleItem>
-              ))}
-            </div>
-          </StylesList>
-        </WidgetCategory>
-
-        <WidgetCategory>
-          <CategoryHeader
-            $expanded={expandedSections.includes('clock-archive')}
-            $muted
-            onClick={() => toggle('clock-archive')}
-          >
-            <CategoryIcon $muted><Archive /></CategoryIcon>
-            Clock Archive
-            <ChevronRight className="chevron" />
-          </CategoryHeader>
-          <StylesList $expanded={expandedSections.includes('clock-archive')}>
-            <div>
-              {CLOCK_ARCHIVE_STYLES.map((s) => (
-                <StyleItem
-                  key={s.value}
-                  $active={currentWidget === `clock-${s.value}`}
-                  onClick={() => onWidgetChange('clock', s.value)}
-                >
-                  <s.icon />
-                  {s.label}
-                </StyleItem>
-              ))}
-            </div>
-          </StylesList>
-        </WidgetCategory>
       </NavSection>
     </SidebarContainer>
   );

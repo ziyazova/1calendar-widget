@@ -60,10 +60,15 @@ const FigmaColorRow = styled.div`
   align-items: center;
   height: 30px;
   border-radius: 10px;
-  border: none;
   background: rgba(0, 0, 0, 0.03);
   box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
   padding: 0 10px 0 5px;
+
+  @media (max-width: 768px) {
+    height: 34px;
+    border-radius: 10px;
+    padding: 0 10px 0 4px;
+  }
 `;
 
 const ColorSwatch = styled.div<{ $color: string }>`
@@ -85,6 +90,11 @@ const ColorSwatch = styled.div<{ $color: string }>`
   &:hover .swatch-icon {
     opacity: 1;
   }
+
+  @media (max-width: 768px) {
+    width: 26px;
+    height: 26px;
+  }
 `;
 
 const SwatchIcon = styled.div<{ $light: boolean }>`
@@ -97,6 +107,10 @@ const SwatchIcon = styled.div<{ $light: boolean }>`
   border-radius: 30%;
   opacity: 0;
   transition: opacity 0.15s ease;
+
+  @media (max-width: 768px) {
+    opacity: 0.6;
+  }
   pointer-events: none;
 
   svg {
@@ -107,11 +121,11 @@ const SwatchIcon = styled.div<{ $light: boolean }>`
 `;
 
 const HexInput = styled.input`
-  width: 80px;
-  height: 28px;
+  width: 70px;
+  height: 20px;
   border: none;
   border-radius: 0;
-  padding: 0 8px 0 0;
+  padding: 0;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
@@ -121,11 +135,17 @@ const HexInput = styled.input`
   flex-shrink: 0;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  text-align: left;
+  line-height: 20px;
   transition: color 0.15s ease;
 
   &:focus {
-    color: #6B6B6B;
+    color: #1F1F1F;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+    height: 26px;
+    line-height: 26px;
   }
 `;
 
@@ -133,11 +153,15 @@ const PresetGroup = styled.div`
   display: flex;
   gap: 6px;
   margin-left: auto;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
 `;
 
 const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
-  width: 17px;
-  height: 17px;
+  width: 20px;
+  height: 20px;
   border-radius: 30%;
   border: 1.5px solid transparent;
   box-shadow: ${({ $selected, $color }) => {
@@ -158,6 +182,11 @@ const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
 
   &:focus {
     outline: none;
+  }
+
+  @media (max-width: 768px) {
+    width: 26px;
+    height: 26px;
   }
 `;
 
@@ -226,6 +255,12 @@ const SaturationCanvas = styled.canvas`
   border-radius: 12px;
   cursor: default;
   display: block;
+  touch-action: none;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 200px;
+  }
 `;
 
 const HueSliderTrack = styled.div`
@@ -237,6 +272,12 @@ const HueSliderTrack = styled.div`
   );
   position: relative;
   cursor: pointer;
+  touch-action: none;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 16px;
+  }
 `;
 
 const HueThumb = styled.div<{ $pos: number }>`
@@ -255,8 +296,8 @@ const HueThumb = styled.div<{ $pos: number }>`
 
 const SatThumb = styled.div<{ $x: number; $y: number }>`
   position: absolute;
-  left: ${({ $x }) => $x}px;
-  top: ${({ $y }) => $y}px;
+  left: ${({ $x }) => $x}%;
+  top: ${({ $y }) => $y}%;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -334,6 +375,72 @@ const PickerHexInput = styled.input`
   }
 `;
 
+const MobilePickerOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 59;
+`;
+
+const MobilePickerHandleArea = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 0;
+  margin-bottom: -12px;
+`;
+
+const MobilePickerHandle = styled.div`
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+`;
+
+const MobilePickerWrap = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12);
+  z-index: 60;
+  padding: 0 20px 32px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const MobilePickerHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+`;
+
+const MobilePickerBack = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.04);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #9A9A9A;
+
+  svg { width: 14px; height: 14px; }
+`;
+
+const MobilePickerTitle = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.02em;
+`;
+
 const isValidHex = (value: string): boolean =>
   /^#[0-9A-Fa-f]{6}$/.test(value);
 
@@ -352,6 +459,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
   // HSV state for picker
   const [hsv, setHsv] = useState<[number, number, number]>(() => hexToHsv(selectedColor));
+  const hsvRef = useRef(hsv);
+  hsvRef.current = hsv;
+  const onColorChangeRef = useRef(onColorChange);
+  onColorChangeRef.current = onColorChange;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const draggingSat = useRef(false);
   const draggingHue = useRef(false);
@@ -377,9 +488,13 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const w = 216, h = 180;
-    canvas.width = w;
-    canvas.height = h;
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.round(rect.width) || 216;
+    const h = Math.round(rect.height) || 180;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
 
     // Base hue color
     const hueColor = hsvToHex(hsv[0], 1, 1);
@@ -399,31 +514,34 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     ctx.fillRect(0, 0, w, h);
   }, [open, hsv[0]]);
 
-  const updateFromSatCanvas = useCallback((e: React.MouseEvent | MouseEvent) => {
+  const updateFromSatCanvas = useCallback((e: React.MouseEvent | MouseEvent | React.TouchEvent | TouchEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-    const newHsv: [number, number, number] = [hsv[0], x, 1 - y];
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
+    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+    const newHsv: [number, number, number] = [hsvRef.current[0], x, 1 - y];
     setHsv(newHsv);
     const hex = hsvToHex(...newHsv);
     setHexInput(hex);
-    onColorChange(hex);
-  }, [hsv, onColorChange]);
+    onColorChangeRef.current(hex);
+  }, []);
 
-  const updateFromHue = useCallback((e: React.MouseEvent | MouseEvent) => {
+  const updateFromHue = useCallback((e: React.MouseEvent | MouseEvent | React.TouchEvent | TouchEvent) => {
     const target = (e.currentTarget || e.target) as HTMLElement;
     const track = target.closest('[data-hue-track]') as HTMLElement || target;
     const rect = track.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const clientX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const newH = x * 360;
-    const newHsv: [number, number, number] = [newH, hsv[1], hsv[2]];
+    const newHsv: [number, number, number] = [newH, hsvRef.current[1], hsvRef.current[2]];
     setHsv(newHsv);
     const hex = hsvToHex(...newHsv);
     setHexInput(hex);
-    onColorChange(hex);
-  }, [hsv, onColorChange]);
+    onColorChangeRef.current(hex);
+  }, []);
 
   // Global mouse handlers for dragging
   useEffect(() => {
@@ -436,11 +554,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         const rect = canvas.getBoundingClientRect();
         const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
         const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-        const newHsv: [number, number, number] = [hsv[0], x, 1 - y];
+        const newHsv: [number, number, number] = [hsvRef.current[0], x, 1 - y];
         setHsv(newHsv);
         const hex = hsvToHex(...newHsv);
         setHexInput(hex);
-        onColorChange(hex);
+        onColorChangeRef.current(hex);
       }
       if (draggingHue.current) {
         const track = document.querySelector('[data-hue-track]') as HTMLElement;
@@ -448,11 +566,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         const rect = track.getBoundingClientRect();
         const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
         const newH = x * 360;
-        const newHsv: [number, number, number] = [newH, hsv[1], hsv[2]];
+        const newHsv: [number, number, number] = [newH, hsvRef.current[1], hsvRef.current[2]];
         setHsv(newHsv);
         const hex = hsvToHex(...newHsv);
         setHexInput(hex);
-        onColorChange(hex);
+        onColorChangeRef.current(hex);
       }
     };
 
@@ -461,13 +579,46 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       draggingHue.current = false;
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (draggingSat.current) {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+        const y = Math.max(0, Math.min(1, (touch.clientY - rect.top) / rect.height));
+        const newHsv: [number, number, number] = [hsvRef.current[0], x, 1 - y];
+        setHsv(newHsv);
+        const hex = hsvToHex(...newHsv);
+        setHexInput(hex);
+        onColorChangeRef.current(hex);
+      }
+      if (draggingHue.current) {
+        const track = document.querySelector('[data-hue-track]') as HTMLElement;
+        if (!track) return;
+        const rect = track.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+        const newH = x * 360;
+        const newHsv: [number, number, number] = [newH, hsvRef.current[1], hsvRef.current[2]];
+        setHsv(newHsv);
+        const hex = hsvToHex(...newHsv);
+        setHexInput(hex);
+        onColorChangeRef.current(hex);
+      }
+    };
+
     window.addEventListener('mousemove', handleMove);
     window.addEventListener('mouseup', handleUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleUp);
     return () => {
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleUp);
     };
-  }, [open, hsv, onColorChange]);
+  }, [open]);
 
   const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace('#', '');
@@ -484,8 +635,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     }
   };
 
-  const satX = hsv[1] * 216;
-  const satY = (1 - hsv[2]) * 180;
+  const satX = hsv[1] * 100;
+  const satY = (1 - hsv[2]) * 100;
 
   return (
     <ColorPickerContainer>
@@ -496,9 +647,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           onClick={() => {
             if (!open && swatchRef.current) {
               const rect = swatchRef.current.getBoundingClientRect();
+              const isMobile = window.innerWidth <= 768;
               setPopupPos({
-                top: rect.bottom - 18,
-                left: Math.max(8, rect.left - 240 - 28),
+                top: isMobile ? Math.min(rect.bottom + 8, window.innerHeight - 320) : rect.bottom - 18,
+                left: isMobile ? Math.max(8, (window.innerWidth - 240) / 2) : Math.max(8, rect.left - 240 - 28),
               });
             }
             setOpen(!open);
@@ -513,6 +665,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           value={hexInput.replace('#', '')}
           onChange={handleHexChange}
           onBlur={handleHexBlur}
+          onFocus={(e) => e.target.select()}
           placeholder="000000"
           maxLength={6}
           spellCheck={false}
@@ -536,7 +689,61 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         </PresetGroup>
       )}
 
-      {open && createPortal(
+      {open && (typeof window !== 'undefined' && window.innerWidth <= 768 ? createPortal(
+        <>
+        <MobilePickerOverlay onClick={() => setOpen(false)} />
+        <MobilePickerWrap>
+          <MobilePickerHandleArea>
+            <MobilePickerHandle />
+          </MobilePickerHandleArea>
+          <MobilePickerHeader>
+            <MobilePickerTitle>Pick color</MobilePickerTitle>
+            <MobilePickerBack onClick={() => setOpen(false)}>
+              <X />
+            </MobilePickerBack>
+          </MobilePickerHeader>
+
+          <SatCanvasWrap>
+            <SaturationCanvas
+              ref={canvasRef}
+              onMouseDown={(e) => { draggingSat.current = true; updateFromSatCanvas(e); }}
+              onTouchStart={(e) => { draggingSat.current = true; updateFromSatCanvas(e); }}
+            />
+            <SatThumb $x={satX} $y={satY} />
+          </SatCanvasWrap>
+
+          <HueSliderTrack
+            data-hue-track
+            onMouseDown={(e) => { draggingHue.current = true; updateFromHue(e); }}
+            onTouchStart={(e) => { draggingHue.current = true; updateFromHue(e); }}
+          >
+            <HueThumb $pos={(hsv[0] / 360) * 100} />
+          </HueSliderTrack>
+
+          <PickerBottomRow>
+            <PickerColorPreview $color={hsvToHex(...hsv)} />
+            <PickerHexInput
+              value={hexInput.replace('#', '')}
+              onChange={(e) => {
+                const val = e.target.value.replace('#', '');
+                setHexInput('#' + val);
+                if (isValidHex('#' + val)) {
+                  onColorChange('#' + val);
+                  setHsv(hexToHsv('#' + val));
+                }
+              }}
+              onBlur={() => {
+                if (!isValidHex(hexInput)) setHexInput(hsvToHex(...hsv));
+              }}
+              placeholder="000000"
+              maxLength={6}
+              spellCheck={false}
+            />
+          </PickerBottomRow>
+        </MobilePickerWrap>
+        </>,
+        document.body
+      ) : createPortal(
         <>
           <PickerOverlay onClick={() => setOpen(false)} />
           <PickerPopup style={{ top: popupPos.top, left: popupPos.left }}>
@@ -608,7 +815,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           </PickerPopup>
         </>,
         document.body
-      )}
+      ))}
     </ColorPickerContainer>
   );
 };

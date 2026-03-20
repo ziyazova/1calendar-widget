@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, LayoutGrid, Grip, SlidersHorizontal, X, Menu, Palette, Ruler, Square, Share2 } from 'lucide-react';
+import { Copy, Check, Pencil, LayoutGrid, Grip, SlidersHorizontal, X, Menu, Palette, Settings2, Brush, Sliders } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -140,7 +140,7 @@ const ZoomableWidget = styled.div<{ $zoom: number }>`
   }
 
   @media (max-width: 768px) {
-    transform: scale(0.85) translateY(0);
+    transform: scale(0.85) translateY(-60px);
     animation: none;
     opacity: 1;
   }
@@ -355,6 +355,10 @@ const GridToggle = styled.button<{ $active: boolean }>`
     width: 16px;
     height: 16px;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const EmbedUrlGroup = styled.div`
@@ -480,14 +484,73 @@ const MobileOverlay = styled.div`
   }
 `;
 
+const MobileEmbedFloating = styled.div`
+  display: none;
+  position: absolute;
+  top: 16px;
+  left: 32px;
+  right: 32px;
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
+const MobileEmbedRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0 4px 0 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+`;
+
+const MobileEmbedUrl = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  color: #6B6B6B;
+  outline: none;
+  text-overflow: ellipsis;
+`;
+
+const MobileCopyButton = styled.button<{ $copied: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  white-space: nowrap;
+  background: ${({ $copied }) => $copied ? 'rgba(34, 197, 94, 0.1)' : 'linear-gradient(135deg, #3384F4, #5BA0F7)'};
+  color: ${({ $copied }) => $copied ? '#22C55E' : '#fff'};
+
+  svg { width: 12px; height: 12px; }
+`;
+
 const DesktopOnly = styled.div`
   @media (max-width: 768px) {
     display: none;
   }
 `;
 
-/* ── Mobile Bottom Tab Bar (Canva-style) ── */
-type MobileTab = 'color' | 'layout' | 'size' | 'share' | null;
+/* ── Mobile Bottom Tab Bar ── */
+type MobileTab = 'content' | 'color' | 'style' | 'layout' | null;
 
 const MobileTabBar = styled.div`
   display: none;
@@ -499,7 +562,7 @@ const MobileTabBar = styled.div`
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   padding: 8px 0;
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
-  z-index: 50;
+  z-index: 52;
 
   @media (max-width: 768px) {
     display: flex;
@@ -507,24 +570,38 @@ const MobileTabBar = styled.div`
   }
 `;
 
-const MobileTabButton = styled.button<{ $active?: boolean }>`
+const MobileTabButton = styled.button<{ $active?: boolean; $disabled?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
+  width: 60px;
+  height: 52px;
   background: none;
   border: none;
-  cursor: pointer;
-  padding: 4px 12px;
-  border-radius: 8px;
+  cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
+  border-radius: 14px;
   transition: all 0.15s ease;
-  color: ${({ $active }) => $active ? '#3384F4' : '#9A9A9A'};
+  color: ${({ $active, $disabled }) => $disabled ? '#BCBCBC' : $active ? '#3384F4' : '#999'};
+  opacity: ${({ $disabled }) => $disabled ? 0.6 : 1};
+  pointer-events: ${({ $disabled }) => $disabled ? 'none' : 'auto'};
 
-  svg { width: 22px; height: 22px; }
+  ${({ $active }) => $active && `
+    background: rgba(51, 132, 244, 0.08);
+    color: #3384F4;
+  `}
+
+  &:hover {
+    background: ${({ $disabled }) => $disabled ? 'none' : 'rgba(51, 132, 244, 0.05)'};
+    color: ${({ $disabled }) => $disabled ? '#D0D0D0' : '#3384F4'};
+  }
+
+  svg { width: 20px; height: 20px; }
 `;
 
 const MobileTabLabel = styled.span`
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: -0.01em;
 `;
@@ -532,13 +609,13 @@ const MobileTabLabel = styled.span`
 const MobileSheet = styled.div<{ $open: boolean }>`
   display: none;
   position: fixed;
-  bottom: 0;
+  bottom: calc(60px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  height: 55vh;
+  max-height: 55vh;
   background: #ffffff;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
   z-index: 51;
   transform: ${({ $open }) => $open ? 'translateY(0)' : 'translateY(100%)'};
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -547,23 +624,65 @@ const MobileSheet = styled.div<{ $open: boolean }>`
 
   @media (max-width: 768px) {
     display: block;
+    padding-bottom: 16px;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
   }
 `;
 
+const MobileSheetTop = styled.div`
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 2;
+  border-radius: 20px 20px 0 0;
+  touch-action: none;
+`;
+
+const MobileSheetHandleArea = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  cursor: grab;
+  touch-action: none;
+`;
+
 const MobileSheetHandle = styled.div`
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(0, 0, 0, 0.12);
-  margin: 10px auto 16px;
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+`;
+
+const MobileSheetHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 18px;
 `;
 
 const MobileSheetTitle = styled.div`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #1F1F1F;
-  padding: 0 20px 16px;
   letter-spacing: -0.02em;
+`;
+
+const MobileSheetClose = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  color: #9A9A9A;
+  cursor: pointer;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover { background: rgba(0, 0, 0, 0.08); }
 `;
 
 const LayoutCheckArea = styled.div`
@@ -669,6 +788,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       .catch((err) => Logger.error('StudioPage', 'Failed to copy embed URL', err));
   };
 
+  // Determine which mobile tabs are available for current widget
+  const isBoard = currentWidget?.type === 'board';
+  const calStyle = currentWidget?.type === 'calendar' ? (currentWidget.settings as CalendarSettings).style : '';
+  const clkStyle = currentWidget?.type === 'clock' ? (currentWidget.settings as ClockSettings).style : '';
+  const isCollageStyle = calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'flower';
+  const hasStyle = isBoard || clkStyle === 'flower'; // only flower clock and board have Style presets
+  const hasColor = !isBoard;
+  const hasLayout = !isBoard && !isCollageStyle;
+
   return (
     <StudioContainer $transitioning={transitioning}>
       <WorkspaceContainer>
@@ -685,7 +813,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {mobileSidebar && <MobileOverlay onClick={() => setMobileSidebar(false)} />}
 
         <MobileTopBar>
-          <MobileBarButton onClick={() => setMobileSidebar(!mobileSidebar)}>
+          <MobileBarButton onClick={() => { const next = !mobileSidebar; setMobileSidebar(next); if (next) setMobileTab(null); }}>
             <Menu />
           </MobileBarButton>
           <MobileBarTitle>Studio</MobileBarTitle>
@@ -695,7 +823,20 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         <ContentArea $fullWidth={viewMode === 'layout-check'}>
           {viewMode === 'editor' ? (
             <>
-              <WidgetArea>
+              <WidgetArea onClick={() => mobileTab && setMobileTab(null)}>
+                <MobileEmbedFloating>
+                  <MobileEmbedRow>
+                    <MobileEmbedUrl
+                      readOnly
+                      value={embedUrl}
+                      onFocus={(e) => e.target.select()}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <MobileCopyButton onClick={(e) => { e.stopPropagation(); handleCopyEmbedUrl(); }} $copied={copied}>
+                      {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
+                    </MobileCopyButton>
+                  </MobileEmbedRow>
+                </MobileEmbedFloating>
                 {showGrid && <DotGrid />}
 
                 <ZoomableWidget key={currentWidgetKey} $zoom={studioZoom}>
@@ -803,46 +944,61 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
       {/* Mobile bottom tab bar */}
       <MobileTabBar>
-        <MobileTabButton $active={mobileTab === 'color'} onClick={() => setMobileTab(mobileTab === 'color' ? null : 'color')}>
+        <MobileTabButton $active={mobileTab === 'content'} onClick={() => { setMobileSidebar(false); setMobileTab(mobileTab === 'content' ? null : 'content'); }}>
+          <Sliders />
+          <MobileTabLabel>Content</MobileTabLabel>
+        </MobileTabButton>
+        <MobileTabButton $active={mobileTab === 'color'} $disabled={!hasColor} onClick={() => { if (!hasColor) return; setMobileSidebar(false); setMobileTab(mobileTab === 'color' ? null : 'color'); }}>
           <Palette />
           <MobileTabLabel>Color</MobileTabLabel>
         </MobileTabButton>
-        <MobileTabButton $active={mobileTab === 'layout'} onClick={() => setMobileTab(mobileTab === 'layout' ? null : 'layout')}>
-          <LayoutGrid />
+        <MobileTabButton $active={mobileTab === 'style'} $disabled={!hasStyle} onClick={() => { if (!hasStyle) return; setMobileSidebar(false); setMobileTab(mobileTab === 'style' ? null : 'style'); }}>
+          <Brush />
+          <MobileTabLabel>Style</MobileTabLabel>
+        </MobileTabButton>
+        <MobileTabButton $active={mobileTab === 'layout'} $disabled={!hasLayout} onClick={() => { if (!hasLayout) return; setMobileSidebar(false); setMobileTab(mobileTab === 'layout' ? null : 'layout'); }}>
+          <Settings2 />
           <MobileTabLabel>Layout</MobileTabLabel>
-        </MobileTabButton>
-        <MobileTabButton $active={mobileTab === 'size'} onClick={() => setMobileTab(mobileTab === 'size' ? null : 'size')}>
-          <Ruler />
-          <MobileTabLabel>Size</MobileTabLabel>
-        </MobileTabButton>
-        <MobileTabButton $active={mobileTab === 'share'} onClick={() => { handleCopyEmbedUrl(); }}>
-          <Share2 />
-          <MobileTabLabel>{copied ? 'Copied!' : 'Share'}</MobileTabLabel>
         </MobileTabButton>
       </MobileTabBar>
 
       {/* Mobile bottom sheet */}
-      {mobileTab && mobileTab !== 'share' && (
-        <>
-          <MobileOverlay onClick={() => setMobileTab(null)} />
-          <MobileSheet $open={true}>
+      <MobileSheet $open={!!mobileTab}>
+        <MobileSheetTop
+          onTouchStart={(e) => {
+            const startY = e.touches[0].clientY;
+            const handleMove = (ev: TouchEvent) => {
+              const dy = ev.touches[0].clientY - startY;
+              if (dy > 50) { setMobileTab(null); cleanup(); }
+            };
+            const cleanup = () => { window.removeEventListener('touchmove', handleMove); window.removeEventListener('touchend', cleanup); };
+            window.addEventListener('touchmove', handleMove);
+            window.addEventListener('touchend', cleanup);
+          }}
+        >
+          <MobileSheetHandleArea>
             <MobileSheetHandle />
+          </MobileSheetHandleArea>
+          <MobileSheetHeader>
             <MobileSheetTitle>
-              {mobileTab === 'color' && 'Colors'}
+              {mobileTab === 'style' && 'Style'}
+              {mobileTab === 'content' && 'Content'}
+              {mobileTab === 'color' && 'Color'}
               {mobileTab === 'layout' && 'Layout'}
-              {mobileTab === 'size' && 'Size'}
             </MobileSheetTitle>
-            <div style={{ padding: '0 20px 20px' }}>
-              <CustomizationPanel
-                widget={currentWidget}
-                onSettingsChange={handleSettingsChange}
-                mobileOpen={true}
-                onMobileClose={() => setMobileTab(null)}
-              />
-            </div>
-          </MobileSheet>
-        </>
-      )}
+            <MobileSheetClose onClick={() => setMobileTab(null)}>
+              <X />
+            </MobileSheetClose>
+          </MobileSheetHeader>
+        </MobileSheetTop>
+        {mobileTab && (
+          <CustomizationPanel
+            widget={currentWidget}
+            onSettingsChange={handleSettingsChange}
+            visibleSection={mobileTab}
+          />
+        )}
+      </MobileSheet>
     </StudioContainer>
   );
 };

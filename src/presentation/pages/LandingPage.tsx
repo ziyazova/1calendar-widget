@@ -8,7 +8,6 @@ import { CTASection } from '../components/landing/CTASection';
 import { PinterestGallery } from '../components/landing/PinterestGallery';
 import { FeatureCardsSection } from '../components/landing/FeatureCardsSection';
 import { CategoriesMarquee } from '../components/landing/CategoriesMarquee';
-import { DebugOverlay } from '../components/debug/DebugOverlay';
 import { HeroSection } from '../components/landing/HeroSection';
 import { TemplatesGallery } from '../components/landing/TemplatesGallery';
 
@@ -525,7 +524,6 @@ export const LandingPage: React.FC = () => {
 
   return (
     <Page>
-      <DebugOverlay />
       <TopNav logoPressed={transitioning} onLogoClick={() => navigate('/')} logoSub="Planners" />
       <PageContent $transitioning={transitioning}>
 
@@ -544,7 +542,7 @@ export const LandingPage: React.FC = () => {
         <BestsellersHeader>
           <BestsellersHeaderLeft>
             <BestsellersTitle data-ux="Section Title">Widget Studio</BestsellersTitle>
-            <BestsellersSubtitle>Create, customize and embed in seconds</BestsellersSubtitle>
+            <BestsellersSubtitle>Set up your widget in seconds</BestsellersSubtitle>
           </BestsellersHeaderLeft>
           <BrowseAllButton onClick={() => navigate('/widgets')}>To studio <ArrowRight /></BrowseAllButton>
         </BestsellersHeader>

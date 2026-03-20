@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ArrowRight, Calendar, Clock, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
@@ -272,7 +272,7 @@ const GalleryLabel = styled.span`
   font-size: 11px;
   font-weight: 500;
   color: #fff;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: 6px;
@@ -313,6 +313,7 @@ export const WidgetStudioPage: React.FC = () => {
       <TopNav activeLink="studio" />
 
       <HeroCard>
+        <BackButton onClick={() => navigate('/')} />
         <HeroInner $expanding={expanding}>
           <HeroIcons>
             <HeroIcon $delay="0.15s"><Calendar /></HeroIcon>
@@ -337,7 +338,7 @@ export const WidgetStudioPage: React.FC = () => {
 
       <PageContent $hide={expanding}>
       <GallerySection>
-        <SectionHeader title="Widget gallery" />
+        <SectionHeader title="Explore widgets" subtitle="Get inspired and find your perfect setup" />
         <GalleryFilterRow>
           {GALLERY_FILTERS.map(f => (
             <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
