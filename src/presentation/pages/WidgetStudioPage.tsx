@@ -1,71 +1,15 @@
-import React, { useState, useCallback, useRef } from 'react';
-import styled, { keyframes } from 'styled-components';
-import { ArrowRight, ArrowLeft, Calendar, Clock, Image } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import styled from 'styled-components';
+import { ArrowRight, Calendar, Clock, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-
-const fadeUp = keyframes`
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const Page = styled.div<{ $transitioning?: boolean }>`
-  min-height: 100vh;
-  background: #ffffff;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-`;
+import { PageWrapper, FilterRow, FilterChip, SectionHeader } from '@/presentation/components/shared';
+import { fadeUp } from '@/presentation/themes/animations';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
   transition: opacity 0.3s ease;
   pointer-events: ${({ $hide }) => $hide ? 'none' : 'auto'};
-`;
-
-const HeroContent = styled.div<{ $hide?: boolean }>`
-  opacity: ${({ $hide }) => $hide ? 0 : 1};
-  transition: opacity 0.25s ease;
-`;
-
-const Header = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 48px 0;
-  animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-
-  @media (max-width: 768px) { padding: 32px 24px 0; }
-`;
-
-const BackButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 400;
-  color: #9A9A9A;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  margin-bottom: 16px;
-  transition: color 0.15s ease;
-  &:hover { color: #1F1F1F; }
-  svg { width: 13px; height: 13px; }
-`;
-
-const Title = styled.h1`
-  font-size: 32px;
-  font-weight: 600;
-  color: #1F1F1F;
-  letter-spacing: -0.03em;
-  margin: 0 0 6px;
-`;
-
-const Subtitle = styled.p`
-  font-size: 15px;
-  color: #9A9A9A;
-  margin: 0 0 48px;
-  letter-spacing: -0.01em;
-  max-width: 460px;
 `;
 
 /* ── Hero Card ── */
@@ -75,7 +19,8 @@ const HeroCard = styled.div`
   padding: 40px 48px 56px;
   animation: ${fadeUp} 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 
-  @media (max-width: 768px) { padding: 0 24px 40px; }
+  @media (max-width: 1024px) { padding: 32px 36px 48px; }
+  @media (max-width: 768px) { padding: 24px 24px 40px; }
 `;
 
 const HeroInner = styled.div<{ $expanding?: boolean }>`
@@ -96,13 +41,12 @@ const HeroInner = styled.div<{ $expanding?: boolean }>`
   opacity: ${({ $expanding }) => $expanding ? 0 : 1};
 
   &:hover {
-    transform: ${({ $expanding }) => $expanding ? 'scale(0.97)' : 'translateY(-3px)'};
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.04);
+    transform: ${({ $expanding }) => $expanding ? 'scale(0.97)' : 'none'};
     border-color: rgba(51, 132, 244, 0.08);
   }
 
   @media (max-width: 768px) {
-    padding: 40px 24px;
+    padding: 36px 24px;
     border-radius: 20px;
   }
 `;
@@ -119,6 +63,13 @@ const HeroIcon = styled.div<{ $delay: string }>`
   width: 48px;
   height: 48px;
   border-radius: 14px;
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    svg { width: 18px !important; height: 18px !important; }
+  }
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.8);
@@ -136,6 +87,10 @@ const HeroTitle = styled.h2`
   color: #1F1F1F;
   letter-spacing: -0.03em;
   margin: 0 0 10px;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const HeroDesc = styled.p`
@@ -145,14 +100,21 @@ const HeroDesc = styled.p`
   margin: 0 auto 28px;
   letter-spacing: -0.01em;
   max-width: 380px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
 `;
 
 const HeroButton = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
   height: 44px;
-  padding: 0 28px;
+  padding: 0 20px;
   background: #1F1F1F;
   color: #ffffff;
   border: none;
@@ -168,20 +130,20 @@ const HeroButton = styled.button`
     background: #333;
   }
 
-  svg { width: 15px; height: 15px; }
+  svg { width: 14px; height: 14px; }
 `;
 
 const EmailRow = styled.div`
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-  max-width: 380px;
+  max-width: 320px;
   margin: 0 auto;
 `;
 
 const EmailInput = styled.input`
-  flex: 1;
+  width: 100%;
   height: 44px;
   padding: 0 16px;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -199,7 +161,7 @@ const EmailInput = styled.input`
   }
 
   &:focus {
-    border-color: #3384F4;
+    border-color: rgba(0, 0, 0, 0.16);
   }
 `;
 
@@ -209,9 +171,9 @@ const AuthDivider = styled.div`
   gap: 12px;
   width: 100%;
   max-width: 380px;
-  margin: 16px auto 0;
+  margin: 12px auto 0;
   color: #ccc;
-  font-size: 12px;
+  font-size: 11px;
 
   &::before, &::after {
     content: '';
@@ -222,19 +184,18 @@ const AuthDivider = styled.div`
 `;
 
 const GoogleButton = styled.button`
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
   max-width: 380px;
-  margin: 12px auto 0;
-  height: 44px;
-  padding: 0 20px;
+  margin: 10px auto 0;
+  height: 40px;
+  padding: 0 24px;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  font-size: 14px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 500;
   color: #1F1F1F;
   cursor: pointer;
@@ -247,158 +208,100 @@ const GoogleButton = styled.button`
     border-color: rgba(0, 0, 0, 0.12);
   }
 
-  svg { width: 18px; height: 18px; }
+  svg { width: 16px; height: 16px; }
 `;
 
-/* ── Widgets Grid ── */
-const Section = styled.section`
+/* ── Widget Gallery ── */
+const GallerySection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 48px 80px;
-  animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  padding: 0 48px 60px;
 
-  @media (max-width: 768px) { padding: 0 24px 60px; }
+  @media (max-width: 768px) {
+    padding: 0 24px 40px;
+  }
 `;
 
-const SectionTitle = styled.h2`
-  font-size: 11px;
-  font-weight: 600;
-  color: #ABABAB;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  margin: 0 0 20px;
+const GalleryFilterRow = styled(FilterRow)`
+  margin-bottom: 24px;
 `;
 
-const WidgetGrid = styled.div`
+const GalleryGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    gap: 12px;
   }
 `;
 
-const WidgetCard = styled.div`
-  background: #F8F8F7;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+const GalleryCard = styled.div`
+  border-radius: 16px;
   overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  background: #F8F8F7;
 
-  &:hover {
-    transform: translateY(-3px);
-    border-color: rgba(51, 132, 244, 0.1);
+  @media (max-width: 768px) {
+    border-radius: 12px;
+  }
+  position: relative;
+  aspect-ratio: 4 / 3;
+
+  &:hover img {
+    opacity: 1;
   }
 `;
 
-const WidgetPreview = styled.div<{ $gradient: string }>`
-  height: 180px;
-  background: ${({ $gradient }) => $gradient};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg { width: 40px; height: 40px; color: rgba(0, 0, 0, 0.15); }
+const GalleryImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0.88;
+  transition: opacity 0.3s ease;
 `;
 
-const WidgetBody = styled.div`
-  padding: 20px;
-`;
-
-const WidgetName = styled.h3`
-  font-size: 16px;
-  font-weight: 600;
-  color: #1F1F1F;
-  letter-spacing: -0.02em;
-  margin: 0 0 4px;
-`;
-
-const WidgetDesc = styled.p`
-  font-size: 13px;
-  color: #9A9A9A;
-  line-height: 1.5;
-  margin: 0 0 16px;
-  letter-spacing: -0.01em;
-`;
-
-const WidgetStyles = styled.div`
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-`;
-
-const StyleTag = styled.span`
-  padding: 3px 10px;
-  background: rgba(0, 0, 0, 0.04);
-  color: #6B6B6B;
-  border-radius: 6px;
+const GalleryLabel = styled.span`
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
   font-size: 11px;
   font-weight: 500;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 6px;
   letter-spacing: -0.01em;
 `;
 
-/* ── Features ── */
-const Features = styled.section`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 48px 80px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
-  animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+type WidgetCategory = 'all' | 'calendar' | 'clock' | 'boards' | 'buttons';
 
-  @media (max-width: 768px) { padding: 32px 24px 60px; }
-`;
+const GALLERY_FILTERS: { key: WidgetCategory; label: string }[] = [
+  { key: 'all', label: 'Featured' },
+  { key: 'calendar', label: 'Calendar' },
+  { key: 'clock', label: 'Clocks' },
+  { key: 'boards', label: 'Boards' },
+  { key: 'buttons', label: 'Buttons' },
+];
 
-const FeatureGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-`;
-
-const FeatureItem = styled.div``;
-
-const FeatureTitle = styled.h3`
-  font-size: 14px;
-  font-weight: 600;
-  color: #1F1F1F;
-  margin: 0 0 4px;
-  letter-spacing: -0.02em;
-`;
-
-const FeatureDesc = styled.p`
-  font-size: 12px;
-  color: #9A9A9A;
-  line-height: 1.5;
-  margin: 0;
-  letter-spacing: -0.01em;
-`;
-
-/* ── Footer ── */
-const Footer = styled.footer`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 48px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const FooterText = styled.span`
-  font-size: 12px;
-  color: #ABABAB;
-  letter-spacing: -0.01em;
-`;
+const GALLERY_ITEMS: { image: string; title: string; category: WidgetCategory }[] = [
+  { image: '/widget-calendar.png', title: 'Calendar', category: 'calendar' },
+  { image: '/widget-clock2.png', title: 'Analog Clock', category: 'clock' },
+  { image: '/widget-calendar2.png', title: 'Classic Calendar', category: 'calendar' },
+  { image: '/widget-clock.png', title: 'Digital Clock', category: 'clock' },
+  { image: '/template-dashboard.png', title: 'Dashboard', category: 'boards' },
+  { image: '/widget-typewriter.png', title: 'Typewriter', category: 'buttons' },
+];
 
 export const WidgetStudioPage: React.FC = () => {
   const navigate = useNavigate();
   const [expanding, setExpanding] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<WidgetCategory>('all');
 
   const handleLaunch = useCallback(() => {
     setExpanding(true);
@@ -406,113 +309,54 @@ export const WidgetStudioPage: React.FC = () => {
   }, [navigate]);
 
   return (
-    <Page>
+    <PageWrapper>
       <TopNav activeLink="studio" />
 
       <HeroCard>
-        <HeroInner $expanding={expanding} onClick={handleLaunch}>
+        <HeroInner $expanding={expanding}>
           <HeroIcons>
             <HeroIcon $delay="0.15s"><Calendar /></HeroIcon>
             <HeroIcon $delay="0.25s"><Clock /></HeroIcon>
             <HeroIcon $delay="0.35s"><Image /></HeroIcon>
           </HeroIcons>
-          <HeroTitle>Widget Studio</HeroTitle>
-          <HeroDesc>
-            Pick a widget, customize everything, embed in Notion with one click.
-          </HeroDesc>
+          <HeroTitle>Pick a widget, customize it,<br />embed in Notion with one click.</HeroTitle>
+          <HeroDesc>No coding. No setup. No headaches.</HeroDesc>
           <EmailRow>
             <EmailInput type="email" placeholder="Enter your email" />
-            <HeroButton>
+            <HeroButton onClick={(e) => { e.stopPropagation(); handleLaunch(); }}>
               Sign up <ArrowRight />
             </HeroButton>
           </EmailRow>
           <AuthDivider>Or, sign up with</AuthDivider>
           <GoogleButton>
             <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Google Sign Up
+            Google
           </GoogleButton>
         </HeroInner>
       </HeroCard>
 
       <PageContent $hide={expanding}>
-      <Section>
-        <SectionTitle>Available Widgets</SectionTitle>
-        <WidgetGrid>
-          <WidgetCard onClick={() => navigate('/studio')}>
-            <WidgetPreview $gradient="linear-gradient(135deg, #E8EDFF 0%, #F0E6FF 100%)">
-              <Calendar />
-            </WidgetPreview>
-            <WidgetBody>
-              <WidgetName>Calendar</WidgetName>
-              <WidgetDesc>Month view calendar with customizable colors, borders, and week start day.</WidgetDesc>
-              <WidgetStyles>
-                <StyleTag>Core</StyleTag>
-                <StyleTag>Soft</StyleTag>
-                <StyleTag>Collage</StyleTag>
-                <StyleTag>Letterpress</StyleTag>
-              </WidgetStyles>
-            </WidgetBody>
-          </WidgetCard>
-
-          <WidgetCard onClick={() => navigate('/studio')}>
-            <WidgetPreview $gradient="linear-gradient(135deg, #FFE8E0 0%, #FFD6E8 100%)">
-              <Clock />
-            </WidgetPreview>
-            <WidgetBody>
-              <WidgetName>Clock</WidgetName>
-              <WidgetDesc>Digital and analog clocks with 12/24h format, seconds, and date display.</WidgetDesc>
-              <WidgetStyles>
-                <StyleTag>Duo</StyleTag>
-                <StyleTag>Analog</StyleTag>
-                <StyleTag>Buddy</StyleTag>
-              </WidgetStyles>
-            </WidgetBody>
-          </WidgetCard>
-
-          <WidgetCard onClick={() => navigate('/studio')}>
-            <WidgetPreview $gradient="linear-gradient(135deg, #E0F4E8 0%, #D6F0FF 100%)">
-              <Image />
-            </WidgetPreview>
-            <WidgetBody>
-              <WidgetName>Moodboard</WidgetName>
-              <WidgetDesc>Image collage widget with drag-and-drop reordering and multiple layouts.</WidgetDesc>
-              <WidgetStyles>
-                <StyleTag>Grid</StyleTag>
-                <StyleTag>Masonry</StyleTag>
-                <StyleTag>Carousel</StyleTag>
-              </WidgetStyles>
-            </WidgetBody>
-          </WidgetCard>
-        </WidgetGrid>
-      </Section>
-
-      <Features>
-        <SectionTitle>How it works</SectionTitle>
-        <FeatureGrid>
-          <FeatureItem>
-            <FeatureTitle>1. Pick a widget</FeatureTitle>
-            <FeatureDesc>Choose from calendars, clocks, and moodboards.</FeatureDesc>
-          </FeatureItem>
-          <FeatureItem>
-            <FeatureTitle>2. Customize</FeatureTitle>
-            <FeatureDesc>Adjust colors, style, layout, and size in real time.</FeatureDesc>
-          </FeatureItem>
-          <FeatureItem>
-            <FeatureTitle>3. Copy URL</FeatureTitle>
-            <FeatureDesc>One-click copy of the embed link from the toolbar.</FeatureDesc>
-          </FeatureItem>
-          <FeatureItem>
-            <FeatureTitle>4. Paste in Notion</FeatureTitle>
-            <FeatureDesc>Use /embed in Notion and paste your URL. Done.</FeatureDesc>
-          </FeatureItem>
-        </FeatureGrid>
-      </Features>
-
-      <Footer>
-        <FooterText>Peachy Studio</FooterText>
-        <FooterText>Free forever</FooterText>
-      </Footer>
+      <GallerySection>
+        <SectionHeader title="Widget gallery" />
+        <GalleryFilterRow>
+          {GALLERY_FILTERS.map(f => (
+            <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
+              {f.label}
+            </FilterChip>
+          ))}
+        </GalleryFilterRow>
+        <GalleryGrid>
+          {GALLERY_ITEMS
+            .filter(item => activeFilter === 'all' || item.category === activeFilter)
+            .map((item, i) => (
+              <GalleryCard key={i}>
+                <GalleryImage src={item.image} alt={item.title} />
+                <GalleryLabel>{item.title}</GalleryLabel>
+              </GalleryCard>
+            ))}
+        </GalleryGrid>
+      </GallerySection>
       </PageContent>
-    </Page>
+    </PageWrapper>
   );
 };

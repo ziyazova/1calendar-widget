@@ -20,6 +20,7 @@ export const theme = {
       secondary: '#EEEFF1',
       tertiary: '#EBEDEF',
       elevated: '#ffffff',
+      surface: '#F8F8F7',
       glass: 'rgba(255, 255, 255, 0.72)',
       dark: '#1c1c1e',
       darkSecondary: '#2c2c2e',
@@ -209,6 +210,7 @@ export const theme = {
     bounce: '500ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
 
     apple: '0.25s cubic-bezier(0.25, 0.1, 0.25, 1)',
+    smooth: '0.35s cubic-bezier(0.22, 1, 0.36, 1)',
     spring: '0.4s cubic-bezier(0.54, 1.5, 0.38, 1.11)',
     elastic: '0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   },

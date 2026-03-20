@@ -1,0 +1,139 @@
+import React from 'react';
+import styled from 'styled-components';
+import { scrollLeft } from '@/presentation/themes/animations';
+
+/* ── Categories Marquee ── */
+const CategoriesWrap = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+
+  @media (max-width: 768px) {
+    padding: 0 24px;
+  }
+`;
+
+const CategoriesSection = styled.section`
+  padding: 0 0 80px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const CategoriesTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: ${scrollLeft} ${({ $duration }) => $duration}s linear infinite;
+  animation-direction: ${({ $reverse }) => $reverse ? 'reverse' : 'normal'};
+
+  &:hover {
+    animation-play-state: paused;
+  }
+`;
+
+const CategoryChip = styled.div<{ $color: string }>`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.04)`;
+  }};
+  border: 1px solid ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.06)`;
+  }};
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    background: ${({ $color }) => $color};
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    background: ${({ $color }) => {
+      const hex = $color.replace('#', '');
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, 0.08)`;
+    }};
+    transform: scale(1.04);
+    color: #444;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+`;
+
+const CATEGORY_CHIPS_ROW1 = [
+  { label: 'Planners', color: '#F59E0B' },
+  { label: 'Dashboards', color: '#3B82F6' },
+  { label: 'Trackers', color: '#8B5CF6' },
+  { label: 'Journals', color: '#EC4899' },
+  { label: 'Finance', color: '#10B981' },
+  { label: 'Productivity', color: '#6366F1' },
+  { label: 'Health & Wellness', color: '#F97316' },
+  { label: 'Goals', color: '#14B8A6' },
+  { label: 'Widget Studio', color: '#3B82F6' },
+];
+
+const CATEGORY_CHIPS_ROW2 = [
+  { label: 'Weekly Planner', color: '#F59E0B' },
+  { label: 'Life OS', color: '#A855F7' },
+  { label: 'Budget Tracker', color: '#22C55E' },
+  { label: 'Habit Tracker', color: '#3B82F6' },
+  { label: 'Mood Journal', color: '#F43F5E' },
+  { label: 'Student Planner', color: '#8B5CF6' },
+  { label: 'Project Roadmap', color: '#06B6D4' },
+  { label: 'Reading List', color: '#6366F1' },
+  { label: 'Meal Planner', color: '#10B981' },
+];
+
+interface CategoriesMarqueeProps {
+  onNavigate: (path: string) => void;
+}
+
+export const CategoriesMarquee: React.FC<CategoriesMarqueeProps> = ({ onNavigate }) => {
+  return (
+    <CategoriesWrap>
+      <CategoriesSection data-ux="Categories Marquee">
+        <CategoriesTrack $duration={50}>
+          {[...CATEGORY_CHIPS_ROW1, ...CATEGORY_CHIPS_ROW1, ...CATEGORY_CHIPS_ROW1].map((c, i) => (
+            <CategoryChip key={`cr1-${i}`} $color={c.color} onClick={() => c.label === 'Widget Studio' ? onNavigate('/widgets') : onNavigate(`/templates?cat=${c.label.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`)}>{c.label}</CategoryChip>
+          ))}
+        </CategoriesTrack>
+        <CategoriesTrack $duration={55} $reverse>
+          {[...CATEGORY_CHIPS_ROW2, ...CATEGORY_CHIPS_ROW2, ...CATEGORY_CHIPS_ROW2].map((c, i) => (
+            <CategoryChip key={`cr2-${i}`} $color={c.color} onClick={() => onNavigate(`/templates?cat=${c.label.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`)}>{c.label}</CategoryChip>
+          ))}
+        </CategoriesTrack>
+      </CategoriesSection>
+    </CategoriesWrap>
+  );
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, LayoutGrid, Grip } from 'lucide-react';
+import { Copy, Check, Pencil, LayoutGrid, Grip, SlidersHorizontal, X, Menu, Palette, Ruler, Square, Share2 } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -34,6 +34,11 @@ const WorkspaceContainer = styled.div`
   display: flex;
   flex: 1;
   height: 100vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: 100dvh;
+  }
 `;
 
 const ContentArea = styled.div<{ $fullWidth?: boolean }>`
@@ -82,6 +87,15 @@ const WidgetArea = styled.div`
   box-shadow: none;
   margin: 12px 0 20px 0;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (max-width: 768px) {
+    height: auto;
+    flex: 1;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    padding-bottom: 70px;
+  }
 `;
 
 
@@ -124,6 +138,12 @@ const ZoomableWidget = styled.div<{ $zoom: number }>`
     from { opacity: 0; transform: scale(var(--zoom)) translateY(-44px); }
     to { opacity: 1; transform: scale(var(--zoom)) translateY(-48px); }
   }
+
+  @media (max-width: 768px) {
+    transform: scale(0.85) translateY(0);
+    animation: none;
+    opacity: 1;
+  }
 `;
 
 /* ── Floating Toolbar (Figma-style) ── */
@@ -143,6 +163,10 @@ const FloatingToolbar = styled.div`
   padding: 8px 12px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 10;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ToolbarDivider = styled.div`
@@ -150,6 +174,10 @@ const ToolbarDivider = styled.div`
   height: 28px;
   background: rgba(0, 0, 0, 0.08);
   margin: 0 8px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Tooltip = styled.span`
@@ -224,6 +252,11 @@ const TopRightControls = styled.div`
   align-items: center;
   gap: 8px;
   z-index: 10;
+
+  @media (max-width: 768px) {
+    top: 16px;
+    right: 16px;
+  }
 `;
 
 const ZoomControl = styled.div`
@@ -236,6 +269,10 @@ const ZoomControl = styled.div`
   padding: 0 4px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ZoomSlider = styled.input`
@@ -324,6 +361,10 @@ const EmbedUrlGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const EmbedUrlInput = styled.input`
@@ -388,6 +429,143 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   }
 `;
 
+/* ── Mobile Controls ── */
+const MobileTopBar = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  z-index: 20;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const MobileBarButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  color: #1F1F1F;
+  cursor: pointer;
+
+  svg { width: 18px; height: 18px; }
+
+  &:hover { background: rgba(0, 0, 0, 0.08); }
+`;
+
+const MobileBarTitle = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.02em;
+`;
+
+const MobileOverlay = styled.div`
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 49;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
+const DesktopOnly = styled.div`
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+/* ── Mobile Bottom Tab Bar (Canva-style) ── */
+type MobileTab = 'color' | 'layout' | 'size' | 'share' | null;
+
+const MobileTabBar = styled.div`
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 8px 0;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  z-index: 50;
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: space-around;
+  }
+`;
+
+const MobileTabButton = styled.button<{ $active?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  color: ${({ $active }) => $active ? '#3384F4' : '#9A9A9A'};
+
+  svg { width: 22px; height: 22px; }
+`;
+
+const MobileTabLabel = styled.span`
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+`;
+
+const MobileSheet = styled.div<{ $open: boolean }>`
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55vh;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12);
+  z-index: 51;
+  transform: ${({ $open }) => $open ? 'translateY(0)' : 'translateY(100%)'};
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
+const MobileSheetHandle = styled.div`
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.12);
+  margin: 10px auto 16px;
+`;
+
+const MobileSheetTitle = styled.div`
+  font-size: 15px;
+  font-weight: 600;
+  color: #1F1F1F;
+  padding: 0 20px 16px;
+  letter-spacing: -0.02em;
+`;
+
 const LayoutCheckArea = styled.div`
   flex: 1;
   height: 100vh;
@@ -405,6 +583,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [showGrid, setShowGrid] = useState(false);
   const [copied, setCopied] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [mobileSidebar, setMobileSidebar] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState(false);
+  const [mobileTab, setMobileTab] = useState<MobileTab>(null);
   const navigate = useNavigate();
 
   const handleLogoClick = useCallback(() => {
@@ -491,13 +672,25 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   return (
     <StudioContainer $transitioning={transitioning}>
       <WorkspaceContainer>
-        <Sidebar
-          availableWidgets={availableWidgets}
-          currentWidget={currentWidgetKey}
-          onWidgetChange={handleWidgetChange}
-          onLogoClick={handleLogoClick}
-          logoPressed={transitioning}
-        />
+        <div style={{ position: 'relative', zIndex: mobileSidebar ? 50 : undefined }}>
+          <Sidebar
+            availableWidgets={availableWidgets}
+            currentWidget={currentWidgetKey}
+            onWidgetChange={(type, style) => { handleWidgetChange(type, style); setMobileSidebar(false); }}
+            onLogoClick={handleLogoClick}
+            logoPressed={transitioning}
+            mobileOpen={mobileSidebar}
+          />
+        </div>
+        {mobileSidebar && <MobileOverlay onClick={() => setMobileSidebar(false)} />}
+
+        <MobileTopBar>
+          <MobileBarButton onClick={() => setMobileSidebar(!mobileSidebar)}>
+            <Menu />
+          </MobileBarButton>
+          <MobileBarTitle>Studio</MobileBarTitle>
+          <div style={{ width: 40 }} />
+        </MobileTopBar>
 
         <ContentArea $fullWidth={viewMode === 'layout-check'}>
           {viewMode === 'editor' ? (
@@ -563,10 +756,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 </TopRightControls>
               </WidgetArea>
 
-              <CustomizationPanel
-                widget={currentWidget}
-                onSettingsChange={handleSettingsChange}
-              />
+              <DesktopOnly>
+                <CustomizationPanel
+                  widget={currentWidget}
+                  onSettingsChange={handleSettingsChange}
+                />
+              </DesktopOnly>
             </>
           ) : (
             <LayoutCheckArea>
@@ -605,6 +800,49 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           )}
         </ContentArea>
       </WorkspaceContainer>
+
+      {/* Mobile bottom tab bar */}
+      <MobileTabBar>
+        <MobileTabButton $active={mobileTab === 'color'} onClick={() => setMobileTab(mobileTab === 'color' ? null : 'color')}>
+          <Palette />
+          <MobileTabLabel>Color</MobileTabLabel>
+        </MobileTabButton>
+        <MobileTabButton $active={mobileTab === 'layout'} onClick={() => setMobileTab(mobileTab === 'layout' ? null : 'layout')}>
+          <LayoutGrid />
+          <MobileTabLabel>Layout</MobileTabLabel>
+        </MobileTabButton>
+        <MobileTabButton $active={mobileTab === 'size'} onClick={() => setMobileTab(mobileTab === 'size' ? null : 'size')}>
+          <Ruler />
+          <MobileTabLabel>Size</MobileTabLabel>
+        </MobileTabButton>
+        <MobileTabButton $active={mobileTab === 'share'} onClick={() => { handleCopyEmbedUrl(); }}>
+          <Share2 />
+          <MobileTabLabel>{copied ? 'Copied!' : 'Share'}</MobileTabLabel>
+        </MobileTabButton>
+      </MobileTabBar>
+
+      {/* Mobile bottom sheet */}
+      {mobileTab && mobileTab !== 'share' && (
+        <>
+          <MobileOverlay onClick={() => setMobileTab(null)} />
+          <MobileSheet $open={true}>
+            <MobileSheetHandle />
+            <MobileSheetTitle>
+              {mobileTab === 'color' && 'Colors'}
+              {mobileTab === 'layout' && 'Layout'}
+              {mobileTab === 'size' && 'Size'}
+            </MobileSheetTitle>
+            <div style={{ padding: '0 20px 20px' }}>
+              <CustomizationPanel
+                widget={currentWidget}
+                onSettingsChange={handleSettingsChange}
+                mobileOpen={true}
+                onMobileClose={() => setMobileTab(null)}
+              />
+            </div>
+          </MobileSheet>
+        </>
+      )}
     </StudioContainer>
   );
 };

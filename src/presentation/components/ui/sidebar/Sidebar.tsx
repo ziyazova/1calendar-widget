@@ -10,9 +10,10 @@ interface SidebarProps {
   onWidgetChange: (type: string, style?: string) => void;
   onLogoClick?: () => void;
   logoPressed?: boolean;
+  mobileOpen?: boolean;
 }
 
-const SidebarContainer = styled.aside`
+const SidebarContainer = styled.aside<{ $mobileOpen?: boolean }>`
   position: fixed;
   left: 0;
   top: 0;
@@ -25,9 +26,10 @@ const SidebarContainer = styled.aside`
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+  @media (max-width: 768px) {
+    transform: ${({ $mobileOpen }) => $mobileOpen ? 'translateX(0)' : 'translateX(-100%)'};
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: ${({ $mobileOpen }) => $mobileOpen ? '4px 0 20px rgba(0, 0, 0, 0.1)' : 'none'};
   }
 `;
 
@@ -220,6 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onWidgetChange,
   onLogoClick,
   logoPressed,
+  mobileOpen,
 }) => {
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>(['calendar']);
@@ -231,7 +234,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <SidebarContainer>
+    <SidebarContainer $mobileOpen={mobileOpen}>
       <SidebarHeader>
         <LogoWrapper $pressed={logoPressed} onClick={() => onLogoClick ? onLogoClick() : navigate('/')}>
           <img src="/PeachyLogo.png" alt="Logo" width="22" height="22" style={{ objectFit: 'contain' }} />

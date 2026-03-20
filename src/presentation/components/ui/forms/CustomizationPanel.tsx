@@ -11,9 +11,11 @@ import { ColorPicker } from '../ColorPicker';
 interface CustomizationPanelProps {
   widget: Widget | null;
   onSettingsChange: (settings: Partial<CalendarSettings | ClockSettings | BoardSettings>) => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-const PanelContainer = styled.div`
+const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
   width: 290px;
   height: 100vh;
   position: fixed;
@@ -27,6 +29,20 @@ const PanelContainer = styled.div`
   flex-shrink: 0;
   border-left: none;
   z-index: ${({ theme }) => theme.zIndex.sticky};
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 60vh;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.1);
+    transform: ${({ $mobileOpen }) => $mobileOpen ? 'translateY(0)' : 'translateY(100%)'};
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 `;
 
 const PanelHeader = styled.div`
@@ -600,6 +616,8 @@ const CompactOption = styled.button<{ $active: boolean }>`
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   widget,
   onSettingsChange,
+  mobileOpen,
+  onMobileClose,
 }) => {
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -667,7 +685,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
 
   if (!widget) {
     return (
-      <PanelContainer>
+      <PanelContainer $mobileOpen={mobileOpen}>
         <PanelHeader>
           <PanelTitle>Design</PanelTitle>
         </PanelHeader>
@@ -690,7 +708,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   const isDuoClockStyle = clkStyle === 'classic';
 
   return (
-    <PanelContainer>
+    <PanelContainer $mobileOpen={mobileOpen}>
       <PanelHeader>
         <PanelTitle>Design</PanelTitle>
         {getWidgetInfo() && (

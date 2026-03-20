@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { theme } from './presentation/themes/theme';
 
@@ -26,6 +27,12 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
 function App() {
   const diContainer = DIContainer.getInstance();
 
@@ -34,6 +41,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyles />
         <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/widgets" element={<WidgetStudioPage />} />

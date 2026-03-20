@@ -1,6 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
 interface TopNavProps {
   logoPressed?: boolean;
@@ -68,7 +69,7 @@ const NavLinks = styled.div`
   gap: 28px;
 
   @media (max-width: 768px) {
-    gap: 16px;
+    display: none;
   }
 `;
 
@@ -83,10 +84,6 @@ const NavLink = styled.button<{ $active?: boolean }>`
   letter-spacing: -0.01em;
   transition: color 0.15s ease;
   &:hover { color: #1F1F1F; }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
 `;
 
 const NavCTA = styled.button`
@@ -109,15 +106,106 @@ const NavCTA = styled.button`
   }
 `;
 
+/* ── Burger ── */
+const BurgerButton = styled.button`
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1F1F1F;
+
+  svg { width: 20px; height: 20px; }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const MobileMenu = styled.div`
+  display: none;
+  position: fixed;
+  top: 57px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 24px;
+  animation: ${fadeIn} 0.2s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+`;
+
+const MobileLink = styled.button<{ $active?: boolean }>`
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: ${({ $active }) => $active ? '600' : '400'};
+  color: ${({ $active }) => $active ? '#1F1F1F' : '#6B6B6B'};
+  background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.03)' : 'none'};
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+    color: #1F1F1F;
+  }
+`;
+
+const MobileCTA = styled.button`
+  width: 100%;
+  height: 48px;
+  margin-top: 16px;
+  background: #1F1F1F;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+
+  &:hover { background: #333; }
+`;
+
 export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, activeLink, logoSub = 'Studio' }) => {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogo = () => {
+    setMenuOpen(false);
     if (onLogoClick) {
       onLogoClick();
     } else {
       navigate('/');
     }
+  };
+
+  const handleNav = (path: string) => {
+    setMenuOpen(false);
+    navigate(path);
   };
 
   return (
@@ -130,14 +218,26 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         </LogoRow>
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
-          <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Notion Widgets</NavLink>
+          <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Widget Studio</NavLink>
           <NavLink $active={activeLink === 'apps'}>Apps</NavLink>
           <NavLink $active={activeLink === 'community'}>Community</NavLink>
           <NavCTA>Log in</NavCTA>
         </NavLinks>
+        <BurgerButton onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <X /> : <Menu />}
+        </BurgerButton>
       </NavInner>
     </Nav>
     <NavSpacer />
+    {menuOpen && (
+      <MobileMenu>
+        <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
+        <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav('/widgets')}>Widget Studio</MobileLink>
+        <MobileLink $active={activeLink === 'apps'}>Apps</MobileLink>
+        <MobileLink $active={activeLink === 'community'}>Community</MobileLink>
+        <MobileCTA onClick={() => handleNav('/widgets')}>Log in</MobileCTA>
+      </MobileMenu>
+    )}
     </>
   );
 };
