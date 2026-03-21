@@ -41,19 +41,29 @@ const WorkspaceContainer = styled.div`
   }
 `;
 
-const ContentArea = styled.div<{ $fullWidth?: boolean }>`
+const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boolean }>`
   display: flex;
   flex: 1;
   gap: 0;
   padding: 0;
-  overflow: visible;
-  margin-left: 270px;
+  overflow: hidden;
+  margin-left: ${({ $sidebarCollapsed }) => $sidebarCollapsed ? '64px' : '270px'};
   margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '290px'};
   height: 100vh;
+  transition: margin-left 0.25s ease, margin-right 0.25s ease;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 1024px) {
+    margin-left: ${({ $sidebarCollapsed }) => $sidebarCollapsed ? '64px' : '220px'};
+    margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '240px'};
+  }
+
+  @media (max-width: 768px) {
     margin-left: 0;
     margin-right: 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 0;
     flex-direction: column;
   }
 `;
@@ -85,8 +95,13 @@ const WidgetArea = styled.div`
   border-radius: 28px;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: none;
-  margin: 12px 0 20px 0;
+  margin: 12px 0 12px 0;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (max-width: 768px) {
+    margin: 12px;
+    border-radius: 20px;
+  }
 
   @media (max-width: 768px) {
     height: auto;
@@ -164,6 +179,13 @@ const FloatingToolbar = styled.div`
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 10;
 
+  @media (max-width: 1024px) {
+    bottom: 84px;
+    padding: 6px 10px;
+    border-radius: 12px;
+    max-width: 360px;
+  }
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -175,7 +197,7 @@ const ToolbarDivider = styled.div`
   background: rgba(0, 0, 0, 0.08);
   margin: 0 8px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     display: none;
   }
 `;
@@ -241,6 +263,10 @@ const ToolbarButton = styled.button<{ $active?: boolean }>`
     width: 18px;
     height: 18px;
   }
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
 `;
 
 
@@ -254,8 +280,7 @@ const TopRightControls = styled.div`
   z-index: 10;
 
   @media (max-width: 768px) {
-    top: 16px;
-    right: 16px;
+    display: none;
   }
 `;
 
@@ -410,6 +435,7 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   transition: all 0.15s ease;
   white-space: nowrap;
   flex-shrink: 0;
+  min-width: 76px;
   background: ${({ $copied }) => $copied
     ? 'rgba(34, 197, 94, 0.12)'
     : 'linear-gradient(135deg, #3384F4, #5BA0F7)'};
@@ -705,6 +731,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [mobileSidebar, setMobileSidebar] = useState(false);
   const [mobilePanel, setMobilePanel] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
 
   const handleLogoClick = useCallback(() => {
@@ -808,6 +835,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             onLogoClick={handleLogoClick}
             logoPressed={transitioning}
             mobileOpen={mobileSidebar}
+            collapsed={window.innerWidth > 768 && window.innerWidth <= 1024 ? sidebarCollapsed : false}
+            onToggleCollapse={window.innerWidth > 768 && window.innerWidth <= 1024 ? () => setSidebarCollapsed(!sidebarCollapsed) : undefined}
           />
         </div>
         {mobileSidebar && <MobileOverlay onClick={() => setMobileSidebar(false)} />}
@@ -820,10 +849,10 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <div style={{ width: 40 }} />
         </MobileTopBar>
 
-        <ContentArea $fullWidth={viewMode === 'layout-check'}>
+        <ContentArea $fullWidth={viewMode === 'layout-check'} $sidebarCollapsed={sidebarCollapsed}>
           {viewMode === 'editor' ? (
             <>
-              <WidgetArea onClick={() => mobileTab && setMobileTab(null)}>
+              <WidgetArea onClick={() => { if (mobileTab) setMobileTab(null); if (window.innerWidth <= 1024 && !sidebarCollapsed) setSidebarCollapsed(true); }}>
                 <MobileEmbedFloating>
                   <MobileEmbedRow>
                     <MobileEmbedUrl
@@ -897,12 +926,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 </TopRightControls>
               </WidgetArea>
 
-              <DesktopOnly>
-                <CustomizationPanel
-                  widget={currentWidget}
-                  onSettingsChange={handleSettingsChange}
-                />
-              </DesktopOnly>
+              <CustomizationPanel
+                widget={currentWidget}
+                onSettingsChange={handleSettingsChange}
+                mobileOpen={mobilePanel}
+                onMobileClose={() => setMobilePanel(false)}
+              />
+              {mobilePanel && <MobileOverlay onClick={() => setMobilePanel(false)} />}
             </>
           ) : (
             <LayoutCheckArea>

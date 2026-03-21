@@ -223,5 +223,37 @@ export function useDebugMode() {
     if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
     setMeasureInfo('');
   }, []);
-  return { enabled, info, toggle, locked, unlock, copyInfo, measureMode, toggleMeasure, measureInfo };
+  // Redlines data
+  const [redlines, setRedlines] = useState<{
+    el: DOMRect; parent: DOMRect | null;
+    prevGap: number | null; nextGap: number | null;
+    toTop: number; toRight: number; toBottom: number; toLeft: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!enabled) { setRedlines(null); return; }
+    const update = (e: MouseEvent) => {
+      if (locked) return;
+      const el = e.target as HTMLElement;
+      if (!el || el.closest('[data-debug-ui]')) return;
+      const rect = el.getBoundingClientRect();
+      const parent = el.parentElement?.getBoundingClientRect() || null;
+      const prev = el.previousElementSibling as HTMLElement;
+      const next = el.nextElementSibling as HTMLElement;
+      const prevGap = prev ? Math.round(rect.top - prev.getBoundingClientRect().bottom) : null;
+      const nextGap = next ? Math.round(next.getBoundingClientRect().top - rect.bottom) : null;
+      setRedlines({
+        el: rect, parent,
+        prevGap, nextGap,
+        toTop: parent ? Math.round(rect.top - parent.top) : 0,
+        toRight: parent ? Math.round(parent.right - rect.right) : 0,
+        toBottom: parent ? Math.round(parent.bottom - rect.bottom) : 0,
+        toLeft: parent ? Math.round(rect.left - parent.left) : 0,
+      });
+    };
+    document.addEventListener('mousemove', update);
+    return () => document.removeEventListener('mousemove', update);
+  }, [enabled, locked]);
+
+  return { enabled, info, toggle, locked, unlock, copyInfo, measureMode, toggleMeasure, measureInfo, redlines };
 }

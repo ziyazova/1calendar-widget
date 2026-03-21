@@ -21,10 +21,11 @@ const Nav = styled.nav`
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  padding-top: env(safe-area-inset-top, 0px);
 `;
 
 const NavSpacer = styled.div`
-  height: 57px;
+  height: calc(57px + env(safe-area-inset-top, 0px));
 `;
 
 const NavInner = styled.div`
@@ -219,8 +220,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
           <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Widget Studio</NavLink>
-          <NavLink $active={activeLink === 'apps'}>Apps</NavLink>
-          <NavLink $active={activeLink === 'community'}>Community</NavLink>
           <NavCTA>Log in</NavCTA>
         </NavLinks>
         <BurgerButton onClick={() => setMenuOpen(!menuOpen)}>
@@ -233,8 +232,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
       <MobileMenu>
         <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
         <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav('/widgets')}>Widget Studio</MobileLink>
-        <MobileLink $active={activeLink === 'apps'}>Apps</MobileLink>
-        <MobileLink $active={activeLink === 'community'}>Community</MobileLink>
         <MobileCTA onClick={() => handleNav('/widgets')}>Log in</MobileCTA>
       </MobileMenu>
     )}

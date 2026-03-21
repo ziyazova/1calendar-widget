@@ -104,6 +104,63 @@ const DebugToggle = styled.button<{ $on: boolean }>`
   &:hover { background: ${({ $on }) => $on ? '#cc2a22' : 'rgba(0,0,0,0.1)'}; }
 `;
 
+const RedlinesOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+`;
+
+const RedlineV = styled.div<{ $color?: string }>`
+  position: absolute;
+  width: 1px;
+  background: ${({ $color }) => $color || '#FF3B30'};
+  opacity: 0.8;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    left: -3px;
+    width: 7px;
+    height: 1px;
+    background: ${({ $color }) => $color || '#FF3B30'};
+  }
+  &::before { top: 0; }
+  &::after { bottom: 0; }
+`;
+
+const RedlineH = styled.div<{ $color?: string }>`
+  position: absolute;
+  height: 1px;
+  background: ${({ $color }) => $color || '#FF3B30'};
+  opacity: 0.8;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    height: 7px;
+    width: 1px;
+    background: ${({ $color }) => $color || '#FF3B30'};
+  }
+  &::before { left: 0; }
+  &::after { right: 0; }
+`;
+
+const RedlineLabel = styled.span<{ $color?: string }>`
+  position: absolute;
+  left: 6px;
+  background: ${({ $color }) => $color || '#FF3B30'};
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'SF Mono', monospace;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  line-height: 14px;
+`;
+
 export const DebugOverlay: React.FC = () => {
   const debug = useDebugMode();
 
@@ -141,6 +198,46 @@ export const DebugOverlay: React.FC = () => {
             </span>
           )}
         </DebugTooltip>
+      )}
+      {debug.enabled && debug.redlines && debug.redlines.parent && (
+        <RedlinesOverlay data-debug-ui>
+          {/* Top distance */}
+          {debug.redlines.toTop > 0 && (
+            <RedlineV style={{ left: debug.redlines.el.left + debug.redlines.el.width / 2 - 0.5, top: debug.redlines.parent.top, height: debug.redlines.toTop }}>
+              <RedlineLabel style={{ top: debug.redlines.toTop / 2 - 8 }}>{debug.redlines.toTop}</RedlineLabel>
+            </RedlineV>
+          )}
+          {/* Bottom distance */}
+          {debug.redlines.toBottom > 0 && (
+            <RedlineV style={{ left: debug.redlines.el.left + debug.redlines.el.width / 2 - 0.5, top: debug.redlines.el.bottom, height: debug.redlines.toBottom }}>
+              <RedlineLabel style={{ top: debug.redlines.toBottom / 2 - 8 }}>{debug.redlines.toBottom}</RedlineLabel>
+            </RedlineV>
+          )}
+          {/* Left distance */}
+          {debug.redlines.toLeft > 0 && (
+            <RedlineH style={{ top: debug.redlines.el.top + debug.redlines.el.height / 2 - 0.5, left: debug.redlines.parent.left, width: debug.redlines.toLeft }}>
+              <RedlineLabel style={{ left: debug.redlines.toLeft / 2 - 12 }}>{debug.redlines.toLeft}</RedlineLabel>
+            </RedlineH>
+          )}
+          {/* Right distance */}
+          {debug.redlines.toRight > 0 && (
+            <RedlineH style={{ top: debug.redlines.el.top + debug.redlines.el.height / 2 - 0.5, left: debug.redlines.el.right, width: debug.redlines.toRight }}>
+              <RedlineLabel style={{ left: debug.redlines.toRight / 2 - 12 }}>{debug.redlines.toRight}</RedlineLabel>
+            </RedlineH>
+          )}
+          {/* Prev sibling gap */}
+          {debug.redlines.prevGap !== null && debug.redlines.prevGap > 0 && (
+            <RedlineV style={{ left: debug.redlines.el.left + debug.redlines.el.width / 2 - 0.5, top: debug.redlines.el.top - debug.redlines.prevGap, height: debug.redlines.prevGap }} $color="#F59E0B">
+              <RedlineLabel $color="#F59E0B" style={{ top: debug.redlines.prevGap / 2 - 8 }}>↑{debug.redlines.prevGap}</RedlineLabel>
+            </RedlineV>
+          )}
+          {/* Next sibling gap */}
+          {debug.redlines.nextGap !== null && debug.redlines.nextGap > 0 && (
+            <RedlineV style={{ left: debug.redlines.el.left + debug.redlines.el.width / 2 - 0.5, top: debug.redlines.el.bottom, height: debug.redlines.nextGap }} $color="#F59E0B">
+              <RedlineLabel $color="#F59E0B" style={{ top: debug.redlines.nextGap / 2 - 8 }}>↓{debug.redlines.nextGap}</RedlineLabel>
+            </RedlineV>
+          )}
+        </RedlinesOverlay>
       )}
       <DebugToggle $on={debug.enabled} onClick={debug.toggle} data-debug-ui>{'\u2699'}</DebugToggle>
     </>

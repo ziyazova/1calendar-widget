@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled, { keyframes } from 'styled-components';
-import { ChevronRight, Calendar, Clock, Archive, Image } from 'lucide-react';
-import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES, ARCHIVE_STYLES, CLOCK_ARCHIVE_STYLES } from '../widgetConfig';
+import styled, { keyframes, css } from 'styled-components';
+import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft } from 'lucide-react';
+import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../widgetConfig';
+import type { WidgetStyleConfig } from '../widgetConfig';
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -11,13 +12,17 @@ interface SidebarProps {
   onLogoClick?: () => void;
   logoPressed?: boolean;
   mobileOpen?: boolean;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-const SidebarContainer = styled.aside<{ $mobileOpen?: boolean }>`
+/* ─── Sidebar Container ─── */
+
+const SidebarContainer = styled.aside<{ $mobileOpen?: boolean; $collapsed?: boolean }>`
   position: fixed;
   left: 0;
   top: 0;
-  width: 270px;
+  width: ${({ $collapsed }) => $collapsed ? '64px' : '270px'};
   height: 100vh;
   background: #ffffff;
   backdrop-filter: blur(20px);
@@ -25,20 +30,30 @@ const SidebarContainer = styled.aside<{ $mobileOpen?: boolean }>`
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
+  transition: width 0.25s ease;
+  overflow: visible;
+
+  @media (max-width: 1024px) {
+    width: ${({ $collapsed }) => $collapsed ? '56px' : '220px'};
+  }
 
   @media (max-width: 768px) {
+    width: 270px;
     transform: ${({ $mobileOpen }) => $mobileOpen ? 'translateX(0)' : 'translateX(-100%)'};
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     box-shadow: ${({ $mobileOpen }) => $mobileOpen ? '4px 0 20px rgba(0, 0, 0, 0.1)' : 'none'};
   }
 `;
 
-const SidebarHeader = styled.div`
-  padding: 0 24px;
-  height: 64px;
+/* ─── Header ─── */
+
+const SidebarHeader = styled.div<{ $collapsed?: boolean }>`
+  padding: 24px ${({ $collapsed }) => $collapsed ? '10px' : '16px'} 0;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: ${({ $collapsed }) => $collapsed ? 'center' : 'flex-start'};
+  gap: 8px;
   border-bottom: none;
 `;
 
@@ -61,11 +76,16 @@ const LogoWrapper = styled.div<{ $pressed?: boolean }>`
   }
 `;
 
-const LogoText = styled.span`
+const LogoText = styled.span<{ $collapsed?: boolean }>`
   font-size: 16px;
   font-weight: 600;
   color: #1F1F1F;
   letter-spacing: -0.02em;
+  opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
 `;
 
 const LogoSub = styled.span`
@@ -73,17 +93,79 @@ const LogoSub = styled.span`
   color: #9A9A9A;
 `;
 
-const NavSection = styled.nav`
+const BackButton = styled.button`
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #9A9A9A;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #1F1F1F;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
+const CollapseHeaderBtn = styled.button`
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  cursor: pointer;
+  color: #6B6B6B;
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(51, 132, 244, 0.08);
+    color: #3384F4;
+  }
+
+  svg { width: 18px; height: 18px; }
+
+  @media (min-width: 1025px) {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+/* ─── Nav Section ─── */
+
+const NavSection = styled.nav<{ $collapsed?: boolean }>`
   flex: 1;
-  padding: 16px 0;
+  padding: ${({ $collapsed }) => $collapsed ? '20px 0' : '16px 0'};
   overflow-y: auto;
+  overflow-x: visible;
+  display: flex;
+  flex-direction: column;
+  ${({ $collapsed }) => $collapsed && 'align-items: center;'}
 
   &::-webkit-scrollbar {
     width: 0;
   }
 `;
 
-const SectionLabel = styled.h2`
+const SectionLabel = styled.h2<{ $collapsed?: boolean }>`
   font-size: 11px;
   font-weight: 500;
   color: #9A9A9A;
@@ -92,28 +174,38 @@ const SectionLabel = styled.h2`
   margin: 0 0 18px 0;
   padding: 0 24px;
   letter-spacing: -0.01em;
+  opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
+  height: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
+  margin-bottom: ${({ $collapsed }) => $collapsed ? '0' : '18px'};
+  overflow: hidden;
+  transition: opacity 0.15s ease, height 0.25s ease, margin 0.25s ease;
 
   &:nth-of-type(n+2) {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    margin-top: ${({ $collapsed }) => $collapsed ? '0' : '24px'};
+    padding-top: ${({ $collapsed }) => $collapsed ? '0' : '24px'};
+    border-top: ${({ $collapsed }) => $collapsed ? 'none' : '1px solid rgba(0, 0, 0, 0.06)'};
   }
 `;
 
-const WidgetCategory = styled.div`
-  margin-bottom: 8px;
+/* ─── Widget Category ─── */
+
+const WidgetCategory = styled.div<{ $collapsed?: boolean }>`
+  margin-bottom: ${({ $collapsed }) => $collapsed ? '10px' : '8px'};
+  position: relative;
 `;
 
-const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
-  width: calc(100% - 32px);
-  margin: 0 16px;
+const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $collapsed?: boolean }>`
+  width: ${({ $collapsed }) => $collapsed ? '44px' : 'calc(100% - 32px)'};
+  margin: ${({ $collapsed }) => $collapsed ? '0 auto' : '0 16px'};
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+  justify-content: ${({ $collapsed }) => $collapsed ? 'center' : 'flex-start'};
+  gap: ${({ $collapsed }) => $collapsed ? '0' : '12px'};
+  padding: ${({ $collapsed }) => $collapsed ? '0' : '8px 12px'};
+  height: ${({ $collapsed }) => $collapsed ? '44px' : 'auto'};
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ $collapsed }) => $collapsed ? '10px' : '8px'};
   color: ${({ $muted }) => $muted ? '#6B6B6B' : '#1F1F1F'};
   font-size: 14px;
   font-weight: 500;
@@ -122,6 +214,7 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
   transition: all 0.15s ease;
   font-family: inherit;
   letter-spacing: -0.01em;
+  position: relative;
 
   &:hover {
     background: rgba(51, 132, 244, 0.04);
@@ -138,16 +231,49 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean }>`
   }
 `;
 
-const CategoryIcon = styled.div<{ $muted?: boolean }>`
+const CategoryText = styled.span<{ $collapsed?: boolean }>`
+  opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
+`;
+
+const CollapsedIconWrapper = styled.div<{ $hasActive?: boolean }>`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ${({ $hasActive }) => $hasActive && css`
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3384F4;
+    }
+  `}
+`;
+
+const CategoryIcon = styled.div<{ $muted?: boolean; $active?: boolean }>`
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: ${({ $muted }) => $muted
-    ? 'rgba(0, 0, 0, 0.04)'
-    : 'linear-gradient(135deg, rgba(51, 132, 244, 0.08), rgba(91, 160, 247, 0.08))'};
+  background: ${({ $muted, $active }) =>
+    $active
+      ? 'rgba(51, 132, 244, 0.08)'
+      : $muted
+        ? 'rgba(0, 0, 0, 0.04)'
+        : 'linear-gradient(135deg, rgba(51, 132, 244, 0.08), rgba(91, 160, 247, 0.08))'};
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 
   svg {
     color: ${({ $muted }) => $muted ? '#9A9A9A' : '#3384F4'};
@@ -155,6 +281,8 @@ const CategoryIcon = styled.div<{ $muted?: boolean }>`
     height: 16px;
   }
 `;
+
+/* ─── Styles List (expanded mode) ─── */
 
 const StylesList = styled.div<{ $expanded: boolean }>`
   display: grid;
@@ -215,6 +343,192 @@ const StyleItem = styled.button<{ $active: boolean }>`
   }
 `;
 
+/* ─── Tooltip ─── */
+
+const Tooltip = styled.div`
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1F1F1F;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 1000;
+
+  ${CategoryHeader}:hover & {
+    opacity: 1;
+  }
+`;
+
+/* ─── Popover (collapsed mode) ─── */
+
+const popoverFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const PopoverOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 64px;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+`;
+
+const PopoverContainer = styled.div<{ $top: number }>`
+  position: fixed;
+  left: 68px;
+  top: ${({ $top }) => $top}px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  padding: 8px;
+  min-width: 180px;
+  z-index: 1000;
+  animation: ${popoverFadeIn} 0.15s ease both;
+`;
+
+const PopoverTitle = styled.div`
+  font-size: 11px;
+  font-weight: 500;
+  color: #9A9A9A;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 8px 8px;
+`;
+
+const PopoverItem = styled.button<{ $active: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.06)' : 'transparent'};
+  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: ${({ $active }) => $active ? 500 : 400};
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+
+  &:hover {
+    background: rgba(51, 132, 244, 0.06);
+    color: #3384F4;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+`;
+
+/* ─── Collapse Toggle ─── */
+
+const CollapseToggle = styled.button<{ $collapsed?: boolean }>`
+  width: ${({ $collapsed }) => $collapsed ? '36px' : 'calc(100% - 32px)'};
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: ${({ $collapsed }) => $collapsed ? 'center' : 'flex-start'};
+  gap: 8px;
+  padding: ${({ $collapsed }) => $collapsed ? '0' : '8px 12px'};
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #9A9A9A;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #1F1F1F;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+    transform: rotate(${({ $collapsed }) => $collapsed ? '180deg' : '0deg'});
+  }
+`;
+
+const CollapseText = styled.span<{ $collapsed?: boolean }>`
+  opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
+`;
+
+/* ─── Category Popover Component ─── */
+
+interface CategoryPopoverProps {
+  title: string;
+  styles: WidgetStyleConfig[];
+  widgetType: string;
+  currentWidget: string;
+  onWidgetChange: (type: string, style?: string) => void;
+  anchorTop: number;
+  onClose: () => void;
+}
+
+const CategoryPopover: React.FC<CategoryPopoverProps> = ({
+  title,
+  styles,
+  widgetType,
+  currentWidget,
+  onWidgetChange,
+  anchorTop,
+  onClose,
+}) => {
+  return (
+    <>
+      <PopoverOverlay onClick={onClose} />
+      <PopoverContainer $top={anchorTop}>
+        <PopoverTitle>{title}</PopoverTitle>
+        {styles.map((s) => (
+          <PopoverItem
+            key={s.value}
+            $active={currentWidget === `${widgetType}-${s.value}`}
+            onClick={() => {
+              onWidgetChange(widgetType, s.value);
+            }}
+          >
+            <s.icon />
+            {s.label}
+          </PopoverItem>
+        ))}
+      </PopoverContainer>
+    </>
+  );
+};
+
+/* ─── Sidebar Component ─── */
 
 export const Sidebar: React.FC<SidebarProps> = ({
   availableWidgets,
@@ -223,9 +537,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogoClick,
   logoPressed,
   mobileOpen,
+  collapsed,
+  onToggleCollapse,
 }) => {
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>(['calendar']);
+  const [popover, setPopover] = useState<{
+    type: string;
+    title: string;
+    styles: WidgetStyleConfig[];
+    top: number;
+  } | null>(null);
+
+  const calendarRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>;
+  const clockRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>;
+  const boardRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>;
 
   const toggle = (key: string) => {
     setExpandedSections(prev =>
@@ -233,100 +559,149 @@ export const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
+  const openPopover = useCallback((
+    type: string,
+    title: string,
+    styles: WidgetStyleConfig[],
+    ref: React.RefObject<HTMLButtonElement>,
+  ) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    setPopover({ type, title, styles, top: rect.top });
+  }, []);
+
+  const closePopover = useCallback(() => setPopover(null), []);
+
+  // Close popover when collapsing/expanding
+  useEffect(() => {
+    setPopover(null);
+  }, [collapsed]);
+
+  // Esc closes popover
+  useEffect(() => {
+    if (!popover) return;
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') closePopover(); };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [popover, closePopover]);
+
+  const handleCategoryClick = (
+    key: string,
+    title: string,
+    styles: WidgetStyleConfig[],
+    ref: React.RefObject<HTMLButtonElement>,
+  ) => {
+    if (collapsed) {
+      if (popover?.type === key) {
+        closePopover();
+      } else {
+        openPopover(key, title, styles, ref);
+      }
+    } else {
+      toggle(key);
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (onLogoClick) {
+      onLogoClick();
+    } else {
+      navigate('/');
+    }
+  };
+
+  const hasActiveStyle = (type: string, styles: WidgetStyleConfig[]) =>
+    styles.some(s => currentWidget === `${type}-${s.value}`);
+
+  const renderCategory = (
+    key: string,
+    title: string,
+    Icon: React.FC,
+    styles: WidgetStyleConfig[],
+    ref: React.RefObject<HTMLButtonElement>,
+  ) => {
+    if (!availableWidgets.includes(key)) return null;
+
+    const isExpanded = expandedSections.includes(key);
+    const hasActive = hasActiveStyle(key, styles);
+
+    return (
+      <WidgetCategory key={key} $collapsed={collapsed}>
+        <CategoryHeader
+          ref={ref}
+          $expanded={isExpanded}
+          $collapsed={collapsed}
+          onClick={() => handleCategoryClick(key, title, styles, ref)}
+        >
+          <CollapsedIconWrapper $hasActive={collapsed ? hasActive : false}>
+            <CategoryIcon $active={collapsed && hasActive}>
+              <Icon />
+            </CategoryIcon>
+          </CollapsedIconWrapper>
+          <CategoryText $collapsed={collapsed}>{title}</CategoryText>
+          {!collapsed && <ChevronRight className="chevron" />}
+          {collapsed && <Tooltip>{title}</Tooltip>}
+        </CategoryHeader>
+        {!collapsed && (
+          <StylesList $expanded={isExpanded}>
+            <div>
+              {styles.map((s) => (
+                <StyleItem
+                  key={s.value}
+                  $active={currentWidget === `${key}-${s.value}`}
+                  onClick={() => onWidgetChange(key, s.value)}
+                >
+                  <s.icon />
+                  {s.label}
+                </StyleItem>
+              ))}
+            </div>
+          </StylesList>
+        )}
+      </WidgetCategory>
+    );
+  };
+
   return (
-    <SidebarContainer $mobileOpen={mobileOpen}>
-      <SidebarHeader>
-        <LogoWrapper $pressed={logoPressed} onClick={() => onLogoClick ? onLogoClick() : navigate('/')}>
-          <img src="/PeachyLogo.png" alt="Logo" width="22" height="22" style={{ objectFit: 'contain' }} />
-          <LogoText>Peachy <LogoSub>Studio</LogoSub></LogoText>
-        </LogoWrapper>
+    <SidebarContainer $mobileOpen={mobileOpen} $collapsed={collapsed}>
+      <SidebarHeader $collapsed={collapsed}>
+        {collapsed ? (
+          <CollapseHeaderBtn onClick={onToggleCollapse} title="Expand sidebar" style={{ margin: '0 auto' }}>
+            <PanelLeftClose style={{ transform: 'rotate(180deg)' }} />
+          </CollapseHeaderBtn>
+        ) : (
+          <>
+            <BackButton onClick={handleLogoClick} title="Back">
+              <ArrowLeft />
+            </BackButton>
+            <LogoText $collapsed={collapsed}>Widget <LogoSub>Studio</LogoSub></LogoText>
+            {onToggleCollapse && (
+              <CollapseHeaderBtn onClick={onToggleCollapse} title="Collapse">
+                <PanelLeftClose />
+              </CollapseHeaderBtn>
+            )}
+          </>
+        )}
       </SidebarHeader>
 
-      <NavSection>
-        <SectionLabel>Widgets</SectionLabel>
-
-        {availableWidgets.includes('calendar') && (
-          <WidgetCategory>
-            <CategoryHeader
-              $expanded={expandedSections.includes('calendar')}
-              onClick={() => toggle('calendar')}
-            >
-              <CategoryIcon><Calendar /></CategoryIcon>
-              Calendar
-              <ChevronRight className="chevron" />
-            </CategoryHeader>
-            <StylesList $expanded={expandedSections.includes('calendar')}>
-              <div>
-                {CALENDAR_STYLES.map((s) => (
-                  <StyleItem
-                    key={s.value}
-                    $active={currentWidget === `calendar-${s.value}`}
-                    onClick={() => onWidgetChange('calendar', s.value)}
-                  >
-                    <s.icon />
-                    {s.label}
-                  </StyleItem>
-                ))}
-              </div>
-            </StylesList>
-          </WidgetCategory>
-        )}
-
-        {availableWidgets.includes('clock') && (
-          <WidgetCategory>
-            <CategoryHeader
-              $expanded={expandedSections.includes('clock')}
-              onClick={() => toggle('clock')}
-            >
-              <CategoryIcon><Clock /></CategoryIcon>
-              Clock
-              <ChevronRight className="chevron" />
-            </CategoryHeader>
-            <StylesList $expanded={expandedSections.includes('clock')}>
-              <div>
-                {CLOCK_STYLES.map((s) => (
-                  <StyleItem
-                    key={s.value}
-                    $active={currentWidget === `clock-${s.value}`}
-                    onClick={() => onWidgetChange('clock', s.value)}
-                  >
-                    <s.icon />
-                    {s.label}
-                  </StyleItem>
-                ))}
-              </div>
-            </StylesList>
-          </WidgetCategory>
-        )}
-
-        {availableWidgets.includes('board') && (
-          <WidgetCategory>
-            <CategoryHeader
-              $expanded={expandedSections.includes('board')}
-              onClick={() => toggle('board')}
-            >
-              <CategoryIcon><Image /></CategoryIcon>
-              Canvas
-              <ChevronRight className="chevron" />
-            </CategoryHeader>
-            <StylesList $expanded={expandedSections.includes('board')}>
-              <div>
-                {BOARD_STYLES.map((s) => (
-                  <StyleItem
-                    key={s.value}
-                    $active={currentWidget === `board-${s.value}`}
-                    onClick={() => onWidgetChange('board', s.value)}
-                  >
-                    <s.icon />
-                    {s.label}
-                  </StyleItem>
-                ))}
-              </div>
-            </StylesList>
-          </WidgetCategory>
-        )}
-
+      <NavSection $collapsed={collapsed}>
+        <SectionLabel $collapsed={collapsed}>Widgets</SectionLabel>
+        {renderCategory('calendar', 'Calendar', Calendar, CALENDAR_STYLES, calendarRef)}
+        {renderCategory('clock', 'Clock', Clock, CLOCK_STYLES, clockRef)}
+        {renderCategory('board', 'Canvas', Image, BOARD_STYLES, boardRef)}
       </NavSection>
+
+      {collapsed && popover && (
+        <CategoryPopover
+          title={popover.title}
+          styles={popover.styles}
+          widgetType={popover.type}
+          currentWidget={currentWidget}
+          onWidgetChange={onWidgetChange}
+          anchorTop={popover.top}
+          onClose={closePopover}
+        />
+      )}
     </SidebarContainer>
   );
 };

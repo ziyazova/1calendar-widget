@@ -83,6 +83,92 @@ const WIDGET_DATA = [
   { image: '/widget-calendar2.png', title: 'Classic Calendar' },
 ];
 
+/* ── Big Footer ── */
+const BigFooter = styled.footer`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 48px 40px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 768px) {
+    padding: 48px 24px 32px;
+  }
+`;
+
+const FooterInner = styled.div`
+  display: flex;
+  gap: 64px;
+  margin-bottom: 48px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 32px;
+  }
+`;
+
+const FooterBrand = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+`;
+
+const FooterBrandName = styled.span`
+  font-size: 18px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.02em;
+`;
+
+const FooterColumns = styled.div`
+  display: flex;
+  gap: 48px;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 32px 24px;
+  }
+`;
+
+const FooterColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 120px;
+
+  @media (max-width: 768px) {
+    min-width: 40%;
+  }
+`;
+
+const FooterColumnTitle = styled.h4`
+  font-size: 13px;
+  font-weight: 600;
+  color: #1F1F1F;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+`;
+
+const FooterLink = styled.span`
+  font-size: 13px;
+  color: #9A9A9A;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  letter-spacing: -0.01em;
+
+  &:hover { color: #1F1F1F; }
+`;
+
+const FooterBottom = styled.div`
+  font-size: 12px;
+  color: #ABABAB;
+  text-align: center;
+  padding-top: 32px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  letter-spacing: -0.01em;
+`;
+
 /* ── Bestsellers ── */
 const Bestsellers = styled.section`
   max-width: 1200px;
@@ -96,7 +182,7 @@ const Bestsellers = styled.section`
 
 const BestsellersHeader = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 32px;
 
@@ -136,7 +222,8 @@ const BrowseAllButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 20px;
+  height: 34px;
+  padding: 0 18px;
   font-size: 13px;
   font-weight: 500;
   color: #fff;
@@ -532,8 +619,6 @@ export const LandingPage: React.FC = () => {
       {/* ── Categories Marquee ── */}
       <CategoriesMarquee onNavigate={(path) => navigate(path)} />
 
-      <FeatureCardsSection />
-
       {/* ── Templates Gallery ── */}
       <TemplatesGallery onNavigate={(path) => navigate(path)} />
 
@@ -549,15 +634,46 @@ export const LandingPage: React.FC = () => {
         <PinterestGallery />
       </WidgetsSection>
 
+      <FeatureCardsSection />
+
       {/* ── Testimonials ── */}
       <TestimonialsSection />
 
       <CTASection onBrowseTemplates={() => navigate('/templates')} onExploreWidgets={() => navigate('/widgets')} />
 
-      <Footer>
-        <FooterText>Peachy Studio</FooterText>
-        <FooterText>Widgets &middot; Planners &middot; Templates</FooterText>
-      </Footer>
+      <BigFooter>
+        <FooterInner>
+          <FooterBrand>
+            <img src="/PeachyLogo.png" alt="Peachy" width="28" height="28" style={{ objectFit: 'contain' }} />
+            <FooterBrandName>Peachy</FooterBrandName>
+          </FooterBrand>
+          <FooterColumns>
+            <FooterColumn>
+              <FooterColumnTitle>Resources</FooterColumnTitle>
+              <FooterLink onClick={() => navigate('/templates')}>Notion Templates</FooterLink>
+              <FooterLink onClick={() => navigate('/widgets')}>Widget Studio</FooterLink>
+            </FooterColumn>
+            <FooterColumn>
+              <FooterColumnTitle>Social</FooterColumnTitle>
+              <FooterLink>X (Twitter)</FooterLink>
+            </FooterColumn>
+            <FooterColumn>
+              <FooterColumnTitle>Legal</FooterColumnTitle>
+              <FooterLink>Privacy Policy</FooterLink>
+              <FooterLink>Terms & Conditions</FooterLink>
+            </FooterColumn>
+            <FooterColumn>
+              <FooterColumnTitle>Widgets</FooterColumnTitle>
+              <FooterLink onClick={() => navigate('/widgets')}>Calendar Widgets</FooterLink>
+              <FooterLink onClick={() => navigate('/widgets')}>Clock Widgets</FooterLink>
+              <FooterLink onClick={() => navigate('/widgets')}>Canvas Widgets</FooterLink>
+            </FooterColumn>
+          </FooterColumns>
+        </FooterInner>
+        <FooterBottom>
+          © {new Date().getFullYear()} Peachy Studio. All rights reserved.
+        </FooterBottom>
+      </BigFooter>
       </PageContent>
     </Page>
   );

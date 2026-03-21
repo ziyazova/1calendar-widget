@@ -33,6 +33,10 @@ const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
   border-left: none;
   z-index: ${({ theme }) => theme.zIndex.sticky};
 
+  @media (max-width: 1024px) {
+    width: 240px;
+  }
+
   @media (max-width: 768px) {
     width: 100%;
     height: 60vh;
@@ -54,7 +58,7 @@ const PanelHeader = styled.div`
   flex-direction: column;
   justify-content: center;
   gap: 10px;
-  padding: 16px 24px;
+  padding: 32px 24px 16px;
   border-bottom: none;
 `;
 
@@ -427,6 +431,7 @@ const ImageInputRow = styled.div`
 
 const ImageUrlInput = styled.input`
   flex: 1;
+  min-width: 0;
   height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.08);

@@ -41,7 +41,7 @@ const TemplatesMarqueeWrap = styled.div`
 
 const TemplatesGalleryHeader = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto 24px;
@@ -83,7 +83,8 @@ const BrowseAllButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 20px;
+  height: 34px;
+  padding: 0 18px;
   font-size: 13px;
   font-weight: 500;
   color: #fff;
@@ -143,12 +144,18 @@ const TemplatesScrollHint = styled.div`
   svg {
     width: 14px;
     height: 14px;
-    color: #1F1F1F;
+    color: #6B6B6B;
   }
 
   &:hover {
-    background: #333;
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.2);
     transform: translateY(-50%);
+    svg { color: #1F1F1F; }
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
   }
 
   @media (max-width: 1024px) {
