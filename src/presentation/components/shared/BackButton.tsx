@@ -8,7 +8,7 @@ const BackButtonWrap = styled.button`
   gap: 6px;
   font-size: 12px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   background: none;
   border: none;
   cursor: pointer;

@@ -75,7 +75,7 @@ const HeaderTitle = styled.h2`
 const HeaderSubtitle = styled.p`
   font-size: 14px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
 `;
 
@@ -90,7 +90,7 @@ const BrowseAllButton = styled.button`
   color: #fff;
   background: #1F1F1F;
   border: none;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;
   font-family: inherit;
   transition: all 0.2s;
@@ -172,11 +172,11 @@ const TemplateCard = styled.div`
   width: 288px;
   height: 228px;
   position: relative;
-  border-radius: 24px;
+  border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: clip;
   cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
   ${TemplateCardWrap}:hover & img {
     transform: scale(1.22);
   }
@@ -184,7 +184,7 @@ const TemplateCard = styled.div`
   @media (max-width: 768px) {
     width: 160px;
     height: 126px;
-    border-radius: 16px;
+    border-radius: ${({ theme }) => theme.radii.lg};
   }
 `;
 
@@ -210,7 +210,7 @@ const TemplateCardMeta = styled.div`
 const TemplateCardTitle = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
@@ -238,7 +238,7 @@ const TemplateCardTag = styled.span<{ $bg?: string; $color?: string }>`
   padding: 2px 7px;
   border-radius: 5px;
   background: ${({ $bg }) => $bg || 'rgba(0, 0, 0, 0.05)'};
-  color: ${({ $color }) => $color || '#888'};
+  color: ${({ $color, theme }) => $color || theme.colors.text.tertiary};
 `;
 
 const TEMPLATE_ROW_1 = [

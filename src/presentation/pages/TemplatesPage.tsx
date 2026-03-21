@@ -68,7 +68,7 @@ const PageTitle = styled.h1`
 
 const PageSubtitle = styled.p`
   font-size: 15px;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 28px;
   letter-spacing: -0.01em;
 `;
@@ -85,7 +85,7 @@ const SearchIcon = styled.div`
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   display: flex;
   svg { width: 15px; height: 15px; }
 `;
@@ -94,17 +94,17 @@ const SearchInput = styled.input`
   width: 100%;
   height: 40px;
   padding: 0 14px 0 40px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-family: inherit;
   color: #1F1F1F;
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surface};
   outline: none;
   transition: all 0.2s ease;
   letter-spacing: -0.01em;
 
-  &::placeholder { color: #ABABAB; }
+  &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }
   &:focus {
     border-color: rgba(0, 0, 0, 0.16);
     background: #ffffff;
@@ -124,8 +124,8 @@ const SubChip = styled.button<{ $active: boolean }>`
   padding: 0 14px;
   border: none;
   background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#3384F4' : '#9A9A9A'};
-  border-radius: 8px;
+  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.tertiary};
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 12px;
   font-weight: ${({ $active }) => $active ? '500' : '400'};
   cursor: pointer;
@@ -185,18 +185,18 @@ const CardImage = styled.div<{ $gradient: string }>`
   width: 100%;
   aspect-ratio: 288 / 228;
   position: relative;
-  border-radius: 24px;
+  border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: clip;
   cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
 
   &:hover ${CardInner} {
     transform: scale(1.24);
   }
 
   @media (max-width: 768px) {
-    border-radius: 16px;
+    border-radius: ${({ theme }) => theme.radii.lg};
   }
 `;
 
@@ -238,14 +238,14 @@ const CardTitle = styled.span`
 const Price = styled.span<{ $free: boolean }>`
   font-size: 13px;
   font-weight: 500;
-  color: ${({ $free }) => $free ? '#22C55E' : '#9A9A9A'};
+  color: ${({ $free, theme }) => $free ? '#22C55E' : theme.colors.text.tertiary};
 `;
 
 const EmptyState = styled.div`
   grid-column: 1 / -1;
   text-align: center;
   padding: 80px 0;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: 14px;
 `;
 

@@ -90,7 +90,7 @@ const LogoText = styled.span<{ $collapsed?: boolean }>`
 
 const LogoSub = styled.span`
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
 const BackButton = styled.button`
@@ -101,9 +101,9 @@ const BackButton = styled.button`
   justify-content: center;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   cursor: pointer;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   flex-shrink: 0;
   transition: all 0.15s ease;
 
@@ -126,9 +126,9 @@ const CollapseHeaderBtn = styled.button`
   justify-content: center;
   border: none;
   background: rgba(0, 0, 0, 0.04);
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   margin-left: auto;
   flex-shrink: 0;
   transition: all 0.15s ease;
@@ -168,7 +168,7 @@ const NavSection = styled.nav<{ $collapsed?: boolean }>`
 const SectionLabel = styled.h2<{ $collapsed?: boolean }>`
   font-size: 11px;
   font-weight: 500;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 18px 0;
@@ -183,7 +183,7 @@ const SectionLabel = styled.h2<{ $collapsed?: boolean }>`
   &:nth-of-type(n+2) {
     margin-top: ${({ $collapsed }) => $collapsed ? '0' : '24px'};
     padding-top: ${({ $collapsed }) => $collapsed ? '0' : '24px'};
-    border-top: ${({ $collapsed }) => $collapsed ? 'none' : '1px solid rgba(0, 0, 0, 0.06)'};
+    border-top: ${({ $collapsed, theme }) => $collapsed ? 'none' : `1px solid ${theme.colors.border.light}`};
   }
 `;
 
@@ -206,7 +206,7 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $co
   background: transparent;
   border: none;
   border-radius: ${({ $collapsed }) => $collapsed ? '10px' : '8px'};
-  color: ${({ $muted }) => $muted ? '#6B6B6B' : '#1F1F1F'};
+  color: ${({ $muted, theme }) => $muted ? theme.colors.text.secondary : '#1F1F1F'};
   font-size: 14px;
   font-weight: 500;
   line-height: 22px;
@@ -265,7 +265,7 @@ const CategoryIcon = styled.div<{ $muted?: boolean; $active?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ $muted, $active }) =>
     $active
       ? 'rgba(51, 132, 244, 0.08)'
@@ -276,7 +276,7 @@ const CategoryIcon = styled.div<{ $muted?: boolean; $active?: boolean }>`
   transition: all 0.2s ease;
 
   svg {
-    color: ${({ $muted }) => $muted ? '#9A9A9A' : '#3384F4'};
+    color: ${({ $muted, theme }) => $muted ? theme.colors.text.tertiary : '#3384F4'};
     width: 16px;
     height: 16px;
   }
@@ -305,7 +305,7 @@ const StylesList = styled.div<{ $expanded: boolean }>`
     top: 8px;
     bottom: 12px;
     width: 1px;
-    background: rgba(0, 0, 0, 0.08);
+    background: ${({ theme }) => theme.colors.border.light};
     opacity: ${({ $expanded }) => $expanded ? 1 : 0};
     transition: opacity 0.2s ease;
   }
@@ -320,7 +320,7 @@ const StyleItem = styled.button<{ $active: boolean }>`
   background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
   color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 13px;
   font-weight: ${({ $active }) => $active ? 500 : 400};
   cursor: pointer;
@@ -394,7 +394,7 @@ const PopoverContainer = styled.div<{ $top: number }>`
   left: 68px;
   top: ${({ $top }) => $top}px;
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
   padding: 8px;
   min-width: 180px;
@@ -405,7 +405,7 @@ const PopoverContainer = styled.div<{ $top: number }>`
 const PopoverTitle = styled.div`
   font-size: 11px;
   font-weight: 500;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
   letter-spacing: 0.03em;
   padding: 4px 8px 8px;
@@ -420,7 +420,7 @@ const PopoverItem = styled.button<{ $active: boolean }>`
   background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.06)' : 'transparent'};
   color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 13px;
   font-weight: ${({ $active }) => $active ? 500 : 400};
   cursor: pointer;
@@ -455,8 +455,8 @@ const CollapseToggle = styled.button<{ $collapsed?: boolean }>`
   height: 36px;
   background: transparent;
   border: none;
-  border-radius: 10px;
-  color: #9A9A9A;
+  border-radius: ${({ theme }) => theme.radii.button};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: 13px;
   font-weight: 400;
   cursor: pointer;

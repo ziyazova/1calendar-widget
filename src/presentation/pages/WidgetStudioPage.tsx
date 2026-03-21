@@ -24,7 +24,7 @@ const HeroCard = styled.div`
 `;
 
 const HeroInner = styled.div<{ $expanding?: boolean }>`
-  border-radius: 28px;
+  border-radius: ${({ theme }) => theme.radii['3xl']};
   padding: 64px 48px;
   text-align: center;
   cursor: pointer;
@@ -35,7 +35,7 @@ const HeroInner = styled.div<{ $expanding?: boolean }>`
     radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
     #F8F8F7;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   transform: ${({ $expanding }) => $expanding ? 'scale(0.97)' : 'scale(1)'};
   opacity: ${({ $expanding }) => $expanding ? 0 : 1};
@@ -47,7 +47,7 @@ const HeroInner = styled.div<{ $expanding?: boolean }>`
 
   @media (max-width: 768px) {
     padding: 36px 24px;
-    border-radius: 20px;
+    border-radius: ${({ theme }) => theme.radii.xl};
   }
 `;
 
@@ -67,7 +67,7 @@ const HeroIcon = styled.div<{ $delay: string }>`
   @media (max-width: 768px) {
     width: 40px;
     height: 40px;
-    border-radius: 12px;
+    border-radius: ${({ theme }) => theme.radii.md};
     svg { width: 18px !important; height: 18px !important; }
   }
   background: rgba(255, 255, 255, 0.7);
@@ -78,7 +78,7 @@ const HeroIcon = styled.div<{ $delay: string }>`
   justify-content: center;
   animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${({ $delay }) => $delay} both;
 
-  svg { width: 22px; height: 22px; color: #6B6B6B; }
+  svg { width: 22px; height: 22px; color: ${({ theme }) => theme.colors.text.secondary}; }
 `;
 
 const HeroTitle = styled.h2`
@@ -95,7 +95,7 @@ const HeroTitle = styled.h2`
 
 const HeroDesc = styled.p`
   font-size: 15px;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0 auto 28px;
   letter-spacing: -0.01em;
@@ -118,7 +118,7 @@ const HeroButton = styled.button`
   background: #1F1F1F;
   color: #ffffff;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -146,8 +146,8 @@ const EmailInput = styled.input`
   width: 100%;
   height: 44px;
   padding: 0 16px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-family: inherit;
   color: #1F1F1F;
@@ -157,7 +157,7 @@ const EmailInput = styled.input`
   transition: border-color 0.2s;
 
   &::placeholder {
-    color: #bbb;
+    color: ${({ theme }) => theme.colors.text.muted};
   }
 
   &:focus {
@@ -172,14 +172,14 @@ const AuthDivider = styled.div`
   width: 100%;
   max-width: 380px;
   margin: 12px auto 0;
-  color: #ccc;
+  color: ${({ theme }) => theme.colors.text.muted};
   font-size: 11px;
 
   &::before, &::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(0, 0, 0, 0.06);
+    background: ${({ theme }) => theme.colors.border.light};
   }
 `;
 
@@ -193,8 +193,8 @@ const GoogleButton = styled.button`
   height: 40px;
   padding: 0 24px;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.button};
   font-size: 13px;
   font-weight: 500;
   color: #1F1F1F;
@@ -204,7 +204,7 @@ const GoogleButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #f9f9f9;
+    background: ${({ theme }) => theme.colors.background.surface};
     border-color: rgba(0, 0, 0, 0.12);
   }
 
@@ -241,12 +241,12 @@ const GalleryGrid = styled.div`
 `;
 
 const GalleryCard = styled.div`
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
-  background: #F8F8F7;
+  background: ${({ theme }) => theme.colors.background.surface};
 
   @media (max-width: 768px) {
-    border-radius: 12px;
+    border-radius: ${({ theme }) => theme.radii.md};
   }
   position: relative;
   aspect-ratio: 4 / 3;

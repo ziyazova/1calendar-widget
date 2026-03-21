@@ -5,7 +5,7 @@ const FooterWrap = styled.footer`
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 48px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,7 +19,7 @@ const FooterWrap = styled.footer`
 
 const FooterText = styled.span`
   font-size: 12px;
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   letter-spacing: -0.01em;
 `;
 

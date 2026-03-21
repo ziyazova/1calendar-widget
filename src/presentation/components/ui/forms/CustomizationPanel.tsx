@@ -113,14 +113,14 @@ const Section = styled.div`
   & + & {
     margin-top: 24px;
     padding-top: 24px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   }
 `;
 
 const SectionTitle = styled.h3`
   font-size: 11px;
   font-weight: 600;
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 18px 0;
@@ -169,9 +169,9 @@ const Select = styled.select`
   height: 36px;
   padding: 0 12px;
   border: none;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   background: rgba(0, 0, 0, 0.03);
-  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.form};
   color: #1F1F1F;
 
   @media (max-width: 768px) { height: 40px; font-size: 13px; }
@@ -208,7 +208,7 @@ const Slider = styled.input`
   height: 4px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.03);
-  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.form};
   outline: none;
   -webkit-appearance: none;
   margin: 0;
@@ -248,7 +248,7 @@ const Slider = styled.input`
 
 const SliderValue = styled.span`
   font-size: 12px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   min-width: 32px;
@@ -289,7 +289,7 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
   background: ${({ $checked }) => $checked
     ? 'linear-gradient(135deg, #3384F4, #5BA0F7)'
     : 'rgba(0, 0, 0, 0.08)'};
-  box-shadow: ${({ $checked }) => $checked ? 'none' : '0 0.5px 1px rgba(0, 0, 0, 0.04)'};
+  box-shadow: ${({ $checked, theme }) => $checked ? 'none' : theme.shadows.form};
   position: relative;
   transition: background 0.25s ease;
   flex-shrink: 0;
@@ -418,7 +418,7 @@ const TYPEWRITER_COLORS = [
 
 const ImageHint = styled.p`
   font-size: 11px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 12px 0;
   line-height: 1.5;
   letter-spacing: -0.01em;
@@ -434,8 +434,8 @@ const ImageUrlInput = styled.input`
   min-width: 0;
   height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(255, 255, 255, 0.8);
   color: #1F1F1F;
   font-size: 12px;
@@ -451,7 +451,7 @@ const ImageUrlInput = styled.input`
     box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
   &::placeholder {
-    color: #6B6B6B;
+    color: ${({ theme }) => theme.colors.text.secondary};
   }
 `;
 
@@ -459,7 +459,7 @@ const AddButton = styled.button`
   height: 34px;
   padding: 0 16px;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: linear-gradient(135deg, #3384F4, #5BA0F7);
   color: #fff;
   font-size: 12px;
@@ -490,7 +490,7 @@ const AddButton = styled.button`
 
 const ImageCounter = styled.span`
   font-size: 11px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-weight: 500;
   margin-top: 8px;
   display: block;
@@ -513,9 +513,9 @@ const ImageItem = styled.div<{ $dragging?: boolean; $dragOver?: boolean }>`
     $dragging ? 'rgba(51, 132, 244, 0.06)' :
     $dragOver ? 'rgba(51, 132, 244, 0.04)' :
     'rgba(0, 0, 0, 0.02)'};
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 11px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   transition: background 0.12s ease, opacity 0.12s ease, border-color 0.12s ease;
   opacity: ${({ $dragging }) => $dragging ? 0.5 : 1};
   border: 1px solid ${({ $dragOver }) => $dragOver ? 'rgba(51, 132, 244, 0.2)' : 'transparent'};
@@ -540,7 +540,7 @@ const DragHandle = styled.div`
   }
 
   &:hover {
-    color: #6B6B6B;
+    color: ${({ theme }) => theme.colors.text.secondary};
   }
 
   svg {
@@ -552,10 +552,10 @@ const DragHandle = styled.div`
 const ImageThumb = styled.img`
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
 `;
 
 const ImageUrl = styled.span`
@@ -571,12 +571,12 @@ const RemoveButton = styled.button`
   height: 24px;
   border: none;
   background: transparent;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   flex-shrink: 0;
   padding: 0;
   transition: all 0.15s ease;
@@ -597,9 +597,9 @@ const LayoutOption = styled.button<{ $active: boolean }>`
   height: 36px;
   border: none;
   background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.04)' : 'rgba(0, 0, 0, 0.03)'};
-  box-shadow: ${({ $active }) => $active ? '0 0 0 1px rgba(51, 132, 244, 0.3)' : '0 0.5px 1px rgba(0, 0, 0, 0.04)'};
-  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
-  border-radius: 10px;
+  box-shadow: ${({ $active, theme }) => $active ? '0 0 0 1px rgba(51, 132, 244, 0.3)' : theme.shadows.form};
+  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
+  border-radius: ${({ theme }) => theme.radii.button};
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -641,7 +641,7 @@ const CompactOptions = styled.div`
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.08);
   border: none;
-  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.form};
   position: relative;
   cursor: pointer;
   display: flex;
@@ -657,7 +657,7 @@ const CompactSlider = styled.div<{ $activeIndex: number }>`
   left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 45px - 2px)'};
   width: 45px;
   height: calc(100% - 4px);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: #ffffff;
   border: none;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -674,7 +674,7 @@ const CompactOption = styled.button<{ $active: boolean }>`
   height: 100%;
   border: none;
   background: transparent;
-  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
+  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;

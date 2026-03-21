@@ -59,14 +59,14 @@ const FigmaColorRow = styled.div`
   display: flex;
   align-items: center;
   height: 30px;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   background: rgba(0, 0, 0, 0.03);
-  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.form};
   padding: 0 10px 0 5px;
 
   @media (max-width: 768px) {
     height: 34px;
-    border-radius: 10px;
+    border-radius: ${({ theme }) => theme.radii.button};
     padding: 0 10px 0 4px;
   }
 `;
@@ -129,7 +129,7 @@ const HexInput = styled.input`
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   background: transparent;
   outline: none;
   flex-shrink: 0;
@@ -202,7 +202,7 @@ const PickerPopup = styled.div`
   position: fixed;
   width: 240px;
   background: #fff;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 1060;
   padding: 12px;
@@ -230,17 +230,17 @@ const CloseButton = styled.button`
   height: 24px;
   border: none;
   background: transparent;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   padding: 0;
 
   &:hover {
     background: rgba(0, 0, 0, 0.05);
-    color: #6B6B6B;
+    color: ${({ theme }) => theme.colors.text.secondary};
   }
 
   svg {
@@ -252,7 +252,7 @@ const CloseButton = styled.button`
 const SaturationCanvas = styled.canvas`
   width: 216px;
   height: 180px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: default;
   display: block;
   touch-action: none;
@@ -266,7 +266,7 @@ const SaturationCanvas = styled.canvas`
 const HueSliderTrack = styled.div`
   width: 216px;
   height: 12px;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   background: linear-gradient(to right,
     #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
   );
@@ -320,10 +320,10 @@ const PickerBottomRow = styled.div`
 const EyedropperButton = styled.button`
   width: 28px;
   height: 28px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  background: #f8f8f8;
-  color: #6B6B6B;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.button};
+  background: ${({ theme }) => theme.colors.background.surface};
+  color: ${({ theme }) => theme.colors.text.secondary};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -348,7 +348,7 @@ const PickerColorPreview = styled.div<{ $color: string }>`
   height: 28px;
   border-radius: 30%;
   background: ${({ $color }) => $color};
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   flex-shrink: 0;
 `;
 
@@ -356,14 +356,14 @@ const PickerHexInput = styled.input`
   flex: 1;
   min-width: 0;
   height: 28px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.button};
   padding: 0 8px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
   color: #1F1F1F;
-  background: #f8f8f8;
+  background: ${({ theme }) => theme.colors.background.surface};
   outline: none;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -427,9 +427,9 @@ const MobilePickerBack = styled.button`
   height: 28px;
   background: rgba(0, 0, 0, 0.04);
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   cursor: pointer;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
 
   svg { width: 14px; height: 14px; }
 `;

@@ -22,7 +22,7 @@ const PinterestGrid = styled.div`
 `;
 
 const PinCard = styled.div<{ $col?: string; $row?: string; $mobileCol?: string; $mobileRow?: string; $hideOnMobile?: boolean; $hideOnTablet?: boolean }>`
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
   cursor: default;
   grid-column: ${({ $col }) => $col || 'auto'};

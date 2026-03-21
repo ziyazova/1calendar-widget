@@ -92,15 +92,15 @@ const WidgetArea = styled.div`
     radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
     #F8F8F7;
-  border-radius: 28px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: ${({ theme }) => theme.radii['3xl']};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: none;
   margin: 12px 0 12px 0;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {
     margin: 12px;
-    border-radius: 20px;
+    border-radius: ${({ theme }) => theme.radii.xl};
   }
 
   @media (max-width: 768px) {
@@ -174,7 +174,7 @@ const FloatingToolbar = styled.div`
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(24px);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   padding: 8px 12px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 10;
@@ -182,7 +182,7 @@ const FloatingToolbar = styled.div`
   @media (max-width: 1024px) {
     bottom: 84px;
     padding: 6px 10px;
-    border-radius: 12px;
+    border-radius: ${({ theme }) => theme.radii.md};
     max-width: 360px;
   }
 
@@ -212,7 +212,7 @@ const Tooltip = styled.span`
   font-size: 11px;
   font-weight: 500;
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -239,11 +239,11 @@ const ToolbarButton = styled.button<{ $active?: boolean }>`
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   transition: all 0.15s ease;
   background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.12)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
+  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
 
   &:hover {
     background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.15)' : 'rgba(0, 0, 0, 0.05)'};
@@ -289,11 +289,11 @@ const ZoomControl = styled.div`
   align-items: center;
   gap: 0;
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   height: 36px;
   padding: 0 4px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
 
   @media (max-width: 768px) {
     display: none;
@@ -335,7 +335,7 @@ const ZoomValueDivider = styled.div`
 const ZoomValue = styled.span`
   font-size: 12px;
   font-weight: 500;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-variant-numeric: tabular-nums;
   min-width: 42px;
   text-align: center;
@@ -346,7 +346,7 @@ const ZoomValue = styled.span`
 const ZoomLabel = styled.span`
   font-size: 16px;
   font-weight: 400;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   user-select: none;
   cursor: pointer;
   padding: 0 10px;
@@ -364,13 +364,13 @@ const GridToggle = styled.button<{ $active: boolean }>`
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: #ffffff;
-  color: ${({ $active }) => $active ? '#3384F4' : '#6B6B6B'};
+  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
 
   &:hover {
     color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
@@ -401,11 +401,11 @@ const EmbedUrlInput = styled.input`
   height: 32px;
   padding: 0 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: rgba(0, 0, 0, 0.04);
   font-size: 11px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.01em;
   outline: none;
 
@@ -427,7 +427,7 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   height: 32px;
   padding: 0 16px;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -466,7 +466,7 @@ const MobileTopBar = styled.div`
   justify-content: space-between;
   padding: 12px 16px;
   background: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
   z-index: 20;
 
   @media (max-width: 768px) {
@@ -481,7 +481,7 @@ const MobileBarButton = styled.button`
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(0, 0, 0, 0.04);
   color: #1F1F1F;
   cursor: pointer;
@@ -530,7 +530,7 @@ const MobileEmbedRow = styled.div`
   height: 40px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid rgba(0, 0, 0, 0.1);
   padding: 0 4px 0 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -543,7 +543,7 @@ const MobileEmbedUrl = styled.input`
   background: transparent;
   font-size: 11px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   outline: none;
   text-overflow: ellipsis;
 `;
@@ -556,7 +556,7 @@ const MobileCopyButton = styled.button<{ $copied: boolean }>`
   height: 28px;
   padding: 0 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   cursor: pointer;
   flex-shrink: 0;
   font-size: 11px;
@@ -609,7 +609,7 @@ const MobileTabButton = styled.button<{ $active?: boolean; $disabled?: boolean }
   cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
   border-radius: 14px;
   transition: all 0.15s ease;
-  color: ${({ $active, $disabled }) => $disabled ? '#BCBCBC' : $active ? '#3384F4' : '#999'};
+  color: ${({ $active, $disabled, theme }) => $disabled ? theme.colors.text.muted : $active ? '#3384F4' : theme.colors.text.tertiary};
   opacity: ${({ $disabled }) => $disabled ? 0.6 : 1};
   pointer-events: ${({ $disabled }) => $disabled ? 'none' : 'auto'};
 
@@ -620,7 +620,7 @@ const MobileTabButton = styled.button<{ $active?: boolean; $disabled?: boolean }
 
   &:hover {
     background: ${({ $disabled }) => $disabled ? 'none' : 'rgba(51, 132, 244, 0.05)'};
-    color: ${({ $disabled }) => $disabled ? '#D0D0D0' : '#3384F4'};
+    color: ${({ $disabled, theme }) => $disabled ? theme.colors.text.muted : '#3384F4'};
   }
 
   svg { width: 20px; height: 20px; }
@@ -701,9 +701,9 @@ const MobileSheetClose = styled.button`
   width: 28px;
   height: 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: rgba(0, 0, 0, 0.04);
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   cursor: pointer;
 
   svg { width: 14px; height: 14px; }

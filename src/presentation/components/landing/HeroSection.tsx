@@ -126,7 +126,7 @@ const Title = styled.h1`
 const HeroSubtitle = styled.p`
   font-size: 18px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0 auto 40px;
   max-width: 480px;
@@ -180,7 +180,7 @@ const PrimaryButton = styled.button`
   @media (max-width: 768px) {
     height: 44px;
     font-size: 14px;
-    border-radius: 12px;
+    border-radius: ${({ theme }) => theme.radii.md};
   }
 `;
 
@@ -190,9 +190,9 @@ const SecondaryButton = styled.button`
   justify-content: center;
   height: 48px;
   padding: 0 24px;
-  background: #F5F5F5;
+  background: ${({ theme }) => theme.colors.background.surface};
   color: #1F1F1F;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: 14px;
   font-size: 15px;
   font-weight: 500;
@@ -209,7 +209,7 @@ const SecondaryButton = styled.button`
   @media (max-width: 768px) {
     height: 44px;
     font-size: 14px;
-    border-radius: 12px;
+    border-radius: ${({ theme }) => theme.radii.md};
   }
 `;
 

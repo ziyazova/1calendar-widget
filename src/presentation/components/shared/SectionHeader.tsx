@@ -36,7 +36,7 @@ const Title = styled.h2`
 const Subtitle = styled.p`
   font-size: 14px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
   letter-spacing: -0.01em;
 `;
@@ -51,7 +51,7 @@ const ActionButton = styled.button`
   color: #fff;
   background: #1F1F1F;
   border: none;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;

@@ -61,7 +61,7 @@ const LogoText = styled.span`
 
 const LogoSub = styled.span`
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
 const NavLinks = styled.div`
@@ -77,7 +77,7 @@ const NavLinks = styled.div`
 const NavLink = styled.button<{ $active?: boolean }>`
   font-size: 13px;
   font-weight: ${({ $active }) => $active ? '500' : '400'};
-  color: ${({ $active }) => $active ? '#1F1F1F' : '#6B6B6B'};
+  color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
   background: none;
   border: none;
   cursor: pointer;
@@ -93,7 +93,7 @@ const NavCTA = styled.button`
   background: #1F1F1F;
   color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -158,10 +158,10 @@ const MobileLink = styled.button<{ $active?: boolean }>`
   padding: 14px 16px;
   font-size: 16px;
   font-weight: ${({ $active }) => $active ? '600' : '400'};
-  color: ${({ $active }) => $active ? '#1F1F1F' : '#6B6B6B'};
+  color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
   background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.03)' : 'none'};
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
@@ -180,7 +180,7 @@ const MobileCTA = styled.button`
   background: #1F1F1F;
   color: #ffffff;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;

@@ -54,10 +54,10 @@ const WidgetCardBox = styled.div`
   width: 100%;
   height: 207px;
   position: relative;
-  border-radius: 24px;
+  border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
   transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
   ${WidgetCardWrap}:hover & img {
@@ -88,7 +88,7 @@ const BigFooter = styled.footer`
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 48px 40px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
 
   @media (max-width: 768px) {
     padding: 48px 24px 32px;
@@ -152,7 +152,7 @@ const FooterColumnTitle = styled.h4`
 
 const FooterLink = styled.span`
   font-size: 13px;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   cursor: pointer;
   transition: color 0.15s ease;
   letter-spacing: -0.01em;
@@ -162,10 +162,10 @@ const FooterLink = styled.span`
 
 const FooterBottom = styled.div`
   font-size: 12px;
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   text-align: center;
   padding-top: 32px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   letter-spacing: -0.01em;
 `;
 
@@ -214,7 +214,7 @@ const BestsellersTitle = styled.h2`
 const BestsellersSubtitle = styled.p`
   font-size: 14px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
 `;
 
@@ -229,7 +229,7 @@ const BrowseAllButton = styled.button`
   color: #fff;
   background: #1F1F1F;
   border: none;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;
   font-family: inherit;
   transition: all 0.2s;
@@ -271,9 +271,9 @@ const BestsellerCard = styled.div`
 
 const BestsellerImageWrap = styled.div`
   height: 280px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
   ${BestsellerCard}:hover & {
@@ -310,7 +310,7 @@ const BestsellerTitle = styled.div`
 
 const BestsellerInfo = styled.div`
   font-size: 13px;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   display: flex;
   align-items: center;
   gap: 6px;
@@ -322,7 +322,7 @@ const TemplateCardTag = styled.span<{ $bg?: string; $color?: string }>`
   padding: 2px 7px;
   border-radius: 5px;
   background: ${({ $bg }) => $bg || 'rgba(0, 0, 0, 0.05)'};
-  color: ${({ $color }) => $color || '#888'};
+  color: ${({ $color, theme }) => $color || theme.colors.text.tertiary};
 `;
 
 const BestsellerTag = TemplateCardTag;
@@ -346,7 +346,7 @@ const StudioBlock = styled.section`
 `;
 
 const StudioCard = styled.div`
-  border-radius: 28px;
+  border-radius: ${({ theme }) => theme.radii['3xl']};
   padding: 64px 48px;
   text-align: center;
   cursor: pointer;
@@ -357,7 +357,7 @@ const StudioCard = styled.div`
     radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
     #F8F8F7;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
@@ -368,7 +368,7 @@ const StudioCard = styled.div`
 
   @media (max-width: 768px) {
     padding: 40px 24px;
-    border-radius: 20px;
+    border-radius: ${({ theme }) => theme.radii.xl};
   }
 `;
 
@@ -390,7 +390,7 @@ const StudioIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  svg { width: 22px; height: 22px; color: #6B6B6B; }
+  svg { width: 22px; height: 22px; color: ${({ theme }) => theme.colors.text.secondary}; }
 `;
 
 const StudioTitle = styled.h2`
@@ -403,7 +403,7 @@ const StudioTitle = styled.h2`
 
 const StudioDesc = styled.p`
   font-size: 15px;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0 auto 28px;
   letter-spacing: -0.01em;
@@ -423,9 +423,9 @@ const _Showcase = styled.section`
 `;
 
 const ShowcaseCard = styled.div`
-  background: #F8F8F7;
-  border-radius: 28px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  background: ${({ theme }) => theme.colors.background.surface};
+  border-radius: ${({ theme }) => theme.radii['3xl']};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   padding: 48px;
   display: flex;
   align-items: center;
@@ -446,7 +446,7 @@ const ShowcasePlaceholder = styled.div`
   gap: 32px;
   opacity: 0.4;
 
-  svg { width: 48px; height: 48px; color: #9A9A9A; }
+  svg { width: 48px; height: 48px; color: ${({ theme }) => theme.colors.text.tertiary}; }
 `;
 
 /* ── Products ── */
@@ -463,7 +463,7 @@ const Products = styled.section`
 const SectionLabel = styled.h2`
   font-size: 11px;
   font-weight: 600;
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   text-transform: uppercase;
   letter-spacing: -0.01em;
   margin: 0 0 32px;
@@ -480,9 +480,9 @@ const ProductGrid = styled.div`
 `;
 
 const ProductCard = styled.div`
-  background: #F8F8F7;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  background: ${({ theme }) => theme.colors.background.surface};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   padding: 32px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
@@ -497,7 +497,7 @@ const ProductCard = styled.div`
 const ProductIcon = styled.div`
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(51, 132, 244, 0.06);
   display: flex;
   align-items: center;
@@ -518,7 +518,7 @@ const ProductTitle = styled.h3`
 const ProductDesc = styled.p`
   font-size: 13px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0 0 20px;
   letter-spacing: -0.01em;
@@ -541,7 +541,7 @@ const Features = styled.section`
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 48px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
 
   @media (max-width: 768px) {
     padding: 60px 24px;
@@ -572,7 +572,7 @@ const FeatureLabel = styled.h3`
 const FeatureDesc = styled.p`
   font-size: 13px;
   font-weight: 400;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.5;
   margin: 0;
   letter-spacing: -0.01em;
@@ -586,7 +586,7 @@ const Footer = styled.footer`
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 48px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -600,7 +600,7 @@ const Footer = styled.footer`
 
 const FooterText = styled.span`
   font-size: 12px;
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   letter-spacing: -0.01em;
 `;
 

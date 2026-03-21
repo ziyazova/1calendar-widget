@@ -64,7 +64,7 @@ const Title = styled.h2`
 
 const Subtitle = styled.p`
   font-size: 15px;
-  color: #9A9A9A;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   text-align: center;
   margin: -32px 0 48px;
   letter-spacing: -0.01em;
@@ -129,10 +129,10 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
 
 const Card = styled.div`
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   padding: 24px;
   flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 `;
 
@@ -180,7 +180,7 @@ const Stars = styled.div`
 
 const Text = styled.p`
   font-size: 14px;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text.secondary};
   line-height: 1.6;
   margin: 0;
   letter-spacing: -0.01em;

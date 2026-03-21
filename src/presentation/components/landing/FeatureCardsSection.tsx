@@ -37,7 +37,7 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
   border: none;
   box-shadow: ${({ $index, $activeIdx, $total }) => {
@@ -110,8 +110,8 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     opacity: 1 !important;
     scroll-snap-align: start;
     overflow: clip;
-    border-radius: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: ${({ theme }) => theme.radii.xl};
+    border: 1px solid ${({ theme }) => theme.colors.border.light};
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
   }
 `;
@@ -138,7 +138,7 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #CDCDCD;
+  color: ${({ theme }) => theme.colors.text.muted};
 `;
 
 const FeatureTabIcon = styled.span`
@@ -148,7 +148,7 @@ const FeatureTabIcon = styled.span`
 const FeatureTabTitle = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: #555;
+  color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.01em;
 `;
 
@@ -157,7 +157,7 @@ const FeatureTabActions = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #aaa;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: 14px;
 `;
 
@@ -182,7 +182,7 @@ const FeatureCardText = styled.div`
 const FeatureCardTitle = styled.h3`
   font-size: 24px;
   font-weight: 600;
-  color: #111;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 12px;
   line-height: 1.3;
@@ -190,7 +190,7 @@ const FeatureCardTitle = styled.h3`
 
 const FeatureCardDesc = styled.p`
   font-size: 15px;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text.secondary};
   line-height: 1.6;
   margin: 0;
   letter-spacing: -0.01em;
@@ -201,7 +201,7 @@ const FeatureCardImage = styled.div`
   min-width: 0;
   align-self: stretch;
   margin: 28px 40px 40px 20px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.03);
 

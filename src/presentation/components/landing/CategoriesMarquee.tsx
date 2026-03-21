@@ -55,10 +55,10 @@ const CategoryChip = styled.div<{ $color: string }>`
     const b = parseInt(hex.slice(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, 0.06)`;
   }};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-weight: 500;
-  color: #666;
+  color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.01em;
   white-space: nowrap;
   cursor: pointer;
@@ -83,7 +83,7 @@ const CategoryChip = styled.div<{ $color: string }>`
       return `rgba(${r}, ${g}, ${b}, 0.08)`;
     }};
     transform: scale(1.04);
-    color: #444;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   &:active {
