@@ -12,6 +12,7 @@ import { ClockEmbedPage } from './presentation/pages/ClockEmbedPage';
 import { BoardEmbedPage } from './presentation/pages/BoardEmbedPage';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 import { DebugOverlay } from './presentation/components/debug/DebugOverlay';
+import { DesignSystemPage } from './presentation/pages/DesignSystemPage';
 
 import { DIContainer } from './infrastructure/di/DIContainer';
 
@@ -52,6 +53,7 @@ function App() {
             <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
             <Route path="/embed/clock" element={<ClockEmbedPage />} />
             <Route path="/embed/board" element={<BoardEmbedPage />} />
+            <Route path="/dev" element={<DesignSystemPage />} />
             <Route path="*" element={<LandingPage />} />
           </Routes>
         </Router>
