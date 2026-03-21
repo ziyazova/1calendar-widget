@@ -7,7 +7,7 @@ import { FilterChip } from '@/presentation/components/shared/FilterChip';
 import { BackButton } from '@/presentation/components/shared/BackButton';
 import { SectionHeader } from '@/presentation/components/shared/SectionHeader';
 import { Footer } from '@/presentation/components/shared/Footer';
-import { Search, Check, Clipboard } from 'lucide-react';
+import { Search, Check, Star, User, Home, Settings, Calendar, Clock, ToggleLeft, ToggleRight, Type } from 'lucide-react';
 
 /* ── Toast animation ── */
 
@@ -581,6 +581,497 @@ const ComponentLabel = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing['4']};
 `;
 
+/* ── Blur ── */
+
+const BlurGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: ${({ theme }) => theme.spacing['4']};
+`;
+
+const BlurItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing['2']};
+  cursor: pointer;
+`;
+
+const BlurBox = styled.div<{ $blur: string }>`
+  width: 100%;
+  height: 100px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #3384F4 0%, #EC4899 50%, #F59E0B 100%);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(${({ $blur }) => $blur});
+    -webkit-backdrop-filter: blur(${({ $blur }) => $blur});
+  }
+`;
+
+/* ── Breakpoints ruler ── */
+
+const BreakpointsBar = styled.div`
+  position: relative;
+  height: 64px;
+  background: ${({ theme }) => theme.colors.background.surface};
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  overflow: hidden;
+`;
+
+const BreakpointMarker = styled.div<{ $left: string }>`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: ${({ $left }) => $left};
+  border-left: 2px dashed ${({ theme }) => theme.colors.border.medium};
+  display: flex;
+  align-items: flex-start;
+  padding-top: 6px;
+`;
+
+const BreakpointTag = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  background: ${({ theme }) => theme.colors.background.page};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  padding: 2px 6px;
+  margin-left: 4px;
+  white-space: nowrap;
+`;
+
+const CurrentWidthMarker = styled.div<{ $left: string }>`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: ${({ $left }) => $left};
+  width: 3px;
+  background: ${({ theme }) => theme.colors.accent};
+  border-radius: 2px;
+
+  &::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 6px;
+    left: 8px;
+    font-size: ${({ theme }) => theme.typography.sizes.xs};
+    font-weight: ${({ theme }) => theme.typography.weights.medium};
+    color: ${({ theme }) => theme.colors.text.accent};
+    white-space: nowrap;
+  }
+`;
+
+/* ── Z-index stacked cards ── */
+
+const ZIndexStack = styled.div`
+  position: relative;
+  height: 280px;
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
+`;
+
+const ZIndexCard = styled.div<{ $zIndex: number; $offset: number; $color: string }>`
+  position: absolute;
+  left: ${({ $offset }) => $offset * 24}px;
+  top: ${({ $offset }) => $offset * 28}px;
+  width: 200px;
+  height: 72px;
+  background: ${({ theme }) => theme.colors.background.page};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+  box-shadow: ${({ theme }) => theme.shadows.medium};
+  z-index: ${({ $zIndex }) => $zIndex};
+  display: flex;
+  align-items: center;
+  padding: 0 ${({ theme }) => theme.spacing['4']};
+  gap: ${({ theme }) => theme.spacing['3']};
+  cursor: pointer;
+  transition: transform ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: ${({ theme }) => theme.radii.full};
+    background: ${({ $color }) => $color};
+    flex-shrink: 0;
+  }
+`;
+
+/* ── Line Heights ── */
+
+const LineHeightRow = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing['6']};
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+  }
+`;
+
+const LineHeightBox = styled.div`
+  flex: 1;
+  padding: ${({ theme }) => theme.spacing['4']};
+  background: ${({ theme }) => theme.colors.background.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+`;
+
+const LineHeightText = styled.p<{ $lh: number }>`
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  line-height: ${({ $lh }) => $lh};
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: ${({ theme }) => theme.spacing['2']} 0 0;
+`;
+
+/* ── Button sizes table ── */
+
+const SpecTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: ${({ theme }) => theme.spacing['6']};
+
+  th, td {
+    text-align: left;
+    padding: ${({ theme }) => theme.spacing['2']} ${({ theme }) => theme.spacing['3']};
+    font-size: ${({ theme }) => theme.typography.sizes.sm};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
+  }
+
+  th {
+    font-weight: ${({ theme }) => theme.typography.weights.medium};
+    color: ${({ theme }) => theme.colors.text.secondary};
+    text-transform: uppercase;
+    font-size: ${({ theme }) => theme.typography.sizes.xs};
+    letter-spacing: 0.04em;
+  }
+
+  td {
+    font-family: ${({ theme }) => theme.typography.fonts.mono};
+    font-size: ${({ theme }) => theme.typography.sizes.xs};
+    color: ${({ theme }) => theme.colors.text.tertiary};
+  }
+`;
+
+/* ── Borders ── */
+
+const BorderGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: ${({ theme }) => theme.spacing['4']};
+`;
+
+const BorderCard = styled.div<{ $border: string }>`
+  padding: ${({ theme }) => theme.spacing['6']};
+  background: ${({ theme }) => theme.colors.background.page};
+  border: ${({ $border }) => $border};
+  border-radius: ${({ theme }) => theme.radii.md};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing['2']};
+`;
+
+const DividerLine = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${({ theme }) => theme.colors.border.light};
+  margin: ${({ theme }) => theme.spacing['2']} 0;
+`;
+
+/* ── Site Components section ── */
+
+const ComponentFrame = styled.div`
+  padding: ${({ theme }) => theme.spacing['6']};
+  border: 1px dashed ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.background.surface};
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
+`;
+
+const ComponentFrameHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${({ theme }) => theme.spacing['4']};
+`;
+
+const ComponentFrameName = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const ComponentFrameUsage = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-style: italic;
+`;
+
+/* inline mini nav preview */
+const MiniNavBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: ${({ theme }) => theme.radii.md};
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
+`;
+
+const MiniNavLogo = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+`;
+
+const MiniNavLinks = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing['4']};
+`;
+
+const MiniNavLink = styled.span<{ $active?: boolean }>`
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.tertiary};
+  cursor: pointer;
+  transition: color ${({ theme }) => theme.transitions.fast};
+
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
+`;
+
+/* testimonial card mini */
+const TestimonialCardMini = styled.div`
+  background: ${({ theme }) => theme.colors.background.page};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.spacing['5']};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  box-shadow: ${({ theme }) => theme.shadows.subtle};
+  max-width: 340px;
+`;
+
+const TestimonialHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing['3']};
+  margin-bottom: ${({ theme }) => theme.spacing['3']};
+`;
+
+const TestimonialAvatar = styled.div<{ $color: string }>`
+  width: 36px;
+  height: 36px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ $color }) => $color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  color: ${({ theme }) => theme.colors.text.inverse};
+`;
+
+const TestimonialName = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const TestimonialRole = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+`;
+
+const TestimonialStars = styled.div`
+  display: flex;
+  gap: 2px;
+  margin-bottom: ${({ theme }) => theme.spacing['2']};
+  color: #F59E0B;
+
+  svg { width: 14px; height: 14px; fill: currentColor; }
+`;
+
+const TestimonialText = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  line-height: ${({ theme }) => theme.typography.lineHeights.normal};
+  margin: 0;
+`;
+
+/* pinterest pin mini */
+const MiniPinCard = styled.div<{ $bg: string; $color?: string }>`
+  padding: ${({ theme }) => theme.spacing['5']};
+  background: ${({ $bg }) => $bg};
+  color: ${({ $color }) => $color || '#1F1F1F'};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100px;
+`;
+
+const MiniPinTitle = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+`;
+
+const MiniPinSub = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  opacity: 0.7;
+`;
+
+/* feature tab mini */
+const FeatureTabMini = styled.div`
+  display: flex;
+  flex-direction: column;
+  border-radius: ${({ theme }) => theme.radii['2xl']};
+  overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  max-width: 300px;
+`;
+
+const FeatureTabHeader = styled.div<{ $bg: string }>`
+  padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['5']};
+  background: ${({ $bg }) => $bg};
+  color: ${({ theme }) => theme.colors.text.inverse};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+`;
+
+const FeatureTabBody = styled.div`
+  padding: ${({ theme }) => theme.spacing['5']};
+  background: ${({ theme }) => theme.colors.background.page};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  line-height: ${({ theme }) => theme.typography.lineHeights.normal};
+`;
+
+/* color picker mini */
+const ColorPickerMini = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing['3']};
+`;
+
+const ColorSwatch = styled.div<{ $color: string }>`
+  width: 36px;
+  height: 36px;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ $color }) => $color};
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform ${({ theme }) => theme.transitions.fast};
+
+  &:hover { transform: scale(1.1); }
+`;
+
+const ColorHexInput = styled.div`
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.page};
+`;
+
+/* toggle mini */
+const ToggleTrack = styled.div<{ $on: boolean }>`
+  width: 44px;
+  height: 24px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ $on }) => $on ? '#3384F4' : '#D4D4D4'};
+  position: relative;
+  cursor: pointer;
+  transition: background ${({ theme }) => theme.transitions.fast};
+`;
+
+const ToggleThumb = styled.div<{ $on: boolean }>`
+  position: absolute;
+  top: 2px;
+  left: ${({ $on }) => $on ? '22px' : '2px'};
+  width: 20px;
+  height: 20px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: #ffffff;
+  box-shadow: ${({ theme }) => theme.shadows.form};
+  transition: left ${({ theme }) => theme.transitions.fast};
+`;
+
+/* input field mini */
+const MiniInput = styled.input`
+  width: 240px;
+  height: 40px;
+  padding: 0 ${({ theme }) => theme.spacing['3']};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.page};
+  outline: none;
+  box-shadow: ${({ theme }) => theme.shadows.form};
+  transition: border-color ${({ theme }) => theme.transitions.fast};
+
+  &::placeholder { color: ${({ theme }) => theme.colors.text.tertiary}; }
+  &:focus { border-color: ${({ theme }) => theme.colors.border.focus}; }
+`;
+
+/* mobile tab bar mini */
+const MobileTabBarMini = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 0;
+  background: ${({ theme }) => theme.colors.background.page};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  max-width: 320px;
+`;
+
+const MobileTabItem = styled.div<{ $active?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.tertiary};
+  transition: color ${({ theme }) => theme.transitions.fast};
+
+  svg { width: 20px; height: 20px; }
+
+  span {
+    font-size: 10px;
+    font-weight: ${({ theme }) => theme.typography.weights.medium};
+  }
+`;
+
 /* ── Sections nav data ── */
 
 const SECTIONS = [
@@ -589,9 +1080,16 @@ const SECTIONS = [
   { id: 'spacing', label: 'Spacing', dot: theme.colors.success },
   { id: 'radii', label: 'Border Radius', dot: theme.colors.warning },
   { id: 'shadows', label: 'Shadows', dot: '#9A9A9A' },
+  { id: 'blur', label: 'Blur', dot: '#A78BFA' },
+  { id: 'breakpoints', label: 'Breakpoints', dot: '#06B6D4' },
+  { id: 'zindex', label: 'Z-index', dot: '#F97316' },
+  { id: 'lineheights', label: 'Line Heights', dot: '#10B981' },
+  { id: 'buttonsizes', label: 'Button Sizes', dot: theme.colors.destructive },
+  { id: 'borders', label: 'Borders', dot: '#8B5CF6' },
   { id: 'buttons', label: 'Buttons', dot: theme.colors.destructive },
   { id: 'transitions', label: 'Transitions', dot: '#7C63B8' },
   { id: 'components', label: 'Components', dot: '#E89A78' },
+  { id: 'sitecomponents', label: 'Site Components', dot: '#EC4899' },
 ];
 
 /* ── Helpers ── */
@@ -616,6 +1114,26 @@ function matchesFilter(text: string, filter: string): boolean {
   const lower = filter.toLowerCase();
   return text.toLowerCase().includes(lower);
 }
+
+/* ── Toggle Switch sub-component (needs local state) ── */
+
+const ToggleSwitchFrame: React.FC<{ copy: (v: string) => void }> = ({ copy }) => {
+  const [on, setOn] = useState(false);
+  return (
+    <ComponentFrame>
+      <ComponentFrameHeader>
+        <ComponentFrameName>Toggle Switch</ComponentFrameName>
+        <ComponentFrameUsage>Used in: Studio (CustomizationPanel)</ComponentFrameUsage>
+      </ComponentFrameHeader>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <ToggleTrack $on={on} onClick={() => setOn(!on)}>
+          <ToggleThumb $on={on} />
+        </ToggleTrack>
+        <TokenLabel>{on ? 'On' : 'Off'}</TokenLabel>
+      </div>
+    </ComponentFrame>
+  );
+};
 
 /* ── Main page ── */
 
@@ -945,7 +1463,201 @@ export const DesignSystemPage: React.FC = () => {
             </SectionCard>
           </Section>
 
-          {/* ═══════ 6. BUTTONS ═══════ */}
+          {/* ═══════ 6. BLUR ═══════ */}
+          {matchesFilter('blur frosted glass', f) && (
+            <Section id="blur">
+              <SectionCard>
+                <SectionTitle>Blur Effects</SectionTitle>
+                <HeroSubtitle style={{ marginBottom: 24 }}>
+                  Frosted glass overlays using backdrop-filter. Click to copy the value.
+                </HeroSubtitle>
+                <BlurGrid>
+                  {(Object.entries(theme.blur) as [string, string][]).map(([key, value]) => (
+                    <BlurItem key={key} onClick={() => copy(value)}>
+                      <BlurBox $blur={value} />
+                      <TokenLabel>blur.{key}</TokenLabel>
+                      <TokenMono>{value}</TokenMono>
+                    </BlurItem>
+                  ))}
+                </BlurGrid>
+              </SectionCard>
+            </Section>
+          )}
+
+          {/* ═══════ 7. BREAKPOINTS ═══════ */}
+          {matchesFilter('breakpoints responsive', f) && (
+            <Section id="breakpoints">
+              <SectionCard>
+                <SectionTitle>Breakpoints</SectionTitle>
+                <HeroSubtitle style={{ marginBottom: 24 }}>
+                  Responsive breakpoints with current window width indicator.
+                </HeroSubtitle>
+                <BreakpointsBar>
+                  {(Object.entries(theme.breakpoints) as [string, string][]).map(([key, value]) => {
+                    const px = parseInt(value);
+                    const pct = Math.min((px / 1400) * 100, 98);
+                    return (
+                      <BreakpointMarker key={key} $left={`${pct}%`} onClick={() => copy(value)}>
+                        <BreakpointTag>{key}: {value}</BreakpointTag>
+                      </BreakpointMarker>
+                    );
+                  })}
+                  <CurrentWidthMarker
+                    $left={`${Math.min((window.innerWidth / 1400) * 100, 98)}%`}
+                    data-label={`Current: ${window.innerWidth}px`}
+                  />
+                </BreakpointsBar>
+                <div style={{ marginTop: 16 }}>
+                  {(Object.entries(theme.breakpoints) as [string, string][]).map(([key, value]) => (
+                    <SpacingRow key={key} onClick={() => copy(value)}>
+                      <SpacingLabel>
+                        <TokenLabel>{key}</TokenLabel>
+                        <TokenMono>{value}</TokenMono>
+                      </SpacingLabel>
+                    </SpacingRow>
+                  ))}
+                </div>
+              </SectionCard>
+            </Section>
+          )}
+
+          {/* ═══════ 8. Z-INDEX ═══════ */}
+          {matchesFilter('zindex z-index layer stack', f) && (
+            <Section id="zindex">
+              <SectionCard>
+                <SectionTitle>Z-index</SectionTitle>
+                <HeroSubtitle style={{ marginBottom: 24 }}>
+                  Layering system — stacked cards show relative z-levels. Click to copy.
+                </HeroSubtitle>
+                <ZIndexStack>
+                  {(Object.entries(theme.zIndex) as [string, number][]).map(([key, value], idx) => {
+                    const colors = ['#3384F4', '#22C55E', '#F59E0B', '#DC2828', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316'];
+                    return (
+                      <ZIndexCard
+                        key={key}
+                        $zIndex={value || idx}
+                        $offset={idx}
+                        $color={colors[idx % colors.length]}
+                        onClick={() => copy(String(value))}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <TokenLabel>{key}</TokenLabel>
+                          <TokenMono>{value}</TokenMono>
+                        </div>
+                      </ZIndexCard>
+                    );
+                  })}
+                </ZIndexStack>
+              </SectionCard>
+            </Section>
+          )}
+
+          {/* ═══════ 9. LINE HEIGHTS ═══════ */}
+          {matchesFilter('line height leading', f) && (
+            <Section id="lineheights">
+              <SectionCard>
+                <SectionTitle>Line Heights</SectionTitle>
+                <LineHeightRow>
+                  {(Object.entries(theme.typography.lineHeights) as [string, number][]).map(([key, value]) => (
+                    <LineHeightBox key={key} onClick={() => copy(String(value))} style={{ cursor: 'pointer' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <TokenLabel>{key}</TokenLabel>
+                        <TokenMono>{value}</TokenMono>
+                      </div>
+                      <LineHeightText $lh={value}>
+                        The quick brown fox jumps over the lazy dog. Typography is the art and technique
+                        of arranging type to make written language legible and appealing.
+                      </LineHeightText>
+                    </LineHeightBox>
+                  ))}
+                </LineHeightRow>
+              </SectionCard>
+            </Section>
+          )}
+
+          {/* ═══════ 10. BUTTON SIZES ═══════ */}
+          {matchesFilter('button size spec', f) && (
+            <Section id="buttonsizes">
+              <SectionCard>
+                <SectionTitle>Button Sizes</SectionTitle>
+                <SubsectionTitle>Specs</SubsectionTitle>
+                <SpecTable>
+                  <thead>
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Padding</th>
+                      <th>Radius</th>
+                      <th>Font Size</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr onClick={() => copy('buttons.sm')}>
+                      <td style={{ fontWeight: 500, color: theme.colors.text.primary, fontFamily: 'inherit' }}>sm</td>
+                      <td>{theme.buttons.sm.height}</td>
+                      <td>{theme.buttons.sm.padding}</td>
+                      <td>{theme.buttons.sm.radius}</td>
+                      <td>{theme.buttons.sm.fontSize}</td>
+                    </tr>
+                    <tr onClick={() => copy('buttons.lg')}>
+                      <td style={{ fontWeight: 500, color: theme.colors.text.primary, fontFamily: 'inherit' }}>lg</td>
+                      <td>{theme.buttons.lg.height}</td>
+                      <td>{theme.buttons.lg.padding}</td>
+                      <td>{theme.buttons.lg.radius}</td>
+                      <td>{theme.buttons.lg.fontSize}</td>
+                    </tr>
+                    <tr onClick={() => copy('buttons.icon')}>
+                      <td style={{ fontWeight: 500, color: theme.colors.text.primary, fontFamily: 'inherit' }}>icon</td>
+                      <td>{theme.buttons.icon.size}</td>
+                      <td>--</td>
+                      <td>{theme.buttons.icon.radius}</td>
+                      <td>--</td>
+                    </tr>
+                  </tbody>
+                </SpecTable>
+                <SubsectionTitle>Rendered</SubsectionTitle>
+                <ButtonCellRow>
+                  <Button $variant="primary" $size="sm">Small</Button>
+                  <Button $variant="primary" $size="lg">Large</Button>
+                  <Button $variant="secondary" $size="sm">Small</Button>
+                  <Button $variant="secondary" $size="lg">Large</Button>
+                </ButtonCellRow>
+              </SectionCard>
+            </Section>
+          )}
+
+          {/* ═══════ 11. BORDERS ═══════ */}
+          {matchesFilter('border stroke divider', f) && (
+            <Section id="borders">
+              <SectionCard>
+                <SectionTitle>Borders & Strokes</SectionTitle>
+                <BorderGrid>
+                  <BorderCard $border={`1px solid ${theme.colors.border.light}`} onClick={() => copy(theme.colors.border.light)}>
+                    <TokenLabel>border.light</TokenLabel>
+                    <TokenMono>1px — card borders, dividers</TokenMono>
+                  </BorderCard>
+                  <BorderCard $border={`1px solid ${theme.colors.border.medium}`} onClick={() => copy(theme.colors.border.medium)}>
+                    <TokenLabel>border.medium</TokenLabel>
+                    <TokenMono>1px — hover, active states</TokenMono>
+                  </BorderCard>
+                  <BorderCard $border={`2px solid ${theme.colors.border.focus}`} onClick={() => copy(theme.colors.border.focus)}>
+                    <TokenLabel>border.focus</TokenLabel>
+                    <TokenMono>2px — focus ring</TokenMono>
+                  </BorderCard>
+                </BorderGrid>
+                <SubsectionDivider>
+                  <SubsectionTitle>Divider</SubsectionTitle>
+                  <div style={{ padding: '0 16px' }}>
+                    <TokenMono>1px solid border.light</TokenMono>
+                    <DividerLine />
+                    <TokenMono>Used between list items, section separators</TokenMono>
+                  </div>
+                </SubsectionDivider>
+              </SectionCard>
+            </Section>
+          )}
+
+          {/* ═══════ 12. BUTTONS ═══════ */}
           <Section id="buttons">
             <SectionCard>
               <SectionTitle>Buttons</SectionTitle>
@@ -1032,6 +1744,175 @@ export const DesignSystemPage: React.FC = () => {
                   <ComponentLabel>Footer</ComponentLabel>
                   <Footer left="Peachy Studio" right="Design System" />
                 </ComponentBox>
+              )}
+            </SectionCard>
+          </Section>
+          {/* ═══════ 16. SITE COMPONENTS ═══════ */}
+          <Section id="sitecomponents">
+            <SectionCard>
+              <SectionTitle>Site Components</SectionTitle>
+
+              {/* Navigation Bar */}
+              {matchesFilter('navigation nav bar topnav', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Navigation Bar</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: All pages</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <MiniNavBar>
+                    <MiniNavLogo>Peachy</MiniNavLogo>
+                    <MiniNavLinks>
+                      <MiniNavLink $active>Templates</MiniNavLink>
+                      <MiniNavLink>Studio</MiniNavLink>
+                      <MiniNavLink>Dev</MiniNavLink>
+                    </MiniNavLinks>
+                  </MiniNavBar>
+                </ComponentFrame>
+              )}
+
+              {/* Section Header */}
+              {matchesFilter('section header title', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Section Header</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Landing, Templates</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <SectionHeader
+                    title="Popular Templates"
+                    subtitle="Ready-made Notion setups with embedded widgets"
+                    actionLabel="Browse all"
+                    onAction={() => {}}
+                  />
+                </ComponentFrame>
+              )}
+
+              {/* Testimonial Card */}
+              {matchesFilter('testimonial review card', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Testimonial Card</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Landing</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <TestimonialCardMini>
+                    <TestimonialHeader>
+                      <TestimonialAvatar $color="#6366F1">AK</TestimonialAvatar>
+                      <div>
+                        <TestimonialName>Anna Kovacs</TestimonialName>
+                        <TestimonialRole>Product Designer at Figma</TestimonialRole>
+                      </div>
+                    </TestimonialHeader>
+                    <TestimonialStars>
+                      {[...Array(5)].map((_, i) => <Star key={i} />)}
+                    </TestimonialStars>
+                    <TestimonialText>
+                      Finally a widget tool that doesn't look like it's from 2015. The calendar fits perfectly into my Notion setup.
+                    </TestimonialText>
+                  </TestimonialCardMini>
+                </ComponentFrame>
+              )}
+
+              {/* Pinterest Pin */}
+              {matchesFilter('pinterest pin card gallery', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Pinterest Pin</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Landing (PinterestGallery)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                    <MiniPinCard $bg="#F0E6FF" style={{ width: 180 }}>
+                      <MiniPinTitle>Life OS</MiniPinTitle>
+                      <MiniPinSub>Complete Notion template</MiniPinSub>
+                    </MiniPinCard>
+                    <MiniPinCard $bg="#1c1c1e" $color="#ffffff" style={{ width: 180 }}>
+                      <MiniPinTitle>Dark Mode</MiniPinTitle>
+                      <MiniPinSub>Sleek dark widgets</MiniPinSub>
+                    </MiniPinCard>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {/* Feature Card Tab */}
+              {matchesFilter('feature card tab header', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Feature Card Tab</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Landing (FeatureCardsSection)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <FeatureTabMini>
+                    <FeatureTabHeader $bg="#3384F4">Customizable Widgets</FeatureTabHeader>
+                    <FeatureTabBody>
+                      Pick colors, fonts, and layouts. Every widget adapts to your Notion workspace.
+                    </FeatureTabBody>
+                  </FeatureTabMini>
+                </ComponentFrame>
+              )}
+
+              {/* Filter Chips */}
+              {matchesFilter('filter chip active inactive tag', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Filter Chips</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Landing, Templates</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <ButtonCellRow>
+                    <FilterChip $active={true}>All Widgets</FilterChip>
+                    <FilterChip $active={false}>Calendar</FilterChip>
+                    <FilterChip $active={false}>Clock</FilterChip>
+                    <FilterChip $active={false}>Templates</FilterChip>
+                  </ButtonCellRow>
+                </ComponentFrame>
+              )}
+
+              {/* Color Picker mini */}
+              {matchesFilter('color picker swatch hex', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Color Picker (inline)</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Studio (CustomizationPanel)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <ColorPickerMini>
+                    <ColorSwatch $color="#3384F4" />
+                    <ColorSwatch $color="#6E7FF2" />
+                    <ColorSwatch $color="#7C63B8" />
+                    <ColorSwatch $color="#E89A78" />
+                    <ColorHexInput>#3384F4</ColorHexInput>
+                  </ColorPickerMini>
+                </ComponentFrame>
+              )}
+
+              {/* Toggle Switch */}
+              {matchesFilter('toggle switch on off', f) && (
+                <ToggleSwitchFrame copy={copy} />
+              )}
+
+              {/* Input Field */}
+              {matchesFilter('input field text placeholder', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Input Field</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Studio, Design System</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <MiniInput placeholder="Widget name..." />
+                    <MiniInput placeholder="Search templates..." style={{ borderColor: theme.colors.border.focus }} />
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {/* Mobile Tab Bar */}
+              {matchesFilter('mobile tab bar bottom navigation', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Mobile Tab Bar</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: Landing (mobile), Studio (mobile)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <MobileTabBarMini>
+                    <MobileTabItem $active><Home /><span>Home</span></MobileTabItem>
+                    <MobileTabItem><Calendar /><span>Calendar</span></MobileTabItem>
+                    <MobileTabItem><Clock /><span>Clock</span></MobileTabItem>
+                    <MobileTabItem><Settings /><span>Settings</span></MobileTabItem>
+                  </MobileTabBarMini>
+                </ComponentFrame>
               )}
             </SectionCard>
           </Section>
