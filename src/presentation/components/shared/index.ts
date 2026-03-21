@@ -4,3 +4,4 @@ export { FilterChip, FilterRow } from './FilterChip';
 export { BackButton } from './BackButton';
 export { SectionHeader } from './SectionHeader';
 export { PageWrapper } from './PageWrapper';
+export { Button, PrimaryButton, SecondaryButton } from './Button';

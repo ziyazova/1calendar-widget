@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { PrimaryButton, SecondaryButton } from '../shared/Button';
 
 /* ── Rotating text ── */
 const RotatingLine = styled.span<{ $width: number }>`
@@ -151,67 +152,6 @@ const ButtonRow = styled.div`
   }
 `;
 
-const PrimaryButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 24px;
-  background: #1F1F1F;
-  color: #ffffff;
-  border: none;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-
-  &:hover {
-    background: #3384F4;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(51, 132, 244, 0.2);
-  }
-
-  svg { width: 16px; height: 16px; }
-
-  @media (max-width: 768px) {
-    height: 44px;
-    font-size: 14px;
-    border-radius: ${({ theme }) => theme.radii.md};
-  }
-`;
-
-const SecondaryButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 44px;
-  padding: 0 24px;
-  background: ${({ theme }) => theme.colors.background.surface};
-  color: #1F1F1F;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #EBEBEB;
-    transform: translateY(-2px);
-  }
-
-  @media (max-width: 768px) {
-    height: 44px;
-    font-size: 14px;
-    border-radius: ${({ theme }) => theme.radii.md};
-  }
-`;
 
 interface HeroSectionProps {
   onBrowseTemplates: () => void;
