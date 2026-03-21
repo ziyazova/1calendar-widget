@@ -156,7 +156,7 @@ const PrimaryButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 48px;
+  height: 44px;
   padding: 0 24px;
   background: #1F1F1F;
   color: #ffffff;
@@ -188,7 +188,7 @@ const SecondaryButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 48px;
+  height: 44px;
   padding: 0 24px;
   background: ${({ theme }) => theme.colors.background.surface};
   color: #1F1F1F;

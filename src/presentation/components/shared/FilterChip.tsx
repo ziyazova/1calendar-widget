@@ -7,7 +7,7 @@ export const FilterRow = styled.div`
 `;
 
 export const FilterChip = styled.button<{ $active: boolean }>`
-  height: 32px;
+  height: 36px;
   padding: 0 16px;
   border: none;
   flex-shrink: 0;
@@ -28,7 +28,7 @@ export const FilterChip = styled.button<{ $active: boolean }>`
   }
 
   @media (max-width: 768px) {
-    height: 30px;
+    height: 36px;
     padding: 0 12px;
     font-size: 12px;
   }

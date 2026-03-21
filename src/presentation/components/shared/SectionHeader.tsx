@@ -61,7 +61,7 @@ const ActionButton = styled.button`
   svg { width: 14px; height: 14px; }
 
   @media (max-width: 768px) {
-    height: 34px;
+    height: 36px;
     padding: 0 14px;
     font-size: 12px;
     svg { width: 12px; height: 12px; }

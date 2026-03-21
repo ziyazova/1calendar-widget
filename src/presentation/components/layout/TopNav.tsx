@@ -88,7 +88,7 @@ const NavLink = styled.button<{ $active?: boolean }>`
 `;
 
 const NavCTA = styled.button`
-  height: 34px;
+  height: 36px;
   padding: 0 18px;
   background: #1F1F1F;
   color: #ffffff;
@@ -175,7 +175,7 @@ const MobileLink = styled.button<{ $active?: boolean }>`
 
 const MobileCTA = styled.button`
   width: 100%;
-  height: 48px;
+  height: 44px;
   margin-top: 16px;
   background: #1F1F1F;
   color: #ffffff;

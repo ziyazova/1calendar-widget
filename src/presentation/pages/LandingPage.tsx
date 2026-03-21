@@ -222,7 +222,7 @@ const BrowseAllButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
+  height: 36px;
   padding: 0 18px;
   font-size: 13px;
   font-weight: 500;
@@ -242,7 +242,7 @@ const BrowseAllButton = styled.button`
   white-space: nowrap;
 
   @media (max-width: 768px) {
-    height: 34px;
+    height: 36px;
     padding: 0 14px;
     font-size: 12px;
     svg { width: 12px; height: 12px; }

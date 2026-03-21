@@ -456,7 +456,7 @@ const ImageUrlInput = styled.input`
 `;
 
 const AddButton = styled.button`
-  height: 34px;
+  height: 36px;
   padding: 0 16px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};

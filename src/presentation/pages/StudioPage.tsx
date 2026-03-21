@@ -424,7 +424,7 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 32px;
+  height: 36px;
   padding: 0 16px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
