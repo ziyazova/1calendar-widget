@@ -220,6 +220,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
           <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Widget Studio</NavLink>
+          <NavLink $active={activeLink === 'dev'} onClick={() => navigate('/dev')}>Design System</NavLink>
           <NavCTA>Log in</NavCTA>
         </NavLinks>
         <BurgerButton onClick={() => setMenuOpen(!menuOpen)}>
@@ -232,6 +233,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
       <MobileMenu>
         <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
         <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav('/widgets')}>Widget Studio</MobileLink>
+        <MobileLink $active={activeLink === 'dev'} onClick={() => handleNav('/dev')}>Design System</MobileLink>
         <MobileCTA onClick={() => handleNav('/widgets')}>Log in</MobileCTA>
       </MobileMenu>
     )}
