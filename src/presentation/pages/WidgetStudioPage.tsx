@@ -24,7 +24,7 @@ const HeroCard = styled.div`
 `;
 
 const HeroInner = styled.div<{ $expanding?: boolean }>`
-  border-radius: ${({ theme }) => theme.radii['3xl']};
+  border-radius: ${({ theme }) => theme.radii['2xl']};
   padding: 64px 48px;
   text-align: center;
   cursor: pointer;
@@ -94,7 +94,7 @@ const HeroTitle = styled.h2`
 `;
 
 const HeroDesc = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0 auto 28px;

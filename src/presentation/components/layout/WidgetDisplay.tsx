@@ -49,7 +49,7 @@ const EmptyState = styled.div`
 `;
 
 const EmptyTitle = styled.h3`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 4px 0;

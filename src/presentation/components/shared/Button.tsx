@@ -41,7 +41,7 @@ const lgStyles = css`
   height: 44px;
   padding: 0 24px;
   border-radius: 14px;
-  font-size: 15px;
+  font-size: 14px;
 
   @media (max-width: 768px) {
     height: 44px;

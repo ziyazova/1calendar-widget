@@ -181,7 +181,7 @@ const MobileCTA = styled.button`
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;

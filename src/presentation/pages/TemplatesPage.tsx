@@ -67,7 +67,7 @@ const PageTitle = styled.h1`
 `;
 
 const PageSubtitle = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 28px;
   letter-spacing: -0.01em;

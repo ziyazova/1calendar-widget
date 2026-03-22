@@ -92,7 +92,7 @@ const WidgetArea = styled.div`
     radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
     #F8F8F7;
-  border-radius: ${({ theme }) => theme.radii['3xl']};
+  border-radius: ${({ theme }) => theme.radii['2xl']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: none;
   margin: 12px 0 12px 0;

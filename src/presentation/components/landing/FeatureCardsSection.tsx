@@ -189,7 +189,7 @@ const FeatureCardTitle = styled.h3`
 `;
 
 const FeatureCardDesc = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.secondary};
   line-height: 1.6;
   margin: 0;

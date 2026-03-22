@@ -70,14 +70,13 @@ export const theme = {
     sizes: {
       xs: '11px',        // captions, badges, counters
       sm: '12px',        // small labels, slider values, tags
-      md: '13px',        // buttons, nav links, form labels, secondary text
-      base: '14px',      // body text, card titles, toggle text
-      lg: '16px',        // logo, pin titles, section subtitles
+      md: '13px',        // buttons, nav links, form labels
+      base: '14px',      // body text, descriptions, card titles
+      lg: '16px',        // logo, pin titles, subtitles
       xl: '18px',        // section headings (H2)
       '2xl': '24px',     // feature card titles
       '3xl': '32px',     // page titles
       '4xl': '36px',     // CTA title, hero mobile
-      hero: '56px',      // hero desktop (scales 56→36 responsive)
     },
 
     weights: {
@@ -102,7 +101,6 @@ export const theme = {
 
   // Spacing — 4/8pt grid
   spacing: {
-    '0': '0',
     '1': '4px',
     '2': '8px',
     '3': '12px',
@@ -118,14 +116,12 @@ export const theme = {
 
   // Border radius — 4 semantic levels
   radii: {
-    none: '0',
     sm: '8px',         // inputs, tags, small elements
     button: '10px',    // buttons, chips, nav items
     md: '12px',        // cards, popups, controls
     lg: '16px',        // medium cards, images
     xl: '20px',        // modals, sheets, mobile cards
-    '2xl': '24px',     // large cards (templates, features)
-    '3xl': '28px',     // hero cards, studio area
+    '2xl': '24px',     // large cards, hero cards, studio area
     full: '9999px',    // pills, avatars
   },
 

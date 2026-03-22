@@ -63,7 +63,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-align: center;
   margin: -32px 0 48px;
