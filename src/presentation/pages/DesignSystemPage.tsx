@@ -1072,6 +1072,55 @@ const MobileTabItem = styled.div<{ $active?: boolean }>`
   }
 `;
 
+/* ── Rules cards ── */
+
+const RulesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: ${({ theme }) => theme.spacing['4']};
+`;
+
+const RuleCard = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing['3']};
+  padding: ${({ theme }) => theme.spacing['5']};
+  background: ${({ theme }) => theme.colors.background.page};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+  transition: box-shadow ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    box-shadow: ${({ theme }) => theme.shadows.subtle};
+  }
+`;
+
+const RuleDot = styled.div<{ $color: string }>`
+  width: 8px;
+  height: 8px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ $color }) => $color};
+  flex-shrink: 0;
+  margin-top: 5px;
+`;
+
+const RuleContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const RuleTitle = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const RuleDescription = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  line-height: ${({ theme }) => theme.typography.lineHeights.normal};
+`;
+
 /* ── Sections nav data ── */
 
 const SECTIONS = [
@@ -1090,6 +1139,7 @@ const SECTIONS = [
   { id: 'transitions', label: 'Transitions', dot: '#7C63B8' },
   { id: 'components', label: 'Components', dot: '#E89A78' },
   { id: 'sitecomponents', label: 'Site Components', dot: '#EC4899' },
+  { id: 'rules', label: 'Rules', dot: '#22C55E' },
 ];
 
 /* ── Helpers ── */
@@ -1197,7 +1247,7 @@ export const DesignSystemPage: React.FC = () => {
           <HeroHeader>
             <HeroTitle>Design System</HeroTitle>
             <HeroSubtitle>
-              Peachy Studio — design tokens, components and patterns
+              9 type sizes &middot; 7 radii &middot; 4 shadows &middot; 3 transitions &middot; 4 text colors &middot; 200+ token refs
             </HeroSubtitle>
           </HeroHeader>
 
@@ -1916,6 +1966,73 @@ export const DesignSystemPage: React.FC = () => {
               )}
             </SectionCard>
           </Section>
+
+          {/* ═══════ RULES ═══════ */}
+          {matchesFilter('rules spacing button border color radius shadow typography transition', f) && (
+            <Section id="rules">
+              <SectionCard>
+                <SectionTitle>Rules</SectionTitle>
+                <RulesGrid>
+                  <RuleCard>
+                    <RuleDot $color="#22C55E" />
+                    <RuleContent>
+                      <RuleTitle>Spacing Rule</RuleTitle>
+                      <RuleDescription>All gaps follow 4/8pt grid: 4, 8, 12, 16, 24, 32, 48, 64px. No exceptions.</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#3384F4" />
+                    <RuleContent>
+                      <RuleTitle>Button Rule</RuleTitle>
+                      <RuleDescription>Two sizes only: sm (36px) and lg (44px). Icon buttons: 40px.</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#8B5CF6" />
+                    <RuleContent>
+                      <RuleTitle>Border Rule</RuleTitle>
+                      <RuleDescription>One border opacity: border.light (rgba 0.06). One hover border: border.medium (rgba 0.12).</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#6B6B6B" />
+                    <RuleContent>
+                      <RuleTitle>Color Rule</RuleTitle>
+                      <RuleDescription>Four grays only: primary (#1F1F1F), secondary (#6B6B6B), tertiary (#9A9A9A), muted (#ABABAB).</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#F59E0B" />
+                    <RuleContent>
+                      <RuleTitle>Radius Rule</RuleTitle>
+                      <RuleDescription>Seven levels: sm(8) button(10) md(12) lg(16) xl(20) 2xl(24) full.</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#9A9A9A" />
+                    <RuleContent>
+                      <RuleTitle>Shadow Rule</RuleTitle>
+                      <RuleDescription>Four levels: form, subtle, medium, heavy. No custom shadows.</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#1F1F1F" />
+                    <RuleContent>
+                      <RuleTitle>Typography Rule</RuleTitle>
+                      <RuleDescription>Nine sizes: 11, 12, 13, 14, 16, 18, 24, 32, 36px. No 15px.</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                  <RuleCard>
+                    <RuleDot $color="#7C63B8" />
+                    <RuleContent>
+                      <RuleTitle>Transition Rule</RuleTitle>
+                      <RuleDescription>Three speeds: fast (0.15s), base (0.2s), smooth (0.3s cubic-bezier). No other curves.</RuleDescription>
+                    </RuleContent>
+                  </RuleCard>
+                </RulesGrid>
+              </SectionCard>
+            </Section>
+          )}
         </Content>
       </PageWrap>
 
