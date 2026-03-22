@@ -14,7 +14,7 @@ export const theme = {
 
     // Background system
     background: {
-      page: '#ffffff',
+      page: '#FAFAFA',
       surface: '#F8F8F7',
       elevated: '#ffffff',
       glass: 'rgba(255, 255, 255, 0.72)',

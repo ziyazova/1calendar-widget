@@ -6,7 +6,7 @@ import { SectionHeader } from '../shared';
 /* ── Templates Gallery (horizontal marquee) ── */
 const TemplatesGallerySection = styled.section`
   padding: 40px 0 80px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.page};
   position: relative;
 
   @media (max-width: 768px) {
