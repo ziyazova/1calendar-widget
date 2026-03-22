@@ -172,7 +172,7 @@ const Name = styled.span`
 
 const Stars = styled.div`
   display: flex;
-  gap: 3px;
+  gap: 4px;
   margin-bottom: 12px;
   color: #F5A623;
   font-size: 12px;

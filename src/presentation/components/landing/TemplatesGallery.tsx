@@ -52,7 +52,7 @@ const StyledSectionHeader = styled(SectionHeader)`
 
 const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
   display: flex;
-  gap: 28px;
+  gap: 24px;
   padding: 10px 0;
 
   &:last-child {
@@ -84,7 +84,7 @@ const TemplatesScrollHint = styled.div`
   svg {
     width: 14px;
     height: 14px;
-    color: #6B6B6B;
+    color: ${({ theme }) => theme.colors.text.secondary};
   }
 
   &:hover {
@@ -156,7 +156,7 @@ const TemplateCardTitle = styled.span`
 
 const TemplateCardTags = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
   margin-top: auto;
 `;

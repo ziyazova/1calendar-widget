@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, LayoutGrid, Grip, SlidersHorizontal, X, Menu, Palette, Settings2, Brush, Sliders } from 'lucide-react';
+import { Copy, Check, Pencil, LayoutGrid, Grip, X, Menu, Palette, Settings2, Brush, Sliders } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -114,20 +114,6 @@ const WidgetArea = styled.div`
 `;
 
 
-const TransitionOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: #ffffff;
-  z-index: 9998;
-  animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  pointer-events: none;
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-`;
-
 const DotGrid = styled.div`
   position: absolute;
   inset: 0;
@@ -173,7 +159,7 @@ const FloatingToolbar = styled.div`
   gap: 4px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.lg};
   padding: 8px 12px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -292,7 +278,7 @@ const ZoomControl = styled.div`
   border-radius: ${({ theme }) => theme.radii.md};
   height: 36px;
   padding: 0 4px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: ${({ theme }) => theme.shadows.subtle};
 
   @media (max-width: 768px) {
@@ -365,7 +351,7 @@ const GridToggle = styled.button<{ $active: boolean }>`
   width: 36px;
   height: 36px;
   border-radius: ${({ theme }) => theme.radii.md};
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   background: #ffffff;
   color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
   cursor: pointer;
@@ -526,7 +512,7 @@ const MobileEmbedFloating = styled.div`
 const MobileEmbedRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   height: 40px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
@@ -569,12 +555,6 @@ const MobileCopyButton = styled.button<{ $copied: boolean }>`
   svg { width: 12px; height: 12px; }
 `;
 
-const DesktopOnly = styled.div`
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
 /* ── Mobile Bottom Tab Bar ── */
 type MobileTab = 'content' | 'color' | 'style' | 'layout' | null;
 
@@ -585,7 +565,7 @@ const MobileTabBar = styled.div`
   left: 0;
   right: 0;
   background: #ffffff;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   padding: 8px 0;
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
   z-index: 52;

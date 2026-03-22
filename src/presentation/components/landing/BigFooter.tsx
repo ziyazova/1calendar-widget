@@ -26,7 +26,7 @@ const FooterInner = styled.div`
 const FooterBrand = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 `;
 
@@ -51,7 +51,7 @@ const FooterColumns = styled.div`
 const FooterColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   min-width: 120px;
 
   @media (max-width: 768px) {

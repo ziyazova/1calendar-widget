@@ -34,7 +34,7 @@ const RightPanel = styled.div`
 const PanelHeader = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   padding: 16px 24px 8px;
 `;
 
@@ -54,14 +54,14 @@ const PanelSection = styled.div`
   & + & {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   }
 `;
 
 const PanelSectionTitle = styled.h3`
   font-size: 11px;
   font-weight: 600;
-  color: #ABABAB;
+  color: ${({ theme }) => theme.colors.text.muted};
   text-transform: uppercase;
   letter-spacing: -0.01em;
   margin: 0 0 12px 0;
@@ -98,7 +98,7 @@ const StyleBadge = styled.span`
 
 const Subtitle = styled.p`
   font-size: 12px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 16px 0;
   letter-spacing: -0.01em;
 `;
@@ -128,7 +128,7 @@ const ControlGroup = styled.div`
 const ControlLabel = styled.label`
   font-size: 12px;
   font-weight: 500;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.01em;
 `;
 
@@ -160,7 +160,7 @@ const ControlSlider = styled.input`
 
 const ControlValue = styled.span`
   font-size: 11px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   min-width: 36px;
@@ -171,7 +171,7 @@ const ControlSelect = styled.select`
   font-size: 12px;
   font-weight: 400;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   background: rgba(255, 255, 255, 0.8);
   color: #1F1F1F;
   font-family: inherit;
@@ -264,7 +264,7 @@ const DebugLegend = styled.div<{ $visible: boolean }>`
   border-radius: 12px;
   font-size: 11px;
   font-family: monospace;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   flex-wrap: wrap;
 `;
 
@@ -294,9 +294,9 @@ const PresetButton = styled.button`
   font-size: 11px;
   font-weight: 500;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   background: rgba(255, 255, 255, 0.8);
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s ease;
@@ -323,7 +323,7 @@ const EmbedArea = styled.div<{ $dark?: boolean }>`
   min-height: 0;
   background: ${({ $dark }) => $dark ? '#191919' : '#F8F8F7'};
   border-radius: 28px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   margin: 12px 0 20px 0;
   transition: background 0.3s ease;
 `;
@@ -357,7 +357,7 @@ const lightContainerStyles = css`
 
 const EmbedContainer = styled.div<{ $dark?: boolean }>`
   ${({ $dark }) => $dark ? darkContainerStyles : lightContainerStyles};
-  border: 1px solid ${({ $dark }) => $dark ? '#333' : 'rgba(0, 0, 0, 0.08)'};
+  border: 1px solid ${({ $dark, theme }) => $dark ? '#333' : theme.colors.border.light};
   border-radius: 12px;
   overflow: hidden;
   resize: both;
@@ -394,7 +394,7 @@ const SizeLabel = styled.span<{ $dark?: boolean }>`
 const EmptyState = styled.div`
   text-align: center;
   padding: 80px 24px;
-  color: #6B6B6B;
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-size: 14px;
   font-weight: 500;
 `;

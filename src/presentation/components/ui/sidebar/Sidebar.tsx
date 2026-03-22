@@ -57,25 +57,6 @@ const SidebarHeader = styled.div<{ $collapsed?: boolean }>`
   border-bottom: none;
 `;
 
-const logoAppear = keyframes`
-  from { transform: scale(0.96); }
-  to { transform: scale(1); }
-`;
-
-const LogoWrapper = styled.div<{ $pressed?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  animation: ${({ $pressed }) => $pressed ? 'none' : logoAppear} 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-  transform: ${({ $pressed }) => $pressed ? 'scale(0.94)' : 'scale(1)'};
-
-  &:hover {
-    opacity: 0.7;
-  }
-`;
-
 const LogoText = styled.span<{ $collapsed?: boolean }>`
   font-size: 16px;
   font-weight: 600;
@@ -170,10 +151,9 @@ const SectionLabel = styled.h2<{ $collapsed?: boolean }>`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.01em;
   margin: 0 0 18px 0;
   padding: 0 24px;
-  letter-spacing: -0.01em;
   opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
   height: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
   margin-bottom: ${({ $collapsed }) => $collapsed ? '0' : '18px'};

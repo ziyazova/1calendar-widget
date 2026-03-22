@@ -67,7 +67,7 @@ const LogoSub = styled.span`
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
 
   @media (max-width: 768px) {
     display: none;

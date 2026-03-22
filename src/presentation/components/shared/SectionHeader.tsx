@@ -44,7 +44,7 @@ const Subtitle = styled.p`
 const ActionButton = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   height: 36px;
   padding: 0 18px;
   font-size: 13px;

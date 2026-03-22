@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const FilterRow = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 `;
 

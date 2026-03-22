@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 const BackButtonWrap = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
   font-weight: 400;
   color: ${({ theme }) => theme.colors.text.tertiary};

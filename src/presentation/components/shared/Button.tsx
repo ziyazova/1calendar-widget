@@ -87,7 +87,7 @@ export const Button = styled.button<ButtonTransientProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   border: none;
   cursor: pointer;
   font-family: inherit;

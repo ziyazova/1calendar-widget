@@ -111,7 +111,7 @@ const HeroButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
   height: 44px;
   padding: 0 20px;
@@ -136,7 +136,7 @@ const HeroButton = styled.button`
 const EmailRow = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   max-width: 320px;
   margin: 0 auto;

@@ -151,7 +151,7 @@ const HexInput = styled.input`
 
 const PresetGroup = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
   margin-left: auto;
 
   @media (max-width: 768px) {

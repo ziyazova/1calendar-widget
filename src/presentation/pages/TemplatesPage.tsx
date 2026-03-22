@@ -146,11 +146,11 @@ const Grid = styled.div`
   padding: 32px 48px 80px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 36px 32px;
+  gap: 32px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px 20px;
+    gap: 24px 20px;
   }
 
   @media (max-width: 768px) {

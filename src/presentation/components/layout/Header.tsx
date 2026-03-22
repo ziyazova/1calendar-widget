@@ -28,7 +28,7 @@ const HeaderContainer = styled.header`
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   margin-left: 270px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {

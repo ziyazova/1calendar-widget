@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { X, GripVertical, Image, Palette, SlidersHorizontal } from 'lucide-react';
+import { X, GripVertical } from 'lucide-react';
 import { getWidgetBadgeLabel } from '../widgetConfig';
 import { Widget } from '../../../../domain/entities/Widget';
 import { CalendarSettings } from '../../../../domain/value-objects/CalendarSettings';
@@ -45,7 +45,7 @@ const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
     left: 0;
     right: 0;
     border-radius: 20px 20px 0 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid ${({ theme }) => theme.colors.border.light};
     box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.1);
     transform: ${({ $mobileOpen }) => $mobileOpen ? 'translateY(0)' : 'translateY(100%)'};
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -57,7 +57,7 @@ const PanelHeader = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   padding: 32px 24px 16px;
   border-bottom: none;
 `;
@@ -74,7 +74,7 @@ const PanelTitle = styled.h2`
 const WidgetBadge = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: none;
   width: fit-content;
 
@@ -122,9 +122,8 @@ const SectionTitle = styled.h3`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.muted};
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 18px 0;
   letter-spacing: -0.01em;
+  margin: 0 0 18px 0;
 `;
 
 const MobilePanelContent = styled.div`
@@ -345,12 +344,6 @@ const EmptyState = styled.div`
   }
 `;
 
-const ToggleGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
 const TypewriterColorRow = styled.div`
   display: flex;
   gap: 8px;
@@ -530,7 +523,7 @@ const DragHandle = styled.div`
   align-items: center;
   justify-content: center;
   cursor: grab;
-  color: #c8cdd3;
+  color: ${({ theme }) => theme.colors.text.muted};
   flex-shrink: 0;
   padding: 4px 0;
   transition: color 0.12s ease;
@@ -618,21 +611,7 @@ const LayoutOption = styled.button<{ $active: boolean }>`
 
 const LayoutOptions = styled.div`
   display: flex;
-  gap: 6px;
-`;
-
-const InlineRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 0;
-`;
-
-const InlineLabel = styled.span`
-  font-size: 12px;
-  font-weight: 400;
-  color: #1F1F1F;
-  letter-spacing: -0.01em;
+  gap: 8px;
 `;
 
 const CompactOptions = styled.div`

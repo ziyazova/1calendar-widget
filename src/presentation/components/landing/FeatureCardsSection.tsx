@@ -164,7 +164,7 @@ const FeatureTabActions = styled.div`
 const FeatureCardBody = styled.div`
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 32px;
   padding: 28px 40px 0;
   flex: 1;
 
