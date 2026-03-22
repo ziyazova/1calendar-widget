@@ -13,6 +13,7 @@ import { BoardEmbedPage } from './presentation/pages/BoardEmbedPage';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 import { DebugOverlay } from './presentation/components/debug/DebugOverlay';
 import { DesignSystemPage } from './presentation/pages/DesignSystemPage';
+import { PageTransition } from './presentation/components/shared/PageTransition';
 
 import { DIContainer } from './infrastructure/di/DIContainer';
 
@@ -54,17 +55,19 @@ function App() {
         <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
           <DebugOverlay />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/widgets" element={<WidgetStudioPage />} />
-            <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
-            <Route path="/templates" element={<TemplatesPage />} />
-            <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
-            <Route path="/embed/clock" element={<ClockEmbedPage />} />
-            <Route path="/embed/board" element={<BoardEmbedPage />} />
-            <Route path="/dev" element={<DesignSystemPage />} />
-            <Route path="*" element={<LandingPage />} />
-          </Routes>
+          <PageTransition>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/widgets" element={<WidgetStudioPage />} />
+              <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
+              <Route path="/templates" element={<TemplatesPage />} />
+              <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
+              <Route path="/embed/clock" element={<ClockEmbedPage />} />
+              <Route path="/embed/board" element={<BoardEmbedPage />} />
+              <Route path="/dev" element={<DesignSystemPage />} />
+              <Route path="*" element={<LandingPage />} />
+            </Routes>
+          </PageTransition>
         </Router>
       </ThemeProvider>
     </ErrorBoundary>

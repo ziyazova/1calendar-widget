@@ -46,10 +46,21 @@ const LogoRow = styled.div<{ $pressed?: boolean }>`
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  transform: ${({ $pressed }) => $pressed ? 'scale(0.94)' : 'scale(1)'};
-  opacity: ${({ $pressed }) => $pressed ? 0.6 : 1};
-  &:hover { opacity: 0.7; }
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+  transform: ${({ $pressed }) => $pressed ? 'scale(0.88)' : 'scale(1)'};
+  opacity: ${({ $pressed }) => $pressed ? 0.4 : 1};
+  transform-origin: left center;
+
+  &:hover {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  &:active {
+    transform: scale(0.92);
+    opacity: 0.5;
+    transition: transform 0.1s ease, opacity 0.1s ease;
+  }
 `;
 
 const LogoText = styled.span`
