@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, BackButton, FilterRow, FilterChip, Footer } from '@/presentation/components/shared';
+import { PageWrapper, BackButton, FilterRow, FilterChip } from '@/presentation/components/shared';
+import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
 
 type Category = 'all' | 'planners' | 'productivity' | 'health' | 'student';
@@ -336,7 +337,7 @@ export const TemplatesPage: React.FC = () => {
         )}
       </Grid>
 
-      <Footer left="Peachy Studio" right="Widgets · Planners · Templates" />
+      <BigFooter onNavigate={(path) => navigate(path)} />
     </PageWrapper>
   );
 };

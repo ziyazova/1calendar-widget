@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
+import { BigFooter } from '@/presentation/components/landing/BigFooter';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
@@ -357,6 +358,7 @@ export const WidgetStudioPage: React.FC = () => {
             ))}
         </GalleryGrid>
       </GallerySection>
+      <BigFooter onNavigate={(path) => navigate(path)} />
       </PageContent>
     </PageWrapper>
   );
