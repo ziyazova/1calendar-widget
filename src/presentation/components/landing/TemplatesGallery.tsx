@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { ArrowRight } from 'lucide-react';
+import { SectionHeader } from '../shared';
 
 /* ── Templates Gallery (horizontal marquee) ── */
 const TemplatesGallerySection = styled.section`
@@ -39,74 +40,13 @@ const TemplatesMarqueeWrap = styled.div`
   }
 `;
 
-const TemplatesGalleryHeader = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+const StyledSectionHeader = styled(SectionHeader)`
   max-width: 1200px;
   margin: 0 auto 24px;
   padding: 0 48px;
 
   @media (max-width: 768px) {
     padding: 0 24px;
-  }
-
-  @media (max-width: 380px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const HeaderTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 600;
-  color: #1F1F1F;
-  letter-spacing: -0.03em;
-  margin: 0;
-`;
-
-const HeaderSubtitle = styled.p`
-  font-size: 14px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0;
-`;
-
-const BrowseAllButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  background: #1F1F1F;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #333;
-  }
-
-  svg { width: 14px; height: 14px; }
-  white-space: nowrap;
-
-  @media (max-width: 768px) {
-    height: 34px;
-    padding: 0 14px;
-    font-size: 12px;
-    svg { width: 12px; height: 12px; }
   }
 `;
 
@@ -258,13 +198,14 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
 
   return (
     <TemplatesGallerySection data-ux="Templates Gallery">
-      <TemplatesGalleryHeader>
-        <HeaderLeft>
-          <HeaderTitle data-ux="Section Title">Top templates</HeaderTitle>
-          <HeaderSubtitle>Top picks from our community</HeaderSubtitle>
-        </HeaderLeft>
-        <BrowseAllButton onClick={() => onNavigate('/templates')}>Explore all <ArrowRight /></BrowseAllButton>
-      </TemplatesGalleryHeader>
+      <StyledSectionHeader
+        title="Top templates"
+        subtitle="Top picks from our community"
+        actionLabel="Explore all"
+        onAction={() => onNavigate('/templates')}
+        titleUx="Section Title"
+        marginBottom="0px"
+      />
       <TemplatesMarqueeWrap
         data-ux="Marquee Wrap"
         data-scrolled={templateScrolled ? 'true' : 'false'}
