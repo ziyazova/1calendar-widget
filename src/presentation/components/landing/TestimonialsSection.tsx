@@ -166,7 +166,7 @@ const Info = styled.div`
 const Name = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 

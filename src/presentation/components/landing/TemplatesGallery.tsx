@@ -91,7 +91,7 @@ const TemplatesScrollHint = styled.div`
     background: rgba(0, 0, 0, 0.04);
     border-color: rgba(0, 0, 0, 0.2);
     transform: translateY(-50%);
-    svg { color: #1F1F1F; }
+    svg { color: ${({ theme }) => theme.colors.text.primary}; }
   }
 
   &:active {

@@ -139,7 +139,7 @@ const HexInput = styled.input`
   transition: color 0.15s ease;
 
   &:focus {
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   @media (max-width: 768px) {
@@ -221,7 +221,7 @@ const PickerHeader = styled.div`
 const PickerTitle = styled.span`
   font-size: 12px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
@@ -334,7 +334,7 @@ const EyedropperButton = styled.button`
 
   &:hover {
     background: #f0f0f0;
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   svg {
@@ -362,16 +362,16 @@ const PickerHexInput = styled.input`
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surface};
   outline: none;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 
   &:focus {
-    border-color: #3384F4;
+    border-color: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 0 0 2px rgba(51, 132, 244, 0.1);
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
@@ -437,7 +437,7 @@ const MobilePickerBack = styled.button`
 const MobilePickerTitle = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
 `;
 
@@ -698,7 +698,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           </MobilePickerHandleArea>
           <MobilePickerHeader>
             <MobilePickerTitle>Pick color</MobilePickerTitle>
-            <MobilePickerBack onClick={() => setOpen(false)}>
+            <MobilePickerBack aria-label="Close" onClick={() => setOpen(false)}>
               <X />
             </MobilePickerBack>
           </MobilePickerHeader>
@@ -749,7 +749,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           <PickerPopup style={{ top: popupPos.top, left: popupPos.left }}>
             <PickerHeader>
               <PickerTitle>Pick color</PickerTitle>
-              <CloseButton onClick={() => setOpen(false)}>
+              <CloseButton aria-label="Close" onClick={() => setOpen(false)}>
                 <X />
               </CloseButton>
             </PickerHeader>
@@ -780,13 +780,12 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                 onClick={async () => {
                   if ('EyeDropper' in window) {
                     try {
-                      const eyeDropper = new (window as any).EyeDropper();
-                      const result = await eyeDropper.open();
-                      const color = result.sRGBHex;
-                      setHexInput(color);
-                      onColorChange(color);
-                      setHsv(hexToHsv(color));
-                    } catch {}
+                      const EyeDropperCtor = (window as unknown as { EyeDropper: new () => { open: () => Promise<{ sRGBHex: string }> } }).EyeDropper;
+                      const result = await new EyeDropperCtor().open();
+                      setHexInput(result.sRGBHex);
+                      onColorChange(result.sRGBHex);
+                      setHsv(hexToHsv(result.sRGBHex));
+                    } catch { /* user cancelled or API unavailable */ }
                   }
                 }}
                 title="Eyedropper"

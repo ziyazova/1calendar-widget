@@ -33,7 +33,7 @@ const FooterBrand = styled.div`
 const FooterBrandName = styled.span`
   font-size: 18px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
 `;
 
@@ -62,7 +62,7 @@ const FooterColumn = styled.div`
 const FooterColumnTitle = styled.h4`
   font-size: 13px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 4px;
   letter-spacing: -0.01em;
 `;
@@ -74,7 +74,7 @@ const FooterLink = styled.span`
   transition: color 0.15s ease;
   letter-spacing: -0.01em;
 
-  &:hover { color: #1F1F1F; }
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 const FooterBottom = styled.div`

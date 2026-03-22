@@ -107,7 +107,7 @@ const Hero = styled.section`
 const Title = styled.h1`
   font-size: 64px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   line-height: 1.2;
   letter-spacing: -0.035em;
   margin: 0 0 24px;

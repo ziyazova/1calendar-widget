@@ -10,7 +10,7 @@ describe('CalendarSettings', () => {
       expect(settings.defaultView).toBe('month');
       expect(settings.showWeekends).toBe(true);
       expect(settings.borderRadius).toBe(12);
-      expect(settings.showBorder).toBe(true);
+      expect(settings.showBorder).toBe(false);
       expect(settings.style).toBe('modern-grid');
       expect(settings.embedWidth).toBe(420);
       expect(settings.embedHeight).toBe(380);

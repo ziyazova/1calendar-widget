@@ -84,7 +84,7 @@ const HeroIcon = styled.div<{ $delay: string }>`
 const HeroTitle = styled.h2`
   font-size: 28px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 10px;
 
@@ -115,7 +115,7 @@ const HeroButton = styled.button`
   width: 100%;
   height: 44px;
   padding: 0 20px;
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
@@ -150,7 +150,7 @@ const EmailInput = styled.input`
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-family: inherit;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   background: #fff;
   outline: none;
   letter-spacing: -0.01em;
@@ -197,7 +197,7 @@ const GoogleButton = styled.button`
   border-radius: ${({ theme }) => theme.radii.button};
   font-size: 13px;
   font-weight: 500;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;

@@ -57,7 +57,7 @@ const Header = styled.div`
 const PageTitle = styled.h1`
   font-size: 32px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 6px;
 
@@ -98,7 +98,7 @@ const SearchInput = styled.input`
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-family: inherit;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surface};
   outline: none;
   transition: all 0.2s ease;
@@ -207,7 +207,7 @@ const CardBadge = styled.span`
   padding: 3px 8px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   border-radius: 6px;
   font-size: 10px;
   font-weight: 500;
@@ -227,7 +227,7 @@ const CardMeta = styled.div`
 const CardTitle = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {

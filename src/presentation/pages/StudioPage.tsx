@@ -60,10 +60,6 @@ const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boole
   @media (max-width: 768px) {
     margin-left: 0;
     margin-right: 0;
-  }
-
-  @media (max-width: 768px) {
-    margin-left: 0;
     flex-direction: column;
   }
 `;
@@ -193,7 +189,7 @@ const Tooltip = styled.span`
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   color: #fff;
   font-size: 11px;
   font-weight: 500;
@@ -213,7 +209,7 @@ const Tooltip = styled.span`
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: #1F1F1F;
+    border-top-color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
@@ -340,7 +336,7 @@ const ZoomLabel = styled.span`
   line-height: 36px;
 
   &:hover {
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
@@ -397,7 +393,7 @@ const EmbedUrlInput = styled.input`
 
   &:focus {
     background: rgba(0, 0, 0, 0.06);
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   &::selection {
@@ -469,7 +465,7 @@ const MobileBarButton = styled.button`
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(0, 0, 0, 0.04);
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   cursor: pointer;
 
   svg { width: 18px; height: 18px; }
@@ -480,7 +476,7 @@ const MobileBarButton = styled.button`
 const MobileBarTitle = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
 `;
 
@@ -670,7 +666,7 @@ const MobileSheetHeader = styled.div`
 const MobileSheetTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
 `;
 
@@ -822,7 +818,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {mobileSidebar && <MobileOverlay onClick={() => setMobileSidebar(false)} />}
 
         <MobileTopBar>
-          <MobileBarButton onClick={() => { const next = !mobileSidebar; setMobileSidebar(next); if (next) setMobileTab(null); }}>
+          <MobileBarButton aria-label="Open menu" onClick={() => { const next = !mobileSidebar; setMobileSidebar(next); if (next) setMobileTab(null); }}>
             <Menu />
           </MobileBarButton>
           <MobileBarTitle>Studio</MobileBarTitle>
@@ -857,6 +853,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <ToolbarButton
                       $active={viewMode === 'editor'}
                       onClick={() => setViewMode('editor')}
+                      aria-label="Editor"
                     >
                       <Pencil />
                       <Tooltip>Editor</Tooltip>
@@ -864,6 +861,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <ToolbarButton
                       $active={viewMode === 'layout-check' as ViewMode}
                       onClick={() => setViewMode('layout-check')}
+                      aria-label="Preview"
                     >
                       <LayoutGrid />
                       <Tooltip>Preview</Tooltip>
@@ -887,7 +885,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
                 <TopRightControls>
                   <ZoomControl>
-                    <ZoomLabel onClick={() => setStudioZoom(Math.max(0.5, +(studioZoom - 0.1).toFixed(1)))}>−</ZoomLabel>
+                    <ZoomLabel role="button" aria-label="Zoom out" onClick={() => setStudioZoom(Math.max(0.5, +(studioZoom - 0.1).toFixed(1)))}>−</ZoomLabel>
                     <ZoomSlider
                       type="range"
                       min="0.5"
@@ -896,11 +894,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       value={studioZoom}
                       onChange={(e) => setStudioZoom(parseFloat(e.target.value))}
                     />
-                    <ZoomLabel onClick={() => setStudioZoom(Math.min(2.0, +(studioZoom + 0.1).toFixed(1)))}>+</ZoomLabel>
+                    <ZoomLabel role="button" aria-label="Zoom in" onClick={() => setStudioZoom(Math.min(2.0, +(studioZoom + 0.1).toFixed(1)))}>+</ZoomLabel>
                     <ZoomValueDivider />
                     <ZoomValue>{Math.round(studioZoom * 100)}%</ZoomValue>
                   </ZoomControl>
-                  <GridToggle $active={showGrid} onClick={() => setShowGrid(!showGrid)}>
+                  <GridToggle $active={showGrid} onClick={() => setShowGrid(!showGrid)} aria-label="Toggle grid">
                     <Grip />
                   </GridToggle>
                 </TopRightControls>
@@ -922,12 +920,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 <FloatingToolbar style={{ left: 'calc(50% - 145px)' }}>
                   <ToolbarButton
                     onClick={() => setViewMode('editor')}
+                    aria-label="Editor"
                   >
                     <Pencil />
                     <Tooltip>Editor</Tooltip>
                   </ToolbarButton>
                   <ToolbarButton
                     $active
+                    aria-label="Preview"
                   >
                     <LayoutGrid />
                     <Tooltip>Preview</Tooltip>
@@ -996,7 +996,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               {mobileTab === 'color' && 'Color'}
               {mobileTab === 'layout' && 'Layout'}
             </MobileSheetTitle>
-            <MobileSheetClose onClick={() => setMobileTab(null)}>
+            <MobileSheetClose aria-label="Close" onClick={() => setMobileTab(null)}>
               <X />
             </MobileSheetClose>
           </MobileSheetHeader>

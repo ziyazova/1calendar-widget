@@ -77,7 +77,7 @@ const HeaderRow = styled.div`
 const Title = styled.h2`
   font-size: 16px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
   letter-spacing: -0.02em;
   display: flex;
@@ -173,7 +173,7 @@ const ControlSelect = styled.select`
   border-radius: 12px;
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   background: rgba(255, 255, 255, 0.8);
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   font-family: inherit;
   cursor: pointer;
   appearance: none;
@@ -189,7 +189,7 @@ const ControlSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #3384F4;
+    border-color: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
 `;
@@ -260,7 +260,7 @@ const DebugLegend = styled.div<{ $visible: boolean }>`
   align-items: center;
   margin: 16px 0 0;
   padding: 12px 16px;
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   border-radius: 12px;
   font-size: 11px;
   font-family: monospace;
@@ -305,7 +305,7 @@ const PresetButton = styled.button`
   &:hover {
     background: rgba(51, 132, 244, 0.04);
     border-color: rgba(51, 132, 244, 0.15);
-    color: #3384F4;
+    color: ${({ theme }) => theme.colors.accent};
   }
 `;
 
@@ -464,7 +464,7 @@ export const LayoutCheck: React.FC<LayoutCheckProps> = ({ widget }) => {
   const embedUrl = makeEmbedUrl(widgetType, style);
 
   const sendDebug = useCallback((msg: string) => {
-    try { iframeRef.current?.contentWindow?.postMessage(msg, '*'); } catch {}
+    try { iframeRef.current?.contentWindow?.postMessage(msg, '*'); } catch { /* iframe not ready */ }
   }, []);
 
   useEffect(() => {

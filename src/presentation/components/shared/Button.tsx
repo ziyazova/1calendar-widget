@@ -9,14 +9,14 @@ interface ButtonTransientProps {
 }
 
 const primaryStyles = css<ButtonTransientProps>`
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
 `;
 
 const secondaryStyles = css<ButtonTransientProps>`
   background: ${({ theme }) => theme.colors.background.surface};
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
 `;
 

@@ -29,7 +29,7 @@ const HeaderLeft = styled.div`
 const Title = styled.h2`
   font-size: 18px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0;
 `;
@@ -50,7 +50,7 @@ const ActionButton = styled.button`
   font-size: 13px;
   font-weight: 500;
   color: #fff;
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   border: none;
   border-radius: ${({ theme }) => theme.radii.button};
   cursor: pointer;

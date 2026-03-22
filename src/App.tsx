@@ -27,6 +27,15 @@ const GlobalStyles = createGlobalStyle`
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
+
+  *:focus-visible {
+    outline: 2px solid #3384F4;
+    outline-offset: 2px;
+  }
+
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
 `;
 
 function ScrollToTop() {

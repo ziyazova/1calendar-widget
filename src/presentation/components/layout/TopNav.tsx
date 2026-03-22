@@ -55,7 +55,7 @@ const LogoRow = styled.div<{ $pressed?: boolean }>`
 const LogoText = styled.span`
   font-size: 16px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
 `;
 
@@ -84,13 +84,13 @@ const NavLink = styled.button<{ $active?: boolean }>`
   font-family: inherit;
   letter-spacing: -0.01em;
   transition: color 0.15s ease;
-  &:hover { color: #1F1F1F; }
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 const NavCTA = styled.button`
   height: 36px;
   padding: 0 18px;
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.button};
@@ -117,7 +117,7 @@ const BurgerButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
 
   svg { width: 20px; height: 20px; }
 
@@ -169,7 +169,7 @@ const MobileLink = styled.button<{ $active?: boolean }>`
 
   &:hover {
     background: rgba(0, 0, 0, 0.03);
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
@@ -177,7 +177,7 @@ const MobileCTA = styled.button`
   width: 100%;
   height: 44px;
   margin-top: 16px;
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
@@ -223,7 +223,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
           <NavLink $active={activeLink === 'dev'} onClick={() => navigate('/dev')}>Design System</NavLink>
           <NavCTA>Log in</NavCTA>
         </NavLinks>
-        <BurgerButton onClick={() => setMenuOpen(!menuOpen)}>
+        <BurgerButton aria-label={menuOpen ? 'Close menu' : 'Open menu'} onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X /> : <Menu />}
         </BurgerButton>
       </NavInner>

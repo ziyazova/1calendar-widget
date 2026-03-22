@@ -16,7 +16,7 @@ const CTASectionWrap = styled.section`
 const CTATitle = styled.h2`
   font-size: 36px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 16px;
 `;

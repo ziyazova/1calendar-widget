@@ -60,7 +60,7 @@ const SidebarHeader = styled.div<{ $collapsed?: boolean }>`
 const LogoText = styled.span<{ $collapsed?: boolean }>`
   font-size: 16px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
   transition: opacity 0.15s ease;
@@ -90,7 +90,7 @@ const BackButton = styled.button`
 
   &:hover {
     background: rgba(0, 0, 0, 0.04);
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   svg {
@@ -116,7 +116,7 @@ const CollapseHeaderBtn = styled.button`
 
   &:hover {
     background: rgba(51, 132, 244, 0.08);
-    color: #3384F4;
+    color: ${({ theme }) => theme.colors.accent};
   }
 
   svg { width: 18px; height: 18px; }
@@ -312,7 +312,7 @@ const StyleItem = styled.button<{ $active: boolean }>`
 
   &:hover {
     background: rgba(51, 132, 244, 0.04);
-    color: #3384F4;
+    color: ${({ theme }) => theme.colors.accent};
   }
 
   svg {
@@ -330,7 +330,7 @@ const Tooltip = styled.div`
   left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%);
-  background: #1F1F1F;
+  background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   font-size: 12px;
   font-weight: 500;
@@ -411,7 +411,7 @@ const PopoverItem = styled.button<{ $active: boolean }>`
 
   &:hover {
     background: rgba(51, 132, 244, 0.06);
-    color: #3384F4;
+    color: ${({ theme }) => theme.colors.accent};
   }
 
   svg {
@@ -445,7 +445,7 @@ const CollapseToggle = styled.button<{ $collapsed?: boolean }>`
 
   &:hover {
     background: rgba(0, 0, 0, 0.04);
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   svg {

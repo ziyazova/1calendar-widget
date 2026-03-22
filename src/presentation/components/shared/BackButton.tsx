@@ -15,7 +15,7 @@ const BackButtonWrap = styled.button`
   font-family: inherit;
   margin-bottom: 16px;
   transition: color 0.15s ease;
-  &:hover { color: #1F1F1F; }
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
   svg { width: 13px; height: 13px; }
 `;
 

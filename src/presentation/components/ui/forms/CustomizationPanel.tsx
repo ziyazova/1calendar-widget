@@ -66,7 +66,7 @@ const PanelTitle = styled.h2`
   font-size: 16px;
   font-weight: 600;
   line-height: 22px;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
   letter-spacing: -0.02em;
 `;
@@ -89,7 +89,7 @@ const WidgetBadge = styled.span`
 const WidgetBadgeText = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: #3384F4;
+  color: ${({ theme }) => theme.colors.accent};
   letter-spacing: -0.01em;
 `;
 
@@ -156,7 +156,7 @@ const Label = styled.label`
   display: block;
   font-size: 12px;
   font-weight: 400;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: 8px;
   letter-spacing: -0.01em;
 
@@ -171,7 +171,7 @@ const Select = styled.select`
   border-radius: ${({ theme }) => theme.radii.button};
   background: rgba(0, 0, 0, 0.03);
   box-shadow: ${({ theme }) => theme.shadows.form};
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
 
   @media (max-width: 768px) { height: 40px; font-size: 13px; }
   font-size: 13px;
@@ -191,7 +191,7 @@ const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #3384F4;
+    border-color: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
 `;
@@ -275,7 +275,7 @@ const Toggle = styled.label`
 const ToggleText = styled.span`
   font-size: 12px;
   font-weight: 400;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) { font-size: 13px; }
@@ -430,7 +430,7 @@ const ImageUrlInput = styled.input`
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(255, 255, 255, 0.8);
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   font-size: 12px;
   font-family: inherit;
   transition: all 0.15s ease;
@@ -440,7 +440,7 @@ const ImageUrlInput = styled.input`
   }
   &:focus {
     outline: none;
-    border-color: #3384F4;
+    border-color: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
   &::placeholder {
