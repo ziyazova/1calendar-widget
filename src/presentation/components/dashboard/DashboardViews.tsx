@@ -58,9 +58,43 @@ const Grid = styled.div`
 
 const FilterRow = styled.div`
   display: flex;
+  align-items: center;
   gap: 6px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+`;
+
+const FilterSpacer = styled.div`
+  flex: 1;
+`;
+
+const SortSelect = styled.select`
+  height: 32px;
+  padding: 0 28px 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  color: #999;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  outline: none;
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #666;
+  }
+
+  &:focus {
+    border-color: rgba(51, 132, 244, 0.3);
+  }
 `;
 
 const FilterChip = styled.button<{ $active: boolean }>`
@@ -709,6 +743,12 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
             {f.label}
           </FilterChip>
         ))}
+        <FilterSpacer />
+        <SortSelect defaultValue="newest">
+          <option value="newest">Newest</option>
+          <option value="popular">Popular</option>
+          <option value="name">A — Z</option>
+        </SortSelect>
       </FilterRow>
       <ExploreGrid>
         {ALL_EXPLORE_WIDGETS
