@@ -150,6 +150,9 @@ const PreviewScale = styled.div`
   min-height: 380px;
   flex-shrink: 0;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ClockPreviewScale = styled(PreviewScale)`
@@ -532,6 +535,9 @@ const ExploreScaleCalendar = styled.div`
   width: 420px;
   min-height: 380px;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ExploreScaleClock = styled(ExploreScaleCalendar)`
