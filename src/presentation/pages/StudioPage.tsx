@@ -104,7 +104,7 @@ const WidgetArea = styled.div`
   border-radius: ${({ theme }) => theme.radii['2xl']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: none;
-  margin: 12px;
+  margin: 12px 24px 12px 12px;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {
@@ -746,14 +746,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [mobilePanel, setMobilePanel] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
-  const [stylePanel, setStylePanel] = useState<string | null>('calendar');
+  const [stylePanel, setStylePanel] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const navigate = useNavigate();
   const { isRegistered } = useAuth();
+  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>(isRegistered ? 'my-widgets' : null);
 
   const handleLogoClick = useCallback(() => {
     setTransitioning(true);
@@ -891,9 +891,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             collapsed={window.innerWidth > 768 && window.innerWidth <= 1024 ? sidebarCollapsed : false}
             onToggleCollapse={window.innerWidth > 768 && window.innerWidth <= 1024 ? () => setSidebarCollapsed(!sidebarCollapsed) : undefined}
             dashboardView={dashboardView}
-            onDashboardViewChange={setDashboardView}
+            onDashboardViewChange={(v) => { setDashboardView(v); if (v) { setStylePanel(null); setEditorOpen(false); } }}
             expandedCategory={stylePanel}
-            onCategoryToggle={(cat) => { setStylePanel(cat); if (cat) setEditorOpen(false); }}
+            onCategoryToggle={(cat) => { setStylePanel(cat); if (cat) { setEditorOpen(false); setDashboardView(null); } }}
           />
           {stylePanel && (() => {
             const stylesMap: Record<string, { styles: typeof CALENDAR_STYLES; label: string }> = {

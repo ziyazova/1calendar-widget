@@ -733,11 +733,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </SidebarHeader>
 
       <NavSection $collapsed={collapsed}>
-        <SectionLabel $collapsed={collapsed}>Widgets</SectionLabel>
-        {renderCategory('calendar', 'Calendar', Calendar, CALENDAR_STYLES, calendarRef)}
-        {renderCategory('clock', 'Clock', Clock, CLOCK_STYLES, clockRef)}
-        {renderCategory('board', 'Canvas', Image, BOARD_STYLES, boardRef)}
-
         {isRegistered && (
           <>
             <SectionLabel $collapsed={collapsed}>Account</SectionLabel>
@@ -767,6 +762,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </AccountItem>
           </>
         )}
+
+        <SectionLabel $collapsed={collapsed}>Widgets</SectionLabel>
+        {renderCategory('calendar', 'Calendar', Calendar, CALENDAR_STYLES, calendarRef)}
+        {renderCategory('clock', 'Clock', Clock, CLOCK_STYLES, clockRef)}
+        {renderCategory('board', 'Canvas', Image, BOARD_STYLES, boardRef)}
       </NavSection>
 
       {isRegistered && (
