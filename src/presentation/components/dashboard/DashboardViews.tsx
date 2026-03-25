@@ -1,10 +1,26 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Calendar, Clock, Layout, Download, ExternalLink, Pencil, Trash2, LogOut } from 'lucide-react';
 import type { DashboardView } from '../ui/sidebar/Sidebar';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { WidgetStorageService, type SavedWidget } from '@/infrastructure/services/WidgetStorageService';
+import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
+import { ClockSettings } from '@/domain/value-objects/ClockSettings';
+import { BoardSettings } from '@/domain/value-objects/BoardSettings';
+import { getContrastColor } from '@/presentation/themes/colors';
+
+/* Calendar styles */
+import { ModernGridZoomFixed } from '../widgets/calendar/styles/ModernGridZoomFixed';
+import { ClassicCalendar } from '../widgets/calendar/styles/ClassicCalendar';
+import { CollageCalendar } from '../widgets/calendar/styles/CollageCalendar';
+import { TypewriterCalendar } from '../widgets/calendar/styles/TypewriterCalendar';
+/* Clock styles */
+import { ClassicClock } from '../widgets/clock/styles/ClassicClock';
+import { FlowerClock } from '../widgets/clock/styles/FlowerClock';
+import { DreamyClock } from '../widgets/clock/styles/DreamyClock';
+/* Board styles */
+import { InspirationBoard } from '../widgets/board/styles/InspirationBoard';
 
 /* ── Shared ── */
 
@@ -12,7 +28,7 @@ const Container = styled.div`
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 48px 32px;
+  padding: 32px 32px;
 
   @media (max-width: 768px) {
     padding: 24px 16px;
@@ -75,77 +91,96 @@ const ChipCount = styled.span`
 
 /* ── Widget Card ── */
 
+const cardAppear = keyframes`
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+`;
+
 const CardOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   opacity: 0;
   transition: opacity 0.2s ease;
-  border-radius: inherit;
+  z-index: 2;
 `;
 
-const Card = styled.div`
-  background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.lg};
+const Card = styled.div<{ $index?: number }>`
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  background: #ffffff;
   overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: ${({ $index }) => 0.04 + ($index || 0) * 0.05}s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
 
   &:hover ${CardOverlay} { opacity: 1; }
 `;
 
 const CardPreview = styled.div`
-  height: 140px;
-  background: ${({ theme }) => theme.colors.background.surface};
+  aspect-ratio: 16 / 10;
+  background: #FAFAFA;
   position: relative;
   overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.1);
-    display: block;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-const CardBadge = styled.span`
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 2px 8px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
+const PreviewScale = styled.div`
+  transform: scale(0.28);
+  transform-origin: center center;
+  width: 420px;
+  min-height: 380px;
+  flex-shrink: 0;
+  pointer-events: none;
+`;
+
+const ClockPreviewScale = styled(PreviewScale)`
+  width: 360px;
+  min-height: 360px;
+`;
+
+const BoardPreviewScale = styled(PreviewScale)`
+  width: 420px;
+  min-height: 420px;
 `;
 
 const CardInfo = styled.div`
-  padding: ${({ theme }) => theme.spacing['3']} ${({ theme }) => theme.spacing['4']};
+  padding: 10px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
 const CardName = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: 13px;
+  font-weight: 500;
+  color: #1F1F1F;
+  letter-spacing: -0.01em;
 `;
 
 const CardMeta = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-size: 11px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin-top: 2px;
 `;
 
 const OverlayBtn = styled.button<{ $danger?: boolean }>`
   height: 34px;
-  padding: 0 14px;
+  padding: 0 18px;
   background: ${({ $danger }) => $danger ? 'rgba(220, 40, 40, 0.9)' : 'rgba(255, 255, 255, 0.95)'};
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -154,16 +189,17 @@ const OverlayBtn = styled.button<{ $danger?: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: all 0.15s ease;
 
-  svg { width: 13px; height: 13px; }
+  svg { width: 14px; height: 14px; }
 
   &:hover { transform: scale(1.04); }
+  &:active { transform: scale(0.95); }
 `;
 
 const AddCard = styled.div`
-  background: ${({ theme }) => theme.colors.background.surface};
-  border: 2px dashed ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 2px dashed rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,6 +209,8 @@ const AddCard = styled.div`
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text.tertiary};
   transition: all 0.15s ease;
+  opacity: 0;
+  animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   svg { width: 22px; height: 22px; }
 
@@ -183,8 +221,8 @@ const AddCard = styled.div`
 `;
 
 const AddLabel = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  font-size: 13px;
+  font-weight: 500;
 `;
 
 /* ── Purchase Row ── */
@@ -337,6 +375,36 @@ const SaveBtn = styled.button`
   &:hover { background: #333; }
 `;
 
+/* ── Widget Preview Renderers ── */
+
+const PREVIEW_TIME = new Date(2026, 2, 25, 10, 42, 15);
+
+const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style }) => {
+  if (type === 'calendar') {
+    const settings = new CalendarSettings({ style: style as CalendarSettings['style'] });
+    switch (style) {
+      case 'classic': return <PreviewScale><ClassicCalendar settings={settings} /></PreviewScale>;
+      case 'collage': return <PreviewScale><CollageCalendar settings={settings} /></PreviewScale>;
+      case 'typewriter': return <PreviewScale><TypewriterCalendar settings={settings} /></PreviewScale>;
+      default: return <PreviewScale><ModernGridZoomFixed settings={settings} /></PreviewScale>;
+    }
+  }
+  if (type === 'clock') {
+    const settings = new ClockSettings({ style: style as ClockSettings['style'] });
+    const textColor = getContrastColor(settings.backgroundColor);
+    switch (style) {
+      case 'flower': return <ClockPreviewScale><FlowerClock settings={settings} time={PREVIEW_TIME} textColor={textColor} /></ClockPreviewScale>;
+      case 'dreamy': return <ClockPreviewScale><DreamyClock settings={settings} time={PREVIEW_TIME} textColor={textColor} /></ClockPreviewScale>;
+      default: return <ClockPreviewScale><ClassicClock settings={settings} time={PREVIEW_TIME} textColor={textColor} /></ClockPreviewScale>;
+    }
+  }
+  if (type === 'board') {
+    const settings = new BoardSettings({ layout: style as BoardSettings['layout'] });
+    return <BoardPreviewScale><InspirationBoard settings={settings} /></BoardPreviewScale>;
+  }
+  return null;
+};
+
 /* ── Data ── */
 
 type WidgetFilter = 'all' | 'calendar' | 'clock' | 'board';
@@ -412,11 +480,10 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
           <Plus />
           <AddLabel>New Widget</AddLabel>
         </AddCard>
-        {filtered.map(w => (
-          <Card key={w.id}>
+        {filtered.map((w, i) => (
+          <Card key={w.id} $index={i}>
             <CardPreview>
-              <img src={WIDGET_IMAGES[w.type] || '/template-main.png'} alt={w.name} />
-              <CardBadge>{w.style}</CardBadge>
+              <WidgetPreview type={w.type} style={w.style} />
               <CardOverlay>
                 <OverlayBtn onClick={() => onEditWidget?.(w)}><Pencil /> Edit</OverlayBtn>
                 <OverlayBtn $danger onClick={() => handleDelete(w.id)}><Trash2 /></OverlayBtn>
@@ -424,7 +491,7 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
             </CardPreview>
             <CardInfo>
               <CardName>{w.name}</CardName>
-              <CardMeta>{w.type} · {formatDate(w.created_at)}</CardMeta>
+              <CardMeta>{w.type} · {w.style} · {formatDate(w.created_at)}</CardMeta>
             </CardInfo>
           </Card>
         ))}

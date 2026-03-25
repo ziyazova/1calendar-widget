@@ -57,7 +57,7 @@ const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boole
     const panelW = $stylePanelOpen ? 280 : 0;
     return `${sidebarW + panelW}px`;
   }};
-  margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '290px' : '0'};
+  margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '290px' : '12px'};
   height: 100vh;
   transition: margin-left 0.35s cubic-bezier(0.22, 1, 0.36, 1), margin-right 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -67,7 +67,7 @@ const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boole
       const panelW = $stylePanelOpen ? 260 : 0;
       return `${sidebarW + panelW}px`;
     }};
-    margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '240px' : '0'};
+    margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '240px' : '12px'};
   }
 
   @media (max-width: 768px) {
@@ -104,7 +104,7 @@ const WidgetArea = styled.div`
   border-radius: ${({ theme }) => theme.radii['2xl']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: none;
-  margin: 24px 24px 12px 12px;
+  margin: 24px 12px 12px 12px;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {

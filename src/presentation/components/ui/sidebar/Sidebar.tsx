@@ -191,10 +191,10 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $co
   gap: ${({ $collapsed }) => $collapsed ? '0' : '12px'};
   padding: ${({ $collapsed }) => $collapsed ? '0' : '8px 12px'};
   height: ${({ $collapsed }) => $collapsed ? '44px' : 'auto'};
-  background: ${({ $hasActive, $expanded }) => ($hasActive || $expanded) ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
+  background: ${({ $expanded }) => $expanded ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
   border: none;
   border-radius: ${({ $collapsed }) => $collapsed ? '10px' : '8px'};
-  color: ${({ $hasActive, $muted, theme }) => $hasActive ? '#3384F4' : $muted ? theme.colors.text.secondary : '#1F1F1F'};
+  color: ${({ $expanded, $muted, theme }) => $expanded ? '#3384F4' : $muted ? theme.colors.text.secondary : '#1F1F1F'};
   font-size: 14px;
   font-weight: 500;
   line-height: 22px;
