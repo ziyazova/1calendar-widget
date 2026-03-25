@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { Check, X, Pencil } from 'lucide-react';
+import { X, Pencil } from 'lucide-react';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -213,18 +213,12 @@ const BoardPreviewScale = styled(PreviewScale)`
   min-height: 420px;
 `;
 
-const CardBottom = styled.div<{ $active: boolean }>`
+const CardBottom = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.04);
-`;
-
-const CardInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
 `;
 
 const CardLabel = styled.span<{ $active: boolean }>`
@@ -234,30 +228,16 @@ const CardLabel = styled.span<{ $active: boolean }>`
   letter-spacing: -0.01em;
 `;
 
-const CheckBadge = styled.div`
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #3384F4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-
-  svg { width: 10px; height: 10px; }
-`;
-
 const EditButton = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 28px;
-  padding: 0 12px;
+  height: 32px;
+  padding: 0 14px;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  background: rgba(0, 0, 0, 0.04);
-  color: ${({ theme }) => theme.colors.text.secondary};
+  border-radius: ${({ theme }) => theme.radii.button};
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: #fff;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -265,11 +245,14 @@ const EditButton = styled.button`
   transition: all 0.15s ease;
   letter-spacing: -0.01em;
 
-  svg { width: 12px; height: 12px; }
+  svg { width: 13px; height: 13px; }
 
   &:hover {
-    background: rgba(51, 132, 244, 0.08);
-    color: #3384F4;
+    opacity: 0.85;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -330,15 +313,8 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
                 <PreviewWrap>
                   {renderPreview(s.value)}
                 </PreviewWrap>
-                <CardBottom $active={isActive}>
-                  <CardInfo>
-                    {isActive && (
-                      <CheckBadge>
-                        <Check />
-                      </CheckBadge>
-                    )}
-                    <CardLabel $active={isActive}>{s.label}</CardLabel>
-                  </CardInfo>
+                <CardBottom>
+                  <CardLabel $active={isActive}>{s.label}</CardLabel>
                   <EditButton
                     onClick={(e) => {
                       e.stopPropagation();
