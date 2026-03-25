@@ -939,26 +939,28 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           ) : viewMode === 'editor' ? (
             <>
               <WidgetArea onClick={() => { if (mobileTab) setMobileTab(null); if (window.innerWidth <= 1024 && !sidebarCollapsed) setSidebarCollapsed(true); }}>
-                <MobileEmbedFloating>
-                  <MobileEmbedRow>
-                    <MobileEmbedUrl
-                      readOnly
-                      value={embedUrl}
-                      onFocus={(e) => e.target.select()}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <MobileCopyButton onClick={(e) => { e.stopPropagation(); handleCopyEmbedUrl(); }} $copied={copied}>
-                      {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
-                    </MobileCopyButton>
-                  </MobileEmbedRow>
-                </MobileEmbedFloating>
+                {editorOpen && (
+                  <MobileEmbedFloating>
+                    <MobileEmbedRow>
+                      <MobileEmbedUrl
+                        readOnly
+                        value={embedUrl}
+                        onFocus={(e) => e.target.select()}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <MobileCopyButton onClick={(e) => { e.stopPropagation(); handleCopyEmbedUrl(); }} $copied={copied}>
+                        {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
+                      </MobileCopyButton>
+                    </MobileEmbedRow>
+                  </MobileEmbedFloating>
+                )}
                 {showGrid && <DotGrid />}
 
                 <ZoomableWidget key={currentWidgetKey} $zoom={studioZoom}>
                   <WidgetDisplay widget={currentWidget} />
                 </ZoomableWidget>
 
-                {currentWidget && (
+                {currentWidget && editorOpen && (
                   <FloatingToolbar>
                     <ToolbarButton
                       $active={viewMode === 'editor'}
@@ -988,17 +990,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       <CopyButton onClick={handleCopyEmbedUrl} $copied={copied}>
                         {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
                       </CopyButton>
-                      {isRegistered && (
-                        <SaveBtn onClick={handleSaveWidget} disabled={saving} $saved={saved}>
-                          {saved ? <><Check /> Saved</> : saving ? <>Saving...</> : <><Save /> Save</>}
-                        </SaveBtn>
-                      )}
                     </EmbedUrlGroup>
 
                   </FloatingToolbar>
                 )}
 
-                <TopRightControls>
+                {editorOpen && <TopRightControls>
                   <ZoomControl>
                     <ZoomLabel role="button" aria-label="Zoom out" onClick={() => setStudioZoom(Math.max(0.5, +(studioZoom - 0.1).toFixed(1)))}>−</ZoomLabel>
                     <ZoomSlider
@@ -1016,7 +1013,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   <GridToggle $active={showGrid} onClick={() => setShowGrid(!showGrid)} aria-label="Toggle grid">
                     <Grip />
                   </GridToggle>
-                </TopRightControls>
+                </TopRightControls>}
               </WidgetArea>
 
               {editorOpen && (

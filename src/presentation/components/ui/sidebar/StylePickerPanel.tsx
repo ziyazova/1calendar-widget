@@ -87,6 +87,17 @@ const slideIn = keyframes`
   }
 `;
 
+const cardAppear = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+`;
+
 const PanelContainer = styled.div`
   position: fixed;
   left: 270px;
@@ -94,11 +105,11 @@ const PanelContainer = styled.div`
   width: 280px;
   height: 100vh;
   background: #ffffff;
-  border-right: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-left: 1px solid ${({ theme }) => theme.colors.border.light};
   z-index: ${({ theme }) => theme.zIndex.sticky - 1};
   display: flex;
   flex-direction: column;
-  animation: ${slideIn} 0.2s ease both;
+  animation: ${slideIn} 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 1024px) {
     left: 220px;
@@ -163,14 +174,17 @@ const CardList = styled.div`
   gap: 12px;
 `;
 
-const CardOuter = styled.div<{ $active: boolean }>`
+const CardOuter = styled.div<{ $active: boolean; $index: number }>`
   position: relative;
   border: 1.5px solid ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.06)'};
   border-radius: 14px;
   background: #ffffff;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  opacity: 0;
+  animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: ${({ $index }) => 0.06 + $index * 0.06}s;
 
   &:hover {
     border-color: ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.12)'};
@@ -232,12 +246,12 @@ const EditButton = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 32px;
-  padding: 0 14px;
+  height: 30px;
+  padding: 0 16px;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #fff;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: rgba(0, 0, 0, 0.05);
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -248,7 +262,8 @@ const EditButton = styled.button`
   svg { width: 13px; height: 13px; }
 
   &:hover {
-    opacity: 0.85;
+    background: rgba(51, 132, 244, 0.1);
+    color: #3384F4;
   }
 
   &:active {
@@ -302,12 +317,13 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
       </PanelHeader>
       <PanelBody>
         <CardList>
-          {styles.map((s) => {
+          {styles.map((s, i) => {
             const isActive = currentWidget === `${widgetType}-${s.value}`;
             return (
               <CardOuter
                 key={s.value}
                 $active={isActive}
+                $index={i}
                 onClick={() => onWidgetChange(widgetType, s.value)}
               >
                 <PreviewWrap>

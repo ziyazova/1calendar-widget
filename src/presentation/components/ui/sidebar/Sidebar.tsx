@@ -182,7 +182,7 @@ const WidgetCategory = styled.div<{ $collapsed?: boolean }>`
   position: relative;
 `;
 
-const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $collapsed?: boolean }>`
+const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $collapsed?: boolean; $hasActive?: boolean }>`
   width: ${({ $collapsed }) => $collapsed ? '44px' : 'calc(100% - 32px)'};
   margin: ${({ $collapsed }) => $collapsed ? '0 auto' : '0 16px'};
   display: flex;
@@ -191,10 +191,10 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $co
   gap: ${({ $collapsed }) => $collapsed ? '0' : '12px'};
   padding: ${({ $collapsed }) => $collapsed ? '0' : '8px 12px'};
   height: ${({ $collapsed }) => $collapsed ? '44px' : 'auto'};
-  background: transparent;
+  background: ${({ $hasActive, $expanded }) => ($hasActive || $expanded) ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
   border: none;
   border-radius: ${({ $collapsed }) => $collapsed ? '10px' : '8px'};
-  color: ${({ $muted, theme }) => $muted ? theme.colors.text.secondary : '#1F1F1F'};
+  color: ${({ $hasActive, $muted, theme }) => $hasActive ? '#3384F4' : $muted ? theme.colors.text.secondary : '#1F1F1F'};
   font-size: 14px;
   font-weight: 500;
   line-height: 22px;
@@ -695,10 +695,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ref={ref}
           $expanded={isExpanded}
           $collapsed={collapsed}
+          $hasActive={hasActive}
           onClick={() => handleCategoryClick(key, title, styles, ref)}
         >
           <CollapsedIconWrapper $hasActive={collapsed ? hasActive : false}>
-            <CategoryIcon $active={isExpanded || (collapsed && hasActive)}>
+            <CategoryIcon $active={isExpanded || hasActive}>
               <Icon />
             </CategoryIcon>
           </CollapsedIconWrapper>
