@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Calendar, Clock, Layout, Download, ExternalLink, Pencil, Trash2, LogOut, Search, ArrowRight } from 'lucide-react';
+import { Plus, Download, ExternalLink, Pencil, Trash2, LogOut, Search } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../ui/widgetConfig';
 import type { DashboardView } from '../ui/sidebar/Sidebar';
 import { useAuth } from '@/presentation/context/AuthContext';
@@ -27,12 +27,12 @@ import { InspirationBoard } from '../widgets/board/styles/InspirationBoard';
 
 const Container = styled.div`
   width: 100%;
-  max-width: 900px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 80px 40px 40px;
+  padding: 56px 48px 48px;
 
   @media (max-width: 768px) {
-    padding: 40px 16px 24px;
+    padding: 32px 16px 24px;
   }
 `;
 
@@ -52,26 +52,26 @@ const Subtitle = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: ${({ theme }) => theme.spacing['4']};
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
 `;
 
 const FilterRow = styled.div`
   display: flex;
   gap: 6px;
-  margin-bottom: ${({ theme }) => theme.spacing['5']};
+  margin-bottom: 16px;
   flex-wrap: wrap;
 `;
 
 const FilterChip = styled.button<{ $active: boolean }>`
   height: 32px;
   padding: 0 14px;
-  background: ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.04)'};
-  color: ${({ $active }) => $active ? '#fff' : '#6B6B6B'};
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  background: ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.03)'};
+  color: ${({ $active }) => $active ? '#fff' : '#999'};
+  border: 1px solid ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.06)'};
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   display: flex;
@@ -79,15 +79,17 @@ const FilterChip = styled.button<{ $active: boolean }>`
   gap: 6px;
   white-space: nowrap;
   transition: all 0.15s ease;
+  letter-spacing: -0.01em;
 
   &:hover {
-    background: ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.08)'};
+    background: ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.06)'};
+    color: ${({ $active }) => $active ? '#fff' : '#666'};
   }
 `;
 
 const ChipCount = styled.span`
   font-size: 10px;
-  opacity: 0.6;
+  opacity: 0.5;
 `;
 
 /* ── Widget Card ── */
@@ -112,25 +114,27 @@ const CardOverlay = styled.div`
 
 const Card = styled.div<{ $index?: number }>`
   border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 14px;
+  border-radius: 16px;
   background: #ffffff;
   overflow: hidden;
   cursor: pointer;
   opacity: 0;
   animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: ${({ $index }) => 0.04 + ($index || 0) * 0.05}s;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
   }
 
   &:hover ${CardOverlay} { opacity: 1; }
 `;
 
 const CardPreview = styled.div`
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   background: #FAFAFA;
   position: relative;
   overflow: hidden;
@@ -140,7 +144,7 @@ const CardPreview = styled.div`
 `;
 
 const PreviewScale = styled.div`
-  transform: scale(0.28);
+  transform: scale(0.32);
   transform-origin: center center;
   width: 420px;
   min-height: 380px;
@@ -420,11 +424,6 @@ const FILTERS: { key: WidgetFilter; label: string }[] = [
   { key: 'board', label: 'Boards' },
 ];
 
-const WIDGET_IMAGES: Record<string, string> = {
-  calendar: '/widget-calendar.png',
-  clock: '/widget-clock.png',
-  board: '/template-main.png',
-};
 
 const PURCHASES = [
   { id: 'p1', name: 'Weekly Planner', price: 'Free', date: 'Mar 22, 2026', order: '#PY-1042', image: '/template-main.png' },
@@ -432,11 +431,6 @@ const PURCHASES = [
   { id: 'p3', name: 'Student Planner', price: '$3.99', date: 'Mar 15, 2026', order: '#PY-1025', image: '/template-main.png' },
 ];
 
-const iconForType = (type: string) => {
-  if (type === 'Calendar') return <Calendar />;
-  if (type === 'Clock') return <Clock />;
-  return <Layout />;
-};
 
 /* ── Views ── */
 
@@ -478,63 +472,34 @@ const SearchIcon = styled.div`
 
 const SectionHeading = styled.div`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin: 40px 0 20px;
+  margin: 36px 0 12px;
 
   &:first-of-type { margin-top: 0; }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 600;
   color: #1F1F1F;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 `;
 
 const SectionCount = styled.span`
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.3);
   font-weight: 400;
-`;
-
-const SeeAllBtn = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: #3384F4;
-  cursor: pointer;
-  font-family: inherit;
+  text-transform: none;
   letter-spacing: -0.01em;
-  padding: 0;
-
-  svg { width: 14px; height: 14px; }
-
-  &:hover { opacity: 0.8; }
+  margin-left: 8px;
 `;
 
-/* ── Explore Row ── */
-
-const ExploreRow = styled.div`
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  margin: 0 -8px;
-  padding-left: 8px;
-  padding-right: 8px;
-
-  &::-webkit-scrollbar { height: 0; }
-`;
 
 const ExploreCard = styled.div<{ $index: number }>`
-  flex-shrink: 0;
-  width: 200px;
   border: 1.5px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   background: #ffffff;
@@ -564,7 +529,7 @@ const ExplorePreview = styled.div`
 `;
 
 const ExploreScaleCalendar = styled.div`
-  transform: scale(0.22);
+  transform: scale(0.28);
   transform-origin: center center;
   width: 420px;
   min-height: 380px;
@@ -643,8 +608,6 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
     count: f.key === 'all' ? widgets.length : widgets.filter(w => w.type === f.key).length,
   }));
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
   const renderExplorePreview = (type: string, style: string) => {
     if (type === 'calendar') {
       const s = new CalendarSettings({ style: style as CalendarSettings['style'] });
@@ -711,7 +674,7 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
                 </CardPreview>
                 <CardInfo>
                   <CardName>{w.name}</CardName>
-                  <CardMeta>{w.style} · {formatDate(w.created_at)}</CardMeta>
+                  <CardMeta>{w.style}</CardMeta>
                 </CardInfo>
               </Card>
             ))}

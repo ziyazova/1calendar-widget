@@ -946,7 +946,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
         <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel} $editorOpen={editorOpen}>
           {dashboardView ? (
-            <WidgetArea style={{ overflow: 'auto' }}>
+            <WidgetArea style={{ overflow: 'auto', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
               <DashboardContent
                 view={dashboardView}
                 onAddNew={() => {
