@@ -895,16 +895,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             onDashboardViewChange={(v) => { setDashboardView(v); if (v) { setStylePanel(null); setEditorOpen(false); } }}
             expandedCategory={stylePanel}
             onCategoryToggle={(cat) => {
-              if (dashboardView) {
-                // Stay on dashboard, just filter explore
-                setStylePanel(cat);
-              } else {
-                setStylePanel(cat);
-                if (cat) { setEditorOpen(false); setDashboardView(null); }
-              }
+              setStylePanel(cat);
+              if (cat) setEditorOpen(false);
+              // Don't close dashboard — panel opens alongside it
             }}
           />
-          {stylePanel && !dashboardView && (() => {
+          {stylePanel && (() => {
             const stylesMap: Record<string, { styles: typeof CALENDAR_STYLES; label: string }> = {
               calendar: { styles: CALENDAR_STYLES, label: 'Calendar' },
               clock: { styles: CLOCK_STYLES, label: 'Clock' },
@@ -952,7 +948,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <div style={{ width: 40 }} />
         </MobileTopBar>
 
-        <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel && !dashboardView} $editorOpen={editorOpen}>
+        <ContentArea $fullWidth={viewMode === 'layout-check' || (!!dashboardView && !stylePanel)} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel} $editorOpen={editorOpen}>
           {dashboardView ? (
             <WidgetArea style={{ overflow: 'auto', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
               <DashboardContent
