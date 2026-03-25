@@ -744,22 +744,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <LayoutGrid />
               <AccountItemLabel $collapsed={collapsed}>My Widgets</AccountItemLabel>
             </AccountItem>
-            <AccountItem
-              $active={dashboardView === 'templates'}
-              $collapsed={collapsed}
-              onClick={() => onDashboardViewChange?.(dashboardView === 'templates' ? null : 'templates')}
-            >
-              <ShoppingBag />
-              <AccountItemLabel $collapsed={collapsed}>Templates</AccountItemLabel>
-            </AccountItem>
-            <AccountItem
-              $active={dashboardView === 'purchases'}
-              $collapsed={collapsed}
-              onClick={() => onDashboardViewChange?.(dashboardView === 'purchases' ? null : 'purchases')}
-            >
-              <Receipt />
-              <AccountItemLabel $collapsed={collapsed}>Purchases</AccountItemLabel>
-            </AccountItem>
           </>
         )}
 

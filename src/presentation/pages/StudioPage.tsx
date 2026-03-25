@@ -753,7 +753,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const navigate = useNavigate();
   const { isRegistered } = useAuth();
-  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>(isRegistered ? 'my-widgets' : null);
+  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>('my-widgets');
 
   const handleLogoClick = useCallback(() => {
     setTransitioning(true);
