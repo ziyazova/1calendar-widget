@@ -5,26 +5,41 @@ import { PrimaryButton, SecondaryButton } from '../shared/Button';
 const CTASectionWrap = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px 100px;
+  padding: 0 48px;
+
+  @media (max-width: 768px) {
+    padding: 0 24px;
+  }
+`;
+
+const CTACard = styled.div`
+  background: linear-gradient(135deg, #F0E6FF 0%, #E8EDFF 50%, #FFF0F5 100%);
+  border-radius: 24px;
+  padding: 64px 48px;
   text-align: center;
 
   @media (max-width: 768px) {
-    padding: 60px 24px 80px;
+    padding: 48px 24px;
+    border-radius: 20px;
   }
 `;
 
 const CTATitle = styled.h2`
-  font-size: 36px;
+  font-size: 42px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 16px;
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+  }
 `;
 
 const CTASubtitle = styled.p`
-  font-size: 16px;
+  font-size: 15px;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 32px;
+  margin: 8px 0 32px;
   letter-spacing: -0.01em;
 `;
 
@@ -50,14 +65,16 @@ interface CTASectionProps {
 export const CTASection: React.FC<CTASectionProps> = ({ onBrowseTemplates, onExploreWidgets }) => {
   return (
     <CTASectionWrap data-ux="CTA Section">
-      <CTATitle>Ready to level up?</CTATitle>
-      <CTASubtitle>Explore templates or build your own widgets — no sign up needed.</CTASubtitle>
-      <ButtonRow>
-        <PrimaryButton onClick={onBrowseTemplates}>
-          Browse Templates
-        </PrimaryButton>
-        <SecondaryButton onClick={onExploreWidgets}>Explore Widgets</SecondaryButton>
-      </ButtonRow>
+      <CTACard>
+        <CTATitle>Start building your workspace.</CTATitle>
+        <CTASubtitle>Explore templates or build your own widgets.</CTASubtitle>
+        <ButtonRow>
+          <PrimaryButton onClick={onBrowseTemplates}>
+            Browse Templates
+          </PrimaryButton>
+          <SecondaryButton onClick={onExploreWidgets}>Explore Widgets</SecondaryButton>
+        </ButtonRow>
+      </CTACard>
     </CTASectionWrap>
   );
 };

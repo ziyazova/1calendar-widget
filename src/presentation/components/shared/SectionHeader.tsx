@@ -27,7 +27,7 @@ const HeaderLeft = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;

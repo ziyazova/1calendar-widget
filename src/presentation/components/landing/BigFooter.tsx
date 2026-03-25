@@ -1,14 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const FooterOuter = styled.div``;
+
 const FooterWrapper = styled.footer`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px 40px;
-  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
+  padding: 0 48px 40px;
 
   @media (max-width: 768px) {
-    padding: 48px 24px 32px;
+    padding: 0 24px 32px;
   }
 `;
 
@@ -16,6 +17,12 @@ const FooterInner = styled.div`
   display: flex;
   gap: 64px;
   margin-bottom: 48px;
+  align-items: flex-start;
+  justify-content: center;
+
+  @media (max-width: 1024px) {
+    gap: 40px;
+  }
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -42,8 +49,12 @@ const FooterColumns = styled.div`
   gap: 48px;
   flex: 1;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
+    gap: 28px;
     flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
     gap: 32px 24px;
   }
 `;
@@ -92,6 +103,7 @@ interface BigFooterProps {
 
 export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate }) => {
   return (
+    <FooterOuter>
     <FooterWrapper>
       <FooterInner>
         <FooterBrand>
@@ -125,5 +137,6 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate }) => {
         © {new Date().getFullYear()} Peachy Studio. All rights reserved.
       </FooterBottom>
     </FooterWrapper>
+    </FooterOuter>
   );
 };

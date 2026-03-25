@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, LayoutGrid, Grip, X, Menu, Palette, Settings2, Brush, Sliders } from 'lucide-react';
+import { Copy, Check, Pencil, LayoutGrid, Grip, X, Menu, Palette, Settings2, Brush, Sliders, Save } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -11,9 +11,12 @@ import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 
 type AnySettings = Partial<CalendarSettings | ClockSettings | BoardSettings>;
 import { Sidebar } from '../components/ui/sidebar/Sidebar';
+import { DashboardContent } from '../components/dashboard/DashboardViews';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel } from '../components/ui/forms/CustomizationPanel';
 import { LayoutCheck } from '../components/layout/LayoutCheck';
+import { useAuth } from '../context/AuthContext';
+import { WidgetStorageService } from '../../infrastructure/services/WidgetStorageService';
 
 interface StudioPageProps {
   diContainer: DIContainer;
@@ -441,6 +444,31 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   }
 `;
 
+const SaveBtn = styled.button<{ $saved?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: ${({ $saved }) => $saved ? 'rgba(34, 197, 94, 0.12)' : '#1F1F1F'};
+  color: ${({ $saved }) => $saved ? '#16a34a' : '#fff'};
+
+  &:hover { opacity: 0.9; }
+  &:active { transform: scale(0.95); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  svg { width: 14px; height: 14px; }
+`;
+
 /* ── Mobile Controls ── */
 const MobileTopBar = styled.div`
   display: none;
@@ -614,13 +642,13 @@ const MobileSheet = styled.div<{ $open: boolean }>`
   bottom: calc(60px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  max-height: 55vh;
+  max-height: 60vh;
   background: #ffffff;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
   z-index: 51;
   transform: ${({ $open }) => $open ? 'translateY(0)' : 'translateY(100%)'};
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 
@@ -708,7 +736,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [mobilePanel, setMobilePanel] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isRegistered } = useAuth();
 
   const handleLogoClick = useCallback(() => {
     setTransitioning(true);
@@ -791,6 +824,38 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       .catch((err) => Logger.error('StudioPage', 'Failed to copy embed URL', err));
   };
 
+  const handleSaveWidget = useCallback(async () => {
+    if (!currentWidget || !isRegistered || saving) return;
+    setSaving(true);
+    try {
+      const [type, ...styleParts] = currentWidgetKey.split('-');
+      const style = styleParts.join('-');
+      const settings = currentWidget.settings.toJSON ? currentWidget.settings.toJSON() : { ...currentWidget.settings };
+
+      if (editingWidgetId) {
+        await WidgetStorageService.updateWidget(editingWidgetId, {
+          settings: settings as Record<string, unknown>,
+          embed_url: embedUrl || undefined,
+        });
+      } else {
+        const saved = await WidgetStorageService.saveWidget({
+          name: `${currentWidget.type.charAt(0).toUpperCase() + currentWidget.type.slice(1)} Widget`,
+          type,
+          style,
+          settings: settings as Record<string, unknown>,
+          embed_url: embedUrl || undefined,
+        });
+        if (saved) setEditingWidgetId(saved.id);
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      Logger.error('StudioPage', 'Failed to save widget', err);
+    } finally {
+      setSaving(false);
+    }
+  }, [currentWidget, currentWidgetKey, embedUrl, isRegistered, saving, editingWidgetId]);
+
   // Determine which mobile tabs are available for current widget
   const isBoard = currentWidget?.type === 'board';
   const calStyle = currentWidget?.type === 'calendar' ? (currentWidget.settings as CalendarSettings).style : '';
@@ -807,12 +872,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <Sidebar
             availableWidgets={availableWidgets}
             currentWidget={currentWidgetKey}
-            onWidgetChange={(type, style) => { handleWidgetChange(type, style); setMobileSidebar(false); }}
+            onWidgetChange={(type, style) => { setDashboardView(null); handleWidgetChange(type, style); setMobileSidebar(false); }}
             onLogoClick={handleLogoClick}
             logoPressed={transitioning}
             mobileOpen={mobileSidebar}
             collapsed={window.innerWidth > 768 && window.innerWidth <= 1024 ? sidebarCollapsed : false}
             onToggleCollapse={window.innerWidth > 768 && window.innerWidth <= 1024 ? () => setSidebarCollapsed(!sidebarCollapsed) : undefined}
+            dashboardView={dashboardView}
+            onDashboardViewChange={setDashboardView}
           />
         </div>
         {mobileSidebar && <MobileOverlay onClick={() => setMobileSidebar(false)} />}
@@ -825,8 +892,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <div style={{ width: 40 }} />
         </MobileTopBar>
 
-        <ContentArea $fullWidth={viewMode === 'layout-check'} $sidebarCollapsed={sidebarCollapsed}>
-          {viewMode === 'editor' ? (
+        <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed}>
+          {dashboardView ? (
+            <WidgetArea style={{ overflow: 'auto' }}>
+              <DashboardContent view={dashboardView} />
+            </WidgetArea>
+          ) : viewMode === 'editor' ? (
             <>
               <WidgetArea onClick={() => { if (mobileTab) setMobileTab(null); if (window.innerWidth <= 1024 && !sidebarCollapsed) setSidebarCollapsed(true); }}>
                 <MobileEmbedFloating>
@@ -878,6 +949,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       <CopyButton onClick={handleCopyEmbedUrl} $copied={copied}>
                         {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
                       </CopyButton>
+                      {isRegistered && (
+                        <SaveBtn onClick={handleSaveWidget} disabled={saving} $saved={saved}>
+                          {saved ? <><Check /> Saved</> : saving ? <>Saving...</> : <><Save /> Save</>}
+                        </SaveBtn>
+                      )}
                     </EmbedUrlGroup>
 
                   </FloatingToolbar>
@@ -944,6 +1020,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <CopyButton onClick={handleCopyEmbedUrl} $copied={copied}>
                       {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
                     </CopyButton>
+                    {isRegistered && (
+                      <SaveBtn onClick={handleSaveWidget} disabled={saving} $saved={saved}>
+                        {saved ? <><Check /> Saved</> : saving ? <>Saving...</> : <><Save /> Save</>}
+                      </SaveBtn>
+                    )}
                   </EmbedUrlGroup>
                 </FloatingToolbar>
               )}
@@ -953,7 +1034,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       </WorkspaceContainer>
 
       {/* Mobile bottom tab bar */}
-      <MobileTabBar>
+      {!dashboardView && <MobileTabBar>
         <MobileTabButton $active={mobileTab === 'content'} onClick={() => { setMobileSidebar(false); setMobileTab(mobileTab === 'content' ? null : 'content'); }}>
           <Sliders />
           <MobileTabLabel>Content</MobileTabLabel>
@@ -970,7 +1051,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <Settings2 />
           <MobileTabLabel>Layout</MobileTabLabel>
         </MobileTabButton>
-      </MobileTabBar>
+      </MobileTabBar>}
 
       {/* Mobile bottom sheet */}
       <MobileSheet $open={!!mobileTab}>
@@ -1002,11 +1083,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </MobileSheetHeader>
         </MobileSheetTop>
         {mobileTab && (
-          <CustomizationPanel
-            widget={currentWidget}
-            onSettingsChange={handleSettingsChange}
-            visibleSection={mobileTab}
-          />
+          <div key={mobileTab} style={{ animation: 'fadeIn 0.15s ease' }}>
+            <CustomizationPanel
+              widget={currentWidget}
+              onSettingsChange={handleSettingsChange}
+              visibleSection={mobileTab}
+            />
+          </div>
         )}
       </MobileSheet>
     </StudioContainer>

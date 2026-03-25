@@ -33,7 +33,7 @@ const ghostStyles = css<ButtonTransientProps>`
 const smStyles = css`
   height: 36px;
   padding: 0 18px;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: 12px;
   font-size: 13px;
 `;
 

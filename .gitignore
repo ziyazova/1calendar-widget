@@ -188,3 +188,4 @@ bundle-report.html
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml 
+.npm-cache/

@@ -6,11 +6,11 @@ const PinterestGrid = styled.div`
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
   gap: 16px;
-  height: 560px;
+  height: 530px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
-    height: 480px;
+    height: 450px;
   }
 
   @media (max-width: 768px) {
@@ -22,9 +22,10 @@ const PinterestGrid = styled.div`
 `;
 
 const PinCard = styled.div<{ $col?: string; $row?: string; $mobileCol?: string; $mobileRow?: string; $hideOnMobile?: boolean; $hideOnTablet?: boolean }>`
-  border-radius: ${({ theme }) => theme.radii.lg};
+  border-radius: 16px;
   overflow: hidden;
   cursor: default;
+  border: 1px solid rgba(0, 0, 0, 0.04);
   grid-column: ${({ $col }) => $col || 'auto'};
   grid-row: ${({ $row }) => $row || 'auto'};
   position: relative;
@@ -55,7 +56,7 @@ const PinImage = styled.img`
 `;
 
 const PinText = styled.div<{ $bg: string; $color?: string }>`
-  padding: 28px 24px;
+  padding: 20px;
   background: ${({ $bg }) => $bg};
   color: ${({ $color }) => $color || '#1F1F1F'};
   height: 100%;
@@ -97,21 +98,85 @@ const PinTextDesc = styled.div`
 /* Grid layout: 4 columns × 4 rows desktop, 3 cols tablet, 2 cols mobile */
 type PinItem = { type: 'image' | 'text'; image?: string; bg?: string; color?: string; title?: string; desc?: string; col?: string; row?: string; mobileCol?: string; mobileRow?: string; hideOnMobile?: boolean; hideOnTablet?: boolean };
 
-const PIN_ITEMS: PinItem[] = [
-  /* col 1 */ { type: 'image', image: '/widget-calendar.png', col: '1', row: '1 / 3', mobileCol: '1', mobileRow: '1 / 3' },
-  /* col 1 */ { type: 'text', bg: '#F0E6FF', title: 'Customizable', desc: 'Colors, borders, layouts — make it yours.', col: '1', row: '3 / 5', mobileCol: '1', mobileRow: '3 / 5' },
-  /* col 2 */ { type: 'image', image: '/widget-clock2.png', col: '2', row: '1 / 4', mobileCol: '2', mobileRow: '1 / 4' },
-  /* col 2 */ { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Dark mode', desc: 'Auto-adapts to Notion light and dark themes.', col: '2', row: '4 / 5', mobileCol: '2', mobileRow: '4 / 5' },
-  /* col 3 */ { type: 'text', bg: '#E8EDFF', title: 'No sign-up', desc: 'Config lives in the URL. No accounts needed.', col: '3', row: '1 / 3', hideOnMobile: true },
-  /* col 3 */ { type: 'image', image: '/template-main.png', col: '3', row: '3 / 5', hideOnMobile: true },
-  /* col 4 */ { type: 'image', image: '/widget-calendar2.png', col: '4', row: '1 / 4', hideOnMobile: true, hideOnTablet: true },
-  /* col 4 */ { type: 'text', bg: '#FFF8E0', title: 'Free forever', desc: 'No premium tier, no limits.', col: '4', row: '4 / 5', hideOnMobile: true, hideOnTablet: true },
-];
+const PIN_SETS: Record<string, PinItem[]> = {
+  Featured: [
+    { type: 'image', image: '/widget-calendar.png', col: '1', row: '1 / 3', mobileCol: '1', mobileRow: '1 / 3' },
+    { type: 'text', bg: '#F5F0E8', title: 'Yours from day one.', desc: 'Color palettes, layout guides, and pre-made themes included.', col: '1', row: '3 / 5', mobileCol: '1', mobileRow: '3 / 5' },
+    { type: 'image', image: '/widget-clock2.png', col: '2', row: '1 / 4', mobileCol: '2', mobileRow: '1 / 4' },
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Only on Peachy.', desc: 'Widgets you won\'t find anywhere else.', col: '2', row: '4 / 5', mobileCol: '2', mobileRow: '4 / 5' },
+    { type: 'text', bg: '#E8EDFF', title: 'Pay once. Keep forever.', desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.', col: '3', row: '1 / 3', hideOnMobile: true },
+    { type: 'image', image: '/template-main.png', col: '3', row: '3 / 5', hideOnMobile: true },
+    { type: 'image', image: '/camera-frame.png', col: '4', row: '1 / 4', hideOnMobile: true, hideOnTablet: true },
+    { type: 'text', bg: '#FFF8E0', title: 'Built for both themes.', desc: 'Most templates adapt to light and dark mode.', col: '4', row: '4 / 5', hideOnMobile: true, hideOnTablet: true },
+  ],
+  Calendar: [
+    /* большое фото слева на 3 строки */
+    { type: 'image', image: '/widget-calendar.png', col: '1', row: '1 / 4', mobileCol: '1', mobileRow: '1 / 3' },
+    { type: 'text', bg: '#E8EDFF', title: 'Classic Style', desc: 'Clean month view with chevron navigation.', col: '1', row: '4 / 5', mobileCol: '1', mobileRow: '3 / 5' },
+    /* текст сверху, фото снизу */
+    { type: 'text', bg: '#F0E6FF', title: 'Modern Grid', desc: 'Zoom-fixed responsive layout.', col: '2', row: '1 / 2', mobileCol: '2', mobileRow: '1 / 2' },
+    { type: 'image', image: '/widget-calendar2.png', col: '2', row: '2 / 5', mobileCol: '2', mobileRow: '2 / 5' },
+    /* col 3: чередование */
+    { type: 'image', image: '/widget-calendar.png', col: '3', row: '1 / 3', hideOnMobile: true },
+    { type: 'text', bg: '#FFF8E0', title: 'Week View', desc: 'Focus on what matters this week.', col: '3', row: '3 / 5', hideOnMobile: true },
+    /* col 4: тёмная текстовая + фото */
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Dark Mode', desc: 'Auto-adapts to Notion themes.', col: '4', row: '1 / 3', hideOnMobile: true, hideOnTablet: true },
+    { type: 'image', image: '/widget-calendar2.png', col: '4', row: '3 / 5', hideOnMobile: true, hideOnTablet: true },
+  ],
+  Clocks: [
+    /* col 1: текст + фото */
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Digital', desc: 'Modern time with seconds toggle.', col: '1', row: '1 / 2', mobileCol: '1', mobileRow: '1 / 2' },
+    { type: 'image', image: '/widget-clock.png', col: '1', row: '2 / 5', mobileCol: '1', mobileRow: '2 / 5' },
+    /* col 2: большое фото */
+    { type: 'image', image: '/widget-clock2.png', col: '2', row: '1 / 3', mobileCol: '2', mobileRow: '1 / 3' },
+    { type: 'text', bg: '#F0E6FF', title: 'Analog', desc: 'Animated hour and minute hands.', col: '2', row: '3 / 4', mobileCol: '2', mobileRow: '3 / 4' },
+    { type: 'text', bg: '#E8EDFF', title: '24h / 12h', desc: 'Switch formats instantly.', col: '2', row: '4 / 5', mobileCol: '2', mobileRow: '4 / 5' },
+    /* col 3: flower clock */
+    { type: 'image', image: '/flower-clock-green.png', col: '3', row: '1 / 4', hideOnMobile: true },
+    { type: 'text', bg: '#E0F4E8', title: 'Flower Clock', desc: 'Decorative frame styles.', col: '3', row: '4 / 5', hideOnMobile: true },
+    /* col 4 */
+    { type: 'text', bg: '#FFF8E0', title: 'Show Date', desc: 'Date below the time display.', col: '4', row: '1 / 2', hideOnMobile: true, hideOnTablet: true },
+    { type: 'image', image: '/widget-clock.png', col: '4', row: '2 / 5', hideOnMobile: true, hideOnTablet: true },
+  ],
+  Boards: [
+    /* col 1: большое фото на всю высоту */
+    { type: 'image', image: '/template-main.png', col: '1', row: '1 / 5', mobileCol: '1', mobileRow: '1 / 3' },
+    /* col 2: текст + фото + текст */
+    { type: 'text', bg: '#E0F4E8', title: 'Collage', desc: 'Pin photos, notes, and ideas.', col: '2', row: '1 / 2', mobileCol: '1', mobileRow: '3 / 4' },
+    { type: 'image', image: '/template-dashboard.png', col: '2', row: '2 / 4', mobileCol: '2', mobileRow: '1 / 4' },
+    { type: 'text', bg: '#F0E6FF', title: 'Mood Board', desc: 'Visual inspiration board.', col: '2', row: '4 / 5', mobileCol: '1', mobileRow: '4 / 5' },
+    /* col 3 */
+    { type: 'image', image: '/template-main.png', col: '3', row: '1 / 3', hideOnMobile: true },
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Drag & Drop', desc: 'Rearrange with ease.', col: '3', row: '3 / 5', hideOnMobile: true },
+    /* col 4 */
+    { type: 'text', bg: '#FFF8E0', title: 'Custom Images', desc: 'Upload your own photos.', col: '4', row: '1 / 3', hideOnMobile: true, hideOnTablet: true },
+    { type: 'image', image: '/template-dashboard.png', col: '4', row: '3 / 5', hideOnMobile: true, hideOnTablet: true },
+  ],
+  Buttons: [
+    /* col 1: большое фото typewriter */
+    { type: 'image', image: '/widget-typewriter.png', col: '1', row: '1 / 4', mobileCol: '1', mobileRow: '1 / 4' },
+    { type: 'text', bg: '#E8EDFF', title: 'Typewriter', desc: 'Vintage aesthetic.', col: '1', row: '4 / 5', mobileCol: '1', mobileRow: '4 / 5' },
+    /* col 2: текст сверху, camera снизу */
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Decorative', desc: 'Make your workspace unique.', col: '2', row: '1 / 3', mobileCol: '2', mobileRow: '1 / 2' },
+    { type: 'image', image: '/camera-frame.png', col: '2', row: '3 / 5', mobileCol: '2', mobileRow: '2 / 5' },
+    /* col 3: чередование */
+    { type: 'image', image: '/alarm-clock-frame.png', col: '3', row: '1 / 3', hideOnMobile: true },
+    { type: 'text', bg: '#F0E6FF', title: 'Alarm Clock', desc: 'Classic alarm frame style.', col: '3', row: '3 / 5', hideOnMobile: true },
+    /* col 4 */
+    { type: 'text', bg: '#FFF8E0', title: 'Embed Ready', desc: 'One-click Notion embed.', col: '4', row: '1 / 2', hideOnMobile: true, hideOnTablet: true },
+    { type: 'image', image: '/knitted-clock-frame.png', col: '4', row: '2 / 5', hideOnMobile: true, hideOnTablet: true },
+  ],
+};
 
-export const PinterestGallery: React.FC = () => {
+interface PinterestGalleryProps {
+  filter?: string;
+}
+
+export const PinterestGallery: React.FC<PinterestGalleryProps> = ({ filter = 'All' }) => {
+  const items = PIN_SETS[filter] || PIN_SETS.Featured;
   return (
     <PinterestGrid>
-      {PIN_ITEMS.map((pin, i) => (
+      {items.map((pin, i) => (
         <PinCard key={i} $col={pin.col} $row={pin.row} $mobileCol={pin.mobileCol} $mobileRow={pin.mobileRow} $hideOnMobile={pin.hideOnMobile} $hideOnTablet={pin.hideOnTablet}>
           {pin.type === 'image' ? (
             <PinImage src={pin.image} alt="" />

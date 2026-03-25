@@ -37,7 +37,10 @@ const MorphBlob = styled.span<{ $bg: string; $radius: string }>`
 const RotatingText = styled.span<{ $state: 'in' | 'out' | 'idle'; $color: string }>`
   display: inline-flex;
   align-items: center;
-  color: ${({ $color }) => $color};
+  background: ${({ $color }) => $color.includes('gradient') ? $color : 'none'};
+  -webkit-background-clip: ${({ $color }) => $color.includes('gradient') ? 'text' : 'unset'};
+  -webkit-text-fill-color: ${({ $color }) => $color.includes('gradient') ? 'transparent' : 'unset'};
+  color: ${({ $color }) => $color.includes('gradient') ? 'transparent' : $color};
   position: relative;
   z-index: 1;
   transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -62,7 +65,7 @@ const ROTATING_WORDS = [
   { text: 'better', bg: 'rgba(99, 102, 241, 0.1)', color: '#6366F1', radius: '14px' },
   { text: 'smarter', bg: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', radius: '50px' },
   { text: 'faster', bg: 'rgba(16, 185, 129, 0.1)', color: '#10B981', radius: '8px' },
-  { text: 'easier', bg: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', radius: '50px' },
+  { text: 'easier', bg: 'rgba(245, 158, 11, 0.1)', color: 'linear-gradient(90deg, #F5C76A, #EFAF3A)', radius: '50px' },
 ];
 
 const useRotatingWord = () => {
@@ -95,12 +98,12 @@ const fadeUp = keyframes`
 const Hero = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 100px 48px 88px;
+  padding: 80px 48px 80px;
   text-align: center;
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {
-    padding: 60px 24px 80px;
+    padding: 60px 24px 48px;
   }
 `;
 
@@ -130,7 +133,7 @@ const HeroSubtitle = styled.p`
   color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0 auto 40px;
-  max-width: 480px;
+  max-width: 500px;
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
@@ -139,10 +142,43 @@ const HeroSubtitle = styled.p`
   }
 `;
 
+const HeroPrimary = styled(PrimaryButton)`
+  border-radius: 14px;
+  background: #000;
+  padding: 0 28px;
+  font-size: 15px;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.accent};
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
+  }
+`;
+
+const GhostButton = styled.button`
+  height: 44px;
+  padding: 0 24px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  border: 1px solid #E5E5E5;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.primary};
+    background: rgba(0, 0, 0, 0.04);
+  }
+`;
+
 const ButtonRow = styled.div`
   display: flex;
   gap: 12px;
   justify-content: center;
+  margin-top: 8px;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -189,14 +225,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onBrowseTemplates, onE
         </RotatingLine>{'\u00A0\u00A0'}for you.
       </Title>
       <HeroSubtitle data-ux="Hero Subtitle">
-        Templates and widgets that turn it into a clear, structured system
-        for life, work, business, and study.
+        Templates and widgets that turn your Notion into a clear, structured system.
       </HeroSubtitle>
       <ButtonRow>
-        <PrimaryButton onClick={onBrowseTemplates}>
+        <HeroPrimary onClick={onBrowseTemplates}>
           Browse Templates
-        </PrimaryButton>
-        <SecondaryButton onClick={onExploreWidgets}>Explore Widgets</SecondaryButton>
+        </HeroPrimary>
+        <GhostButton onClick={onExploreWidgets}>Explore Widgets</GhostButton>
       </ButtonRow>
     </Hero>
   );

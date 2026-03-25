@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes, css } from 'styled-components';
-import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft } from 'lucide-react';
+import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, LayoutGrid, ShoppingBag, Receipt, Settings, LogOut } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../widgetConfig';
+import { useAuth } from '@/presentation/context/AuthContext';
 import type { WidgetStyleConfig } from '../widgetConfig';
+
+export type DashboardView = 'my-widgets' | 'templates' | 'purchases' | 'profile' | null;
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -14,6 +17,8 @@ interface SidebarProps {
   mobileOpen?: boolean;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  dashboardView?: DashboardView;
+  onDashboardViewChange?: (view: DashboardView) => void;
 }
 
 /* ─── Sidebar Container ─── */
@@ -347,6 +352,139 @@ const Tooltip = styled.div`
   }
 `;
 
+/* ─── Account Nav Item ─── */
+
+const AccountItem = styled.button<{ $active?: boolean; $collapsed?: boolean }>`
+  width: ${({ $collapsed }) => $collapsed ? '44px' : 'calc(100% - 32px)'};
+  margin: ${({ $collapsed }) => $collapsed ? '0 auto' : '0 16px'};
+  height: ${({ $collapsed }) => $collapsed ? '44px' : '36px'};
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: ${({ $collapsed }) => $collapsed ? '0' : '0 12px'};
+  justify-content: ${({ $collapsed }) => $collapsed ? 'center' : 'flex-start'};
+  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'transparent'};
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: ${({ $active }) => $active ? '500' : '400'};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.secondary};
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease;
+  position: relative;
+  margin-bottom: 2px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'rgba(0, 0, 0, 0.03)'};
+    color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.primary};
+  }
+`;
+
+const AccountItemLabel = styled.span<{ $collapsed?: boolean }>`
+  opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
+  width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+`;
+
+/* ─── Profile Footer ─── */
+
+const ProfileFooter = styled.div<{ $collapsed?: boolean }>`
+  padding: ${({ $collapsed }) => $collapsed ? '12px 10px' : '12px 16px'};
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  flex-shrink: 0;
+`;
+
+const ProfileAvatar = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.85; }
+`;
+
+const ProfileInfo = styled.div`
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+`;
+
+const ProfileName = styled.div`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.primary};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const ProfileEmail = styled.div`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.text.muted};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const ProfilePopup = styled.div`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 12px;
+  right: 12px;
+  background: #fff;
+  border-radius: ${({ theme }) => theme.radii.md};
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  padding: 6px;
+  z-index: 100;
+`;
+
+const ProfilePopupItem = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  transition: all 0.1s ease;
+
+  svg { width: 15px; height: 15px; }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+`;
+
 /* ─── Popover (collapsed mode) ─── */
 
 const popoverFadeIn = keyframes`
@@ -519,9 +657,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen,
   collapsed,
   onToggleCollapse,
+  dashboardView,
+  onDashboardViewChange,
 }) => {
   const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>(['calendar']);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { isRegistered, user, logout } = useAuth();
   const [popover, setPopover] = useState<{
     type: string;
     title: string;
@@ -669,7 +811,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {renderCategory('calendar', 'Calendar', Calendar, CALENDAR_STYLES, calendarRef)}
         {renderCategory('clock', 'Clock', Clock, CLOCK_STYLES, clockRef)}
         {renderCategory('board', 'Canvas', Image, BOARD_STYLES, boardRef)}
+
+        {isRegistered && (
+          <>
+            <SectionLabel $collapsed={collapsed}>Account</SectionLabel>
+            <AccountItem
+              $active={dashboardView === 'my-widgets'}
+              $collapsed={collapsed}
+              onClick={() => onDashboardViewChange?.(dashboardView === 'my-widgets' ? null : 'my-widgets')}
+            >
+              <LayoutGrid />
+              <AccountItemLabel $collapsed={collapsed}>My Widgets</AccountItemLabel>
+            </AccountItem>
+            <AccountItem
+              $active={dashboardView === 'templates'}
+              $collapsed={collapsed}
+              onClick={() => onDashboardViewChange?.(dashboardView === 'templates' ? null : 'templates')}
+            >
+              <ShoppingBag />
+              <AccountItemLabel $collapsed={collapsed}>Templates</AccountItemLabel>
+            </AccountItem>
+            <AccountItem
+              $active={dashboardView === 'purchases'}
+              $collapsed={collapsed}
+              onClick={() => onDashboardViewChange?.(dashboardView === 'purchases' ? null : 'purchases')}
+            >
+              <Receipt />
+              <AccountItemLabel $collapsed={collapsed}>Purchases</AccountItemLabel>
+            </AccountItem>
+          </>
+        )}
       </NavSection>
+
+      {isRegistered && (
+        <ProfileFooter $collapsed={collapsed}>
+          <ProfileAvatar onClick={() => setProfileOpen(!profileOpen)}>
+            {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+          </ProfileAvatar>
+          {!collapsed && (
+            <ProfileInfo onClick={() => setProfileOpen(!profileOpen)}>
+              <ProfileName>{user?.name || 'User'}</ProfileName>
+              <ProfileEmail>{user?.email || ''}</ProfileEmail>
+            </ProfileInfo>
+          )}
+          {profileOpen && (
+            <ProfilePopup>
+              <ProfilePopupItem onClick={() => { setProfileOpen(false); onDashboardViewChange?.('profile'); }}>
+                <Settings /> Settings
+              </ProfilePopupItem>
+              <ProfilePopupItem onClick={async () => { await logout(); navigate('/'); }}>
+              <LogOut /> Log out
+            </ProfilePopupItem>
+          </ProfilePopup>
+        )}
+      </ProfileFooter>
+      )}
 
       {collapsed && popover && (
         <CategoryPopover

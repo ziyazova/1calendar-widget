@@ -3,9 +3,9 @@ import styled from 'styled-components';
 
 /* ── Feature Cards (stacked) ── */
 const FeatureCardsSectionWrap = styled.section`
-  max-width: 1200px;
+  max-width: 940px;
   margin: 0 auto;
-  padding: 0 48px 40px;
+  padding: 0 24px;
 
   @media (max-width: 768px) {
     padding: 0 24px 60px;
@@ -14,7 +14,7 @@ const FeatureCardsSectionWrap = styled.section`
 
 const FeatureStack = styled.div`
   position: relative;
-  height: 810px;
+  height: 780px;
 
   @media (max-width: 768px) {
     height: auto;
@@ -33,19 +33,27 @@ const FeatureStack = styled.div`
   }
 `;
 
-const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: number; $activeIdx: number }>`
+const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: number; $activeIdx: number; $color: string }>`
   display: flex;
   flex-direction: column;
   background: #ffffff;
   border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
-  border: none;
+  border: 1.5px solid ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.2)`;
+  }};
   box-shadow: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
     return behind === 0
-      ? '0 20px 56px rgba(0, 0, 0, 0.16), 0 6px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06)'
-      : '0 14px 44px rgba(0, 0, 0, 0.13), 0 4px 14px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.05)';
+      ? '0 4px 24px rgba(0, 0, 0, 0.06)'
+      : '0 2px 16px rgba(0, 0, 0, 0.04)';
   }};
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   cursor: pointer;
   position: absolute;
   left: 0;
@@ -58,13 +66,13 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   }};
   top: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
-    const base = ($total - 1) * 52;
-    return `${base - behind * 52}px`;
+    const base = ($total - 1) * 50;
+    return `${base - behind * 50}px`;
   }};
   transform: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
     if (behind === 0) return 'scale(1)';
-    const scaleVal = 1 - behind * 0.04;
+    const scaleVal = 1 - behind * 0.03;
     return `scale(${scaleVal})`;
   }};
   margin-left: ${({ $index, $activeIdx, $total }) => {
@@ -77,7 +85,7 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   }};
   opacity: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
-    return behind === 0 ? 1 : 1 - behind * 0.06;
+    return behind === 0 ? 1 : 1 - behind * 0.03;
   }};
   transition: top 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1), margin 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 
@@ -85,11 +93,11 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     opacity: 1;
     box-shadow: ${({ $index, $activeIdx, $total }) => {
       const behind = ($index - $activeIdx + $total) % $total;
-      return behind === 0 ? '0 24px 64px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06)' : '0 18px 48px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.05)';
+      return behind === 0 ? '0 6px 28px rgba(0, 0, 0, 0.08)' : '0 4px 20px rgba(0, 0, 0, 0.05)';
     }};
     top: ${({ $index, $activeIdx, $total }) => {
       const behind = ($index - $activeIdx + $total) % $total;
-      const base = ($total - 1) * 52;
+      const base = ($total - 1) * 50;
       if (behind === 0) return `${base}px`;
       return `${base - behind * 52 - 14}px`;
     }};
@@ -117,16 +125,16 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
 `;
 
 const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
-  padding: 10px 16px;
+  padding: 12px 16px;
   background: ${({ $color, $intensity = 0.05 }) => {
     const hex = $color.replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.5})`;
+    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.43})`;
   }};
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border-bottom: 1px solid ${({ $color, $intensity = 0.05 }) => {
     const hex = $color.replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
@@ -138,17 +146,21 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.muted};
+  color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
-const FeatureTabIcon = styled.span`
-  font-size: 16px;
+const FeatureTabDot = styled.span<{ $color: string }>`
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+  flex-shrink: 0;
 `;
 
 const FeatureTabTitle = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
@@ -156,16 +168,14 @@ const FeatureTabActions = styled.div`
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  font-size: 14px;
+  gap: 5px;
 `;
 
 const FeatureCardBody = styled.div`
   display: flex;
   align-items: center;
   gap: 32px;
-  padding: 28px 40px 0;
+  padding: 32px 0 0 40px;
   flex: 1;
 
   @media (max-width: 768px) {
@@ -176,21 +186,21 @@ const FeatureCardBody = styled.div`
 `;
 
 const FeatureCardText = styled.div`
-  flex: 0 0 40%;
+  flex: 0 0 32%;
 `;
 
 const FeatureCardTitle = styled.h3`
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 12px;
-  line-height: 1.3;
+  line-height: 1.2;
 `;
 
 const FeatureCardDesc = styled.p`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.6;
   margin: 0;
   letter-spacing: -0.01em;
@@ -200,10 +210,12 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 28px 40px 40px 20px;
-  border-radius: ${({ theme }) => theme.radii.lg};
+  margin: 12px -1px -1px 0;
+  border-radius: 16px 0 0 0;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.03);
+  border-right: none;
+  border-bottom: none;
 
   img {
     width: 100%;
@@ -211,7 +223,7 @@ const FeatureCardImage = styled.div`
     object-fit: cover;
     object-position: center;
     display: block;
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
 
   @media (max-width: 768px) {
@@ -220,30 +232,40 @@ const FeatureCardImage = styled.div`
   }
 `;
 
+const WhyTitle = styled.h2`
+  font-size: 36px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.03em;
+  margin: 0 0 32px;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+    margin: 0 0 24px;
+  }
+`;
+
 const FEATURE_CARDS = [
   {
-    tab: 'Design',
-    icon: '\u{1F3A8}',
-    color: '#F59E0B',
-    title: 'Pixel-perfect design',
-    desc: 'Every widget is crafted with Apple-level attention to detail. Clean typography, balanced spacing, and premium color palettes.',
-    image: '/widget-calendar.png',
-  },
-  {
-    tab: 'Embed',
-    icon: '\u{1F517}',
-    color: '#3B82F6',
-    title: 'One-click embed',
-    desc: 'Copy the URL, paste into Notion. No accounts, no databases, no tracking. Everything is encoded in the URL.',
+    tab: 'Payment',
+    color: '#8B5CF6',
+    title: 'Pay once. Keep forever.',
+    desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.',
     image: '/template-main.png',
   },
   {
-    tab: 'Themes',
-    icon: '\u{1F319}',
-    color: '#8B5CF6',
-    title: 'Dark mode that just works',
-    desc: 'Auto theme detection means your widgets adapt to Notion\'s light and dark mode seamlessly. No manual switching.',
-    image: '/widget-clock2.png',
+    tab: 'Design',
+    color: '#3B82F6',
+    title: 'Clean by default.',
+    desc: 'Open it and it just feels right. Everything where you\'d expect it to be.',
+    image: '/template-dashboard.png',
+  },
+  {
+    tab: 'Functionality',
+    color: '#E8926A',
+    title: 'Built to work.',
+    desc: 'Automations, dashboards, pre-filled sections. Plus video guides so you\'re never stuck.',
+    image: '/widget-calendar.png',
   },
 ];
 
@@ -260,12 +282,17 @@ export const FeatureCardsSection: React.FC = () => {
             $index={i}
             $total={FEATURE_CARDS.length}
             $activeIdx={activeFeature}
+            $color={f.color}
             onClick={() => setActiveFeature(i === activeFeature ? (i + 1) % FEATURE_CARDS.length : i)}
           >
             <FeatureCardTab $color={f.color} $intensity={i === activeFeature ? 0.48 : 0.32} data-ux="Feature Card Tab">
-              <FeatureTabIcon>{f.icon}</FeatureTabIcon>
+              <FeatureTabDot $color={f.color} />
               <FeatureTabTitle>{f.tab}</FeatureTabTitle>
-              <FeatureTabActions>{'\u22EF'}</FeatureTabActions>
+              <FeatureTabActions>
+                <FeatureTabDot $color={f.color} style={{ width: 7, height: 7, opacity: 0.5 }} />
+                <FeatureTabDot $color={f.color} style={{ width: 7, height: 7, opacity: 0.5 }} />
+                <FeatureTabDot $color={f.color} style={{ width: 7, height: 7, opacity: 0.5 }} />
+              </FeatureTabActions>
             </FeatureCardTab>
             <FeatureCardBody data-ux="Feature Card Body">
               <FeatureCardText>

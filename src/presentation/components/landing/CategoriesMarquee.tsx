@@ -40,20 +40,20 @@ const CategoryChip = styled.div<{ $color: string }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 18px;
+  padding: 10px 24px;
   background: ${({ $color }) => {
     const hex = $color.replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.04)`;
+    return `rgba(${r}, ${g}, ${b}, 0.08)`;
   }};
   border: 1px solid ${({ $color }) => {
     const hex = $color.replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.06)`;
+    return `rgba(${r}, ${g}, ${b}, 0.12)`;
   }};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
@@ -94,16 +94,16 @@ const CategoryChip = styled.div<{ $color: string }>`
 const CATEGORY_CHIPS_ROW1 = [
   { label: 'Life Planners', color: '#F59E0B' },
   { label: 'Productivity Systems', color: '#6366F1' },
-  { label: 'Health & Wellness', color: '#F97316' },
-  { label: 'Widget Studio', color: '#3B82F6' },
+  { label: 'Health & Wellness', color: '#10B981' },
   { label: 'Student Planner', color: '#8B5CF6' },
+  { label: 'Finance', color: '#3B82F6' },
 ];
 
 const CATEGORY_CHIPS_ROW2 = [
   { label: 'Student Planner', color: '#8B5CF6' },
-  { label: 'Widget Studio', color: '#3B82F6' },
+  { label: 'Finance', color: '#3B82F6' },
   { label: 'Life Planners', color: '#F59E0B' },
-  { label: 'Health & Wellness', color: '#F97316' },
+  { label: 'Health & Wellness', color: '#10B981' },
   { label: 'Productivity Systems', color: '#6366F1' },
 ];
 

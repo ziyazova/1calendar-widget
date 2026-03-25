@@ -1,16 +1,20 @@
-import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
+import React, { useState, useRef, useEffect } from 'react';
+import styled, { keyframes, css } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
-import { SectionHeader } from '../shared';
+import { FilterChip } from '../shared';
+
+const fadeUp = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 /* ── Templates Gallery (horizontal marquee) ── */
 const TemplatesGallerySection = styled.section`
-  padding: 40px 0 80px;
-  background: ${({ theme }) => theme.colors.background.page};
+  padding: 0;
   position: relative;
 
   @media (max-width: 768px) {
-    padding: 0 0 60px;
+    padding: 0;
   }
 `;
 
@@ -40,20 +44,89 @@ const TemplatesMarqueeWrap = styled.div`
   }
 `;
 
-const StyledSectionHeader = styled(SectionHeader)`
+const GalleryHeader = styled.div`
   max-width: 1200px;
-  margin: 0 auto 24px;
-  padding: 0 48px;
+  margin: 0 auto;
+  padding: 0 48px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
   @media (max-width: 768px) {
-    padding: 0 24px;
+    padding: 0 24px 16px;
   }
 `;
+
+const GalleryTitleRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+`;
+
+const GalleryTitleGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const GalleryTitle = styled.h2`
+  font-size: 36px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.03em;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+`;
+
+const GallerySubtitle = styled.p`
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0;
+`;
+
+const ExploreBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: ${({ theme }) => theme.colors.text.primary};
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.button};
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &:hover { background: #333; }
+  svg { width: 14px; height: 14px; }
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+
+const TEMPLATE_CATEGORIES = [
+  { label: 'All', tag: '' },
+  { label: 'Life', tag: 'life' },
+  { label: 'Student', tag: 'students' },
+  { label: 'Wellness', tag: 'bestsellers' },
+];
 
 const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
   display: flex;
   gap: 24px;
-  padding: 10px 0;
+  padding: 16px 0;
 
   &:last-child {
     margin-bottom: 0;
@@ -66,8 +139,8 @@ const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean 
 
 const TemplatesScrollHint = styled.div`
   position: absolute;
-  right: 106px;
-  top: 50%;
+  right: 80px;
+  top: calc(50% + 12px);
   transform: translateY(-50%);
   width: 36px;
   height: 36px;
@@ -103,89 +176,86 @@ const TemplatesScrollHint = styled.div`
   }
 `;
 
+
 const TemplateCardWrap = styled.div`
   flex-shrink: 0;
   cursor: pointer;
-`;
+  width: 300px;
+  transition: transform 0.3s ease;
 
-const TemplateCard = styled.div`
-  width: 288px;
-  height: 228px;
-  position: relative;
-  border-radius: ${({ theme }) => theme.radii['2xl']};
-  overflow: clip;
-  cursor: pointer;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  box-shadow: ${({ theme }) => theme.shadows.subtle};
-  ${TemplateCardWrap}:hover & img {
-    transform: scale(1.22);
+  &:hover {
+    transform: scale(1.06);
+    z-index: 2;
   }
 
   @media (max-width: 768px) {
-    width: 160px;
-    height: 126px;
-    border-radius: ${({ theme }) => theme.radii.lg};
+    width: 200px;
+  }
+`;
+
+const TemplateCard = styled.div`
+  width: 100%;
+  aspect-ratio: 288 / 220;
+  position: relative;
+  border-radius: ${({ theme }) => theme.radii['2xl']};
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  background: ${({ theme }) => theme.colors.background.surface};
+  margin-bottom: 8px;
+
+  @media (max-width: 768px) {
+    border-radius: ${({ theme }) => theme.radii.md};
+    margin-bottom: 6px;
   }
 `;
 
 const TemplateCardImage = styled.img`
-  width: calc(100% + 36px);
-  height: calc(100% + 28px);
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  object-position: center 15%;
-  position: absolute;
-  top: -14px;
-  left: -18px;
-  transform: scale(1.15);
+  display: block;
+  transform: scale(1.23);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  ${TemplateCardWrap}:hover & {
+    transform: scale(1.30);
+  }
 `;
 
 const TemplateCardMeta = styled.div`
-  padding: 10px 4px 0;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 0;
 `;
 
 const TemplateCardTitle = styled.span`
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
-const TemplateCardTags = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: auto;
-`;
-
-const TAG_COLORS: Record<string, { bg: string; color: string }> = {
-  Education: { bg: 'rgba(99, 102, 241, 0.07)', color: '#8B8FC7' },
-  Productivity: { bg: 'rgba(245, 158, 11, 0.07)', color: '#C4A46A' },
-  Personal: { bg: 'rgba(236, 72, 153, 0.07)', color: '#C48DA5' },
-  Premium: { bg: 'rgba(139, 92, 246, 0.07)', color: '#9B8BBF' },
-  Work: { bg: 'rgba(59, 130, 246, 0.07)', color: '#8AABC7' },
-  Finance: { bg: 'rgba(16, 185, 129, 0.07)', color: '#7BB5A0' },
-  Free: { bg: 'rgba(34, 197, 94, 0.07)', color: '#7BB58E' },
-  Popular: { bg: 'rgba(245, 158, 11, 0.07)', color: '#C4A46A' },
-};
-
-const TemplateCardTag = styled.span<{ $bg?: string; $color?: string }>`
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: ${({ $bg }) => $bg || 'rgba(0, 0, 0, 0.05)'};
-  color: ${({ $color, theme }) => $color || theme.colors.text.tertiary};
+const TemplateCardPrice = styled.span`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 const TEMPLATE_ROW_1 = [
-  { image: '/template-main.png', title: 'Student Planner', price: '$3.99', tag: 'Education' },
-  { image: '/template-main.png', title: 'Habit Tracker', price: 'Free', tag: 'Productivity' },
-  { image: '/template-main.png', title: 'Weekly Planner', price: 'Free', tag: 'Productivity' },
-  { image: '/template-main.png', title: 'Journal', price: 'Free', tag: 'Personal' },
+  { id: '1', image: '/template-main.png', title: 'Weekly Planner', price: 'Free', tags: ['bestsellers', 'life'] },
+  { id: '3', image: '/template-main.png', title: 'Student Planner', price: '$3.99', tags: ['students'] },
+  { id: '6', image: '/template-main.png', title: 'Life OS Template', price: '$7.99', tags: ['bestsellers', 'life', 'new'] },
+  { id: '9', image: '/template-main.png', title: 'Habit Tracker', price: 'Free', tags: ['life', 'new'] },
+  { id: '5', image: '/template-main.png', title: 'OKR Template', price: 'Free', tags: ['new'] },
+  { id: '7', image: '/template-main.png', title: 'Budget Tracker', price: '$2.99', tags: ['life'] },
+  { id: '12', image: '/template-main.png', title: 'Reading List', price: 'Free', tags: ['students'] },
+  { id: '8', image: '/template-main.png', title: 'Meal Planner', price: 'Free', tags: ['life', 'bestsellers'] },
 ];
 
 interface TemplatesGalleryProps {
@@ -194,18 +264,37 @@ interface TemplatesGalleryProps {
 
 export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }) => {
   const [templateScrolled, setTemplateScrolled] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('');
+  const [featuredIdx, setFeaturedIdx] = useState(0);
   const templateWrapRef = useRef<HTMLDivElement>(null);
+
+  const filteredTemplates = activeFilter
+    ? TEMPLATE_ROW_1.filter(t => t.tags.includes(activeFilter))
+    : TEMPLATE_ROW_1;
 
   return (
     <TemplatesGallerySection data-ux="Templates Gallery">
-      <StyledSectionHeader
-        title="Top templates"
-        subtitle="Top picks from our community"
-        actionLabel="Explore all"
-        onAction={() => onNavigate('/templates')}
-        titleUx="Section Title"
-        marginBottom="0px"
-      />
+      <GalleryHeader>
+        <GalleryTitleRow>
+          <GalleryTitleGroup>
+            <GalleryTitle>Top templates</GalleryTitle>
+          </GalleryTitleGroup>
+        </GalleryTitleRow>
+        <FilterRow>
+          {TEMPLATE_CATEGORIES.map(c => (
+            <FilterChip
+              key={c.label}
+              $active={activeFilter === c.tag}
+              onClick={() => setActiveFilter(c.tag)}
+            >
+              {c.label}
+            </FilterChip>
+          ))}
+          <ExploreBtn onClick={() => onNavigate('/templates')} style={{ marginLeft: 'auto' }}>
+            Explore all <ArrowRight />
+          </ExploreBtn>
+        </FilterRow>
+      </GalleryHeader>
       <TemplatesMarqueeWrap
         data-ux="Marquee Wrap"
         data-scrolled={templateScrolled ? 'true' : 'false'}
@@ -216,17 +305,14 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
         }}
       >
         <TemplateMarqueeTrack $duration={60}>
-          {[...TEMPLATE_ROW_1, ...TEMPLATE_ROW_1].map((t, i) => (
-            <TemplateCardWrap key={`tr1-${i}`} onClick={() => onNavigate('/templates')}>
+          {[...filteredTemplates, ...filteredTemplates].map((t, i) => (
+            <TemplateCardWrap key={`tr1-${i}`} onClick={() => onNavigate(`/templates/${t.id}`)}>
               <TemplateCard data-ux="Template Card">
                 <TemplateCardImage src={t.image} alt={t.title} />
               </TemplateCard>
               <TemplateCardMeta>
                 <TemplateCardTitle>{t.title}</TemplateCardTitle>
-                <TemplateCardTags>
-                  <TemplateCardTag $bg={TAG_COLORS[t.tag]?.bg} $color={TAG_COLORS[t.tag]?.color}>{t.tag}</TemplateCardTag>
-                  <span style={{ fontSize: 12, color: '#9A9A9A' }}>{t.price}</span>
-                </TemplateCardTags>
+                <TemplateCardPrice>{t.price}</TemplateCardPrice>
               </TemplateCardMeta>
             </TemplateCardWrap>
           ))}

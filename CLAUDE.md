@@ -231,7 +231,180 @@ Smoke tests print `[SMOKE]` tagged output to stdout, covering:
 - Theme hook: `src/presentation/hooks/useResolvedTheme.ts`
 - Classic Calendar: `src/presentation/components/widgets/calendar/styles/ClassicCalendar.tsx`
 
+## Supabase Backend
+
+**Project:** `https://vyycfwgkawtqkjllvsuc.supabase.co`
+**Ref:** `vyycfwgkawtqkjllvsuc`
+
+### Environment Variables
+
+```env
+# .env.local (gitignored, never commit!)
+VITE_SUPABASE_URL=https://vyycfwgkawtqkjllvsuc.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon-jwt-key>
+# .env.production
+VITE_EMBED_BASE_URL=https://1calendar-widget-aliias-projects-37358320.vercel.app
+```
+
+### Authentication System
+
+**Client:** `src/infrastructure/services/supabase.ts` — Supabase client singleton
+**Context:** `src/presentation/context/AuthContext.tsx` — React context wrapping Supabase Auth + guest mode
+
+#### Three Auth Modes
+
+| Mode | Entry Point | Storage | Features |
+|------|-------------|---------|----------|
+| `null` (anonymous) | Browse site | None | Cart, checkout, view templates |
+| `guest` | Code `PEACHY2026` on `/widgets` | `localStorage` flag | Studio access, create widgets, copy embed URL. **No save, no account.** |
+| `registered` | Email/password or Google on `/login` | Supabase Auth (JWT session) | Full Studio + My Widgets (saved to DB) + Purchases + Profile |
+
+#### Auth Providers (Supabase)
+
+| Provider | Status | Config Location |
+|----------|--------|----------------|
+| Email/Password | **Working** | Supabase Dashboard → Auth → Providers → Email |
+| Google OAuth | **Needs setup** | See `docs/SUPABASE.md` for Google Cloud Console steps |
+| Access Code | **Working** | Client-side only, code: `PEACHY2026`, no Supabase involved |
+
+#### Auth Flow
+
+```
+                         ┌─ /login ──► auth.register(name, email, pw) ──► supabase.auth.signUp()
+                         │             auth.login(email, pw) ──► supabase.auth.signInWithPassword()
+                         │             auth.loginWithGoogle() ──► supabase.auth.signInWithOAuth()
+User ──► Peachy Site ────┤                                         │
+                         │                                         ▼
+                         │                              onAuthStateChange ──► mode='registered'
+                         │                                         │
+                         │                                         ▼
+                         │                              /studio (full: widgets + account sidebar)
+                         │
+                         └─ /widgets ──► auth.loginWithCode('PEACHY2026')
+                                                │
+                                                ▼
+                                     localStorage flag ──► mode='guest'
+                                                │
+                                                ▼
+                                     /studio (widgets only, no account sidebar)
+```
+
+#### Key Auth Context Methods
+
+- `auth.register(name, email, password)` → `Promise<string | null>` (null = success, string = error)
+- `auth.login(email, password)` → `Promise<string | null>`
+- `auth.loginWithGoogle()` → `Promise<void>` (redirects to Google)
+- `auth.loginWithCode(code)` → `boolean` (synchronous, client-side only)
+- `auth.logout()` → `Promise<void>` (clears Supabase session + guest flag)
+- `auth.isRegistered` / `auth.isGuest` / `auth.isLoggedIn` — state booleans
+- `auth.user` → `{ name, email, avatarUrl }` or null
+- `auth.loading` → true during initial session check
+
+### Database
+
+**Service:** `src/infrastructure/services/WidgetStorageService.ts`
+
+#### Table: `widgets`
+
+```sql
+create table public.widgets (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  name text not null default 'Untitled Widget',
+  type text not null,        -- 'calendar', 'clock', 'board'
+  style text not null,       -- 'modern-grid-zoom-fixed', 'classic', 'analog-classic', etc
+  settings jsonb not null default '{}',
+  embed_url text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+```
+
+**RLS:** Enabled. Users can only CRUD their own rows (`auth.uid() = user_id`).
+**Migration:** `supabase/migrations/001_widgets.sql`
+
+#### WidgetStorageService API
+
+- `getUserWidgets()` → `Promise<SavedWidget[]>` — fetch all user's widgets
+- `saveWidget({ name, type, style, settings, embed_url })` → `Promise<SavedWidget | null>`
+- `updateWidget(id, { name?, settings?, embed_url? })` → `Promise<boolean>`
+- `deleteWidget(id)` → `Promise<boolean>`
+
+### E-commerce System
+
+**Cart:** `src/presentation/context/CartContext.tsx` — React context, client-side (no backend)
+**Template data:** `src/presentation/data/templates.ts` — 12 templates with prices, descriptions, features
+
+#### Pages
+
+| Route | Page | Purpose |
+|-------|------|---------|
+| `/templates` | TemplatesPage | Template catalog with category filters |
+| `/templates/:id` | TemplateDetailPage | Product page: carousel, buy, FAQ, related |
+| `/checkout` | CheckoutPage | Cart summary, promo code, payment form |
+| `/login` | LoginPage | Email/password + Google sign in/up |
+
+#### Cart Flow
+
+```
+/templates/:id → "Buy Now" → cart badge +1 → cart dropdown → "Checkout"
+→ /checkout → contact + payment form → "Pay $X.XX"
+```
+
+### Dashboard (inside Studio)
+
+When `mode='registered'`, the Studio sidebar shows an **Account** section below widgets:
+
+| Sidebar Item | View in Artboard | Description |
+|-------------|-----------------|-------------|
+| My Widgets | Grid of saved widgets | Filter by category, Edit/Delete overlay, Add New |
+| Templates | Redirects to `/templates` | Opens template shop |
+| Purchases | Purchase history list | Order ID, date, Download/Receipt buttons |
+| Profile (avatar) | Settings view | Name, email, logout. Avatar popup at sidebar bottom |
+
+**Components:** `src/presentation/components/dashboard/DashboardViews.tsx`
+**Sidebar integration:** `src/presentation/components/ui/sidebar/Sidebar.tsx` — `DashboardView` type, `onDashboardViewChange` callback
+
+### TopNav Behavior by Auth Mode
+
+| Element | Anonymous | Guest | Registered |
+|---------|-----------|-------|------------|
+| "Log in" button | Shows → `/login` | Hidden | Hidden |
+| "Studio" button | Hidden | Shows → `/studio` | Shows → `/studio` |
+| Widget Studio link | → `/widgets` | → `/studio` | → `/studio` |
+| Cart icon | Yes | Yes | Yes |
+| Sidebar Account | — | Hidden | Visible |
+| Profile avatar | — | Hidden | Visible |
+
+## File References (Updated)
+
+- Entry: `src/main.tsx` → `src/App.tsx`
+- DI setup: `src/infrastructure/di/DIContainer.ts`
+- URL encoding: `src/infrastructure/services/url-codec/CompactUrlCodec.ts`
+- Embed scaling: `src/presentation/components/embed/EmbedScaleWrapper.tsx`
+- Design tokens: `src/presentation/themes/widgetTokens.ts`
+- Logger: `src/infrastructure/services/Logger.ts`
+- Error Boundary: `src/presentation/components/ErrorBoundary.tsx`
+- ESLint config: `.eslintrc.cjs`
+- Test setup: `src/test/setup.ts`
+- Smoke test: `src/test/embed-size-smoke.test.ts`
+- Embed base URL: `.env.production` → `VITE_EMBED_BASE_URL`
+- Theme hook: `src/presentation/hooks/useResolvedTheme.ts`
+- Classic Calendar: `src/presentation/components/widgets/calendar/styles/ClassicCalendar.tsx`
+- **Supabase client:** `src/infrastructure/services/supabase.ts`
+- **Auth context:** `src/presentation/context/AuthContext.tsx`
+- **Cart context:** `src/presentation/context/CartContext.tsx`
+- **Widget storage:** `src/infrastructure/services/WidgetStorageService.ts`
+- **Dashboard views:** `src/presentation/components/dashboard/DashboardViews.tsx`
+- **Template data:** `src/presentation/data/templates.ts`
+- **Login page:** `src/presentation/pages/LoginPage.tsx`
+- **Checkout page:** `src/presentation/pages/CheckoutPage.tsx`
+- **Template detail:** `src/presentation/pages/TemplateDetailPage.tsx`
+- **Supabase env:** `.env.local` (gitignored)
+- **DB migration:** `supabase/migrations/001_widgets.sql`
+
 ## Documentation
 
 - `README.md` — Overview (Russian)
 - `docs/PROJECT-DOCS.md` — Dev guide, adaptive design spec, changelog, issues & roadmap
+- `docs/SUPABASE.md` — Supabase setup, Google OAuth instructions, troubleshooting

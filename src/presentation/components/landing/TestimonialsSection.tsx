@@ -19,7 +19,6 @@ const testimonials = {
     { name: 'Emma Wilson', initials: 'EW', role: 'Marketing Lead', company: 'Stripe', color: '#A855F7', text: 'Clean design, instant setup, zero maintenance. Exactly what our marketing team needed for our Notion dashboards.' },
   ],
   col3: [
-    { name: 'Oliver Brown', initials: 'OB', role: 'Developer', company: 'GitHub', color: '#EF4444', text: 'As a dev, I appreciate that everything is URL-encoded — no accounts, no databases, no tracking. Pure client-side. Respect.' },
     { name: 'Nina Patel', initials: 'NP', role: 'Operations Manager', company: 'Notion', color: '#0EA5E9', text: 'We actually use Peachy widgets internally. The auto theme detection means they look great in both light and dark mode automatically.' },
     { name: 'Tom Anderson', initials: 'TA', role: 'Creative Director', company: 'Pentagram', color: '#D946EF', text: 'The design language is Apple-level clean. Border radius, typography, color palette — everything is considered. Beautiful work.' },
     { name: 'Lisa Chang', initials: 'LC', role: 'Productivity Coach', company: 'Skillshare', color: '#F97316', text: 'I recommend Peachy to all my clients. The templates are thoughtfully structured and the widgets add that extra polish to any workspace.' },
@@ -32,41 +31,32 @@ type Testimonial = typeof testimonials.col1[number];
 /* ── Styled Components ── */
 
 const Section = styled.section`
-  background: #F0F0F0;
-  padding: 80px 0;
+  background: transparent;
+  padding: 0;
   overflow: hidden;
   position: relative;
-
-
-  @media (max-width: 768px) {
-    padding: 60px 0;
-  }
 `;
 
 const Title = styled.h2`
   font-size: 36px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #6E3FF3, #3B82F6, #EC4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   text-align: center;
-  margin: 0 0 48px;
+  margin: 0;
   line-height: 1.2;
 
   @media (max-width: 768px) {
     font-size: 28px;
-    margin: 0 0 36px;
     padding: 0 24px;
   }
 `;
 
 const Subtitle = styled.p`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.text.secondary};
   text-align: center;
-  margin: -32px 0 48px;
+  margin: 8px 0 24px;
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
@@ -81,7 +71,7 @@ const MarqueeContainer = styled.div`
   gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 48px;
+  padding: 0 80px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -129,11 +119,10 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
 
 const Card = styled.div`
   background: #ffffff;
-  border-radius: ${({ theme }) => theme.radii.xl};
+  border-radius: 16px;
   padding: 24px;
   flex-shrink: 0;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  border: 1px solid #F0F0F0;
 `;
 
 const Author = styled.div`
@@ -180,7 +169,7 @@ const Stars = styled.div`
 
 const Text = styled.p`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: #777;
   line-height: 1.6;
   margin: 0;
   letter-spacing: -0.01em;

@@ -6,42 +6,7 @@ import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, BackButton, FilterRow, FilterChip } from '@/presentation/components/shared';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
-
-type Category = 'all' | 'planners' | 'productivity' | 'health' | 'student';
-
-interface Template {
-  id: string;
-  title: string;
-  category: Category[];
-  sub?: string;
-  price: string;
-  badge?: string;
-  gradient: string;
-  image: string;
-}
-
-const TEMPLATES: Template[] = [
-  { id: '1', title: 'Weekly Planner', category: ['planners'], price: 'Free', badge: 'Popular', gradient: 'linear-gradient(135deg, #E8EDFF 0%, #F0E6FF 100%)', image: '/template-main.png' },
-  { id: '2', title: 'Monthly Dashboard', category: ['productivity'], price: '$4.99', gradient: 'linear-gradient(135deg, #FFE8E0 0%, #FFD6E8 100%)', image: '/template-main.png' },
-  { id: '3', title: 'Student Planner', category: ['student'], price: '$3.99', gradient: 'linear-gradient(135deg, #E0F4E8 0%, #D6F0FF 100%)', image: '/template-main.png' },
-  { id: '4', title: 'Finance Tracker', category: ['productivity'], price: 'Free', gradient: 'linear-gradient(135deg, #E0F4E8 0%, #D1FAE5 100%)', image: '/template-main.png' },
-  { id: '5', title: 'OKR Template', category: ['productivity'], price: 'Free', badge: 'New', gradient: 'linear-gradient(135deg, #FFF8E0 0%, #FFEED6 100%)', image: '/template-main.png' },
-  { id: '6', title: 'Life OS Template', category: ['planners', 'productivity'], price: '$7.99', badge: 'Best seller', gradient: 'linear-gradient(135deg, #E0E8FF 0%, #E0F0FF 100%)', image: '/template-main.png' },
-  { id: '7', title: 'Budget Tracker', category: ['productivity'], price: '$2.99', gradient: 'linear-gradient(135deg, #E8FFE0 0%, #E0FFE8 100%)', image: '/template-main.png' },
-  { id: '8', title: 'Meal Planner', category: ['planners', 'health'], price: 'Free', gradient: 'linear-gradient(135deg, #F0E0FF 0%, #FFE0F0 100%)', image: '/template-main.png' },
-  { id: '9', title: 'Habit Tracker', category: ['health'], price: 'Free', gradient: 'linear-gradient(135deg, #E0FFE8 0%, #E8EDFF 100%)', image: '/template-main.png' },
-  { id: '10', title: 'Mood Journal', category: ['health'], price: '$2.99', gradient: 'linear-gradient(135deg, #FFE0F0 0%, #E8EDFF 100%)', image: '/template-main.png' },
-  { id: '11', title: 'Project Roadmap', category: ['productivity'], price: '$1.99', gradient: 'linear-gradient(135deg, #F5F5F4 0%, #E8E8E6 100%)', image: '/template-main.png' },
-  { id: '12', title: 'Reading List', category: ['student'], price: 'Free', gradient: 'linear-gradient(135deg, #E0E8FF 0%, #F0E6FF 100%)', image: '/template-main.png' },
-];
-
-const CATEGORIES: { key: Category; label: string; title: string; subtitle: string; subs: { key: string; label: string }[] }[] = [
-  { key: 'all', label: 'All', title: 'Templates', subtitle: 'Notion templates, planners, trackers & more', subs: [] },
-  { key: 'planners', label: 'Life Planners', title: 'Life Planners', subtitle: 'Weekly, monthly and custom planners', subs: [] },
-  { key: 'productivity', label: 'Productivity Systems', title: 'Productivity Systems', subtitle: 'OKRs, roadmaps and goal setting', subs: [] },
-  { key: 'health', label: 'Health & Wellness', title: 'Health & Wellness', subtitle: 'Meal planning, fitness and wellness', subs: [] },
-  { key: 'student', label: 'Student Planner', title: 'Student Planner', subtitle: 'Academic planners and study tools', subs: [] },
-];
+import { TEMPLATES, CATEGORIES, type Category } from '@/presentation/data/templates';
 
 
 /* ── Header ── */
@@ -49,7 +14,7 @@ const Header = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 48px 48px 0;
-  animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: ${fadeUp} 0.25s ease both;
 
   @media (max-width: 768px) { padding: 32px 24px 0; }
 `;
@@ -168,7 +133,7 @@ const Grid = styled.div`
 
 const Card = styled.div`
   cursor: pointer;
-  animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: ${fadeUp} 0.25s ease both;
 `;
 
 const CardInner = styled.img`
@@ -324,7 +289,7 @@ export const TemplatesPage: React.FC = () => {
           <EmptyState>No templates in this category yet</EmptyState>
         ) : (
           filtered.map((template, i) => (
-            <Card key={template.id} style={{ animationDelay: `${i * 0.04}s` }}>
+            <Card key={template.id} style={{ animationDelay: `${i * 0.04}s` }} onClick={() => navigate(`/templates/${template.id}`)}>
               <CardImage className="card-preview" $gradient={template.gradient}>
                 <CardInner src={template.image} alt={template.title} />
               </CardImage>

@@ -6,6 +6,9 @@ import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
+import { FeatureCardsSection } from '@/presentation/components/landing/FeatureCardsSection';
+import { PinterestGallery } from '@/presentation/components/landing/PinterestGallery';
+import { useAuth } from '@/presentation/context/AuthContext';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
@@ -184,6 +187,21 @@ const AuthDivider = styled.div`
   }
 `;
 
+const CodeError = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.destructive};
+  text-align: center;
+  margin-top: -4px;
+`;
+
+const AuthLink = styled.span`
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
+`;
+
 const GoogleButton = styled.button`
   display: inline-flex;
   align-items: center;
@@ -245,6 +263,7 @@ const GalleryCard = styled.div`
   border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
   background: ${({ theme }) => theme.colors.background.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
 
   @media (max-width: 768px) {
     border-radius: ${({ theme }) => theme.radii.md};
@@ -280,6 +299,186 @@ const GalleryLabel = styled.span`
   letter-spacing: -0.01em;
 `;
 
+/* ── Features ── */
+const FeaturesSection = styled.section`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 48px;
+
+  @media (max-width: 768px) { padding: 40px 24px; }
+`;
+
+const FeatureRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; gap: 16px; }
+`;
+
+const FeatureItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const FeatureIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+`;
+
+const FeatureTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0;
+  letter-spacing: -0.02em;
+`;
+
+const FeatureDesc = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0;
+  line-height: 1.5;
+`;
+
+/* ── Pricing ── */
+const PricingSection = styled.section`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 48px;
+  text-align: center;
+
+  @media (max-width: 768px) { padding: 40px 24px; }
+`;
+
+const PricingTitle = styled.h2`
+  font-size: 36px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+`;
+
+const PricingSubtitle = styled.p`
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0 0 40px;
+`;
+
+const PricingGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 680px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; max-width: 360px; }
+`;
+
+const PricingCard = styled.div<{ $highlighted?: boolean }>`
+  background: ${({ $highlighted }) => $highlighted ? '#1F1F1F' : '#fff'};
+  color: ${({ $highlighted }) => $highlighted ? '#fff' : 'inherit'};
+  border: 1px solid ${({ $highlighted, theme }) => $highlighted ? 'transparent' : theme.colors.border.light};
+  border-radius: 20px;
+  padding: 32px 28px;
+  text-align: left;
+  position: relative;
+`;
+
+const PricingBadge = styled.span`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: ${({ theme }) => theme.colors.accent};
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+`;
+
+const PricingPlan = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.6;
+  margin-bottom: 4px;
+`;
+
+const PricingPrice = styled.div`
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+`;
+
+const PricingPeriod = styled.div`
+  font-size: 13px;
+  opacity: 0.5;
+  margin-bottom: 24px;
+`;
+
+const PricingFeatures = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  opacity: 0.8;
+
+  li::before {
+    content: '✓ ';
+    margin-right: 4px;
+  }
+`;
+
+const PricingBtn = styled.button<{ $primary?: boolean }>`
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: ${({ $primary }) => $primary ? 'none' : '1px solid rgba(0,0,0,0.1)'};
+  background: ${({ $primary }) => $primary ? '#fff' : 'transparent'};
+  color: ${({ $primary }) => $primary ? '#1F1F1F' : 'inherit'};
+
+  &:hover { opacity: 0.85; }
+`;
+
+/* ── Bottom CTA ── */
+const BottomCTA = styled.section`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 48px;
+  text-align: center;
+
+  @media (max-width: 768px) { padding: 40px 24px; }
+`;
+
+const CTATitle = styled.h2`
+  font-size: 36px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+`;
+
+const CTADesc = styled.p`
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0 0 28px;
+`;
+
 type WidgetCategory = 'all' | 'calendar' | 'clock' | 'boards' | 'buttons';
 
 const GALLERY_FILTERS: { key: WidgetCategory; label: string }[] = [
@@ -303,43 +502,56 @@ export const WidgetStudioPage: React.FC = () => {
   const navigate = useNavigate();
   const [expanding, setExpanding] = useState(false);
   const [activeFilter, setActiveFilter] = useState<WidgetCategory>('all');
+  const [codeInput, setCodeInput] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const { loginWithCode } = useAuth();
 
   const handleLaunch = useCallback(() => {
     setExpanding(true);
     setTimeout(() => navigate('/studio'), 450);
   }, [navigate]);
 
+  const handleCodeEntry = useCallback(() => {
+    setCodeError('');
+    if (loginWithCode(codeInput)) {
+      handleLaunch();
+    } else {
+      setCodeError('Invalid code. Check and try again.');
+    }
+  }, [codeInput, loginWithCode, handleLaunch]);
+
   return (
     <PageWrapper>
       <TopNav activeLink="studio" />
 
+      {/* Hero */}
       <HeroCard>
         <BackButton onClick={() => navigate('/')} />
         <HeroInner $expanding={expanding}>
-          <HeroIcons>
-            <HeroIcon $delay="0.15s"><Calendar /></HeroIcon>
-            <HeroIcon $delay="0.25s"><Clock /></HeroIcon>
-            <HeroIcon $delay="0.35s"><Image /></HeroIcon>
-          </HeroIcons>
-          <HeroTitle>Pick a widget, customize it,<br />embed in Notion with one click.</HeroTitle>
-          <HeroDesc>No coding. No setup. No headaches.</HeroDesc>
+          <HeroTitle>The widgets your Notion is missing.</HeroTitle>
+          <HeroDesc>Calendars, clocks, boards — fully customizable, embeddable in one click.</HeroDesc>
           <EmailRow>
-            <EmailInput type="email" placeholder="Enter your email" />
-            <HeroButton onClick={(e) => { e.stopPropagation(); handleLaunch(); }}>
-              Sign up <ArrowRight />
+            <EmailInput
+              type="text"
+              placeholder="Enter access code"
+              value={codeInput}
+              onChange={e => { setCodeInput(e.target.value); setCodeError(''); }}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleCodeEntry(); } }}
+            />
+            <HeroButton onClick={(e) => { e.stopPropagation(); handleCodeEntry(); }}>
+              Open Studio <ArrowRight />
             </HeroButton>
           </EmailRow>
-          <AuthDivider>Or, sign up with</AuthDivider>
-          <GoogleButton>
-            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Google
-          </GoogleButton>
+          {codeError && <CodeError>{codeError}</CodeError>}
+          <AuthDivider>No code yet? <AuthLink onClick={() => navigate('/templates')}>Get a template</AuthLink> · <AuthLink>Contact us</AuthLink></AuthDivider>
         </HeroInner>
       </HeroCard>
 
       <PageContent $hide={expanding}>
+
+      {/* Gallery with filters */}
       <GallerySection>
-        <SectionHeader title="Explore widgets" subtitle="Get inspired and find your perfect setup" />
+        <SectionHeader title="Explore widgets" subtitle="Find your perfect setup" marginBottom="24px" />
         <GalleryFilterRow>
           {GALLERY_FILTERS.map(f => (
             <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
@@ -347,17 +559,82 @@ export const WidgetStudioPage: React.FC = () => {
             </FilterChip>
           ))}
         </GalleryFilterRow>
-        <GalleryGrid>
-          {GALLERY_ITEMS
-            .filter(item => activeFilter === 'all' || item.category === activeFilter)
-            .map((item, i) => (
-              <GalleryCard key={i}>
-                <GalleryImage src={item.image} alt={item.title} />
-                <GalleryLabel>{item.title}</GalleryLabel>
-              </GalleryCard>
-            ))}
-        </GalleryGrid>
+        <PinterestGallery filter={activeFilter === 'all' ? 'Featured' : activeFilter === 'calendar' ? 'Calendar' : activeFilter === 'clock' ? 'Clocks' : activeFilter === 'boards' ? 'Boards' : 'Featured'} />
       </GallerySection>
+
+      {/* Features */}
+      <FeaturesSection>
+        <FeatureRow>
+          <FeatureItem>
+            <FeatureIcon style={{ background: '#F0E6FF' }}>🎨</FeatureIcon>
+            <FeatureTitle>Customizable</FeatureTitle>
+            <FeatureDesc>Colors, borders, layouts — make it yours.</FeatureDesc>
+          </FeatureItem>
+          <FeatureItem>
+            <FeatureIcon style={{ background: '#FFF8E0' }}>✨</FeatureIcon>
+            <FeatureTitle>Only on Peachy</FeatureTitle>
+            <FeatureDesc>Widgets you won't find anywhere else.</FeatureDesc>
+          </FeatureItem>
+          <FeatureItem>
+            <FeatureIcon style={{ background: '#E0F4E8' }}>🌗</FeatureIcon>
+            <FeatureTitle>Built for both themes</FeatureTitle>
+            <FeatureDesc>Auto-adapts to Notion light and dark mode.</FeatureDesc>
+          </FeatureItem>
+        </FeatureRow>
+      </FeaturesSection>
+
+      {/* Pricing */}
+      <PricingSection>
+        <PricingTitle>Simple pricing</PricingTitle>
+        <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
+        <PricingGrid>
+          <PricingCard>
+            <PricingPlan>Free</PricingPlan>
+            <PricingPrice>$0</PricingPrice>
+            <PricingPeriod>forever</PricingPeriod>
+            <PricingFeatures>
+              <li>3 widgets</li>
+              <li>All widget types</li>
+              <li>Basic customization</li>
+              <li>Embed in Notion</li>
+            </PricingFeatures>
+            <PricingBtn onClick={handleLaunch}>Get started</PricingBtn>
+          </PricingCard>
+          <PricingCard $highlighted>
+            <PricingBadge>Popular</PricingBadge>
+            <PricingPlan>Pro</PricingPlan>
+            <PricingPrice>$9</PricingPrice>
+            <PricingPeriod>one-time</PricingPeriod>
+            <PricingFeatures>
+              <li>Unlimited widgets</li>
+              <li>All widget types</li>
+              <li>Full customization</li>
+              <li>Priority support</li>
+              <li>Early access to new widgets</li>
+            </PricingFeatures>
+            <PricingBtn $primary onClick={handleLaunch}>Get Pro</PricingBtn>
+          </PricingCard>
+        </PricingGrid>
+      </PricingSection>
+
+      {/* Bottom CTA */}
+      <BottomCTA>
+        <CTATitle>Ready to build?</CTATitle>
+        <CTADesc>Enter your code and start creating.</CTADesc>
+        <EmailRow>
+          <EmailInput
+            type="text"
+            placeholder="Access code"
+            value={codeInput}
+            onChange={e => { setCodeInput(e.target.value); setCodeError(''); }}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleCodeEntry(); } }}
+          />
+          <HeroButton onClick={(e) => { e.stopPropagation(); handleCodeEntry(); }}>
+            Start building <ArrowRight />
+          </HeroButton>
+        </EmailRow>
+      </BottomCTA>
+
       <BigFooter onNavigate={(path) => navigate(path)} />
       </PageContent>
     </PageWrapper>

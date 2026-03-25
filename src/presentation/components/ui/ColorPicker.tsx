@@ -647,10 +647,20 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           onClick={() => {
             if (!open && swatchRef.current) {
               const rect = swatchRef.current.getBoundingClientRect();
-              const isMobile = window.innerWidth <= 768;
+              const vw = window.innerWidth;
+              const isMobile = vw <= 768;
+              const isTablet = vw > 768 && vw <= 1024;
               setPopupPos({
-                top: isMobile ? Math.min(rect.bottom + 8, window.innerHeight - 320) : rect.bottom - 18,
-                left: isMobile ? Math.max(8, (window.innerWidth - 240) / 2) : Math.max(8, rect.left - 240 - 28),
+                top: isMobile
+                  ? Math.min(rect.bottom + 8, window.innerHeight - 320)
+                  : isTablet
+                    ? Math.min(rect.bottom + 8, window.innerHeight - 320)
+                    : rect.bottom - 18,
+                left: isMobile
+                  ? Math.max(8, (vw - 240) / 2)
+                  : isTablet
+                    ? Math.max(8, rect.right - 240)
+                    : Math.max(8, rect.left - 240 - 28),
               });
             }
             setOpen(!open);

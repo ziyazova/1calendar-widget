@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Save } from 'lucide-react';
 import { Widget } from '../../../domain/entities/Widget';
 
 type ViewMode = 'editor' | 'layout-check';
@@ -8,6 +8,8 @@ type ViewMode = 'editor' | 'layout-check';
 interface HeaderProps {
   currentWidget: Widget | null;
   onCopyEmbedUrl: () => void;
+  onSaveWidget?: () => Promise<void>;
+  canSave?: boolean;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
 }
@@ -123,13 +125,42 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   }
 `;
 
+const SaveButton = styled.button<{ $saving?: boolean; $saved?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: 36px;
+  background: ${({ $saved }) => $saved ? '#22c55e' : '#1F1F1F'};
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  opacity: ${({ $saving }) => $saving ? 0.7 : 1};
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover:not(:disabled) { background: ${({ $saved }) => $saved ? '#16a34a' : '#333'}; }
+  &:active:not(:disabled) { transform: scale(0.97); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+`;
+
 export const Header: React.FC<HeaderProps> = ({
   currentWidget,
   onCopyEmbedUrl,
+  onSaveWidget,
+  canSave,
   viewMode,
   onViewModeChange,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const handleCopy = () => {
     onCopyEmbedUrl();
@@ -137,24 +168,40 @@ export const Header: React.FC<HeaderProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleSave = async () => {
+    if (!onSaveWidget || saving) return;
+    setSaving(true);
+    try {
+      await onSaveWidget();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <HeaderContainer>
       <HeaderLeft>
         {currentWidget && (
-          <>
-            <TabGroup>
-              <Tab $active={viewMode === 'editor'} onClick={() => onViewModeChange('editor')}>
-                Editor
-              </Tab>
-              <Tab $active={viewMode === 'layout-check'} onClick={() => onViewModeChange('layout-check')}>
-                Layout Check
-              </Tab>
-            </TabGroup>
-          </>
+          <TabGroup>
+            <Tab $active={viewMode === 'editor'} onClick={() => onViewModeChange('editor')}>
+              Editor
+            </Tab>
+            <Tab $active={viewMode === 'layout-check'} onClick={() => onViewModeChange('layout-check')}>
+              Layout Check
+            </Tab>
+          </TabGroup>
         )}
       </HeaderLeft>
 
       <HeaderRight>
+        {currentWidget && canSave && (
+          <SaveButton onClick={handleSave} disabled={saving} $saving={saving} $saved={saved}>
+            {saved ? <Check /> : <Save />}
+            {saving ? 'Saving...' : saved ? 'Saved' : 'Save'}
+          </SaveButton>
+        )}
         {currentWidget && (
           <CopyButton
             onClick={handleCopy}
