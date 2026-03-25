@@ -480,16 +480,16 @@ const SectionHeading = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 32px 0 16px;
+  margin: 40px 0 20px;
 
   &:first-of-type { margin-top: 0; }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   color: #1F1F1F;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   margin: 0;
 `;
 

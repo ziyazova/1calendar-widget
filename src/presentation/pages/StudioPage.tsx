@@ -749,6 +749,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
+  const [editingWidgetName, setEditingWidgetName] = useState<string>('');
   const [stylePanel, setStylePanel] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const navigate = useNavigate();
@@ -851,7 +852,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         });
       } else {
         const saved = await WidgetStorageService.saveWidget({
-          name: `${currentWidget.type.charAt(0).toUpperCase() + currentWidget.type.slice(1)} Widget`,
+          name: editingWidgetName || `${currentWidget.type.charAt(0).toUpperCase() + currentWidget.type.slice(1)} Widget`,
           type,
           style,
           settings: settings as Record<string, unknown>,
@@ -866,7 +867,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     } finally {
       setSaving(false);
     }
-  }, [currentWidget, currentWidgetKey, embedUrl, isRegistered, saving, editingWidgetId]);
+  }, [currentWidget, currentWidgetKey, embedUrl, isRegistered, saving, editingWidgetId, editingWidgetName]);
 
   // Determine which mobile tabs are available for current widget
   const isBoard = currentWidget?.type === 'board';
@@ -911,10 +912,20 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 currentWidget={currentWidgetKey}
                 canEdit={isRegistered}
                 onWidgetChange={(type, style) => { setDashboardView(null); handleWidgetChange(type, style); }}
-                onEdit={(type, style) => {
+                onEdit={async (type, style, name) => {
                   handleWidgetChange(type, style);
                   setDashboardView(null);
                   setStylePanel(null);
+                  setEditingWidgetName(name);
+                  // Save to DB immediately
+                  const saved = await WidgetStorageService.saveWidget({
+                    name,
+                    type,
+                    style,
+                    settings: {},
+                    embed_url: undefined,
+                  });
+                  if (saved) setEditingWidgetId(saved.id);
                   setTimeout(() => setEditorOpen(true), 250);
                 }}
                 onLockedEdit={() => navigate('/login')}
