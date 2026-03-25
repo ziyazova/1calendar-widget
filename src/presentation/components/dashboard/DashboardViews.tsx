@@ -529,7 +529,7 @@ const ExplorePreview = styled.div`
 `;
 
 const ExploreScaleCalendar = styled.div`
-  transform: scale(0.28);
+  transform: scale(0.36);
   transform-origin: center center;
   width: 420px;
   min-height: 380px;
@@ -565,7 +565,7 @@ const ALL_EXPLORE_WIDGETS = [
 
 type ExploreFilter = 'all' | 'calendar' | 'clock' | 'board';
 const EXPLORE_FILTERS: { key: ExploreFilter; label: string }[] = [
-  { key: 'all', label: 'All' },
+  { key: 'all', label: 'Featured' },
   { key: 'calendar', label: 'Calendars' },
   { key: 'clock', label: 'Clocks' },
   { key: 'board', label: 'Canvas' },
