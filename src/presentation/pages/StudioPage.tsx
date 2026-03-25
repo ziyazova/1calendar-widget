@@ -914,7 +914,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   handleWidgetChange(type, style);
                   setDashboardView(null);
                   setStylePanel(null);
-                  setEditorOpen(true);
+                  setTimeout(() => setEditorOpen(true), 250);
                 }}
                 onClose={() => setStylePanel(null)}
               />
