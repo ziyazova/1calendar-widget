@@ -5,6 +5,7 @@ import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, Layout
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../widgetConfig';
 import { useAuth } from '@/presentation/context/AuthContext';
 import type { WidgetStyleConfig } from '../widgetConfig';
+import { StylePickerPanel } from './StylePickerPanel';
 
 export type DashboardView = 'my-widgets' | 'templates' | 'purchases' | 'profile' | null;
 
@@ -275,58 +276,14 @@ const StylesList = styled.div<{ $expanded: boolean }>`
   overflow: hidden;
   transition: grid-template-rows 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   padding: 0 16px;
-  margin-left: 36px;
   position: relative;
 
   > div {
     min-height: 0;
     padding-top: 4px;
   }
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 8px;
-    bottom: 12px;
-    width: 1px;
-    background: ${({ theme }) => theme.colors.border.light};
-    opacity: ${({ $expanded }) => $expanded ? 1 : 0};
-    transition: opacity 0.2s ease;
-  }
 `;
 
-const StyleItem = styled.button<{ $active: boolean }>`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: 13px;
-  font-weight: ${({ $active }) => $active ? 500 : 400};
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: left;
-  margin-bottom: 2px;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-
-  &:hover {
-    background: rgba(51, 132, 244, 0.04);
-    color: ${({ theme }) => theme.colors.accent};
-  }
-
-  svg {
-    width: 13px;
-    height: 13px;
-    flex-shrink: 0;
-    opacity: 0.5;
-  }
-`;
 
 /* ─── Tooltip ─── */
 
@@ -767,16 +724,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!collapsed && (
           <StylesList $expanded={isExpanded}>
             <div>
-              {styles.map((s) => (
-                <StyleItem
-                  key={s.value}
-                  $active={currentWidget === `${key}-${s.value}`}
-                  onClick={() => onWidgetChange(key, s.value)}
-                >
-                  <s.icon />
-                  {s.label}
-                </StyleItem>
-              ))}
+              <StylePickerPanel
+                styles={styles}
+                widgetType={key}
+                currentWidget={currentWidget}
+                onWidgetChange={onWidgetChange}
+              />
             </div>
           </StylesList>
         )}
