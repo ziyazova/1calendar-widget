@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Calendar, Clock, Layout, Download, ExternalLink, Pencil, Trash2, LogOut } from 'lucide-react';
+import { Plus, Calendar, Clock, Layout, Download, ExternalLink, Pencil, Trash2, LogOut, Search, ArrowRight } from 'lucide-react';
+import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../ui/widgetConfig';
 import type { DashboardView } from '../ui/sidebar/Sidebar';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { WidgetStorageService, type SavedWidget } from '@/infrastructure/services/WidgetStorageService';
@@ -435,9 +436,180 @@ const iconForType = (type: string) => {
 
 /* ── Views ── */
 
+/* ── Search Bar ── */
+
+const SearchWrap = styled.div`
+  position: relative;
+  margin-bottom: 28px;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  height: 44px;
+  padding: 0 16px 0 42px;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  background: #FAFAFA;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1F1F1F;
+  outline: none;
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
+
+  &::placeholder { color: rgba(0, 0, 0, 0.3); }
+  &:focus { border-color: rgba(51, 132, 244, 0.3); background: #fff; }
+`;
+
+const SearchIcon = styled.div`
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.25);
+  svg { width: 16px; height: 16px; }
+`;
+
+/* ── Section Heading ── */
+
+const SectionHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 32px 0 16px;
+
+  &:first-of-type { margin-top: 0; }
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.02em;
+  margin: 0;
+`;
+
+const SectionCount = styled.span`
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.35);
+  font-weight: 400;
+`;
+
+const SeeAllBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3384F4;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  padding: 0;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover { opacity: 0.8; }
+`;
+
+/* ── Explore Row ── */
+
+const ExploreRow = styled.div`
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+
+  &::-webkit-scrollbar { height: 0; }
+`;
+
+const ExploreCard = styled.div<{ $index: number }>`
+  flex-shrink: 0;
+  width: 180px;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: ${({ $index }) => 0.04 + $index * 0.05}s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  &:hover ${CardOverlay} { opacity: 1; }
+`;
+
+const ExplorePreview = styled.div`
+  aspect-ratio: 4 / 3;
+  background: #FAFAFA;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+`;
+
+const ExploreScaleCalendar = styled.div`
+  transform: scale(0.22);
+  transform-origin: center center;
+  width: 420px;
+  min-height: 380px;
+  pointer-events: none;
+`;
+
+const ExploreScaleClock = styled(ExploreScaleCalendar)`
+  width: 360px;
+  min-height: 360px;
+`;
+
+const ExploreScaleBoard = styled(ExploreScaleCalendar)`
+  width: 420px;
+  min-height: 420px;
+`;
+
+const ExploreLabel = styled.div`
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1F1F1F;
+  letter-spacing: -0.01em;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+`;
+
+/* ── Explore Categories ── */
+
+const EXPLORE_CATEGORIES = [
+  {
+    key: 'calendar',
+    title: 'Calendars',
+    styles: CALENDAR_STYLES.map(s => ({ type: 'calendar', style: s.value, label: s.label })),
+  },
+  {
+    key: 'clock',
+    title: 'Clocks',
+    styles: CLOCK_STYLES.map(s => ({ type: 'clock', style: s.value, label: s.label })),
+  },
+  {
+    key: 'board',
+    title: 'Canvas',
+    styles: BOARD_STYLES.map(s => ({ type: 'board', style: s.value, label: s.label })),
+  },
+];
+
 const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: SavedWidget) => void }> = ({ onAddNew, onEditWidget }) => {
   const { isRegistered } = useAuth();
   const [filter, setFilter] = useState<WidgetFilter>('all');
+  const [search, setSearch] = useState('');
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -456,7 +628,9 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
     setWidgets(prev => prev.filter(w => w.id !== id));
   };
 
-  const filtered = filter === 'all' ? widgets : widgets.filter(w => w.type === filter);
+  const filtered = (filter === 'all' ? widgets : widgets.filter(w => w.type === filter))
+    .filter(w => !search || w.name.toLowerCase().includes(search.toLowerCase()) || w.style.toLowerCase().includes(search.toLowerCase()));
+
   const counts = FILTERS.map(f => ({
     ...f,
     count: f.key === 'all' ? widgets.length : widgets.filter(w => w.type === f.key).length,
@@ -464,38 +638,114 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
+  const renderExplorePreview = (type: string, style: string) => {
+    if (type === 'calendar') {
+      const s = new CalendarSettings({ style: style as CalendarSettings['style'] });
+      switch (style) {
+        case 'classic': return <ExploreScaleCalendar><ClassicCalendar settings={s} /></ExploreScaleCalendar>;
+        case 'collage': return <ExploreScaleCalendar><CollageCalendar settings={s} /></ExploreScaleCalendar>;
+        case 'typewriter': return <ExploreScaleCalendar><TypewriterCalendar settings={s} /></ExploreScaleCalendar>;
+        default: return <ExploreScaleCalendar><ModernGridZoomFixed settings={s} /></ExploreScaleCalendar>;
+      }
+    }
+    if (type === 'clock') {
+      const s = new ClockSettings({ style: style as ClockSettings['style'] });
+      const tc = getContrastColor(s.backgroundColor);
+      switch (style) {
+        case 'flower': return <ExploreScaleClock><FlowerClock settings={s} time={PREVIEW_TIME} textColor={tc} /></ExploreScaleClock>;
+        case 'dreamy': return <ExploreScaleClock><DreamyClock settings={s} time={PREVIEW_TIME} textColor={tc} /></ExploreScaleClock>;
+        default: return <ExploreScaleClock><ClassicClock settings={s} time={PREVIEW_TIME} textColor={tc} /></ExploreScaleClock>;
+      }
+    }
+    if (type === 'board') {
+      const s = new BoardSettings({ layout: style as BoardSettings['layout'] });
+      return <ExploreScaleBoard><InspirationBoard settings={s} /></ExploreScaleBoard>;
+    }
+    return null;
+  };
+
   return (
     <Container>
-      <Title>My Widgets</Title>
-      <Subtitle>{loading ? 'Loading...' : `${filtered.length} widgets`}</Subtitle>
-      <FilterRow>
-        {counts.map(f => (
-          <FilterChip key={f.key} $active={filter === f.key} onClick={() => setFilter(f.key)}>
-            {f.label} <ChipCount>{f.count}</ChipCount>
-          </FilterChip>
-        ))}
-      </FilterRow>
-      <Grid>
-        <AddCard onClick={() => onAddNew?.()}>
-          <Plus />
-          <AddLabel>New Widget</AddLabel>
-        </AddCard>
-        {filtered.map((w, i) => (
-          <Card key={w.id} $index={i}>
-            <CardPreview>
-              <WidgetPreview type={w.type} style={w.style} />
-              <CardOverlay>
-                <OverlayBtn onClick={() => onEditWidget?.(w)}><Pencil /> Edit</OverlayBtn>
-                <OverlayBtn $danger onClick={() => handleDelete(w.id)}><Trash2 /></OverlayBtn>
-              </CardOverlay>
-            </CardPreview>
-            <CardInfo>
-              <CardName>{w.name}</CardName>
-              <CardMeta>{w.type} · {w.style} · {formatDate(w.created_at)}</CardMeta>
-            </CardInfo>
-          </Card>
-        ))}
-      </Grid>
+      <SearchWrap>
+        <SearchIcon><Search /></SearchIcon>
+        <SearchInput
+          placeholder="Search widgets..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </SearchWrap>
+
+      {/* Saved Widgets */}
+      {widgets.length > 0 && (
+        <>
+          <SectionHeading>
+            <SectionTitle>My Widgets <SectionCount>({widgets.length})</SectionCount></SectionTitle>
+          </SectionHeading>
+          <FilterRow>
+            {counts.map(f => (
+              <FilterChip key={f.key} $active={filter === f.key} onClick={() => setFilter(f.key)}>
+                {f.label} <ChipCount>{f.count}</ChipCount>
+              </FilterChip>
+            ))}
+          </FilterRow>
+          <Grid>
+            {filtered.map((w, i) => (
+              <Card key={w.id} $index={i}>
+                <CardPreview>
+                  <WidgetPreview type={w.type} style={w.style} />
+                  <CardOverlay>
+                    <OverlayBtn onClick={() => onEditWidget?.(w)}><Pencil /> Edit</OverlayBtn>
+                    <OverlayBtn $danger onClick={() => handleDelete(w.id)}><Trash2 /></OverlayBtn>
+                  </CardOverlay>
+                </CardPreview>
+                <CardInfo>
+                  <CardName>{w.name}</CardName>
+                  <CardMeta>{w.style} · {formatDate(w.created_at)}</CardMeta>
+                </CardInfo>
+              </Card>
+            ))}
+            <AddCard onClick={() => onAddNew?.()}>
+              <Plus />
+              <AddLabel>New Widget</AddLabel>
+            </AddCard>
+          </Grid>
+        </>
+      )}
+
+      {/* Empty state — just show Add New prominently */}
+      {!loading && widgets.length === 0 && (
+        <>
+          <SectionHeading>
+            <SectionTitle>My Widgets</SectionTitle>
+          </SectionHeading>
+          <AddCard onClick={() => onAddNew?.()} style={{ maxWidth: 240, margin: '0 0 8px' }}>
+            <Plus />
+            <AddLabel>Create your first widget</AddLabel>
+          </AddCard>
+        </>
+      )}
+
+      {/* Explore Widgets */}
+      {EXPLORE_CATEGORIES.map(cat => (
+        <React.Fragment key={cat.key}>
+          <SectionHeading>
+            <SectionTitle>{cat.title}</SectionTitle>
+            <SeeAllBtn onClick={() => onAddNew?.()}>
+              Browse all <ArrowRight />
+            </SeeAllBtn>
+          </SectionHeading>
+          <ExploreRow>
+            {cat.styles.map((s, i) => (
+              <ExploreCard key={s.style} $index={i} onClick={() => onAddNew?.()}>
+                <ExplorePreview>
+                  {renderExplorePreview(s.type, s.style)}
+                </ExplorePreview>
+                <ExploreLabel>{s.label}</ExploreLabel>
+              </ExploreCard>
+            ))}
+          </ExploreRow>
+        </React.Fragment>
+      ))}
     </Container>
   );
 };
