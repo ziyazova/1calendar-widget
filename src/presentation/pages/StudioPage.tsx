@@ -934,7 +934,21 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel} $editorOpen={editorOpen}>
           {dashboardView ? (
             <WidgetArea style={{ overflow: 'auto' }}>
-              <DashboardContent view={dashboardView} />
+              <DashboardContent
+                view={dashboardView}
+                onAddNew={() => {
+                  setDashboardView(null);
+                  setStylePanel('calendar');
+                  setEditorOpen(false);
+                }}
+                onEditWidget={(w) => {
+                  handleWidgetChange(w.type, w.style);
+                  setDashboardView(null);
+                  setStylePanel(null);
+                  setEditorOpen(true);
+                  setEditingWidgetId(w.id);
+                }}
+              />
             </WidgetArea>
           ) : viewMode === 'editor' ? (
             <>

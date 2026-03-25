@@ -367,8 +367,7 @@ const iconForType = (type: string) => {
 
 /* ── Views ── */
 
-const MyWidgetsView: React.FC = () => {
-  const navigate = useNavigate();
+const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: SavedWidget) => void }> = ({ onAddNew, onEditWidget }) => {
   const { isRegistered } = useAuth();
   const [filter, setFilter] = useState<WidgetFilter>('all');
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
@@ -409,7 +408,7 @@ const MyWidgetsView: React.FC = () => {
         ))}
       </FilterRow>
       <Grid>
-        <AddCard onClick={() => navigate('/widgets')}>
+        <AddCard onClick={() => onAddNew?.()}>
           <Plus />
           <AddLabel>New Widget</AddLabel>
         </AddCard>
@@ -419,7 +418,7 @@ const MyWidgetsView: React.FC = () => {
               <img src={WIDGET_IMAGES[w.type] || '/template-main.png'} alt={w.name} />
               <CardBadge>{w.style}</CardBadge>
               <CardOverlay>
-                <OverlayBtn onClick={() => navigate('/studio')}><Pencil /> Edit</OverlayBtn>
+                <OverlayBtn onClick={() => onEditWidget?.(w)}><Pencil /> Edit</OverlayBtn>
                 <OverlayBtn $danger onClick={() => handleDelete(w.id)}><Trash2 /></OverlayBtn>
               </CardOverlay>
             </CardPreview>
@@ -503,11 +502,13 @@ const ProfileView: React.FC = () => {
 
 interface DashboardContentProps {
   view: DashboardView;
+  onAddNew?: () => void;
+  onEditWidget?: (widget: SavedWidget) => void;
 }
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({ view }) => {
+export const DashboardContent: React.FC<DashboardContentProps> = ({ view, onAddNew, onEditWidget }) => {
   switch (view) {
-    case 'my-widgets': return <MyWidgetsView />;
+    case 'my-widgets': return <MyWidgetsView onAddNew={onAddNew} onEditWidget={onEditWidget} />;
     case 'templates': return <TemplatesView />;
     case 'purchases': return <PurchasesView />;
     case 'profile': return <ProfileView />;
