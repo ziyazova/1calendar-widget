@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { X, Pencil, Lock } from 'lucide-react';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
@@ -575,7 +576,7 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
         </CardList>
       </PanelBody>
 
-      {nameModal && (
+      {nameModal && createPortal(
         <ModalOverlay onClick={() => setNameModal(null)}>
           <ModalCard onClick={(e) => e.stopPropagation()}>
             <ModalTitle>Name your widget</ModalTitle>
@@ -603,7 +604,8 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
               <ModalConfirmBtn onClick={handleConfirmEdit}>Create & Edit</ModalConfirmBtn>
             </ModalActions>
           </ModalCard>
-        </ModalOverlay>
+        </ModalOverlay>,
+        document.body
       )}
     </PanelContainer>
   );
