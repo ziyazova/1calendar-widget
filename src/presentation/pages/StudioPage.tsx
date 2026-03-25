@@ -104,7 +104,7 @@ const WidgetArea = styled.div`
   border-radius: ${({ theme }) => theme.radii['2xl']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: none;
-  margin: 12px 24px 12px 12px;
+  margin: 24px 24px 12px 12px;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {

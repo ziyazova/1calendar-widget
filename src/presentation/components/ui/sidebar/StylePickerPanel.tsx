@@ -196,6 +196,19 @@ const CardOuter = styled.div<{ $active: boolean; $index: number }>`
   `}
 `;
 
+const PreviewOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+  pointer-events: auto;
+`;
+
 const PreviewWrap = styled.div`
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -205,7 +218,10 @@ const PreviewWrap = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+
+  &:hover ${PreviewOverlay} {
+    opacity: 1;
+  }
 `;
 
 const PreviewScale = styled.div`
@@ -245,14 +261,13 @@ const CardLabel = styled.span<{ $active: boolean }>`
 const EditButton = styled.button`
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
-  height: 32px;
-  padding: 0 20px;
+  height: 34px;
+  padding: 0 18px;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  background: rgba(0, 0, 0, 0.05);
-  color: ${({ theme }) => theme.colors.text.secondary};
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1F1F1F;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -263,8 +278,8 @@ const EditButton = styled.button`
   svg { width: 14px; height: 14px; }
 
   &:hover {
-    background: rgba(51, 132, 244, 0.1);
-    color: #3384F4;
+    background: #ffffff;
+    transform: scale(1.04);
   }
 
   &:active {
@@ -329,17 +344,19 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
               >
                 <PreviewWrap>
                   {renderPreview(s.value)}
+                  <PreviewOverlay>
+                    <EditButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(widgetType, s.value);
+                      }}
+                    >
+                      <Pencil /> Edit
+                    </EditButton>
+                  </PreviewOverlay>
                 </PreviewWrap>
                 <CardBottom>
                   <CardLabel $active={isActive}>{s.label}</CardLabel>
-                  <EditButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(widgetType, s.value);
-                    }}
-                  >
-                    <Pencil /> Edit
-                  </EditButton>
                 </CardBottom>
               </CardOuter>
             );
