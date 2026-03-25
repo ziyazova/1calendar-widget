@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes, css } from 'styled-components';
-import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, LayoutGrid, ShoppingBag, Receipt, Settings, LogOut } from 'lucide-react';
+import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, LayoutGrid, Home, Settings, LogOut } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../widgetConfig';
 import { useAuth } from '@/presentation/context/AuthContext';
 import type { WidgetStyleConfig } from '../widgetConfig';
@@ -667,6 +667,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handleLogoClick = () => {
+    const confirmed = window.confirm('Leave Widget Studio? Unsaved changes may be lost.');
+    if (!confirmed) return;
     if (onLogoClick) {
       onLogoClick();
     } else {
@@ -734,17 +736,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <NavSection $collapsed={collapsed}>
         {isRegistered && (
-          <>
-            <SectionLabel $collapsed={collapsed}>Account</SectionLabel>
-            <AccountItem
-              $active={dashboardView === 'my-widgets'}
+          <WidgetCategory $collapsed={collapsed}>
+            <CategoryHeader
+              $expanded={dashboardView === 'my-widgets'}
               $collapsed={collapsed}
               onClick={() => onDashboardViewChange?.(dashboardView === 'my-widgets' ? null : 'my-widgets')}
             >
-              <LayoutGrid />
-              <AccountItemLabel $collapsed={collapsed}>My Widgets</AccountItemLabel>
-            </AccountItem>
-          </>
+              <CategoryIcon $active={dashboardView === 'my-widgets'}>
+                <Home />
+              </CategoryIcon>
+              <CategoryText $collapsed={collapsed}>My Widgets</CategoryText>
+              {collapsed && <Tooltip>My Widgets</Tooltip>}
+            </CategoryHeader>
+          </WidgetCategory>
         )}
 
         <SectionLabel $collapsed={collapsed}>Widgets</SectionLabel>
