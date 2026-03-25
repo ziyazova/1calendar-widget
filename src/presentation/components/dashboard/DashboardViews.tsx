@@ -474,19 +474,17 @@ const SectionHeading = styled.div`
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 36px 0 12px;
+  margin: 48px 0 14px;
 
   &:first-of-type { margin-top: 0; }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 600;
   color: #1F1F1F;
   letter-spacing: -0.02em;
   margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
 `;
 
 const SectionCount = styled.span`
