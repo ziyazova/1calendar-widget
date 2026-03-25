@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { Check, X } from 'lucide-react';
+import { Check, X, Pencil } from 'lucide-react';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -30,6 +30,7 @@ interface StylePickerPanelProps {
   categoryLabel: string;
   currentWidget: string;
   onWidgetChange: (type: string, style?: string) => void;
+  onEdit: (type: string, style: string) => void;
   onClose: () => void;
 }
 
@@ -90,7 +91,7 @@ const PanelContainer = styled.div`
   position: fixed;
   left: 270px;
   top: 0;
-  width: 260px;
+  width: 280px;
   height: 100vh;
   background: #ffffff;
   border-right: 1px solid ${({ theme }) => theme.colors.border.light};
@@ -101,12 +102,12 @@ const PanelContainer = styled.div`
 
   @media (max-width: 1024px) {
     left: 220px;
-    width: 240px;
+    width: 260px;
   }
 
   @media (max-width: 768px) {
     left: 270px;
-    width: 260px;
+    width: 280px;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
   }
 `;
@@ -115,7 +116,7 @@ const PanelHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 16px 16px;
+  padding: 24px 20px 16px;
   flex-shrink: 0;
 `;
 
@@ -145,51 +146,35 @@ const CloseButton = styled.button`
     color: ${({ theme }) => theme.colors.text.primary};
   }
 
-  svg {
-    width: 14px;
-    height: 14px;
-  }
+  svg { width: 14px; height: 14px; }
 `;
 
 const PanelBody = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px 16px;
+  padding: 0 20px 20px;
 
-  &::-webkit-scrollbar {
-    width: 0;
-  }
+  &::-webkit-scrollbar { width: 0; }
 `;
 
-const PanelGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-`;
-
-const CardOuter = styled.button<{ $active: boolean }>`
-  position: relative;
+const CardList = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0;
-  padding: 0;
+  gap: 12px;
+`;
+
+const CardOuter = styled.div<{ $active: boolean }>`
+  position: relative;
   border: 1.5px solid ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.06)'};
-  border-radius: 12px;
+  border-radius: 14px;
   background: #ffffff;
-  cursor: pointer;
-  transition: all 0.2s ease;
   overflow: hidden;
-  font-family: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
 
   &:hover {
     border-color: ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.12)'};
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: scale(0.97);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   }
 
   ${({ $active }) => $active && css`
@@ -199,9 +184,8 @@ const CardOuter = styled.button<{ $active: boolean }>`
 
 const PreviewWrap = styled.div`
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 10px 10px 0 0;
   position: relative;
   background: #FAFAFA;
   display: flex;
@@ -211,7 +195,7 @@ const PreviewWrap = styled.div`
 `;
 
 const PreviewScale = styled.div`
-  transform: scale(0.24);
+  transform: scale(0.32);
   transform-origin: center center;
   width: 420px;
   min-height: 380px;
@@ -229,23 +213,30 @@ const BoardPreviewScale = styled(PreviewScale)`
   min-height: 420px;
 `;
 
-const CardLabel = styled.div<{ $active: boolean }>`
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 12px;
-  font-weight: ${({ $active }) => $active ? 500 : 400};
-  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
-  letter-spacing: -0.01em;
-  text-align: left;
+const CardBottom = styled.div<{ $active: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
+const CardInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const CardLabel = styled.span<{ $active: boolean }>`
+  font-size: 13px;
+  font-weight: ${({ $active }) => $active ? 500 : 400};
+  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+  letter-spacing: -0.01em;
+`;
+
 const CheckBadge = styled.div`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #3384F4;
   display: flex;
@@ -254,9 +245,31 @@ const CheckBadge = styled.div`
   color: #fff;
   flex-shrink: 0;
 
-  svg {
-    width: 10px;
-    height: 10px;
+  svg { width: 10px; height: 10px; }
+`;
+
+const EditButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: rgba(0, 0, 0, 0.04);
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: -0.01em;
+
+  svg { width: 12px; height: 12px; }
+
+  &:hover {
+    background: rgba(51, 132, 244, 0.08);
+    color: #3384F4;
   }
 `;
 
@@ -268,6 +281,7 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
   categoryLabel,
   currentWidget,
   onWidgetChange,
+  onEdit,
   onClose,
 }) => {
   const renderPreview = (styleValue: string) => {
@@ -304,7 +318,7 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
         </CloseButton>
       </PanelHeader>
       <PanelBody>
-        <PanelGrid>
+        <CardList>
           {styles.map((s) => {
             const isActive = currentWidget === `${widgetType}-${s.value}`;
             return (
@@ -316,18 +330,28 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
                 <PreviewWrap>
                   {renderPreview(s.value)}
                 </PreviewWrap>
-                <CardLabel $active={isActive}>
-                  {s.label}
-                  {isActive && (
-                    <CheckBadge>
-                      <Check />
-                    </CheckBadge>
-                  )}
-                </CardLabel>
+                <CardBottom $active={isActive}>
+                  <CardInfo>
+                    {isActive && (
+                      <CheckBadge>
+                        <Check />
+                      </CheckBadge>
+                    )}
+                    <CardLabel $active={isActive}>{s.label}</CardLabel>
+                  </CardInfo>
+                  <EditButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(widgetType, s.value);
+                    }}
+                  >
+                    <Pencil /> Edit
+                  </EditButton>
+                </CardBottom>
               </CardOuter>
             );
           })}
-        </PanelGrid>
+        </CardList>
       </PanelBody>
     </PanelContainer>
   );

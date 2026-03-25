@@ -46,7 +46,7 @@ const WorkspaceContainer = styled.div`
   }
 `;
 
-const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boolean; $stylePanelOpen?: boolean }>`
+const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boolean; $stylePanelOpen?: boolean; $editorOpen?: boolean }>`
   display: flex;
   flex: 1;
   gap: 0;
@@ -54,20 +54,20 @@ const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boole
   overflow: hidden;
   margin-left: ${({ $sidebarCollapsed, $stylePanelOpen }) => {
     const sidebarW = $sidebarCollapsed ? 64 : 270;
-    const panelW = $stylePanelOpen ? 260 : 0;
+    const panelW = $stylePanelOpen ? 280 : 0;
     return `${sidebarW + panelW}px`;
   }};
-  margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '290px'};
+  margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '290px' : '0'};
   height: 100vh;
   transition: margin-left 0.25s ease, margin-right 0.25s ease;
 
   @media (max-width: 1024px) {
     margin-left: ${({ $sidebarCollapsed, $stylePanelOpen }) => {
       const sidebarW = $sidebarCollapsed ? 64 : 220;
-      const panelW = $stylePanelOpen ? 240 : 0;
+      const panelW = $stylePanelOpen ? 260 : 0;
       return `${sidebarW + panelW}px`;
     }};
-    margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '240px'};
+    margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '240px' : '0'};
   }
 
   @media (max-width: 768px) {
@@ -751,6 +751,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [saved, setSaved] = useState(false);
   const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
   const [stylePanel, setStylePanel] = useState<string | null>('calendar');
+  const [editorOpen, setEditorOpen] = useState(false);
   const navigate = useNavigate();
   const { isRegistered } = useAuth();
 
@@ -892,7 +893,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             dashboardView={dashboardView}
             onDashboardViewChange={setDashboardView}
             expandedCategory={stylePanel}
-            onCategoryToggle={setStylePanel}
+            onCategoryToggle={(cat) => { setStylePanel(cat); if (cat) setEditorOpen(false); }}
           />
           {stylePanel && (() => {
             const stylesMap: Record<string, { styles: typeof CALENDAR_STYLES; label: string }> = {
@@ -909,6 +910,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 categoryLabel={cfg.label}
                 currentWidget={currentWidgetKey}
                 onWidgetChange={(type, style) => { setDashboardView(null); handleWidgetChange(type, style); }}
+                onEdit={(type, style) => {
+                  handleWidgetChange(type, style);
+                  setDashboardView(null);
+                  setStylePanel(null);
+                  setEditorOpen(true);
+                }}
                 onClose={() => setStylePanel(null)}
               />
             );
@@ -924,7 +931,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <div style={{ width: 40 }} />
         </MobileTopBar>
 
-        <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel}>
+        <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel} $editorOpen={editorOpen}>
           {dashboardView ? (
             <WidgetArea style={{ overflow: 'auto' }}>
               <DashboardContent view={dashboardView} />
@@ -1012,12 +1019,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 </TopRightControls>
               </WidgetArea>
 
-              <CustomizationPanel
-                widget={currentWidget}
-                onSettingsChange={handleSettingsChange}
-                mobileOpen={mobilePanel}
-                onMobileClose={() => setMobilePanel(false)}
-              />
+              {editorOpen && (
+                <CustomizationPanel
+                  widget={currentWidget}
+                  onSettingsChange={handleSettingsChange}
+                  mobileOpen={mobilePanel}
+                  onMobileClose={() => setMobilePanel(false)}
+                />
+              )}
               {mobilePanel && <MobileOverlay onClick={() => setMobilePanel(false)} />}
             </>
           ) : (
