@@ -16,11 +16,11 @@ const CategoriesWrap = styled.div`
 `;
 
 const CategoriesSection = styled.section`
-  padding: 0 0 80px;
+  padding: 16px 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 `;
 
 const CategoriesTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
@@ -40,7 +40,7 @@ const CategoryChip = styled.div<{ $color: string }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 24px;
+  padding: 8px 16px;
   background: ${({ $color }) => {
     const hex = $color.replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
@@ -56,7 +56,7 @@ const CategoryChip = styled.div<{ $color: string }>`
     return `rgba(${r}, ${g}, ${b}, 0.12)`;
   }};
   border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.01em;

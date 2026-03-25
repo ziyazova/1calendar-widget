@@ -18,7 +18,7 @@ const Nav = styled.nav`
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(250, 250, 250, 0.7);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);

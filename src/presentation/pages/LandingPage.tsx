@@ -11,102 +11,90 @@ import { CTASection } from '../components/landing/CTASection';
 import { BigFooter } from '../components/landing/BigFooter';
 import { HowItWorksSection } from '../components/landing/HowItWorksSection';
 
-const Page = styled.div<{ $transitioning?: boolean }>`
+const Page = styled.div`
   background: ${({ theme }) => theme.colors.background.page};
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
 `;
 
-const PageContent = styled.div<{ $transitioning?: boolean }>`
-  opacity: ${({ $transitioning }) => $transitioning ? 0 : 1};
-  transition: opacity 0.4s ease;
+/* ── Consistent spacing: every section gets 80px top+bottom ── */
+
+const Section = styled.div`
+  padding: 80px 0;
+
+  @media (max-width: 768px) {
+    padding: 48px 0;
+  }
 `;
 
-/* ── Section Groups ── */
-/* Each group controls spacing between its children */
+const SectionTinted = styled.div`
+  background: #FAFAFA;
+  padding: 80px 0;
+
+  @media (max-width: 768px) {
+    padding: 64px 0;
+  }
+`;
 
 const GroupHero = styled.div`
-  background: #FAFAFA;
+  background: linear-gradient(180deg, rgba(225, 230, 255, 0.55) 0%, rgba(235, 240, 255, 0.3) 50%, rgba(245, 245, 250, 0.06) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-/* Single variable controls all section spacing */
-const SectionGroup = styled.div`
-  padding: 56px 0;
+  padding: 80px 0 0;
+  gap: 64px;
 
   @media (max-width: 768px) {
-    padding: 36px 0;
+    padding: 48px 0 32px;
+    gap: 24px;
   }
-`;
-
-const SectionGroupTinted = styled.div`
-  background: transparent;
-  padding: 40px 0;
-  margin: 36px 0;
-  overflow: visible;
-
-  @media (max-width: 768px) {
-    padding: 20px 0;
-    margin: 20px 0;
-  }
-`;
-
-const BottomTinted = styled.div`
-  background: #FAFAFA;
 `;
 
 const GroupFooter = styled.div`
-  padding-top: 48px;
+  background: #FAFAFA;
+  padding: 120px 0 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 
   @media (max-width: 768px) {
-    padding-top: 32px;
+    padding: 64px 0 12px;
   }
 `;
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const [transitioning] = useState(false);
 
   return (
     <Page>
-      <TopNav logoPressed={transitioning} onLogoClick={() => navigate('/')} logoSub="Planners" />
-      <PageContent $transitioning={transitioning}>
+      <TopNav logoPressed={false} onLogoClick={() => navigate('/')} logoSub="Planners" />
 
-        <GroupHero>
-          <HeroSection onBrowseTemplates={() => navigate('/templates')} onExploreWidgets={() => navigate('/widgets')} />
-          <CategoriesMarquee onNavigate={(path) => navigate(path)} />
-        </GroupHero>
+      <GroupHero>
+        <HeroSection onBrowseTemplates={() => navigate('/templates')} onExploreWidgets={() => navigate('/widgets')} />
+        <CategoriesMarquee onNavigate={(path) => navigate(path)} />
+      </GroupHero>
 
-        <SectionGroupTinted>
-          <TemplatesGallery onNavigate={(path) => navigate(path)} />
-        </SectionGroupTinted>
+      <Section style={{ padding: '120px 0 140px' }}>
+        <TemplatesGallery onNavigate={(path) => navigate(path)} />
+      </Section>
 
-        <SectionGroup>
-          <WidgetStudioSection onNavigate={(path) => navigate(path)} />
-        </SectionGroup>
+      <Section style={{ padding: '0' }}>
+        <WidgetStudioSection onNavigate={(path) => navigate(path)} />
+      </Section>
 
-        <SectionGroup>
-          <HowItWorksSection />
-        </SectionGroup>
+      <Section style={{ padding: '120px 0 140px' }}>
+        <HowItWorksSection />
+      </Section>
 
-        <BottomTinted>
-          <SectionGroup>
-            <TestimonialsSection />
-          </SectionGroup>
-        </BottomTinted>
+      <SectionTinted>
+        <TestimonialsSection />
+      </SectionTinted>
 
-        <SectionGroup>
-          <CTASection onBrowseTemplates={() => navigate('/templates')} onExploreWidgets={() => navigate('/widgets')} />
-        </SectionGroup>
+      <div style={{ background: '#FAFAFA' }}>
+        <CTASection onBrowseTemplates={() => navigate('/templates')} onExploreWidgets={() => navigate('/widgets')} />
+      </div>
 
-        <GroupFooter>
-          <BigFooter onNavigate={(path) => navigate(path)} />
-        </GroupFooter>
-
-      </PageContent>
+      <GroupFooter>
+        <BigFooter onNavigate={(path) => navigate(path)} />
+      </GroupFooter>
     </Page>
   );
 };

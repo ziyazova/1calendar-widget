@@ -5,24 +5,24 @@ import { scrollUp } from '@/presentation/themes/animations';
 /* ── Testimonials data ── */
 const testimonials = {
   col1: [
-    { name: 'Anna Kovacs', initials: 'AK', role: 'Product Designer', company: 'Figma', color: '#6366F1', text: 'Finally a widget tool that doesn\'t look like it\'s from 2015. The calendar fits perfectly into my Notion setup — clean, minimal, and actually aesthetic.' },
-    { name: 'James Chen', initials: 'JC', role: 'Engineering Lead', company: 'Vercel', color: '#3B82F6', text: 'We embed Peachy calendars across all our team dashboards in Notion. The dark mode support is flawless and it just works.' },
-    { name: 'Sofia Martinez', initials: 'SM', role: 'Content Creator', company: 'YouTube', color: '#EC4899', text: 'I use the clock widget in my streaming setup and the calendar in my content planner. Both look premium and load instantly.' },
-    { name: 'David Park', initials: 'DP', role: 'Founder', company: 'IndieHacker', color: '#10B981', text: 'Replaced three different widget tools with Peachy. One studio for everything — calendars, clocks, all customizable. And it\'s free?' },
-    { name: 'Lena Fischer', initials: 'LF', role: 'UX Researcher', company: 'Spotify', color: '#F59E0B', text: 'The attention to typography and spacing is rare for a free tool. You can tell someone who cares about design built this.' },
+    { name: 'Anna', initials: 'A', color: '#C4B5FD', text: 'Finally a widget tool that doesn\'t look like it\'s from 2015. The calendar fits perfectly into my Notion setup — clean, minimal, and actually aesthetic.' },
+    { name: 'James', initials: 'J', color: '#93C5FD', text: 'We embed Peachy calendars across all our team dashboards in Notion. The dark mode support is flawless and it just works.' },
+    { name: 'Sofia', initials: 'S', color: '#F9A8D4', text: 'I use the clock widget in my streaming setup and the calendar in my content planner. Both look premium and load instantly.' },
+    { name: 'David', initials: 'D', color: '#6EE7B7', text: 'Replaced three different widget tools with Peachy. One studio for everything — calendars, clocks, all customizable. And it\'s free?' },
+    { name: 'Lena', initials: 'L', color: '#FCD34D', text: 'The attention to typography and spacing is rare for a free tool. You can tell someone who cares about design built this.' },
   ],
   col2: [
-    { name: 'Marcus Thompson', initials: 'MT', role: 'Startup Founder', company: 'Arc', color: '#8B5CF6', text: 'The Life OS template saved me an entire weekend of setup. Combined with Peachy widgets, my Notion workspace finally feels complete.' },
-    { name: 'Yuki Tanaka', initials: 'YT', role: 'Project Manager', company: 'Linear', color: '#06B6D4', text: 'Our whole team switched to Peachy calendars in Notion. The embed URL system is brilliant — just paste and it works. No auth, no fuss.' },
-    { name: 'Rachel Kim', initials: 'RK', role: 'Freelance Designer', company: 'Dribbble', color: '#F43F5E', text: 'I\'ve tried every Notion widget out there. Peachy is the only one that matches the quality of my workspace design. Highly recommend.' },
-    { name: 'Alex Rivera', initials: 'AR', role: 'Student', company: 'MIT', color: '#14B8A6', text: 'The student planner template + calendar widget combo is perfect. I can see my whole semester at a glance right in Notion.' },
-    { name: 'Emma Wilson', initials: 'EW', role: 'Marketing Lead', company: 'Stripe', color: '#A855F7', text: 'Clean design, instant setup, zero maintenance. Exactly what our marketing team needed for our Notion dashboards.' },
+    { name: 'Marcus', initials: 'M', color: '#DDD6FE', text: 'The Life OS template saved me an entire weekend of setup. Combined with Peachy widgets, my Notion workspace finally feels complete.' },
+    { name: 'Yuki', initials: 'Y', color: '#A5F3FC', text: 'Our whole team switched to Peachy calendars in Notion. The embed URL system is brilliant — just paste and it works. No auth, no fuss.' },
+    { name: 'Rachel', initials: 'R', color: '#FCA5A5', text: 'I\'ve tried every Notion widget out there. Peachy is the only one that matches the quality of my workspace design. Highly recommend.' },
+    { name: 'Alex', initials: 'A', color: '#99F6E4', text: 'The student planner template + calendar widget combo is perfect. I can see my whole semester at a glance right in Notion.' },
+    { name: 'Emma', initials: 'E', color: '#E9D5FF', text: 'Clean design, instant setup, zero maintenance. Exactly what our marketing team needed for our Notion dashboards.' },
   ],
   col3: [
-    { name: 'Nina Patel', initials: 'NP', role: 'Operations Manager', company: 'Notion', color: '#0EA5E9', text: 'We actually use Peachy widgets internally. The auto theme detection means they look great in both light and dark mode automatically.' },
-    { name: 'Tom Anderson', initials: 'TA', role: 'Creative Director', company: 'Pentagram', color: '#D946EF', text: 'The design language is Apple-level clean. Border radius, typography, color palette — everything is considered. Beautiful work.' },
-    { name: 'Lisa Chang', initials: 'LC', role: 'Productivity Coach', company: 'Skillshare', color: '#F97316', text: 'I recommend Peachy to all my clients. The templates are thoughtfully structured and the widgets add that extra polish to any workspace.' },
-    { name: 'Chris Murphy', initials: 'CM', role: 'CEO', company: 'Calm', color: '#22C55E', text: 'We evaluated several widget solutions. Peachy won on design quality alone. The fact that it\'s free makes it an absolute no-brainer.' },
+    { name: 'Nina', initials: 'N', color: '#BAE6FD', text: 'We actually use Peachy widgets internally. The auto theme detection means they look great in both light and dark mode automatically.' },
+    { name: 'Tom', initials: 'T', color: '#F5D0FE', text: 'The design language is Apple-level clean. Border radius, typography, color palette — everything is considered. Beautiful work.' },
+    { name: 'Lisa', initials: 'L', color: '#FED7AA', text: 'I recommend Peachy to all my clients. The templates are thoughtfully structured and the widgets add that extra polish to any workspace.' },
+    { name: 'Chris', initials: 'C', color: '#BBF7D0', text: 'We evaluated several widget solutions. Peachy won on design quality alone. The fact that it\'s free makes it an absolute no-brainer.' },
   ],
 };
 
@@ -53,10 +53,10 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  font-size: 15px;
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.text.secondary};
   text-align: center;
-  margin: 8px 0 24px;
+  margin: 8px 0 100px;
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
@@ -118,18 +118,43 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
 `;
 
 const Card = styled.div`
-  background: #ffffff;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
   padding: 24px;
   flex-shrink: 0;
-  border: 1px solid #F0F0F0;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+`;
+
+const Stars = styled.div`
+  display: flex;
+  gap: 3px;
+  margin-bottom: 14px;
+  color: #F5A623;
+  font-size: 12px;
+`;
+
+const Text = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  line-height: 1.65;
+  margin: 0 0 20px;
+  letter-spacing: -0.01em;
+  flex: 1;
+`;
+
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.colors.border.light};
+  margin-bottom: 16px;
 `;
 
 const Author = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
 `;
 
 const Avatar = styled.div<{ $color: string }>`
@@ -140,39 +165,27 @@ const Avatar = styled.div<{ $color: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: #ffffff;
+  color: rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
 `;
 
-const Info = styled.div`
+const AuthorInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2px;
 `;
 
 const Name = styled.span`
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
-const Stars = styled.div`
-  display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
-  color: #F5A623;
-  font-size: 12px;
-`;
-
-const Text = styled.p`
-  font-size: 14px;
-  color: #777;
-  line-height: 1.6;
-  margin: 0;
-  letter-spacing: -0.01em;
+const Role = styled.span`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
 /* ── Star Icon ── */
@@ -193,16 +206,15 @@ const TestimonialColumn: React.FC<{
     <MarqueeInner $duration={duration} $reverse={reverse}>
       {[...items, ...items].map((t, i) => (
         <Card key={`${columnKey}-${i}`}>
-          <Author>
-            <Avatar $color={t.color}>{t.initials}</Avatar>
-            <Info>
-              <Name>{t.name}</Name>
-            </Info>
-          </Author>
           <Stars>
             {[...Array(5)].map((_, s) => <StarIcon key={s} />)}
           </Stars>
           <Text>{t.text}</Text>
+          <Divider />
+          <Author>
+            <Avatar $color={t.color}>{t.initials}</Avatar>
+            <Name>{t.name}</Name>
+          </Author>
         </Card>
       ))}
     </MarqueeInner>

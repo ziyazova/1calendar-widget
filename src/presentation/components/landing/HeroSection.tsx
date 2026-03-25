@@ -98,12 +98,12 @@ const fadeUp = keyframes`
 const Hero = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px 80px;
+  padding: 0 48px;
   text-align: center;
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {
-    padding: 60px 24px 48px;
+    padding: 0 24px;
   }
 `;
 
@@ -157,9 +157,9 @@ const HeroPrimary = styled(PrimaryButton)`
 const GhostButton = styled.button`
   height: 44px;
   padding: 0 24px;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  border: 1px solid #E5E5E5;
+  background: #ffffff;
+  color: ${({ theme }) => theme.colors.text.primary};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: 14px;
   font-size: 14px;
   font-weight: 500;
@@ -225,7 +225,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onBrowseTemplates, onE
         </RotatingLine>{'\u00A0\u00A0'}for you.
       </Title>
       <HeroSubtitle data-ux="Hero Subtitle">
-        Templates and widgets that turn your Notion into a clear, structured system.
+        Templates and widgets that turn your Notion<br />into a clear, structured system.
       </HeroSubtitle>
       <ButtonRow>
         <HeroPrimary onClick={onBrowseTemplates}>

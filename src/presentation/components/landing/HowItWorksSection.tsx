@@ -21,7 +21,7 @@ const SectionTitle = styled.h2`
 `;
 
 const SectionSubtitle = styled.p`
-  font-size: 15px;
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 8px 0 24px;
 `;
@@ -29,29 +29,26 @@ const SectionSubtitle = styled.p`
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 14px;
   }
 `;
 
-const Card = styled.div<{ $accent: string }>`
-  background: #FAFAFA;
-  border: 1.5px solid ${({ $accent }) => {
-    const hex = $accent.replace('#', '');
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.2)`;
-  }};
-  border-radius: 16px;
+const Card = styled.div<{ $bg: string }>`
+  background: ${({ $bg }) => $bg};
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(200, 195, 230, 0.3);
+  border-radius: 20px;
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 190px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(0, 0, 0, 0.02);
+  min-height: 220px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.03);
 
   @media (max-width: 768px) {
     padding: 22px 18px;
@@ -59,22 +56,21 @@ const Card = styled.div<{ $accent: string }>`
   }
 `;
 
-const IconCircle = styled.div<{ $bg: string; $color: string }>`
-  width: 56px;
-  height: 56px;
-  border-radius: ${({ theme }) => theme.radii.lg};
+const IconWrap = styled.div<{ $bg: string; $color: string }>`
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   background: ${({ $bg }) => $bg};
-  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 
   svg {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     color: ${({ $color }) => $color};
-    stroke-width: 1.5;
+    stroke-width: 1.8;
   }
 `;
 
@@ -91,22 +87,31 @@ const CardDesc = styled.p`
   color: ${({ theme }) => theme.colors.text.secondary};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   margin: 0;
+  max-width: 240px;
 `;
 
 const STEPS = [
-  { icon: Search, iconBg: '#EDE9FE', iconColor: '#7C3AED', bg: 'linear-gradient(135deg, #F5F0FF 0%, #FFF0F5 100%)', title: 'Pick your template', desc: 'Browse the collection. Find the one that fits your life.' },
-  { icon: CreditCard, iconBg: '#DBEAFE', iconColor: '#2563EB', bg: 'linear-gradient(135deg, #F0F4FF 0%, #F5F0FF 100%)', title: 'Buy & download', desc: 'One-time payment. Your files arrive instantly.' },
-  { icon: Copy, iconBg: '#D1FAE5', iconColor: '#059669', bg: 'linear-gradient(135deg, #F0FFF5 0%, #F0F9FF 100%)', title: 'Duplicate to Notion', desc: 'One click. It\'s in your workspace. Ready to use.' },
+  { icon: Search, bg: 'linear-gradient(150deg, rgba(240,230,255,0.7) 0%, rgba(232,237,255,0.65) 50%, rgba(255,240,245,0.7) 100%)', iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Pick your template', desc: 'Browse the collection. Find the one that fits your life.' },
+  { icon: CreditCard, bg: 'linear-gradient(150deg, rgba(232,237,255,0.7) 0%, rgba(240,230,255,0.65) 50%, rgba(255,240,245,0.7) 100%)', iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Buy & download', desc: 'One-time payment. Files arrive instantly.' },
+  { icon: Copy, bg: 'linear-gradient(150deg, rgba(255,240,245,0.7) 0%, rgba(232,237,255,0.65) 50%, rgba(240,230,255,0.7) 100%)', iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Duplicate to Notion', desc: 'One click. It\'s in your workspace. Ready to use.' },
 ];
 
-export const HowItWorksSection: React.FC = () => (
+interface HowItWorksProps {
+  showTitle?: boolean;
+}
+
+export const HowItWorksSection: React.FC<HowItWorksProps> = ({ showTitle = true }) => (
   <Section data-ux="How It Works">
-    <SectionTitle>How it works</SectionTitle>
-    <SectionSubtitle>Three steps. No learning curve.</SectionSubtitle>
+    {showTitle && (
+      <>
+        <SectionTitle>How it works.</SectionTitle>
+        <SectionSubtitle>Easy as that.</SectionSubtitle>
+      </>
+    )}
     <Grid>
       {STEPS.map(s => (
-        <Card key={s.title} $accent={s.iconColor}>
-          <IconCircle $bg={s.iconBg} $color={s.iconColor}><s.icon /></IconCircle>
+        <Card key={s.title} $bg={s.bg}>
+          <IconWrap $bg={s.iconBg} $color={s.iconColor}><s.icon /></IconWrap>
           <div>
             <CardTitle>{s.title}</CardTitle>
             <CardDesc>{s.desc}</CardDesc>

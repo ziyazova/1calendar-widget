@@ -21,7 +21,7 @@ const TemplatesGallerySection = styled.section`
 const TemplatesMarqueeWrap = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 48px;
+  padding: 16px 48px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   position: relative;
@@ -47,7 +47,8 @@ const TemplatesMarqueeWrap = styled.div`
 const GalleryHeader = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 48px 20px;
+  padding: 0 48px;
+  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -126,7 +127,7 @@ const TEMPLATE_CATEGORIES = [
 const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
   display: flex;
   gap: 24px;
-  padding: 16px 0;
+  padding: 0;
 
   &:last-child {
     margin-bottom: 0;
@@ -140,8 +141,7 @@ const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean 
 const TemplatesScrollHint = styled.div`
   position: absolute;
   right: 80px;
-  top: calc(50% + 12px);
-  transform: translateY(-50%);
+  bottom: 130px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -163,12 +163,11 @@ const TemplatesScrollHint = styled.div`
   &:hover {
     background: rgba(0, 0, 0, 0.04);
     border-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-50%);
     svg { color: ${({ theme }) => theme.colors.text.primary}; }
   }
 
   &:active {
-    transform: translateY(-50%) scale(0.95);
+    transform: scale(0.95);
   }
 
   @media (max-width: 1024px) {
@@ -200,8 +199,8 @@ const TemplateCard = styled.div`
   border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  background: ${({ theme }) => theme.colors.background.surface};
+  border: 1.5px solid rgba(200, 195, 230, 0.25);
+  background: ${({ theme }) => theme.colors.background.elevated};
   margin-bottom: 8px;
 
   @media (max-width: 768px) {

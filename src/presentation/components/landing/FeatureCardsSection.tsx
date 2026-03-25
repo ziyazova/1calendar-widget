@@ -8,7 +8,7 @@ const FeatureCardsSectionWrap = styled.section`
   padding: 0 24px;
 
   @media (max-width: 768px) {
-    padding: 0 24px 60px;
+    padding: 0 24px;
   }
 `;
 
@@ -39,21 +39,13 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   background: #ffffff;
   border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
-  border: 1.5px solid ${({ $color }) => {
-    const hex = $color.replace('#', '');
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, 0.2)`;
-  }};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
     return behind === 0
       ? '0 4px 24px rgba(0, 0, 0, 0.06)'
       : '0 2px 16px rgba(0, 0, 0, 0.04)';
   }};
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   cursor: pointer;
   position: absolute;
   left: 0;
@@ -125,28 +117,21 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
 `;
 
 const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
-  padding: 12px 16px;
+  padding: 14px 20px;
   background: ${({ $color, $intensity = 0.05 }) => {
     const hex = $color.replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.43})`;
+    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.6})`;
   }};
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-bottom: 1px solid ${({ $color, $intensity = 0.05 }) => {
-    const hex = $color.replace('#', '');
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.4})`;
-  }};
+  border-bottom: none;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const FeatureTabDot = styled.span<{ $color: string }>`
@@ -213,9 +198,9 @@ const FeatureCardImage = styled.div`
   margin: 12px -1px -1px 0;
   border-radius: 16px 0 0 0;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  border-right: none;
-  border-bottom: none;
+  border: none;
+  background: ${({ theme }) => theme.colors.background.surface};
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
 
   img {
     width: 100%;
@@ -247,25 +232,25 @@ const WhyTitle = styled.h2`
 
 const FEATURE_CARDS = [
   {
-    tab: 'Payment',
-    color: '#8B5CF6',
-    title: 'Pay once. Keep forever.',
-    desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.',
-    image: '/template-main.png',
+    tab: 'Functionality',
+    color: '#3B82F6',
+    title: 'Built to work.',
+    desc: 'Automations, dashboards, pre-filled sections. Plus video guides so you\'re never stuck.',
+    image: '/widget-calendar.png',
   },
   {
     tab: 'Design',
-    color: '#3B82F6',
+    color: '#8B5CF6',
     title: 'Clean by default.',
     desc: 'Open it and it just feels right. Everything where you\'d expect it to be.',
     image: '/template-dashboard.png',
   },
   {
-    tab: 'Functionality',
+    tab: 'Payment',
     color: '#E8926A',
-    title: 'Built to work.',
-    desc: 'Automations, dashboards, pre-filled sections. Plus video guides so you\'re never stuck.',
-    image: '/widget-calendar.png',
+    title: 'Pay once. Keep forever.',
+    desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.',
+    image: '/template-main.png',
   },
 ];
 
@@ -289,9 +274,9 @@ export const FeatureCardsSection: React.FC = () => {
               <FeatureTabDot $color={f.color} />
               <FeatureTabTitle>{f.tab}</FeatureTabTitle>
               <FeatureTabActions>
-                <FeatureTabDot $color={f.color} style={{ width: 7, height: 7, opacity: 0.5 }} />
-                <FeatureTabDot $color={f.color} style={{ width: 7, height: 7, opacity: 0.5 }} />
-                <FeatureTabDot $color={f.color} style={{ width: 7, height: 7, opacity: 0.5 }} />
+                <FeatureTabDot $color={f.color} style={{ width: 8, height: 8, opacity: 0.4 }} />
+                <FeatureTabDot $color={f.color} style={{ width: 8, height: 8, opacity: 0.4 }} />
+                <FeatureTabDot $color={f.color} style={{ width: 8, height: 8, opacity: 0.4 }} />
               </FeatureTabActions>
             </FeatureCardTab>
             <FeatureCardBody data-ux="Feature Card Body">

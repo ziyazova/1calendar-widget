@@ -40,7 +40,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  font-size: 15px;
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0;
   text-align: center;

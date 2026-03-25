@@ -25,7 +25,7 @@ const PinCard = styled.div<{ $col?: string; $row?: string; $mobileCol?: string; 
   border-radius: 16px;
   overflow: hidden;
   cursor: default;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(200, 195, 230, 0.25);
   grid-column: ${({ $col }) => $col || 'auto'};
   grid-row: ${({ $row }) => $row || 'auto'};
   position: relative;
@@ -57,7 +57,16 @@ const PinImage = styled.img`
 
 const PinText = styled.div<{ $bg: string; $color?: string }>`
   padding: 20px;
-  background: ${({ $bg }) => $bg};
+  background: ${({ $bg }) => {
+    if ($bg === '#1F1F1F') return $bg;
+    const hex = $bg.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `linear-gradient(150deg, rgba(${r},${g},${b},0.7) 0%, rgba(${r},${g},${b},0.5) 50%, rgba(${r},${g},${b},0.6) 100%)`;
+  }};
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
   color: ${({ $color }) => $color || '#1F1F1F'};
   height: 100%;
   display: flex;
@@ -101,7 +110,7 @@ type PinItem = { type: 'image' | 'text'; image?: string; bg?: string; color?: st
 const PIN_SETS: Record<string, PinItem[]> = {
   Featured: [
     { type: 'image', image: '/widget-calendar.png', col: '1', row: '1 / 3', mobileCol: '1', mobileRow: '1 / 3' },
-    { type: 'text', bg: '#F5F0E8', title: 'Yours from day one.', desc: 'Color palettes, layout guides, and pre-made themes included.', col: '1', row: '3 / 5', mobileCol: '1', mobileRow: '3 / 5' },
+    { type: 'text', bg: '#E0F5ED', title: 'Yours from day one.', desc: 'Color palettes, layout guides, and pre-made themes included.', col: '1', row: '3 / 5', mobileCol: '1', mobileRow: '3 / 5' },
     { type: 'image', image: '/widget-clock2.png', col: '2', row: '1 / 4', mobileCol: '2', mobileRow: '1 / 4' },
     { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Only on Peachy.', desc: 'Widgets you won\'t find anywhere else.', col: '2', row: '4 / 5', mobileCol: '2', mobileRow: '4 / 5' },
     { type: 'text', bg: '#E8EDFF', title: 'Pay once. Keep forever.', desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.', col: '3', row: '1 / 3', hideOnMobile: true },
