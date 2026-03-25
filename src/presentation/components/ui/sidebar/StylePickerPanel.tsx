@@ -209,7 +209,7 @@ const PreviewWrap = styled.div`
 `;
 
 const PreviewScale = styled.div`
-  transform: scale(0.32);
+  transform: scale(0.26);
   transform-origin: center center;
   width: 420px;
   min-height: 380px;
@@ -245,21 +245,22 @@ const CardLabel = styled.span<{ $active: boolean }>`
 const EditButton = styled.button`
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  height: 30px;
-  padding: 0 16px;
+  height: 32px;
+  padding: 0 20px;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.sm};
+  border-radius: ${({ theme }) => theme.radii.button};
   background: rgba(0, 0, 0, 0.05);
   color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.15s ease;
   letter-spacing: -0.01em;
 
-  svg { width: 13px; height: 13px; }
+  svg { width: 14px; height: 14px; }
 
   &:hover {
     background: rgba(51, 132, 244, 0.1);

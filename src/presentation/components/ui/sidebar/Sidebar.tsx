@@ -704,7 +704,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </CategoryIcon>
           </CollapsedIconWrapper>
           <CategoryText $collapsed={collapsed}>{title}</CategoryText>
-          {!collapsed && <ChevronRight className="chevron" />}
           {collapsed && <Tooltip>{title}</Tooltip>}
         </CategoryHeader>
       </WidgetCategory>

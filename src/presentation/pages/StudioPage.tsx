@@ -59,7 +59,7 @@ const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boole
   }};
   margin-right: ${({ $fullWidth, $editorOpen }) => $fullWidth ? '0' : $editorOpen ? '290px' : '0'};
   height: 100vh;
-  transition: margin-left 0.25s ease, margin-right 0.25s ease;
+  transition: margin-left 0.35s cubic-bezier(0.22, 1, 0.36, 1), margin-right 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
   @media (max-width: 1024px) {
     margin-left: ${({ $sidebarCollapsed, $stylePanelOpen }) => {
@@ -104,7 +104,7 @@ const WidgetArea = styled.div`
   border-radius: ${({ theme }) => theme.radii['2xl']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: none;
-  margin: 12px 0 12px 0;
+  margin: 12px;
   animation: ${widgetAreaAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {
