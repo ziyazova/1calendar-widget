@@ -160,7 +160,7 @@ const ZoomableWidget = styled.div<{ $zoom: number }>`
 
 const FloatingToolbar = styled.div`
   position: absolute;
-  bottom: 32px;
+  bottom: 56px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
