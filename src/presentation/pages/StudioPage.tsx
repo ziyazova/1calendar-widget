@@ -842,7 +842,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     try {
       const [type, ...styleParts] = currentWidgetKey.split('-');
       const style = styleParts.join('-');
-      const settings = currentWidget.settings.toJSON ? currentWidget.settings.toJSON() : { ...currentWidget.settings };
+      const settings = JSON.parse(JSON.stringify(currentWidget.settings));
 
       if (editingWidgetId) {
         await WidgetStorageService.updateWidget(editingWidgetId, {
@@ -1008,10 +1008,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       </CopyButton>
                     </EmbedUrlGroup>
 
-                    <ToolbarDivider />
-                    <SaveBtn onClick={handleSaveWidget} disabled={saving} $saved={saved}>
-                      {saved ? <><Check /> Saved</> : saving ? <>Saving...</> : <><Save /> Save</>}
-                    </SaveBtn>
+                    {isRegistered && (
+                      <>
+                        <ToolbarDivider />
+                        <SaveBtn onClick={handleSaveWidget} disabled={saving} $saved={saved}>
+                          {saved ? <><Check /> Saved</> : saving ? <>Saving...</> : <><Save /> Save</>}
+                        </SaveBtn>
+                      </>
+                    )}
 
                   </FloatingToolbar>
                 )}
