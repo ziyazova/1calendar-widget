@@ -17,6 +17,8 @@ import { CustomizationPanel } from '../components/ui/forms/CustomizationPanel';
 import { LayoutCheck } from '../components/layout/LayoutCheck';
 import { useAuth } from '../context/AuthContext';
 import { WidgetStorageService } from '../../infrastructure/services/WidgetStorageService';
+import { StylePickerPanel } from '../components/ui/sidebar/StylePickerPanel';
+import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../components/ui/widgetConfig';
 
 interface StudioPageProps {
   diContainer: DIContainer;
@@ -44,19 +46,27 @@ const WorkspaceContainer = styled.div`
   }
 `;
 
-const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boolean }>`
+const ContentArea = styled.div<{ $fullWidth?: boolean; $sidebarCollapsed?: boolean; $stylePanelOpen?: boolean }>`
   display: flex;
   flex: 1;
   gap: 0;
   padding: 0;
   overflow: hidden;
-  margin-left: ${({ $sidebarCollapsed }) => $sidebarCollapsed ? '64px' : '270px'};
+  margin-left: ${({ $sidebarCollapsed, $stylePanelOpen }) => {
+    const sidebarW = $sidebarCollapsed ? 64 : 270;
+    const panelW = $stylePanelOpen ? 260 : 0;
+    return `${sidebarW + panelW}px`;
+  }};
   margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '290px'};
   height: 100vh;
   transition: margin-left 0.25s ease, margin-right 0.25s ease;
 
   @media (max-width: 1024px) {
-    margin-left: ${({ $sidebarCollapsed }) => $sidebarCollapsed ? '64px' : '220px'};
+    margin-left: ${({ $sidebarCollapsed, $stylePanelOpen }) => {
+      const sidebarW = $sidebarCollapsed ? 64 : 220;
+      const panelW = $stylePanelOpen ? 240 : 0;
+      return `${sidebarW + panelW}px`;
+    }};
     margin-right: ${({ $fullWidth }) => $fullWidth ? '0' : '240px'};
   }
 
@@ -740,6 +750,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
+  const [stylePanel, setStylePanel] = useState<string | null>('calendar');
   const navigate = useNavigate();
   const { isRegistered } = useAuth();
 
@@ -880,7 +891,28 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             onToggleCollapse={window.innerWidth > 768 && window.innerWidth <= 1024 ? () => setSidebarCollapsed(!sidebarCollapsed) : undefined}
             dashboardView={dashboardView}
             onDashboardViewChange={setDashboardView}
+            expandedCategory={stylePanel}
+            onCategoryToggle={setStylePanel}
           />
+          {stylePanel && (() => {
+            const stylesMap: Record<string, { styles: typeof CALENDAR_STYLES; label: string }> = {
+              calendar: { styles: CALENDAR_STYLES, label: 'Calendar' },
+              clock: { styles: CLOCK_STYLES, label: 'Clock' },
+              board: { styles: BOARD_STYLES, label: 'Canvas' },
+            };
+            const cfg = stylesMap[stylePanel];
+            if (!cfg) return null;
+            return (
+              <StylePickerPanel
+                styles={cfg.styles}
+                widgetType={stylePanel}
+                categoryLabel={cfg.label}
+                currentWidget={currentWidgetKey}
+                onWidgetChange={(type, style) => { setDashboardView(null); handleWidgetChange(type, style); }}
+                onClose={() => setStylePanel(null)}
+              />
+            );
+          })()}
         </div>
         {mobileSidebar && <MobileOverlay onClick={() => setMobileSidebar(false)} />}
 
@@ -892,7 +924,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <div style={{ width: 40 }} />
         </MobileTopBar>
 
-        <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed}>
+        <ContentArea $fullWidth={viewMode === 'layout-check' || !!dashboardView} $sidebarCollapsed={sidebarCollapsed} $stylePanelOpen={!!stylePanel}>
           {dashboardView ? (
             <WidgetArea style={{ overflow: 'auto' }}>
               <DashboardContent view={dashboardView} />

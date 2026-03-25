@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import styled, { css } from 'styled-components';
-import { Check } from 'lucide-react';
+import styled, { css, keyframes } from 'styled-components';
+import { Check, X } from 'lucide-react';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -27,8 +27,10 @@ import type { WidgetStyleConfig } from '../widgetConfig';
 interface StylePickerPanelProps {
   styles: WidgetStyleConfig[];
   widgetType: string;
+  categoryLabel: string;
   currentWidget: string;
   onWidgetChange: (type: string, style?: string) => void;
+  onClose: () => void;
 }
 
 /* ── Preview Renderers ── */
@@ -73,11 +75,96 @@ const BoardPreview: React.FC<{ styleValue: string }> = ({ styleValue }) => {
 
 /* ── Styled Components ── */
 
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const PanelContainer = styled.div`
+  position: fixed;
+  left: 270px;
+  top: 0;
+  width: 260px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid ${({ theme }) => theme.colors.border.light};
+  z-index: ${({ theme }) => theme.zIndex.sticky - 1};
+  display: flex;
+  flex-direction: column;
+  animation: ${slideIn} 0.2s ease both;
+
+  @media (max-width: 1024px) {
+    left: 220px;
+    width: 240px;
+  }
+
+  @media (max-width: 768px) {
+    left: 270px;
+    width: 260px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+  }
+`;
+
+const PanelHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 16px 16px;
+  flex-shrink: 0;
+`;
+
+const PanelTitle = styled.h3`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+  margin: 0;
+`;
+
+const CloseButton = styled.button`
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: ${({ theme }) => theme.radii.sm};
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+`;
+
+const PanelBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+`;
+
 const PanelGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 8px 0 4px;
+  gap: 10px;
 `;
 
 const CardOuter = styled.button<{ $active: boolean }>`
@@ -106,7 +193,7 @@ const CardOuter = styled.button<{ $active: boolean }>`
   }
 
   ${({ $active }) => $active && css`
-    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.12);
+    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   `}
 `;
 
@@ -124,7 +211,7 @@ const PreviewWrap = styled.div`
 `;
 
 const PreviewScale = styled.div`
-  transform: scale(0.22);
+  transform: scale(0.24);
   transform-origin: center center;
   width: 420px;
   min-height: 380px;
@@ -156,7 +243,7 @@ const CardLabel = styled.div<{ $active: boolean }>`
   border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
-const CheckIcon = styled.div`
+const CheckBadge = styled.div`
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -178,8 +265,10 @@ const CheckIcon = styled.div`
 export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
   styles,
   widgetType,
+  categoryLabel,
   currentWidget,
   onWidgetChange,
+  onClose,
 }) => {
   const renderPreview = (styleValue: string) => {
     switch (widgetType) {
@@ -207,29 +296,39 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
   };
 
   return (
-    <PanelGrid>
-      {styles.map((s) => {
-        const isActive = currentWidget === `${widgetType}-${s.value}`;
-        return (
-          <CardOuter
-            key={s.value}
-            $active={isActive}
-            onClick={() => onWidgetChange(widgetType, s.value)}
-          >
-            <PreviewWrap>
-              {renderPreview(s.value)}
-            </PreviewWrap>
-            <CardLabel $active={isActive}>
-              {s.label}
-              {isActive && (
-                <CheckIcon>
-                  <Check />
-                </CheckIcon>
-              )}
-            </CardLabel>
-          </CardOuter>
-        );
-      })}
-    </PanelGrid>
+    <PanelContainer>
+      <PanelHeader>
+        <PanelTitle>{categoryLabel}</PanelTitle>
+        <CloseButton onClick={onClose} aria-label="Close">
+          <X />
+        </CloseButton>
+      </PanelHeader>
+      <PanelBody>
+        <PanelGrid>
+          {styles.map((s) => {
+            const isActive = currentWidget === `${widgetType}-${s.value}`;
+            return (
+              <CardOuter
+                key={s.value}
+                $active={isActive}
+                onClick={() => onWidgetChange(widgetType, s.value)}
+              >
+                <PreviewWrap>
+                  {renderPreview(s.value)}
+                </PreviewWrap>
+                <CardLabel $active={isActive}>
+                  {s.label}
+                  {isActive && (
+                    <CheckBadge>
+                      <Check />
+                    </CheckBadge>
+                  )}
+                </CardLabel>
+              </CardOuter>
+            );
+          })}
+        </PanelGrid>
+      </PanelBody>
+    </PanelContainer>
   );
 };

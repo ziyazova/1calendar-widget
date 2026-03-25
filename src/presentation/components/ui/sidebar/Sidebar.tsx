@@ -5,7 +5,6 @@ import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, Layout
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../widgetConfig';
 import { useAuth } from '@/presentation/context/AuthContext';
 import type { WidgetStyleConfig } from '../widgetConfig';
-import { StylePickerPanel } from './StylePickerPanel';
 
 export type DashboardView = 'my-widgets' | 'templates' | 'purchases' | 'profile' | null;
 
@@ -20,6 +19,9 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
   dashboardView?: DashboardView;
   onDashboardViewChange?: (view: DashboardView) => void;
+  /** Called when a widget category is expanded/collapsed in the sidebar */
+  expandedCategory?: string | null;
+  onCategoryToggle?: (category: string | null) => void;
 }
 
 /* ─── Sidebar Container ─── */
@@ -270,19 +272,6 @@ const CategoryIcon = styled.div<{ $muted?: boolean; $active?: boolean }>`
 
 /* ─── Styles List (expanded mode) ─── */
 
-const StylesList = styled.div<{ $expanded: boolean }>`
-  display: grid;
-  grid-template-rows: ${({ $expanded }) => $expanded ? '1fr' : '0fr'};
-  overflow: hidden;
-  transition: grid-template-rows 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  padding: 0 16px;
-  position: relative;
-
-  > div {
-    min-height: 0;
-    padding-top: 4px;
-  }
-`;
 
 
 /* ─── Tooltip ─── */
@@ -616,9 +605,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
   dashboardView,
   onDashboardViewChange,
+  expandedCategory,
+  onCategoryToggle,
 }) => {
   const navigate = useNavigate();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['calendar']);
   const [profileOpen, setProfileOpen] = useState(false);
   const { isRegistered, user, logout } = useAuth();
   const [popover, setPopover] = useState<{
@@ -631,12 +621,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const calendarRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>;
   const clockRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>;
   const boardRef = useRef<HTMLButtonElement>(null) as React.RefObject<HTMLButtonElement>;
-
-  const toggle = (key: string) => {
-    setExpandedSections(prev =>
-      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
-    );
-  };
 
   const openPopover = useCallback((
     type: string,
@@ -677,7 +661,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         openPopover(key, title, styles, ref);
       }
     } else {
-      toggle(key);
+      // Toggle the external category panel
+      onCategoryToggle?.(expandedCategory === key ? null : key);
     }
   };
 
@@ -701,7 +686,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ) => {
     if (!availableWidgets.includes(key)) return null;
 
-    const isExpanded = expandedSections.includes(key);
+    const isExpanded = expandedCategory === key;
     const hasActive = hasActiveStyle(key, styles);
 
     return (
@@ -713,7 +698,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={() => handleCategoryClick(key, title, styles, ref)}
         >
           <CollapsedIconWrapper $hasActive={collapsed ? hasActive : false}>
-            <CategoryIcon $active={collapsed && hasActive}>
+            <CategoryIcon $active={isExpanded || (collapsed && hasActive)}>
               <Icon />
             </CategoryIcon>
           </CollapsedIconWrapper>
@@ -721,18 +706,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!collapsed && <ChevronRight className="chevron" />}
           {collapsed && <Tooltip>{title}</Tooltip>}
         </CategoryHeader>
-        {!collapsed && (
-          <StylesList $expanded={isExpanded}>
-            <div>
-              <StylePickerPanel
-                styles={styles}
-                widgetType={key}
-                currentWidget={currentWidget}
-                onWidgetChange={onWidgetChange}
-              />
-            </div>
-          </StylesList>
-        )}
       </WidgetCategory>
     );
   };
