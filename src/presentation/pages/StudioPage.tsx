@@ -909,6 +909,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 widgetType={stylePanel}
                 categoryLabel={cfg.label}
                 currentWidget={currentWidgetKey}
+                canEdit={isRegistered}
                 onWidgetChange={(type, style) => { setDashboardView(null); handleWidgetChange(type, style); }}
                 onEdit={(type, style) => {
                   handleWidgetChange(type, style);
@@ -916,6 +917,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   setStylePanel(null);
                   setTimeout(() => setEditorOpen(true), 250);
                 }}
+                onLockedEdit={() => navigate('/login')}
                 onClose={() => setStylePanel(null)}
               />
             );
@@ -1005,6 +1007,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                         {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
                       </CopyButton>
                     </EmbedUrlGroup>
+
+                    <ToolbarDivider />
+                    <SaveBtn onClick={handleSaveWidget} disabled={saving} $saved={saved}>
+                      {saved ? <><Check /> Saved</> : saving ? <>Saving...</> : <><Save /> Save</>}
+                    </SaveBtn>
 
                   </FloatingToolbar>
                 )}

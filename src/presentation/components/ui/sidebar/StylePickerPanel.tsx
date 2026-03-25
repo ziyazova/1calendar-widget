@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { X, Pencil } from 'lucide-react';
+import { X, Pencil, Lock } from 'lucide-react';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -29,8 +29,10 @@ interface StylePickerPanelProps {
   widgetType: string;
   categoryLabel: string;
   currentWidget: string;
+  canEdit: boolean;
   onWidgetChange: (type: string, style?: string) => void;
   onEdit: (type: string, style: string) => void;
+  onLockedEdit?: () => void;
   onClose: () => void;
 }
 
@@ -287,6 +289,31 @@ const EditButton = styled.button`
   }
 `;
 
+const LockedButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: -0.01em;
+
+  svg { width: 13px; height: 13px; }
+
+  &:hover {
+    background: #ffffff;
+    color: ${({ theme }) => theme.colors.text.secondary};
+  }
+`;
+
 /* ── Component ── */
 
 export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
@@ -294,8 +321,10 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
   widgetType,
   categoryLabel,
   currentWidget,
+  canEdit,
   onWidgetChange,
   onEdit,
+  onLockedEdit,
   onClose,
 }) => {
   const renderPreview = (styleValue: string) => {
@@ -345,14 +374,25 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
                 <PreviewWrap>
                   {renderPreview(s.value)}
                   <PreviewOverlay>
-                    <EditButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(widgetType, s.value);
-                      }}
-                    >
-                      <Pencil /> Edit
-                    </EditButton>
+                    {canEdit ? (
+                      <EditButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(widgetType, s.value);
+                        }}
+                      >
+                        <Pencil /> Edit
+                      </EditButton>
+                    ) : (
+                      <LockedButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onLockedEdit?.();
+                        }}
+                      >
+                        <Lock /> Pro
+                      </LockedButton>
+                    )}
                   </PreviewOverlay>
                 </PreviewWrap>
                 <CardBottom>
