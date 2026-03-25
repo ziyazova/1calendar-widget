@@ -590,29 +590,32 @@ const ExploreLabel = styled.div`
   border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
-/* ── Explore Categories ── */
+/* ── All Explore Widgets ── */
 
-const EXPLORE_CATEGORIES = [
-  {
-    key: 'calendar',
-    title: 'Calendars',
-    styles: CALENDAR_STYLES.map(s => ({ type: 'calendar', style: s.value, label: s.label })),
-  },
-  {
-    key: 'clock',
-    title: 'Clocks',
-    styles: CLOCK_STYLES.map(s => ({ type: 'clock', style: s.value, label: s.label })),
-  },
-  {
-    key: 'board',
-    title: 'Canvas',
-    styles: BOARD_STYLES.map(s => ({ type: 'board', style: s.value, label: s.label })),
-  },
+const ALL_EXPLORE_WIDGETS = [
+  ...CALENDAR_STYLES.map(s => ({ type: 'calendar', style: s.value, label: s.label, category: 'Calendar' })),
+  ...CLOCK_STYLES.map(s => ({ type: 'clock', style: s.value, label: s.label, category: 'Clock' })),
+  ...BOARD_STYLES.map(s => ({ type: 'board', style: s.value, label: s.label, category: 'Canvas' })),
 ];
+
+type ExploreFilter = 'all' | 'calendar' | 'clock' | 'board';
+const EXPLORE_FILTERS: { key: ExploreFilter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'calendar', label: 'Calendars' },
+  { key: 'clock', label: 'Clocks' },
+  { key: 'board', label: 'Canvas' },
+];
+
+const ExploreGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+`;
 
 const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: SavedWidget) => void }> = ({ onAddNew, onEditWidget }) => {
   const { isRegistered } = useAuth();
   const [filter, setFilter] = useState<WidgetFilter>('all');
+  const [exploreFilter, setExploreFilter] = useState<ExploreFilter>('all');
   const [search, setSearch] = useState('');
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
@@ -730,26 +733,28 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
       )}
 
       {/* Explore Widgets */}
-      {EXPLORE_CATEGORIES.map(cat => (
-        <React.Fragment key={cat.key}>
-          <SectionHeading>
-            <SectionTitle>{cat.title}</SectionTitle>
-            <SeeAllBtn onClick={() => onAddNew?.()}>
-              Browse all <ArrowRight />
-            </SeeAllBtn>
-          </SectionHeading>
-          <ExploreRow>
-            {cat.styles.map((s, i) => (
-              <ExploreCard key={s.style} $index={i} onClick={() => onAddNew?.()}>
-                <ExplorePreview>
-                  {renderExplorePreview(s.type, s.style)}
-                </ExplorePreview>
-                <ExploreLabel>{s.label}</ExploreLabel>
-              </ExploreCard>
-            ))}
-          </ExploreRow>
-        </React.Fragment>
-      ))}
+      <SectionHeading>
+        <SectionTitle>Explore</SectionTitle>
+      </SectionHeading>
+      <FilterRow>
+        {EXPLORE_FILTERS.map(f => (
+          <FilterChip key={f.key} $active={exploreFilter === f.key} onClick={() => setExploreFilter(f.key)}>
+            {f.label}
+          </FilterChip>
+        ))}
+      </FilterRow>
+      <ExploreGrid>
+        {ALL_EXPLORE_WIDGETS
+          .filter(w => exploreFilter === 'all' || w.type === exploreFilter)
+          .map((s, i) => (
+            <ExploreCard key={`${s.type}-${s.style}`} $index={i} onClick={() => onAddNew?.()}>
+              <ExplorePreview>
+                {renderExplorePreview(s.type, s.style)}
+              </ExplorePreview>
+              <ExploreLabel>{s.label} <span style={{ color: 'rgba(0,0,0,0.3)', fontWeight: 400 }}>{s.category}</span></ExploreLabel>
+            </ExploreCard>
+          ))}
+      </ExploreGrid>
     </Container>
   );
 };
