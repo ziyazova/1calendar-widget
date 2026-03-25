@@ -615,11 +615,17 @@ const ExploreGrid = styled.div`
   gap: 12px;
 `;
 
-const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: SavedWidget) => void }> = ({ onAddNew, onEditWidget }) => {
+const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: SavedWidget) => void; exploreCategory?: string | null }> = ({ onAddNew, onEditWidget, exploreCategory }) => {
   const { isRegistered } = useAuth();
   const [filter, setFilter] = useState<WidgetFilter>('all');
-  const [exploreFilter, setExploreFilter] = useState<ExploreFilter>('all');
+  const [exploreFilter, setExploreFilter] = useState<ExploreFilter>((exploreCategory as ExploreFilter) || 'all');
+  const [mySort, setMySort] = useState<'newest' | 'oldest'>('newest');
   const [search, setSearch] = useState('');
+
+  // Sync explore filter when sidebar category changes
+  useEffect(() => {
+    if (exploreCategory) setExploreFilter(exploreCategory as ExploreFilter);
+  }, [exploreCategory]);
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -639,7 +645,11 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
   };
 
   const filtered = (filter === 'all' ? widgets : widgets.filter(w => w.type === filter))
-    .filter(w => !search || w.name.toLowerCase().includes(search.toLowerCase()) || w.style.toLowerCase().includes(search.toLowerCase()));
+    .filter(w => !search || w.name.toLowerCase().includes(search.toLowerCase()) || w.style.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => mySort === 'newest'
+      ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      : new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
 
   const counts = FILTERS.map(f => ({
     ...f,
@@ -695,6 +705,11 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
                 {f.label} <ChipCount>{f.count}</ChipCount>
               </FilterChip>
             ))}
+            <FilterSpacer />
+            <SortSelect value={mySort} onChange={(e) => setMySort(e.target.value as 'newest' | 'oldest')}>
+              <option value="newest">Last Created</option>
+              <option value="oldest">Oldest First</option>
+            </SortSelect>
           </FilterRow>
           <Grid>
             <AddCard onClick={() => onAddNew?.()}>
@@ -837,11 +852,12 @@ interface DashboardContentProps {
   view: DashboardView;
   onAddNew?: () => void;
   onEditWidget?: (widget: SavedWidget) => void;
+  exploreCategory?: string | null;
 }
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({ view, onAddNew, onEditWidget }) => {
+export const DashboardContent: React.FC<DashboardContentProps> = ({ view, onAddNew, onEditWidget, exploreCategory }) => {
   switch (view) {
-    case 'my-widgets': return <MyWidgetsView onAddNew={onAddNew} onEditWidget={onEditWidget} />;
+    case 'my-widgets': return <MyWidgetsView onAddNew={onAddNew} onEditWidget={onEditWidget} exploreCategory={exploreCategory} />;
     case 'templates': return <TemplatesView />;
     case 'purchases': return <PurchasesView />;
     case 'profile': return <ProfileView />;
