@@ -27,12 +27,12 @@ import { InspirationBoard } from '../widgets/board/styles/InspirationBoard';
 
 const Container = styled.div`
   width: 100%;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 32px 32px;
+  padding: 80px 40px 40px;
 
   @media (max-width: 768px) {
-    padding: 24px 16px;
+    padding: 40px 16px 24px;
   }
 `;
 
@@ -199,31 +199,35 @@ const OverlayBtn = styled.button<{ $danger?: boolean }>`
 `;
 
 const AddCard = styled.div`
-  border: 2px dashed rgba(0, 0, 0, 0.08);
+  border: 2px dashed rgba(51, 132, 244, 0.25);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   min-height: 172px;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  transition: all 0.15s ease;
+  color: #3384F4;
+  background: rgba(51, 132, 244, 0.03);
+  transition: all 0.2s ease;
   opacity: 0;
   animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-  svg { width: 22px; height: 22px; }
+  svg { width: 24px; height: 24px; }
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.accent};
-    color: ${({ theme }) => theme.colors.accent};
+    border-color: #3384F4;
+    background: rgba(51, 132, 244, 0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(51, 132, 244, 0.12);
   }
 `;
 
 const AddLabel = styled.span`
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 `;
 
 /* ── Purchase Row ── */
@@ -530,23 +534,23 @@ const ExploreRow = styled.div`
 
 const ExploreCard = styled.div<{ $index: number }>`
   flex-shrink: 0;
-  width: 180px;
+  width: 200px;
   border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 14px;
+  border-radius: 16px;
   background: #ffffff;
   overflow: hidden;
   cursor: pointer;
   opacity: 0;
   animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: ${({ $index }) => 0.04 + $index * 0.05}s;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
   }
-
-  &:hover ${CardOverlay} { opacity: 1; }
 `;
 
 const ExplorePreview = styled.div`
@@ -578,8 +582,8 @@ const ExploreScaleBoard = styled(ExploreScaleCalendar)`
 `;
 
 const ExploreLabel = styled.div`
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
   font-weight: 500;
   color: #1F1F1F;
   letter-spacing: -0.01em;
@@ -689,6 +693,10 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
             ))}
           </FilterRow>
           <Grid>
+            <AddCard onClick={() => onAddNew?.()}>
+              <Plus />
+              <AddLabel>New Widget</AddLabel>
+            </AddCard>
             {filtered.map((w, i) => (
               <Card key={w.id} $index={i}>
                 <CardPreview>
@@ -704,10 +712,6 @@ const MyWidgetsView: React.FC<{ onAddNew?: () => void; onEditWidget?: (widget: S
                 </CardInfo>
               </Card>
             ))}
-            <AddCard onClick={() => onAddNew?.()}>
-              <Plus />
-              <AddLabel>New Widget</AddLabel>
-            </AddCard>
           </Grid>
         </>
       )}
