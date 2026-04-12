@@ -320,14 +320,18 @@ const CartItemImage = styled.div`
   width: 44px;
   height: 44px;
   border-radius: ${({ theme }) => theme.radii.sm};
-  background: ${({ theme }) => theme.colors.background.surface};
+  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;
 
   img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    position: absolute;
+    inset: 0;
+    margin: auto;
   }
 `;
 
@@ -515,7 +519,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
           <NavLink $active={activeLink === 'studio'} onClick={() => navigate(isLoggedIn ? '/studio' : '/widgets')}>Widget Studio</NavLink>
-          <NavLink $active={activeLink === 'dev'} onClick={() => navigate('/dev')}>Design System</NavLink>
           <CartWrap ref={cartRef}>
             <CartButton aria-label="Cart" onClick={() => setCartOpen(!cartOpen)}>
               <ShoppingCart />
@@ -563,7 +566,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
       <MobileMenu>
         <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
         <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav(isLoggedIn ? '/studio' : '/widgets')}>Widget Studio</MobileLink>
-        <MobileLink $active={activeLink === 'dev'} onClick={() => handleNav('/dev')}>Design System</MobileLink>
         <MobileCTA onClick={() => handleNav(isLoggedIn ? '/studio' : '/login')}>
           {isLoggedIn ? 'Studio' : 'Log in'}
         </MobileCTA>

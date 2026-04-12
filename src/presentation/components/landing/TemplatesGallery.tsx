@@ -200,7 +200,7 @@ const TemplateCard = styled.div`
   overflow: hidden;
   cursor: pointer;
   border: 1.5px solid rgba(200, 195, 230, 0.25);
-  background: ${({ theme }) => theme.colors.background.elevated};
+  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
   margin-bottom: 8px;
 
   @media (max-width: 768px) {
@@ -210,15 +210,18 @@ const TemplateCard = styled.div`
 `;
 
 const TemplateCardImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
   display: block;
-  transform: scale(1.23);
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.1));
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 
   ${TemplateCardWrap}:hover & {
-    transform: scale(1.30);
+    transform: scale(1.06);
   }
 `;
 
@@ -247,14 +250,19 @@ const TemplateCardPrice = styled.span`
 `;
 
 const TEMPLATE_ROW_1 = [
-  { id: '1', image: '/template-main.png', title: 'Weekly Planner', price: 'Free', tags: ['bestsellers', 'life'] },
-  { id: '3', image: '/template-main.png', title: 'Student Planner', price: '$3.99', tags: ['students'] },
-  { id: '6', image: '/template-main.png', title: 'Life OS Template', price: '$7.99', tags: ['bestsellers', 'life', 'new'] },
-  { id: '9', image: '/template-main.png', title: 'Habit Tracker', price: 'Free', tags: ['life', 'new'] },
-  { id: '5', image: '/template-main.png', title: 'OKR Template', price: 'Free', tags: ['new'] },
-  { id: '7', image: '/template-main.png', title: 'Budget Tracker', price: '$2.99', tags: ['life'] },
-  { id: '12', image: '/template-main.png', title: 'Reading List', price: 'Free', tags: ['students'] },
-  { id: '8', image: '/template-main.png', title: 'Meal Planner', price: 'Free', tags: ['life', 'bestsellers'] },
+  { id: '1', image: '/template-cherry-planner.png', title: 'Ultimate Life Planner', price: '$18.99', tags: ['bestsellers', 'life'] },
+  { id: '2', image: '/template-wellness.png', title: 'Ultimate Wellness Planner', price: '$14.99', tags: ['bestsellers', 'life'] },
+  { id: '6', image: '/template-mystic.png', title: 'Mystic Life Planner', price: '$16.99', tags: ['life'] },
+  { id: '8', image: '/template-glowup.png', title: 'Glow Up Planner', price: '$12.99', tags: ['bestsellers', 'life'] },
+  { id: '3', image: '/template-academic-dark.png', title: 'Academic Planner Dark', price: '$9.99', tags: ['students'] },
+  { id: '7', image: '/template-academia-light.png', title: 'Light Academia Planner', price: '$11.99', tags: ['students'] },
+  { id: '12', image: '/template-dark-academia.png', title: 'Dark Academia Student', price: '$11.99', tags: ['students'] },
+  { id: '10', image: '/template-cherub.png', title: 'Cherub Planner', price: '$12.99', tags: ['life'] },
+  { id: '4', image: '/template-green-life.png', title: 'Green Life Planner', price: '$14.99', tags: ['life'] },
+  { id: '9', image: '/template-life-olive.png', title: 'Olive Life Planner', price: '$14.99', tags: ['life'] },
+  { id: '11', image: '/template-minimalist-green.png', title: 'Minimalist Green Planner', price: '$13.99', tags: ['life'] },
+  { id: '13', image: '/template-university-dark.png', title: 'University Planner', price: '$9.99', tags: ['students'] },
+  { id: '5', image: '/template-student-light.png', title: 'Student Planner Light', price: '$8.99', tags: ['students'] },
 ];
 
 interface TemplatesGalleryProps {

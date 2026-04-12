@@ -16,7 +16,7 @@ const Header = styled.div`
   padding: 48px 48px 0;
   animation: ${fadeUp} 0.25s ease both;
 
-  @media (max-width: 768px) { padding: 32px 24px 0; }
+  @media (max-width: 768px) { padding: 24px 24px 0; }
 `;
 
 
@@ -139,12 +139,14 @@ const Card = styled.div`
 const CardInner = styled.img`
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 80%;
+  height: 80%;
+  margin: auto;
+  object-fit: contain;
   object-position: center center;
-  transform: scale(1.19);
+  transform: scale(1);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.12));
 `;
 
 const CardImage = styled.div<{ $gradient: string }>`
@@ -156,9 +158,10 @@ const CardImage = styled.div<{ $gradient: string }>`
   cursor: pointer;
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: ${({ theme }) => theme.shadows.subtle};
+  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
 
   &:hover ${CardInner} {
-    transform: scale(1.24);
+    transform: scale(1.06);
   }
 
   @media (max-width: 768px) {

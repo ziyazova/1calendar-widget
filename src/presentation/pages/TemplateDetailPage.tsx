@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ChevronDown, Eye, ShoppingCart, Check } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper } from '@/presentation/components/shared';
+import { PageWrapper, BackButton } from '@/presentation/components/shared';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, FAQ_ITEMS } from '@/presentation/data/templates';
@@ -14,7 +14,7 @@ import { useCart } from '@/presentation/context/CartContext';
 const Content = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 48px 80px;
+  padding: 48px 48px 0;
   animation: ${fadeUp} 0.35s ease both;
   overflow-x: hidden;
 
@@ -124,19 +124,14 @@ const BreadcrumbCurrent = styled.span`
 /* ── Title area ── */
 
 const Title = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['3xl']};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  font-size: 32px;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
-  margin: 0 0 8px;
+  letter-spacing: -0.03em;
+  margin: 0 0 6px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 768px) {
     font-size: 26px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: 22px;
-    margin: 0 0 6px;
   }
 `;
 
@@ -172,10 +167,14 @@ const CarouselWrap = styled.div`
 `;
 
 const CarouselImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
   display: block;
+  margin: auto;
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.12));
 `;
 
 const CarouselLabel = styled.div`
@@ -544,16 +543,22 @@ const RelatedThumb = styled.div`
   height: 96px;
   border-radius: ${({ theme }) => theme.radii.md};
   overflow: hidden;
-  background: ${({ theme }) => theme.colors.background.surface};
+  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   flex-shrink: 0;
+  position: relative;
 `;
 
 const RelatedImg = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
   display: block;
+  margin: auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
 `;
 
 const RelatedPreview = styled.div`
@@ -567,6 +572,7 @@ const RelatedPreview = styled.div`
   overflow: hidden;
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   box-shadow: ${({ theme }) => theme.shadows.heavy};
+  background: linear-gradient(180deg, #FAFAFC 0%, #F4F4FA 40%, #EEEEF8 100%);
   z-index: 20;
   opacity: 0;
   pointer-events: none;
@@ -578,11 +584,14 @@ const RelatedPreview = styled.div`
   }
 
   img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 75%;
+    height: 75%;
+    object-fit: contain;
     display: block;
-    transform: scale(1.1);
+    margin: auto;
+    position: absolute;
+    inset: 0;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.1));
   }
 `;
 
@@ -777,13 +786,7 @@ export const TemplateDetailPage: React.FC = () => {
       <TopNav activeLink="templates" logoSub="Templates" />
 
       <Content>
-        <Breadcrumb>
-          <BreadcrumbLink onClick={() => navigate('/')}>Home</BreadcrumbLink>
-          <span>/</span>
-          <BreadcrumbLink onClick={() => navigate('/templates')}>Templates</BreadcrumbLink>
-          <span>/</span>
-          <BreadcrumbCurrent>{template.title}</BreadcrumbCurrent>
-        </Breadcrumb>
+        <BackButton label="Templates" onClick={() => navigate('/templates')} />
 
         <TwoCol>
           <TopSection>
@@ -791,7 +794,7 @@ export const TemplateDetailPage: React.FC = () => {
             <Description>{template.description}</Description>
 
             {/* Carousel */}
-            <CarouselWrap>
+            <CarouselWrap style={{ background: 'linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%)' }}>
               <CarouselImage src={template.image} alt={`Preview ${activeSlide + 1}`} />
               <CarouselLabel>Preview {activeSlide + 1}</CarouselLabel>
               <CarouselBtn $side="left" onClick={() => setActiveSlide(i => i > 0 ? i - 1 : slides.length - 1)}>
@@ -823,8 +826,7 @@ export const TemplateDetailPage: React.FC = () => {
             </FeatureList>
 
             {/* FAQ */}
-            <Divider />
-            <SectionTitle>Frequently Asked Questions</SectionTitle>
+            <SectionTitle style={{ marginTop: '32px' }}>FAQ</SectionTitle>
             {FAQ_ITEMS.map((faq, i) => (
               <FaqItem key={i}>
                 <FaqQuestion onClick={() => setOpenFaq(openFaq === i ? null : i)}>
@@ -842,9 +844,10 @@ export const TemplateDetailPage: React.FC = () => {
           <RightCol>
             <SidebarCard>
               <BenefitRow><Check /> One-time Payment</BenefitRow>
-              <BenefitRow><Check /> Commercial License</BenefitRow>
-              <BenefitRow><Check /> Lifetime Support</BenefitRow>
-              <BenefitRow><Check /> Source File Available</BenefitRow>
+              <BenefitRow><Check /> Instant Download</BenefitRow>
+              <BenefitRow><Check /> Video Setup Guides</BenefitRow>
+              <BenefitRow><Check /> Customization Guide</BenefitRow>
+              <BenefitRow><Check /> Lifetime Updates</BenefitRow>
 
               <BtnGroup>
                 <ActionBtn $variant="outline">

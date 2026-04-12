@@ -5,24 +5,24 @@ import { scrollUp } from '@/presentation/themes/animations';
 /* ── Testimonials data ── */
 const testimonials = {
   col1: [
-    { name: 'Anna', initials: 'A', color: '#C4B5FD', text: 'Finally a widget tool that doesn\'t look like it\'s from 2015. The calendar fits perfectly into my Notion setup — clean, minimal, and actually aesthetic.' },
-    { name: 'James', initials: 'J', color: '#93C5FD', text: 'We embed Peachy calendars across all our team dashboards in Notion. The dark mode support is flawless and it just works.' },
-    { name: 'Sofia', initials: 'S', color: '#F9A8D4', text: 'I use the clock widget in my streaming setup and the calendar in my content planner. Both look premium and load instantly.' },
-    { name: 'David', initials: 'D', color: '#6EE7B7', text: 'Replaced three different widget tools with Peachy. One studio for everything — calendars, clocks, all customizable. And it\'s free?' },
-    { name: 'Lena', initials: 'L', color: '#FCD34D', text: 'The attention to typography and spacing is rare for a free tool. You can tell someone who cares about design built this.' },
+    { name: 'Amber', initials: 'A', color: '#C4B5FD', text: 'This one.... THIS one is incredible. If you are someone that likes everything to have a place and home in a very organized way, where every block is even and nestled perfectly, this will be perfect for you. This shop always produces the best templates with the prettiest vibes and aesthetic. I am SOO SO SO SO SO happy.' },
+    { name: 'Audrey', initials: 'A', color: '#F9A8D4', text: 'Amazing, somehow manages to do everything I\'ve been using 12 different planners for all in one. GET IT!!! Cannot recommend enough. It\'s well worth the price. I wish I\'d have saved myself some time and bought it ages ago! Easily the best I have ever come across.' },
+    { name: 'Alyssa', initials: 'A', color: '#FCD34D', text: 'An absolute game changer in my daily life.' },
+    { name: 'Donna', initials: 'D', color: '#93C5FD', text: 'This is so fantastically comprehensive and detailed, I honestly think it should cost three times as much! The amount of work that has gone into this is incredible. Also, the customer service is top notch!' },
+    { name: 'Rana', initials: 'R', color: '#6EE7B7', text: 'I highly recommend this.. its sooo pretty.. fun to use.. the seller was very helpful and friendly. Most templates are boring or ugly lol hers are soo cute that it makes you want to use them. Keep up the great work!' },
   ],
   col2: [
-    { name: 'Marcus', initials: 'M', color: '#DDD6FE', text: 'The Life OS template saved me an entire weekend of setup. Combined with Peachy widgets, my Notion workspace finally feels complete.' },
-    { name: 'Yuki', initials: 'Y', color: '#A5F3FC', text: 'Our whole team switched to Peachy calendars in Notion. The embed URL system is brilliant — just paste and it works. No auth, no fuss.' },
-    { name: 'Rachel', initials: 'R', color: '#FCA5A5', text: 'I\'ve tried every Notion widget out there. Peachy is the only one that matches the quality of my workspace design. Highly recommend.' },
-    { name: 'Alex', initials: 'A', color: '#99F6E4', text: 'The student planner template + calendar widget combo is perfect. I can see my whole semester at a glance right in Notion.' },
-    { name: 'Emma', initials: 'E', color: '#E9D5FF', text: 'Clean design, instant setup, zero maintenance. Exactly what our marketing team needed for our Notion dashboards.' },
+    { name: 'Misty', initials: 'M', color: '#DDD6FE', text: 'This is everything and more! This is actually my second time purchasing from this shop. It helps me stay organized with raging ADHD. I looove how there\'s options for phone or tablet layouts. 10/10 worth every penny.' },
+    { name: 'Hedge', initials: 'H', color: '#A5F3FC', text: 'This is THE BEST All in One I\'ve purchased! The pages are super detailed and the integration is mind blowing! I simply love it!! Thank you so very much for making this available for us!' },
+    { name: 'Lorraine', initials: 'L', color: '#FCA5A5', text: 'SUPER CUTE!! Absolutely love it!' },
+    { name: 'Evan', initials: 'E', color: '#99F6E4', text: 'I\'ve been looking for an aesthetically pleasing and comprehensive all-in-one planner for so long, and this one is absolutely perfect for my needs! It\'s detailed without being cluttered. I would absolutely recommend this, thank you for making my life just a little bit easier!' },
+    { name: 'Abby', initials: 'A', color: '#E9D5FF', text: 'I\'m obsessed with this. It is absolutely perfect. I will be using this to organize multiple aspects of my life. It is great value for the price as well!' },
   ],
   col3: [
-    { name: 'Nina', initials: 'N', color: '#BAE6FD', text: 'We actually use Peachy widgets internally. The auto theme detection means they look great in both light and dark mode automatically.' },
-    { name: 'Tom', initials: 'T', color: '#F5D0FE', text: 'The design language is Apple-level clean. Border radius, typography, color palette — everything is considered. Beautiful work.' },
-    { name: 'Lisa', initials: 'L', color: '#FED7AA', text: 'I recommend Peachy to all my clients. The templates are thoughtfully structured and the widgets add that extra polish to any workspace.' },
-    { name: 'Chris', initials: 'C', color: '#BBF7D0', text: 'We evaluated several widget solutions. Peachy won on design quality alone. The fact that it\'s free makes it an absolute no-brainer.' },
+    { name: 'jessdufour', initials: 'J', color: '#BAE6FD', text: 'The amount of time and effort that has gone into this product is blowing my mind. Every time I click somewhere and discover a new detail I am floored. It feels like no stone has been left unturned. I\'ll be buying one for my daughter for college!' },
+    { name: 'Grace', initials: 'G', color: '#F5D0FE', text: 'This ticks ALL the boxes for what I was looking for. It\'s better than I could\'ve asked for to build on my own. Absolutely recommend for the organizational girlies. :)' },
+    { name: 'Natasha', initials: 'N', color: '#FED7AA', text: 'Very cute! Will def come back for more!' },
+    { name: 'Alexandra', initials: 'A', color: '#BBF7D0', text: 'After 3 months of using this, I love it! It is so aesthetically pleasing, and the creator has added so many details to help the user. Thank you so much!!' },
   ],
 };
 

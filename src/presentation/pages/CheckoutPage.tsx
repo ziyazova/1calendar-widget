@@ -175,11 +175,12 @@ const SummaryThumb = styled.div`
   height: 36px;
   border-radius: 6px;
   overflow: hidden;
-  background: ${({ theme }) => theme.colors.background.surface};
+  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   flex-shrink: 0;
+  position: relative;
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  img { width: 80%; height: 80%; object-fit: contain; position: absolute; inset: 0; margin: auto; }
 `;
 
 const SummaryInfo = styled.div`
