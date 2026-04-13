@@ -108,10 +108,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut();
     setIsGuest(false);
     localStorage.removeItem(GUEST_KEY);
-  }, []);
+    // Only call Supabase signOut for registered users, not guests
+    if (supabaseUser) {
+      try { await supabase.auth.signOut(); } catch { /* ignore */ }
+    }
+  }, [supabaseUser]);
 
   const updateProfile = useCallback(async (profile: Partial<UserProfile>) => {
     if (!supabaseUser) return;

@@ -16,6 +16,9 @@ interface CustomizationPanelProps {
   mobileOpen?: boolean;
   onMobileClose?: () => void;
   visibleSection?: PanelSection;
+  widgetCount?: number;
+  widgetLimit?: number;
+  onUpgrade?: () => void;
 }
 
 const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
@@ -58,7 +61,7 @@ const PanelHeader = styled.div`
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 20px 32px 16px 12px;
+  padding: 32px 32px 16px 12px;
   border-bottom: none;
 `;
 
@@ -674,6 +677,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   mobileOpen,
   onMobileClose,
   visibleSection,
+  widgetCount = 0,
+  widgetLimit = 3,
+  onUpgrade,
 }) => {
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [dragIdx, setDragIdx] = useState<number | null>(null);

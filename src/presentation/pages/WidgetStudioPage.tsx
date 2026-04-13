@@ -17,7 +17,7 @@ const PageContent = styled.div<{ $hide?: boolean }>`
 `;
 
 /* ── Hero Card ── */
-const HeroCard = styled.div`
+const HeroCard = styled.div`rjkmwj ult ghj
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 48px;
@@ -195,9 +195,11 @@ const AuthDivider = styled.div`
 
 const CodeError = styled.div`
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.destructive};
+  color: #E07060;
   text-align: center;
-  margin-top: -4px;
+  margin-top: 8px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 `;
 
 const AuthLink = styled.span`
@@ -237,16 +239,16 @@ const GoogleButton = styled.button`
 
 /* ── Floating Widgets ── */
 const float1 = keyframes`
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
+  0%, 100% { transform: translateY(0px) rotate3d(1, 0.5, 0, 0deg); }
+  50% { transform: translateY(-22px) rotate3d(1, 0.5, 0, 5deg); }
 `;
 const float2 = keyframes`
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-16px); }
+  0%, 100% { transform: translateY(0px) rotate3d(0.5, -1, 0, 0deg); }
+  50% { transform: translateY(-26px) rotate3d(0.5, -1, 0, 6deg); }
 `;
 const float3 = keyframes`
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(0px) rotate3d(-1, 0.5, 0, 0deg); }
+  50% { transform: translateY(-20px) rotate3d(-1, 0.5, 0, 5.5deg); }
 `;
 
 const HeroScene = styled.div`
@@ -275,21 +277,18 @@ const FloatingWidget = styled.div<{ $left?: string; $right?: string; $top: strin
   z-index: 2;
   pointer-events: auto;
   cursor: pointer;
+  transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
   img {
     width: 100%;
     display: block;
-    filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.2)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.08)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.04));
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   animation: ${({ $anim }) => $anim === 1 ? float1 : $anim === 2 ? float2 : float3} ${({ $anim }) => $anim === 1 ? '6s' : $anim === 2 ? '7s' : '5.5s'} ease-in-out infinite both;
   animation-delay: ${({ $delay }) => $delay};
   will-change: transform;
-
-  img {
-    width: 100%;
-    display: block;
-  }
 
   @media (max-width: 1024px) {
     width: 140px;
@@ -309,7 +308,7 @@ const WidgetGallerySection = styled.section`
 const WidgetGalleryHeader = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 120px 48px 0;
+  padding: 80px 48px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -368,7 +367,7 @@ const WidgetGalleryGrid = styled.div`
   padding: 24px 48px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 28px;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
@@ -751,8 +750,8 @@ export const WidgetStudioPage: React.FC = () => {
         <TopNav activeLink="studio" logoSub="Widgets" />
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 0' }}>
           <BackButton onClick={() => navigate(-1 as any)} label="Back" />
-          <h1 style={{ fontSize: 32, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>Notion Widgets</h1>
-          <p style={{ fontSize: 14, color: '#999', margin: '0 0 28px', letterSpacing: '-0.01em' }}>Browse styles, customize and embed in your Notion workspace</p>
+          <h1 style={{ fontSize: 32, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 10px' }}>Notion Widgets</h1>
+          <p style={{ fontSize: 14, color: '#999', margin: '0 0 36px', letterSpacing: '-0.01em' }}>Browse styles, customize and embed in your Notion workspace</p>
           <FilterRow>
             {GALLERY_FILTERS.map(f => (
               <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
@@ -765,7 +764,7 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                <GalleryCardLabel>{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : item.category === 'boards' ? 'Board' : 'Widget'}</GalleryCardLabel>
+                {/* label removed */}
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>
@@ -850,58 +849,53 @@ export const WidgetStudioPage: React.FC = () => {
         {/* Upgrade Modal */}
         {showUpgrade && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
+            <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }} />
             <div style={{
-              position: 'relative', background: '#fff', borderRadius: 24, padding: '44px 36px 36px',
-              width: 560, maxWidth: '92vw', boxShadow: '0 24px 64px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.08)',
-              transform: 'scale(1)', opacity: 1,
-              animation: 'modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+              position: 'relative', background: '#fff', borderRadius: 28, padding: '48px 40px 40px',
+              width: 620, maxWidth: '92vw',
+              boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
+              animation: 'modalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
             }}>
-              <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
+              <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
               <button onClick={() => setShowUpgrade(false)} style={{
-                position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
-                background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s',
+                position: 'absolute', top: 20, right: 20, width: 36, height: 36, border: 'none',
+                background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer', fontSize: 20, color: '#bbb',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>×</button>
-              <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                <div style={{ fontSize: 26, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
-                <div style={{ fontSize: 15, color: '#888', marginTop: 6 }}>Unlock all styles and unlimited widgets</div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                {/* Free */}
-                <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 18, padding: '28px 22px' }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Starter</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                    <span style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>Free</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>forever</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Up to 3 widgets</li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Basic styles</li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Embed in Notion</li>
-                  </ul>
-                  <div style={{ marginTop: 20, padding: '10px 0', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6366F1', background: 'rgba(99,102,241,0.06)', borderRadius: 10 }}>Your current plan</div>
+              <div style={{ textAlign: 'center', marginBottom: 36 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg, #6366F1, #818CF8)', marginBottom: 16, boxShadow: '0 4px 16px rgba(99,102,241,0.25)' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" /></svg>
                 </div>
-                {/* Pro */}
-                <div style={{ border: '1.5px solid rgba(99,102,241,0.3)', borderRadius: 18, padding: '28px 22px', position: 'relative', background: 'rgba(99,102,241,0.02)' }}>
-                  <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 14px', borderRadius: 20, whiteSpace: 'nowrap' as const }}>Most popular</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Pro</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                    <span style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>$4.99</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>one-time payment</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Unlimited widgets</li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> All premium styles</li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Full customization</li>
-                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Priority support</li>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
+                <div style={{ fontSize: 15, color: '#999', marginTop: 8 }}>Unlock all styles and unlimited widgets</div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '5fr 6fr', gap: 16, alignItems: 'stretch' }}>
+                <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column' as const }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#bbb', marginBottom: 12, textTransform: 'uppercase' as const, letterSpacing: '0.05em', minHeight: 27, display: 'flex', alignItems: 'center' }}>Free</div>
+                  <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</div>
+                  <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>forever</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column' as const, gap: 14, flex: 1 }}>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> 3 widgets</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Basic widget types</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Limited customization</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Embed in Notion</li>
                   </ul>
-                  <button style={{
-                    marginTop: 20, width: '100%', height: 44, border: 'none', borderRadius: 12,
-                    background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff', fontSize: 14, fontWeight: 600,
-                    fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    transition: 'all 0.15s',
-                  }}>Upgrade Now</button>
+                  <button onClick={() => setShowUpgrade(false)} style={{ marginTop: 28, width: '100%', height: 46, border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 14, background: '#fff', color: '#555', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>Current plan</button>
+                </div>
+                <div style={{ border: '1.5px solid rgba(99,102,241,0.2)', borderRadius: 20, padding: '28px 24px', background: 'linear-gradient(160deg, rgba(99,102,241,0.04) 0%, rgba(236,72,153,0.03) 100%)', display: 'flex', flexDirection: 'column' as const }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Pro</div>
+                    <div style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 20 }}>Popular</div>
+                  </div>
+                  <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$4</div>
+                  <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>/month</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#444', display: 'flex', flexDirection: 'column' as const, gap: 14, flex: 1 }}>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Unlimited widgets</strong></li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>All widget types</strong></li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Full customization</strong></li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Exclusive styles</strong></li>
+                  </ul>
+                  <button style={{ marginTop: 28, width: '100%', height: 46, border: 'none', borderRadius: 14, background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>Get Pro</button>
                 </div>
               </div>
             </div>
@@ -919,16 +913,16 @@ export const WidgetStudioPage: React.FC = () => {
       {/* Hero with floating widgets */}
       <HeroScene>
         {/* Floating widget PNGs with transparent bg */}
-        <FloatingWidget $left="-20px" $top="48px" $delay="0s" $anim={1} data-float data-speed="1.2" style={{ width: 195 }}>
+        <FloatingWidget $left="-20px" $top="66px" $delay="0s" $anim={1} data-float data-speed="1.2" style={{ width: 257 }}>
           <img src="/float-typewriter.png" alt="Typewriter Calendar" />
         </FloatingWidget>
-        <FloatingWidget $right="-10px" $top="40px" $delay="0.5s" $anim={2} data-float data-speed="0.8" style={{ width: 196 }}>
+        <FloatingWidget $right="-10px" $top="58px" $delay="0.5s" $anim={2} data-float data-speed="0.8" style={{ width: 280 }}>
           <img src="/float-collage.png" alt="Collage Calendar" />
         </FloatingWidget>
-        <FloatingWidget $left="60px" $top="280px" $delay="1s" $anim={3} data-float data-speed="1.5" style={{ width: 224 }}>
+        <FloatingWidget $left="60px" $top="330px" $delay="1s" $anim={3} data-float data-speed="1.5" style={{ width: 335 }}>
           <img src="/float-clock.png" alt="Flower Clock" />
         </FloatingWidget>
-        <FloatingWidget $right="20px" $top="280px" $delay="0.3s" $anim={1} data-float data-speed="1" style={{ width: 208 }}>
+        <FloatingWidget $right="20px" $top="350px" $delay="0.3s" $anim={1} data-float data-speed="1" style={{ width: 275 }}>
           <img src="/float-camera.png" alt="Camera Widget" />
         </FloatingWidget>
 
@@ -994,7 +988,7 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                <GalleryCardLabel>{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : item.category === 'boards' ? 'Board' : 'Widget'}</GalleryCardLabel>
+                {/* label removed */}
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>

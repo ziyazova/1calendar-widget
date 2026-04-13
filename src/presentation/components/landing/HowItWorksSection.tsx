@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Search, CreditCard, Copy, Palette, Link, Code } from 'lucide-react';
+import { Search, CreditCard, Copy, Palette, SlidersHorizontal, Code } from 'lucide-react';
 
 const Section = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px;
+  padding: 100px 48px 80px;
 
   @media (max-width: 768px) {
     padding: 48px 24px;
@@ -17,7 +17,7 @@ const SectionTitle = styled.h2`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
-  margin: 0;
+  margin: 0 0 24px;
 `;
 
 const SectionSubtitle = styled.p`
@@ -98,7 +98,7 @@ const TEMPLATE_STEPS = [
 
 const WIDGET_STEPS = [
   { icon: Palette, bg: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 50%, rgba(245,235,250,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Pick a widget', desc: 'Calendar, clock, or board. Choose your style.' },
-  { icon: Link, bg: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(237,228,255,0.4) 50%, rgba(252,228,236,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Customize it', desc: 'Colors, fonts, sizes. Make it match your workspace.' },
+  { icon: SlidersHorizontal, bg: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(237,228,255,0.4) 50%, rgba(252,228,236,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Customize it', desc: 'Colors, fonts, sizes. Make it match your workspace.' },
   { icon: Code, bg: 'linear-gradient(135deg, rgba(252,228,236,0.45) 0%, rgba(232,237,255,0.4) 50%, rgba(237,228,255,0.5) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Embed in Notion', desc: 'Copy the link. Paste in Notion. Done.' },
 ];
 
@@ -114,7 +114,7 @@ export const HowItWorksSection: React.FC<HowItWorksProps> = ({ showTitle = true,
     {showTitle && (
       <>
         <SectionTitle>How it works.</SectionTitle>
-        <SectionSubtitle>Easy as that.</SectionSubtitle>
+        {/* subtitle removed */}
       </>
     )}
     <Grid>

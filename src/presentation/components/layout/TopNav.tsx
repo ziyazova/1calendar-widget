@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home } from 'lucide-react';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 
@@ -538,13 +538,13 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               <div
                 onClick={() => setAvatarOpen(!avatarOpen)}
                 style={{
-                  width: 34, height: 34, borderRadius: '50%',
+                  width: 36, height: 36, borderRadius: '50%',
                   background: avatarOpen ? '#6366F1' : 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 600, color: avatarOpen ? '#fff' : '#6366F1',
-                  cursor: 'pointer', flexShrink: 0,
+                  fontSize: 12, fontWeight: 700, color: avatarOpen ? '#fff' : '#6366F1',
+                  cursor: 'pointer', flexShrink: 0, letterSpacing: '0.02em',
                   transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
-                  boxShadow: avatarOpen ? '0 0 0 3px rgba(99,102,241,0.2)' : 'none',
+                  boxShadow: avatarOpen ? '0 0 0 3px rgba(99,102,241,0.15)' : 'none',
                 }}
               >
                 {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
@@ -554,68 +554,83 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                   <div onClick={() => setAvatarOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 99 }} />
                   <div style={{
                     position: 'absolute', top: 'calc(100% + 10px)', right: -8, zIndex: 100,
-                    background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,0.06)',
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06)',
-                    padding: 0, minWidth: 220, overflow: 'hidden',
-                    animation: 'avatarDropIn 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
+                    background: '#fff', borderRadius: 18, border: '1px solid rgba(0,0,0,0.05)',
+                    boxShadow: '0 16px 48px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04)',
+                    padding: 0, minWidth: 240, overflow: 'hidden',
+                    animation: 'avatarDropIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
                   }}>
-                    <style>{`@keyframes avatarDropIn { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
+                    <style>{`@keyframes avatarDropIn { from { opacity: 0; transform: translateY(-10px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
 
-                    {/* User info */}
-                    <div style={{ padding: '16px 18px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #EDE4FF, #E0E8FF)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 13, fontWeight: 600, color: '#6366F1', flexShrink: 0,
-                      }}>
-                        {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                    {/* User info — gradient header */}
+                    <div style={{
+                      padding: '20px 20px 16px',
+                      background: 'linear-gradient(135deg, rgba(237,228,255,0.3) 0%, rgba(232,237,255,0.2) 100%)',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{
+                          width: 40, height: 40, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 14, fontWeight: 700, color: '#fff', flexShrink: 0,
+                          boxShadow: '0 2px 8px rgba(99,102,241,0.3)',
+                        }}>
+                          {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.name || 'User'}</div>
+                          <div style={{ fontSize: 12, color: '#888', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.email || ''}</div>
+                        </div>
                       </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.name || 'User'}</div>
-                        <div style={{ fontSize: 12, color: '#999', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.email || ''}</div>
+                      {/* Plan badge */}
+                      <div style={{
+                        marginTop: 12, padding: '6px 12px', borderRadius: 8,
+                        background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#999' }}>Free plan</span>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: '#6366F1', cursor: 'pointer' }}
+                          onClick={() => { setAvatarOpen(false); navigate('/studio'); }}
+                        >Upgrade</span>
                       </div>
                     </div>
 
-                    <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
-
                     {/* Menu items */}
-                    <div style={{ padding: '6px 6px' }}>
+                    <div style={{ padding: '8px 8px' }}>
                       {[
-                        { icon: LayoutDashboard, label: 'Dashboard', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
+                        { icon: Home, label: 'Dashboard', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
                         { icon: Settings, label: 'Settings', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
                       ].map(item => (
                         <button
                           key={item.label}
                           onClick={item.onClick}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
-                            border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-                            color: '#444', fontFamily: 'inherit', borderRadius: 8, transition: 'background 0.1s',
+                            display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 14px',
+                            border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 500,
+                            color: '#333', fontFamily: 'inherit', borderRadius: 10, transition: 'background 0.1s',
                           }}
                           onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')}
                           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                         >
-                          <item.icon style={{ width: 15, height: 15, color: '#999' }} /> {item.label}
+                          <item.icon style={{ width: 16, height: 16, color: '#999' }} /> {item.label}
                         </button>
                       ))}
                     </div>
 
-                    <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
+                    <div style={{ height: 1, margin: '2px 16px', background: 'rgba(0,0,0,0.05)' }} />
 
                     {/* Logout */}
-                    <div style={{ padding: '6px 6px' }}>
+                    <div style={{ padding: '8px 8px' }}>
                       <button
                         onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
-                          border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-                          color: '#DC2828', fontFamily: 'inherit', borderRadius: 8, transition: 'background 0.1s',
+                          display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 14px',
+                          border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 500,
+                          color: '#DC2828', fontFamily: 'inherit', borderRadius: 10, transition: 'background 0.1s',
                         }}
                         onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                       >
-                        <LogOut style={{ width: 15, height: 15 }} /> Log out
+                        <LogOut style={{ width: 16, height: 16 }} /> Log out
                       </button>
                     </div>
                   </div>

@@ -25,7 +25,7 @@ const PageTitle = styled.h1`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
-  margin: 0 0 6px;
+  margin: 0 0 10px;
 
   @media (max-width: 768px) {
     font-size: 26px;
@@ -35,7 +35,7 @@ const PageTitle = styled.h1`
 const PageSubtitle = styled.p`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 28px;
+  margin: 0 0 36px;
   letter-spacing: -0.01em;
 `;
 

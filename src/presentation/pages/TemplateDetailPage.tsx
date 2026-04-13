@@ -850,20 +850,20 @@ export const TemplateDetailPage: React.FC = () => {
               <BenefitRow><Check /> Lifetime Updates</BenefitRow>
 
               <BtnGroup>
-                <ActionBtn $variant="outline">
-                  <Eye /> Live Preview
-                </ActionBtn>
                 {inCart ? (
                   <AddedBtn $variant="primary" onClick={() => removeItem(template.id)}>
                     <span className="added-label"><Check /> Added to Cart</span>
                     <span className="remove-label">Remove from Cart</span>
                   </AddedBtn>
                 ) : (
-                  <ActionBtn $variant="primary" onClick={handleAddToCart}>
+                  <ActionBtn $variant="outline" onClick={handleAddToCart}>
                     <ShoppingCart />
-                    {isFree ? 'Get for Free' : `Buy Now ${template.price}`}
+                    {isFree ? 'Get for Free' : 'Add to Cart'}
                   </ActionBtn>
                 )}
+                <ActionBtn $variant="primary" onClick={() => window.open('https://www.etsy.com/shop/PeachyStudio', '_blank')}>
+                  Buy on Etsy {!isFree && template.price}
+                </ActionBtn>
               </BtnGroup>
             </SidebarCard>
 
@@ -913,9 +913,8 @@ export const TemplateDetailPage: React.FC = () => {
             <Check /> Added
           </MobileBuyBtn>
         ) : (
-          <MobileBuyBtn onClick={handleAddToCart}>
-            <ShoppingCart />
-            {isFree ? 'Get for Free' : 'Buy Now'}
+          <MobileBuyBtn onClick={() => window.open('https://www.etsy.com/shop/PeachyStudio', '_blank')}>
+            {isFree ? 'Get for Free' : 'Buy on Etsy'}
           </MobileBuyBtn>
         )}
       </MobileBuyBar>

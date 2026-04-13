@@ -126,9 +126,11 @@ const SectionLink = styled.button`
 /* Widget cards */
 const WidgetGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 
+  @media (max-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 768px) { grid-template-columns: 1fr; }
 `;
 
@@ -147,7 +149,7 @@ const WidgetCard = styled.div<{ $i: number }>`
 `;
 
 const WidgetPreviewWrap = styled.div`
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,8 +164,8 @@ const WidgetLabel = styled.span`
   top: 10px;
   left: 10px;
   font-size: 11px;
-  font-weight: 500;
-  color: #555;
+  font-weight: 600;
+  color: #6366F1;
   background: rgba(255,255,255,0.88);
   backdrop-filter: blur(8px);
   padding: 3px 10px;
@@ -238,21 +240,20 @@ const BrowseBtn = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  height: 52px;
-  background: linear-gradient(135deg, #1F1F1F, #333);
-  color: #fff;
-  border: none;
-  border-radius: 14px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 40%, rgba(245,235,250,0.45) 100%);
+  color: #6366F1;
+  border: 1.5px solid rgba(200,195,230,0.3);
+  border-radius: 16px;
   font-size: 15px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  &:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,0.18); }
+  margin-top: 24px;
+  &:hover { border-color: rgba(99,102,241,0.3); background: linear-gradient(135deg, rgba(237,228,255,0.65) 0%, rgba(232,237,255,0.55) 40%, rgba(245,235,250,0.6) 100%); }
   svg { width: 16px; height: 16px; }
 `;
 
@@ -278,7 +279,7 @@ const PurchaseImg = styled.div`
 
 /* Preview helpers */
 const PreviewScale = styled.div`
-  transform: scale(0.32);
+  transform: scale(0.55);
   transform-origin: center center;
   pointer-events: none;
 `;
@@ -334,13 +335,31 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   // Editing state
   const [editingWidget, setEditingWidget] = useState<Widget | null>(null);
   const [editingWidgetKey, setEditingWidgetKey] = useState<string>('');
+  const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
+  const [editingWidgetName, setEditingWidgetName] = useState<string>('');
   const [editorOpen, setEditorOpen] = useState(false);
-  const [studioZoom, setStudioZoom] = useState(0.9);
+  const [copied, setCopied] = useState(false);
+  const [studioZoom, setStudioZoom] = useState(1.2);
+
+  // Local storage helpers for widget simulation
+  const LOCAL_KEY = 'peachy_local_widgets';
+  const loadLocalWidgets = (): SavedWidget[] => {
+    try {
+      const raw = localStorage.getItem(LOCAL_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  };
+  const saveLocalWidgets = (list: SavedWidget[]) => {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+  };
 
   const loadWidgets = useCallback(async () => {
-    if (!isRegistered) { setLoading(false); return; }
-    const data = await WidgetStorageService.getUserWidgets();
-    setWidgets(data);
+    if (isRegistered) {
+      const data = await WidgetStorageService.getUserWidgets();
+      setWidgets(data);
+    } else {
+      setWidgets(loadLocalWidgets());
+    }
     setLoading(false);
   }, [isRegistered]);
 
@@ -367,6 +386,10 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           }
           setEditingWidget(updated);
           setEditingWidgetKey(`${type}-${style}`);
+          setEditingWidgetName(name);
+          // Auto-save locally on create
+          const newId = saveWidgetLocal(name, type, style);
+          setEditingWidgetId(newId || null);
           setEditorOpen(true);
         } catch (err) {
           Logger.error('StudioPage', 'Failed to create widget from nav state', err);
@@ -375,8 +398,39 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
   }, [location.state, diContainer]);
 
+  // Save widget locally (simulation)
+  const saveWidgetLocal = (name: string, type: string, style: string, settings: Record<string, unknown> = {}, editId?: string) => {
+    const current = loadLocalWidgets();
+    if (editId) {
+      const updated = current.map(w => w.id === editId ? { ...w, name, settings, updated_at: new Date().toISOString() } : w);
+      saveLocalWidgets(updated);
+      setWidgets(updated);
+    } else {
+      const newWidget: SavedWidget = {
+        id: crypto.randomUUID(),
+        user_id: 'local',
+        name,
+        type,
+        style,
+        settings,
+        embed_url: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const updated = [newWidget, ...current];
+      saveLocalWidgets(updated);
+      setWidgets(updated);
+      return newWidget.id;
+    }
+  };
+
   const handleDelete = async (id: string) => {
-    await WidgetStorageService.deleteWidget(id);
+    if (isRegistered) {
+      await WidgetStorageService.deleteWidget(id);
+    } else {
+      const updated = loadLocalWidgets().filter(w => w.id !== id);
+      saveLocalWidgets(updated);
+    }
     setWidgets(prev => prev.filter(w => w.id !== id));
   };
 
@@ -393,25 +447,38 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       }
       setEditingWidget(updated);
       setEditingWidgetKey(`${w.type}-${w.style}`);
+      setEditingWidgetId(w.id);
+      setEditingWidgetName(w.name);
       setEditorOpen(true);
     } catch (err) {
       Logger.error('StudioPage', 'Failed to load widget for editing', err);
     }
   };
 
+  const handleEditorBack = () => {
+    // Save on exit
+    if (editingWidgetId && editingWidget) {
+      const type = editingWidget.type;
+      const style = editingWidgetKey.split('-').slice(1).join('-');
+      saveWidgetLocal(editingWidgetName, type, style, {}, editingWidgetId);
+    }
+    setEditorOpen(false);
+    setEditingWidgetId(null);
+  };
+
   // If editing, show full-screen editor (Figma-style artboard)
   if (editorOpen && editingWidget) {
     const embedUrl = diContainer.getWidgetEmbedUrlUseCase.execute(editingWidget);
-    const [copied, setCopied] = [false, (_v: boolean) => {}]; // placeholder
+    // copied state is declared at component level
     return (
       <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: '#fff' }}>
         {/* Editor top bar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 24px 0 48px', height: 68, paddingTop: 15, background: '#fff', flexShrink: 0, zIndex: 10,
+          padding: '0 24px 0 48px', paddingRight: 310, height: 68, paddingTop: 15, background: '#fff', flexShrink: 0, zIndex: 10,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <button onClick={() => setEditorOpen(false)} style={{
+            <button onClick={handleEditorBack} style={{
               display: 'flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
               border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, background: '#fff',
               fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: '#555', cursor: 'pointer',
@@ -422,6 +489,32 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             <span style={{ fontSize: 15, fontWeight: 600, color: '#6366F1', letterSpacing: '-0.02em' }}>
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
+          </div>
+          {/* Status + Upgrade — right side */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Circular progress ring */}
+              <svg width="24" height="24" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
+                <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="2.5" />
+                <circle cx="12" cy="12" r="9" fill="none"
+                  stroke={widgets.length >= 3 ? '#DC2828' : '#6366F1'}
+                  strokeWidth="2.5" strokeLinecap="round"
+                  strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
+                  style={{ transition: 'stroke-dasharray 0.3s' }}
+                />
+              </svg>
+              <span style={{ fontSize: 12, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length}/3</span>
+            </div>
+            <button onClick={() => setShowUpgrade(true)} style={{
+              display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 16px',
+              border: 'none', borderRadius: 10,
+              background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+              fontSize: 13, fontWeight: 600, fontFamily: 'inherit', color: '#fff', cursor: 'pointer',
+              transition: 'all 0.15s',
+              boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
+            }}>
+              Upgrade now
+            </button>
           </div>
         </div>
 
@@ -447,17 +540,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               backgroundSize: '24px 24px', pointerEvents: 'none', opacity: 0.6,
             }} />
 
-            {/* Zoom controls — top right */}
-            <div style={{
-              position: 'absolute', top: 16, right: 16,
-              display: 'flex', alignItems: 'center', gap: 0,
-              background: '#fff', borderRadius: 10, height: 36, padding: '0 4px',
-              border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-            }}>
-              <button onClick={() => setStudioZoom(Math.max(0.3, +(studioZoom - 0.1).toFixed(1)))} style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>−</button>
-              <span style={{ fontSize: 12, fontWeight: 500, color: '#888', minWidth: 40, textAlign: 'center' as const, fontVariantNumeric: 'tabular-nums' }}>{Math.round(studioZoom * 100)}%</span>
-              <button onClick={() => setStudioZoom(Math.min(2.0, +(studioZoom + 0.1).toFixed(1)))} style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>+</button>
-            </div>
+            {/* Zoom controls removed — fixed at 120% */}
 
             {/* Widget */}
             <div style={{
@@ -482,15 +565,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#777',
                 outline: 'none',
               }} onClick={e => (e.target as HTMLInputElement).select()} />
-              <button onClick={() => { navigator.clipboard.writeText(embedUrl); }} style={{
+              <button onClick={() => { navigator.clipboard.writeText(embedUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); }} style={{
                 display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 18px',
                 border: 'none', borderRadius: 10,
-                background: 'linear-gradient(135deg, #3384F4, #5BA0F7)',
+                background: copied ? '#22C55E' : 'linear-gradient(135deg, #3384F4, #5BA0F7)',
                 color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                cursor: 'pointer', boxShadow: '0 2px 8px rgba(51,132,244,0.3)',
+                cursor: 'pointer', boxShadow: copied ? '0 2px 8px rgba(34,197,94,0.3)' : '0 2px 8px rgba(51,132,244,0.3)',
                 transition: 'all 0.15s',
               }}>
-                <Copy style={{ width: 14, height: 14 }} /> Copy
+                {copied ? <><Check style={{ width: 14, height: 14 }} /> Copied!</> : <><Copy style={{ width: 14, height: 14 }} /> Copy</>}
               </button>
             </div>
           </div>
@@ -498,30 +581,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           {/* Customization panel */}
           <div style={{
             width: 300, flexShrink: 0, overflow: 'auto',
-            background: '#fff', display: 'flex', flexDirection: 'column' as const,
+            background: '#fff',
           }}>
-            {/* Status bar — top of right panel */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '14px 16px 12px',
-              borderBottom: '1px solid rgba(0,0,0,0.05)',
-              flexShrink: 0,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-                <div style={{ width: 60, height: 4, borderRadius: 2, background: '#EBEBEB', overflow: 'hidden' }}>
-                  <div style={{ width: `${Math.min((widgets.length / 3) * 100, 100)}%`, height: '100%', borderRadius: 2, background: widgets.length >= 3 ? '#DC2828' : 'linear-gradient(90deg, #6366F1, #818CF8)', transition: 'width 0.3s' }} />
-                </div>
-                <span style={{ fontSize: 11, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
-              </div>
-              <button onClick={() => setShowUpgrade(true)} style={{
-                fontSize: 11, fontWeight: 600, color: '#6366F1',
-                background: 'none', padding: 0, border: 'none',
-                cursor: 'pointer', fontFamily: 'inherit',
-                whiteSpace: 'nowrap' as const,
-              }}>
-                Upgrade
-              </button>
-            </div>
             <CustomizationPanel
               widget={editingWidget}
               onSettingsChange={(settings) => {
@@ -529,6 +590,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 const updated = editingWidget.updateSettings(settings as CalendarSettings | ClockSettings | BoardSettings);
                 setEditingWidget(updated);
               }}
+              widgetCount={widgets.length}
+              widgetLimit={3}
+              onUpgrade={() => setShowUpgrade(true)}
             />
           </div>
         </div>
@@ -545,7 +609,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, marginTop: 8 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>
-              Welcome back, {user?.name?.split(' ')[0] || 'there'}
+              Welcome 👋
             </h1>
             <p style={{ fontSize: 15, color: '#999', margin: 0 }}>Manage your widgets and templates</p>
           </div>
@@ -555,15 +619,21 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 100, height: 6, borderRadius: 3, background: '#EBEBEB', overflow: 'hidden' }}>
-                <div style={{ width: `${Math.min((widgets.length / 3) * 100, 100)}%`, height: '100%', borderRadius: 3, background: widgets.length >= 3 ? '#DC2828' : 'linear-gradient(90deg, #6366F1, #818CF8)', transition: 'width 0.3s' }} />
-              </div>
+              <svg width="28" height="28" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
+                <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="2.5" />
+                <circle cx="12" cy="12" r="9" fill="none"
+                  stroke={widgets.length >= 3 ? '#DC2828' : '#6366F1'}
+                  strokeWidth="2.5" strokeLinecap="round"
+                  strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
+                  style={{ transition: 'stroke-dasharray 0.3s' }}
+                />
+              </svg>
               <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
             </div>
             <button onClick={() => setShowUpgrade(true)} style={{
-              fontSize: 13, fontWeight: 600, color: '#fff',
+              fontSize: 14, fontWeight: 600, color: '#fff',
               background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-              padding: '8px 20px', borderRadius: 10,
+              padding: '10px 28px', borderRadius: 12,
               border: 'none', cursor: 'pointer', fontFamily: 'inherit',
               whiteSpace: 'nowrap' as const, transition: 'all 0.15s',
               boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
@@ -582,31 +652,35 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {/* ── Widgets Tab ── */}
         {tab === 'widgets' && (
           <>
-            {/* Create new widget — gradient panel */}
+            {/* Create new widget — gradient banner */}
             <div
-              onClick={() => navigate('/widgets')}
               style={{
-                background: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 40%, rgba(245,235,250,0.45) 100%)',
-                border: '1.5px solid rgba(200,195,230,0.2)',
+                background: 'linear-gradient(135deg, rgba(237,228,255,0.6) 0%, rgba(232,237,255,0.5) 40%, rgba(245,235,250,0.55) 100%)',
+                border: '1.5px solid rgba(200,195,230,0.3)',
                 borderRadius: 16,
-                padding: '28px 28px',
+                padding: '32px 32px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                cursor: 'pointer',
                 marginBottom: 32,
-                transition: 'all 0.2s',
               }}
             >
               <div>
-                <div style={{ fontSize: 17, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Create new widget</div>
-                <div style={{ fontSize: 13, color: '#777', marginTop: 4 }}>Browse styles, customize and embed in Notion</div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Create new widget</div>
+                <div style={{ fontSize: 14, color: '#666', marginTop: 6 }}>Browse styles, customize and embed in Notion</div>
               </div>
-              <Btn $primary><Plus /> Browse widgets</Btn>
+              <button onClick={() => navigate('/widgets')} style={{
+                display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 24px',
+                border: 'none', borderRadius: 12,
+                background: '#1F1F1F', color: '#fff', fontSize: 14, fontWeight: 600,
+                fontFamily: 'inherit', cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                transition: 'all 0.15s',
+              }}><Plus style={{ width: 16, height: 16 }} /> Browse widgets</button>
             </div>
 
             {/* Your widgets */}
-            <SectionRow>
+            <SectionRow style={{ marginTop: 18 }}>
               <SectionTitle>Your widgets <SectionCount>{widgets.length}</SectionCount></SectionTitle>
             </SectionRow>
 
@@ -641,14 +715,34 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {/* ── Templates Tab ── */}
         {tab === 'templates' && (
           <>
+            {/* Browse banner — top */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(240,240,248,0.6) 0%, rgba(235,238,250,0.5) 40%, rgba(245,240,250,0.45) 100%)',
+              border: '1.5px solid rgba(200,200,220,0.25)', borderRadius: 16, padding: '32px 32px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32,
+            }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Browse template shop</div>
+                <div style={{ fontSize: 14, color: '#666', marginTop: 6 }}>Notion planners, trackers & productivity systems</div>
+              </div>
+              <button onClick={() => navigate('/templates')} style={{
+                display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 24px',
+                border: 'none', borderRadius: 12,
+                background: '#1F1F1F', color: '#fff', fontSize: 14, fontWeight: 600,
+                fontFamily: 'inherit', cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+              }}><ArrowRight style={{ width: 16, height: 16 }} /> Browse</button>
+            </div>
+
+            {/* Purchases — below */}
             <SectionRow>
-              <SectionTitle>My Templates <SectionCount>{PURCHASES.length}</SectionCount></SectionTitle>
+              <SectionTitle>My Purchases <SectionCount>{PURCHASES.length}</SectionCount></SectionTitle>
             </SectionRow>
 
             {PURCHASES.length === 0 ? (
               <EmptyCard onClick={() => navigate('/templates')}>
                 <EmptyCircle><Download /></EmptyCircle>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', margin: '0 0 4px' }}>No templates yet</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', margin: '0 0 4px' }}>No purchases yet</p>
                 <p style={{ fontSize: 13, color: '#999', margin: 0 }}>Browse the shop to find planners for Notion</p>
               </EmptyCard>
             ) : (
@@ -666,10 +760,6 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 ))}
               </>
             )}
-
-            <BrowseBtn onClick={() => navigate('/templates')}>
-              Browse template shop <ArrowRight />
-            </BrowseBtn>
           </>
         )}
       </Container>
@@ -677,50 +767,77 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       {/* Upgrade Modal */}
       {showUpgrade && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)' }} />
+          <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }} />
           <div style={{
-            position: 'relative', background: '#fff', borderRadius: 24, padding: '44px 36px 36px',
-            width: 560, maxWidth: '92vw', boxShadow: '0 24px 64px rgba(0,0,0,0.2)',
-            animation: 'modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+            position: 'relative', background: '#fff', borderRadius: 28, padding: '48px 40px 40px',
+            width: 620, maxWidth: '92vw',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
+            animation: 'modalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
           }}>
-            <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
+            <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
             <button onClick={() => setShowUpgrade(false)} style={{
-              position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
-              background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              position: 'absolute', top: 20, right: 20, width: 36, height: 36, border: 'none',
+              background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer', fontSize: 20, color: '#bbb',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
             }}>×</button>
-            <div style={{ textAlign: 'center', marginBottom: 32 }}>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
-              <div style={{ fontSize: 15, color: '#888', marginTop: 6 }}>Unlock all styles and unlimited widgets</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 18, padding: '28px 22px' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Starter</div>
-                <div style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>Free</div>
-                <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>forever</div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Up to 3 widgets</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Basic styles</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Embed in Notion</li>
-                </ul>
-                <div style={{ marginTop: 20, padding: '10px 0', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6366F1', background: 'rgba(99,102,241,0.06)', borderRadius: 10 }}>Your current plan</div>
+
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: 36 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg, #6366F1, #818CF8)', marginBottom: 16, boxShadow: '0 4px 16px rgba(99,102,241,0.25)' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" /></svg>
               </div>
-              <div style={{ border: '1.5px solid rgba(99,102,241,0.3)', borderRadius: 18, padding: '28px 22px', position: 'relative', background: 'rgba(99,102,241,0.02)' }}>
-                <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 14px', borderRadius: 20 }}>Most popular</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Pro</div>
-                <div style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>$4.99</div>
-                <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>one-time payment</div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Unlimited widgets</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> All premium styles</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Full customization</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Priority support</li>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
+              <div style={{ fontSize: 15, color: '#999', marginTop: 8, lineHeight: 1.5 }}>Unlock all styles and unlimited widgets</div>
+            </div>
+
+            {/* Plans */}
+            <div style={{ display: 'grid', gridTemplateColumns: '5fr 6fr', gap: 16, alignItems: 'stretch' }}>
+              {/* Free */}
+              <div style={{
+                border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 20, padding: '28px 24px',
+                display: 'flex', flexDirection: 'column' as const,
+              }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#bbb', marginBottom: 12, textTransform: 'uppercase' as const, letterSpacing: '0.05em', minHeight: 27, display: 'flex', alignItems: 'center' }}>Free</div>
+                <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</div>
+                <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>forever</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column' as const, gap: 14, flex: 1 }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> 3 widgets</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Basic widget types</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Limited customization</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Embed in Notion</li>
+                </ul>
+                <button onClick={() => setShowUpgrade(false)} style={{
+                  marginTop: 28, width: '100%', height: 46, border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 14,
+                  background: '#fff', color: '#555', fontSize: 14, fontWeight: 600,
+                  fontFamily: 'inherit', cursor: 'pointer', transition: 'all 0.15s',
+                }}>Current plan</button>
+              </div>
+
+              {/* Pro */}
+              <div style={{
+                border: '1.5px solid rgba(99,102,241,0.2)', borderRadius: 20, padding: '28px 24px',
+                background: 'linear-gradient(160deg, rgba(99,102,241,0.04) 0%, rgba(236,72,153,0.03) 100%)',
+                display: 'flex', flexDirection: 'column' as const, position: 'relative',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Pro</div>
+                  <div style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 20 }}>Popular</div>
+                </div>
+                <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$4</div>
+                <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>/month</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#444', display: 'flex', flexDirection: 'column' as const, gap: 14, flex: 1 }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Unlimited widgets</strong></li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>All widget types</strong></li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Full customization</strong></li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Exclusive styles</strong></li>
                 </ul>
                 <button style={{
-                  marginTop: 20, width: '100%', height: 44, border: 'none', borderRadius: 12,
+                  marginTop: 28, width: '100%', height: 46, border: 'none', borderRadius: 14,
                   background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff', fontSize: 14, fontWeight: 600,
-                  fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                }}>Upgrade Now</button>
+                  fontFamily: 'inherit', cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                  transition: 'all 0.15s',
+                }}>Get Pro</button>
               </div>
             </div>
           </div>
