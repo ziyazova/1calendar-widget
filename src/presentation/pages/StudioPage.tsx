@@ -335,6 +335,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editingWidget, setEditingWidget] = useState<Widget | null>(null);
   const [editingWidgetKey, setEditingWidgetKey] = useState<string>('');
   const [editorOpen, setEditorOpen] = useState(false);
+  const [studioZoom, setStudioZoom] = useState(0.9);
 
   const loadWidgets = useCallback(async () => {
     if (!isRegistered) { setLoading(false); return; }
@@ -418,7 +419,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             }}>
               <ArrowRight style={{ width: 14, height: 14, transform: 'rotate(180deg)' }} /> Back
             </button>
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: '#6366F1', letterSpacing: '-0.02em' }}>
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
           </div>
@@ -453,14 +454,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               background: '#fff', borderRadius: 10, height: 36, padding: '0 4px',
               border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
             }}>
-              <button style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>−</button>
-              <span style={{ fontSize: 12, fontWeight: 500, color: '#888', minWidth: 40, textAlign: 'center' as const, fontVariantNumeric: 'tabular-nums' }}>100%</span>
-              <button style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>+</button>
+              <button onClick={() => setStudioZoom(Math.max(0.3, +(studioZoom - 0.1).toFixed(1)))} style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>−</button>
+              <span style={{ fontSize: 12, fontWeight: 500, color: '#888', minWidth: 40, textAlign: 'center' as const, fontVariantNumeric: 'tabular-nums' }}>{Math.round(studioZoom * 100)}%</span>
+              <button onClick={() => setStudioZoom(Math.min(2.0, +(studioZoom + 0.1).toFixed(1)))} style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>+</button>
             </div>
 
             {/* Widget */}
             <div style={{
-              transform: 'scale(0.9) translateY(-32px)', transformOrigin: 'center center',
+              transform: `scale(${studioZoom}) translateY(-32px)`, transformOrigin: 'center center',
+              transition: 'transform 0.15s ease',
               filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04))',
             }}>
               <WidgetDisplay widget={editingWidget} />

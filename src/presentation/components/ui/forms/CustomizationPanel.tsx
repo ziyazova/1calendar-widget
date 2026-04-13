@@ -58,7 +58,7 @@ const PanelHeader = styled.div`
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 80px 24px 16px;
+  padding: 80px 32px 16px 12px;
   border-bottom: none;
 `;
 
@@ -96,7 +96,7 @@ const WidgetBadgeText = styled.span`
 const PanelContent = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 0 24px 32px;
+  padding: 0 32px 32px 12px;
 
   &::-webkit-scrollbar {
     width: 0;
