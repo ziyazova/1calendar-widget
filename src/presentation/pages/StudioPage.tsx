@@ -328,6 +328,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
   // Editing state
   const [editingWidget, setEditingWidget] = useState<Widget | null>(null);
   const [editingWidgetKey, setEditingWidgetKey] = useState<string>('');
@@ -425,7 +427,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </div>
               <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
             </div>
-            <button onClick={() => {}} style={{
+            <button onClick={() => setShowUpgrade(true)} style={{
               fontSize: 13, fontWeight: 600, color: '#fff',
               background: 'linear-gradient(135deg, #6366F1, #818CF8)',
               padding: '8px 20px', borderRadius: 10,
@@ -538,6 +540,59 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </>
         )}
       </Container>
+
+      {/* Upgrade Modal */}
+      {showUpgrade && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)' }} />
+          <div style={{
+            position: 'relative', background: '#fff', borderRadius: 24, padding: '44px 36px 36px',
+            width: 560, maxWidth: '92vw', boxShadow: '0 24px 64px rgba(0,0,0,0.2)',
+            animation: 'modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+          }}>
+            <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
+            <button onClick={() => setShowUpgrade(false)} style={{
+              position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
+              background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>×</button>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div style={{ fontSize: 26, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
+              <div style={{ fontSize: 15, color: '#888', marginTop: 6 }}>Unlock all styles and unlimited widgets</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 18, padding: '28px 22px' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Starter</div>
+                <div style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>Free</div>
+                <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>forever</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Up to 3 widgets</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Basic styles</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Embed in Notion</li>
+                </ul>
+                <div style={{ marginTop: 20, padding: '10px 0', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6366F1', background: 'rgba(99,102,241,0.06)', borderRadius: 10 }}>Your current plan</div>
+              </div>
+              <div style={{ border: '2px solid #1F1F1F', borderRadius: 18, padding: '28px 22px', position: 'relative', background: '#FAFAFA' }}>
+                <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: '#1F1F1F', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 14px', borderRadius: 20 }}>Most popular</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Pro</div>
+                <div style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>$4.99</div>
+                <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>one-time payment</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Unlimited widgets</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> All premium styles</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Full customization</li>
+                  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Priority support</li>
+                </ul>
+                <button style={{
+                  marginTop: 20, width: '100%', height: 44, border: 'none', borderRadius: 12,
+                  background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff', fontSize: 14, fontWeight: 600,
+                  fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                }}>Upgrade Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Page>
   );
 };

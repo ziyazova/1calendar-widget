@@ -721,6 +721,8 @@ export const WidgetStudioPage: React.FC = () => {
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const { loginWithCode, login, loginWithGoogle, isLoggedIn } = useAuth();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [nameModal, setNameModal] = useState<{ title: string; category: string } | null>(null);
+  const [widgetName, setWidgetName] = useState('');
 
   const handleLaunch = useCallback(() => {
     setExpanding(true);
@@ -767,7 +769,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {item.pro ? (
                   <CustomizeBtn $pro onClick={() => setShowUpgrade(true)}><Lock /> Pro</CustomizeBtn>
                 ) : (
-                  <CustomizeBtn onClick={handleLaunch}><Pencil /> Customize</CustomizeBtn>
+                  <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
@@ -776,6 +778,132 @@ export const WidgetStudioPage: React.FC = () => {
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 12px' }}>
           <BigFooter onNavigate={(path) => navigate(path)} />
         </div>
+
+        {/* Name Modal */}
+        {nameModal && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div onClick={() => setNameModal(null)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
+            <div style={{
+              position: 'relative', background: '#fff', borderRadius: 24, padding: '36px 32px',
+              width: 440, maxWidth: '92vw', boxShadow: '0 24px 64px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.08)',
+              animation: 'modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+            }}>
+              <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
+              <button onClick={() => setNameModal(null)} style={{
+                position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
+                background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>×</button>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: 8 }}>
+                New {nameModal.category === 'calendar' ? 'Calendar' : nameModal.category === 'clock' ? 'Clock' : 'Board'}
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#1F1F1F', marginBottom: 24, letterSpacing: '-0.03em' }}>
+                Name your widget
+              </div>
+              <input
+                autoFocus
+                value={widgetName}
+                onChange={e => setWidgetName(e.target.value)}
+                placeholder="My awesome widget..."
+                style={{
+                  width: '100%', height: 48, padding: '0 16px', border: '1.5px solid rgba(0,0,0,0.1)',
+                  borderRadius: 12, fontSize: 15, fontFamily: 'inherit', color: '#1F1F1F',
+                  outline: 'none', background: '#FAFAFA', marginBottom: 24, boxSizing: 'border-box' as const,
+                }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.background = '#fff'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.background = '#FAFAFA'; }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && widgetName.trim()) {
+                    setNameModal(null);
+                    navigate('/studio');
+                  }
+                }}
+              />
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                <button onClick={() => setNameModal(null)} style={{
+                  height: 44, padding: '0 22px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
+                  background: 'transparent', fontSize: 14, fontWeight: 500, fontFamily: 'inherit',
+                  color: '#666', cursor: 'pointer', transition: 'all 0.15s',
+                }}>Cancel</button>
+                <button
+                  onClick={() => {
+                    if (widgetName.trim()) {
+                      setNameModal(null);
+                      navigate('/studio');
+                    }
+                  }}
+                  style={{
+                    height: 44, padding: '0 28px', border: 'none', borderRadius: 12,
+                    background: '#1F1F1F', fontSize: 14, fontWeight: 600, fontFamily: 'inherit',
+                    color: '#fff', cursor: 'pointer', transition: 'all 0.15s',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  }}
+                >Create & Edit</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Upgrade Modal */}
+        {showUpgrade && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
+            <div style={{
+              position: 'relative', background: '#fff', borderRadius: 24, padding: '44px 36px 36px',
+              width: 560, maxWidth: '92vw', boxShadow: '0 24px 64px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.08)',
+              transform: 'scale(1)', opacity: 1,
+              animation: 'modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+            }}>
+              <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
+              <button onClick={() => setShowUpgrade(false)} style={{
+                position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
+                background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s',
+              }}>×</button>
+              <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                <div style={{ fontSize: 26, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
+                <div style={{ fontSize: 15, color: '#888', marginTop: 6 }}>Unlock all styles and unlimited widgets</div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                {/* Free */}
+                <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 18, padding: '28px 22px' }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Starter</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                    <span style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>Free</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>forever</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Up to 3 widgets</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Basic styles</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Embed in Notion</li>
+                  </ul>
+                  <div style={{ marginTop: 20, padding: '10px 0', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6366F1', background: 'rgba(99,102,241,0.06)', borderRadius: 10 }}>Your current plan</div>
+                </div>
+                {/* Pro */}
+                <div style={{ border: '2px solid #1F1F1F', borderRadius: 18, padding: '28px 22px', position: 'relative', background: '#FAFAFA' }}>
+                  <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: '#1F1F1F', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 14px', borderRadius: 20, whiteSpace: 'nowrap' as const }}>Most popular</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Pro</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                    <span style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>$4.99</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>one-time payment</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 13, color: '#777', display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Unlimited widgets</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> All premium styles</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Full customization</li>
+                    <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: '#22C55E' }}>✓</span> Priority support</li>
+                  </ul>
+                  <button style={{
+                    marginTop: 20, width: '100%', height: 44, border: 'none', borderRadius: 12,
+                    background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff', fontSize: 14, fontWeight: 600,
+                    fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    transition: 'all 0.15s',
+                  }}>Upgrade Now</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </PageWrapper>
     );
   }
@@ -871,7 +999,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {item.pro ? (
                   <CustomizeBtn $pro onClick={() => setShowUpgrade(true)}><Lock /> Pro</CustomizeBtn>
                 ) : (
-                  <CustomizeBtn onClick={handleLaunch}><Pencil /> Customize</CustomizeBtn>
+                  <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
