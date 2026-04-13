@@ -521,10 +521,10 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
           <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Notion Widgets</NavLink>
-          <CartWrap ref={cartRef}>
+          {itemCount > 0 && <CartWrap ref={cartRef}>
             <CartButton aria-label="Cart" onClick={() => setCartOpen(!cartOpen)}>
               <ShoppingCart />
-              {itemCount > 0 && <CartBadge>{itemCount}</CartBadge>}
+              <CartBadge>{itemCount}</CartBadge>
             </CartButton>
             {cartOpen && (
               <CartDropdown>
@@ -532,7 +532,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 {cartItems}
               </CartDropdown>
             )}
-          </CartWrap>
+          </CartWrap>}
           {isLoggedIn ? (
             <div ref={avatarRef} style={{ position: 'relative' }}
               onMouseEnter={() => setAvatarOpen(true)}
@@ -543,10 +543,10 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
                   cursor: 'pointer',
-                  padding: '6px 14px 6px 6px',
-                  borderRadius: 12,
-                  background: avatarOpen ? 'rgba(99,102,241,0.06)' : 'transparent',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  padding: '5px 14px 5px 5px',
+                  borderRadius: 24,
+                  background: avatarOpen ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)',
+                  border: 'none',
                   transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
@@ -560,7 +560,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 }}>
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 600, color: avatarOpen ? '#6366F1' : '#1F1F1F', transition: 'color 0.2s', letterSpacing: '-0.01em' }}>Dashboard</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#6366F1' : '#666', transition: 'color 0.2s' }}>Dashboard</span>
               </div>
               {avatarOpen && (
                 <>
