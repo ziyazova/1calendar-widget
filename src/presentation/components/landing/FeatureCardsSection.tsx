@@ -14,7 +14,7 @@ const FeatureCardsSectionWrap = styled.section`
 
 const FeatureStack = styled.div`
   position: relative;
-  height: 780px;
+  height: 624px;
 
   @media (max-width: 768px) {
     height: auto;
@@ -50,7 +50,7 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   position: absolute;
   left: 0;
   right: 0;
-  height: 644px;
+  height: 515px;
   z-index: ${({ $index, $activeIdx, $total }) => {
     // circular distance behind active
     const behind = ($index - $activeIdx + $total) % $total;
