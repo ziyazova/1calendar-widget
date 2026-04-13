@@ -407,7 +407,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {/* Editor top bar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 24px', height: 60, background: '#fff', flexShrink: 0, zIndex: 10,
+          padding: '0 24px 0 48px', height: 68, paddingTop: 15, background: '#fff', flexShrink: 0, zIndex: 10,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button onClick={() => setEditorOpen(false)} style={{
@@ -435,7 +435,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
               radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
               #F8F8F7`,
-            margin: '0 12px 16px 16px',
+            margin: '12px 12px 24px 48px',
             borderRadius: 20,
             border: '1px solid rgba(0,0,0,0.06)',
           }}>
@@ -445,6 +445,18 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px)',
               backgroundSize: '24px 24px', pointerEvents: 'none', opacity: 0.6,
             }} />
+
+            {/* Zoom controls — top right */}
+            <div style={{
+              position: 'absolute', top: 16, right: 16,
+              display: 'flex', alignItems: 'center', gap: 0,
+              background: '#fff', borderRadius: 10, height: 36, padding: '0 4px',
+              border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            }}>
+              <button style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>−</button>
+              <span style={{ fontSize: 12, fontWeight: 500, color: '#888', minWidth: 40, textAlign: 'center' as const, fontVariantNumeric: 'tabular-nums' }}>100%</span>
+              <button style={{ width: 32, height: 32, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 16, color: '#888', fontFamily: 'inherit', borderRadius: 8 }}>+</button>
+            </div>
 
             {/* Widget */}
             <div style={{
@@ -456,20 +468,20 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
             {/* Floating toolbar — bottom center */}
             <div style={{
-              position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-              display: 'flex', alignItems: 'center', gap: 8,
+              position: 'absolute', bottom: 44, left: '50%', transform: 'translateX(-50%)',
+              display: 'flex', alignItems: 'center', gap: 10,
               background: 'rgba(255,255,255,0.94)', backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               border: '1px solid rgba(0,0,0,0.06)', borderRadius: 16,
               padding: '10px 16px', boxShadow: '0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
             }}>
               <input readOnly value={embedUrl} style={{
-                width: 220, height: 32, padding: '0 12px', border: 'none', borderRadius: 8,
+                width: 240, height: 34, padding: '0 12px', border: 'none', borderRadius: 8,
                 background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#777',
                 outline: 'none',
               }} onClick={e => (e.target as HTMLInputElement).select()} />
               <button onClick={() => { navigator.clipboard.writeText(embedUrl); }} style={{
-                display: 'flex', alignItems: 'center', gap: 6, height: 34, padding: '0 16px',
+                display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 18px',
                 border: 'none', borderRadius: 10,
                 background: 'linear-gradient(135deg, #3384F4, #5BA0F7)',
                 color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
