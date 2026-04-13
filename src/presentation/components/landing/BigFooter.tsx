@@ -110,7 +110,6 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
           <NavTitle>Social</NavTitle>
           <NavLink onClick={() => window.open('https://etsy.com', '_blank')}>Etsy</NavLink>
           <NavLink onClick={() => window.open('https://instagram.com', '_blank')}>Instagram</NavLink>
-          <NavLink onClick={() => window.open('https://pinterest.com', '_blank')}>Pinterest</NavLink>
         </NavGroup>
         <NavGroup>
           <NavTitle>Legal</NavTitle>
