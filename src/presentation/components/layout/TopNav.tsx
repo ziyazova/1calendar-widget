@@ -532,7 +532,18 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
             )}
           </CartWrap>
           {isRegistered ? (
-            <NavCTA onClick={() => navigate('/dashboard')}>Dashboard</NavCTA>
+            <div
+              onClick={() => navigate('/studio')}
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 600, color: '#6366F1',
+                cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+            </div>
           ) : (
             <NavCTA onClick={() => navigate('/login')}>Log in</NavCTA>
           )}

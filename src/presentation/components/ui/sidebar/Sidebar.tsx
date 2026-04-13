@@ -772,8 +772,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <CategoryIcon $active={dashboardView === 'purchases'}>
               <ShoppingBag />
             </CategoryIcon>
-            <CategoryText $collapsed={collapsed}>Templates</CategoryText>
-            {collapsed && <Tooltip>Templates</Tooltip>}
+            <CategoryText $collapsed={collapsed}>Purchases</CategoryText>
+            {collapsed && <Tooltip>Purchases</Tooltip>}
           </CategoryHeader>
         </WidgetCategory>
 

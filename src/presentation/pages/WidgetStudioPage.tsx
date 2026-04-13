@@ -309,13 +309,13 @@ const WidgetGallerySection = styled.section`
 const WidgetGalleryHeader = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px 0;
+  padding: 120px 48px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
 
   @media (max-width: 768px) {
-    padding: 48px 24px 0;
+    padding: 64px 24px 0;
   }
 `;
 

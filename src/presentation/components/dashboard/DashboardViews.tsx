@@ -27,9 +27,9 @@ import { InspirationBoard } from '../widgets/board/styles/InspirationBoard';
 
 const Container = styled.div`
   width: 100%;
-  max-width: 860px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 56px 48px 48px;
+  padding: 48px 48px 64px;
 
   @media (max-width: 768px) {
     padding: 32px 16px 24px;
@@ -463,9 +463,9 @@ const FILTERS: { key: WidgetFilter; label: string }[] = [
 
 
 const PURCHASES = [
-  { id: 'p1', name: 'Weekly Planner', price: 'Free', date: 'Mar 22, 2026', order: '#PY-1042', image: '/template-main.png' },
-  { id: 'p2', name: 'Life OS Template', price: '$7.99', date: 'Mar 20, 2026', order: '#PY-1038', image: '/template-main.png' },
-  { id: 'p3', name: 'Student Planner', price: '$3.99', date: 'Mar 15, 2026', order: '#PY-1025', image: '/template-main.png' },
+  { id: 'p1', name: 'Weekly Planner', price: 'Free', date: 'Mar 22, 2026', order: '#PY-1042', image: '/template-main.png', slug: 'weekly-planner' },
+  { id: 'p2', name: 'Life OS Template', price: '$7.99', date: 'Mar 20, 2026', order: '#PY-1038', image: '/template-main.png', slug: 'life-os' },
+  { id: 'p3', name: 'Student Planner', price: '$3.99', date: 'Mar 15, 2026', order: '#PY-1025', image: '/template-main.png', slug: 'student-planner' },
 ];
 
 
@@ -603,8 +603,8 @@ const ALL_EXPLORE_WIDGETS = [
 
 type ExploreFilter = 'all' | 'calendar' | 'clock' | 'board';
 const EXPLORE_FILTERS: { key: ExploreFilter; label: string }[] = [
-  { key: 'all', label: 'Featured' },
-  { key: 'calendar', label: 'Calendars' },
+  { key: 'all', label: 'All' },
+  { key: 'calendar', label: 'Calendar' },
   { key: 'clock', label: 'Clocks' },
   { key: 'board', label: 'Canvas' },
 ];
@@ -619,13 +619,18 @@ const ExploreGrid = styled.div`
    VIEWS: DASHBOARD · WIDGETS · TEMPLATES · SETTINGS
    ═══════════════════════════════════════════════════════ */
 
-/* ── Shared view styles ── */
+import { Calendar as CalIcon, Clock as ClkIcon, Image as ImgIcon, Link as LinkIcon, ArrowRight, Sparkles } from 'lucide-react';
 
-const OverviewSection = styled.section`
-  margin-top: 48px;
+/* ── Shared view components ── */
+
+const Section = styled.section`
+  margin-top: 40px;
 `;
 
-const ViewLink = styled.button`
+const ViewAllBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: none;
   border: none;
   color: ${({ theme }) => theme.colors.text.tertiary};
@@ -635,219 +640,384 @@ const ViewLink = styled.button`
   cursor: pointer;
   padding: 0;
   transition: color 0.15s;
-
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
+  svg { width: 12px; height: 12px; }
 `;
 
-const PlanBadge = styled.span<{ $pro?: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  background: ${({ $pro }) => $pro ? '#1F1F1F' : 'rgba(0,0,0,0.05)'};
-  color: ${({ $pro }) => $pro ? '#fff' : '#888'};
-`;
-
-const HeroRow = styled.div`
+const TopBar = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 36px;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 32px;
 `;
 
-const HeroAvatar = styled.div`
-  width: 48px;
-  height: 48px;
+const AvatarCircle = styled.div`
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.6));
+  background: linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 600;
   color: #6366F1;
   flex-shrink: 0;
 `;
 
-const HeroInfo = styled.div`
-  flex: 1;
-  min-width: 0;
+const PlanPill = styled.span<{ $pro?: boolean }>`
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: ${({ $pro }) => $pro ? '#1F1F1F' : '#F5F5F5'};
+  color: ${({ $pro }) => $pro ? '#fff' : '#999'};
 `;
 
-const HeroName = styled.h1`
-  font-size: 22px;
+const WelcomeTitle = styled.h1`
+  font-size: 28px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
-  margin: 0;
+  margin: 0 0 4px;
 `;
 
-const HeroSub = styled.p`
-  font-size: 14px;
+const WelcomeSub = styled.p`
+  font-size: 15px;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 2px 0 0;
+  margin: 0 0 32px;
 `;
 
-const CreateGrid = styled.div`
+const CreateRow = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin-bottom: 8px;
 
   @media (max-width: 768px) { gap: 8px; }
 `;
 
-const CreateTypeCard = styled.button<{ $gradient: string }>`
+const CreateCard = styled.button<{ $bg: string }>`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 24px 16px;
-  background: ${({ $gradient }) => $gradient};
-  border: 1.5px solid rgba(200, 195, 230, 0.15);
-  border-radius: 16px;
+  gap: 12px;
+  padding: 20px;
+  background: ${({ $bg }) => $bg};
+  border: 1.5px solid rgba(0,0,0,0.04);
+  border-radius: 14px;
   cursor: pointer;
   font-family: inherit;
+  text-align: left;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
     transform: translateY(-2px);
-    border-color: rgba(200, 195, 230, 0.35);
-    box-shadow: 0 8px 24px rgba(130, 120, 200, 0.08);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.08);
   }
 
-  svg { width: 22px; height: 22px; color: #555; stroke-width: 1.6; }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 12px;
+    gap: 8px;
+  }
 `;
 
-const CreateTypeLabel = styled.span`
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
+const CreateIconWrap = styled.div<{ $color: string }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  svg { width: 20px; height: 20px; color: ${({ $color }) => $color}; stroke-width: 1.6; }
+`;
+
+const CreateCardText = styled.div``;
+
+const CreateCardTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F1F1F;
   letter-spacing: -0.01em;
 `;
 
-const WidgetBigCard = styled.div<{ $index: number }>`
+const CreateCardHint = styled.div`
+  font-size: 12px;
+  color: #999;
+  margin-top: 1px;
+  @media (max-width: 768px) { display: none; }
+`;
+
+/* Big widget cards (Nodi-style) */
+
+const BigGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+`;
+
+const BigCard = styled.div<{ $index: number }>`
   background: #fff;
   border: 1.5px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   overflow: hidden;
-  transition: all 0.2s;
   animation: ${cardAppear} 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${({ $index }) => 0.05 + $index * 0.04}s both;
+  transition: all 0.2s;
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
   }
 `;
 
-const WidgetBigPreview = styled.div`
-  aspect-ratio: 4 / 3;
+const BigCardPreview = styled.div`
+  aspect-ratio: 3 / 2;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #FAFAFA;
+  background: #FAFAF9;
+  cursor: pointer;
   position: relative;
 `;
 
-const WidgetBigInfo = styled.div`
-  padding: 14px 16px;
+const BigCardLabel = styled.span`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #555;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 3px 10px;
+  border-radius: 6px;
+  z-index: 1;
+`;
+
+const BigCardBottom = styled.div`
+  padding: 16px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
-const WidgetBigName = styled.div`
-  font-size: 14px;
+const BigCardName = styled.div`
+  font-size: 13px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
-const WidgetBigActions = styled.div`
+const BigCardMeta = styled.span`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-weight: 400;
+  margin-left: 6px;
+`;
+
+const BigCardActions = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
 `;
 
-const SmallActionBtn = styled.button<{ $danger?: boolean }>`
-  display: flex;
+const ActionButton = styled.button<{ $primary?: boolean; $danger?: boolean }>`
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 5px;
-  height: 30px;
-  padding: 0 12px;
-  border: 1px solid ${({ $danger }) => $danger ? 'rgba(220,40,40,0.15)' : 'rgba(0,0,0,0.08)'};
+  height: 32px;
+  padding: 0 14px;
   border-radius: 8px;
-  background: transparent;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
-  color: ${({ $danger, theme }) => $danger ? '#DC2828' : theme.colors.text.secondary};
   cursor: pointer;
   transition: all 0.15s;
+  border: 1px solid ${({ $primary, $danger }) => $primary ? '#1F1F1F' : $danger ? 'rgba(220,40,40,0.2)' : 'rgba(0,0,0,0.1)'};
+  background: ${({ $primary }) => $primary ? '#1F1F1F' : 'transparent'};
+  color: ${({ $primary, $danger }) => $primary ? '#fff' : $danger ? '#DC2828' : '#666'};
 
   &:hover {
-    background: ${({ $danger }) => $danger ? 'rgba(220,40,40,0.06)' : 'rgba(0,0,0,0.03)'};
-    border-color: ${({ $danger }) => $danger ? 'rgba(220,40,40,0.25)' : 'rgba(0,0,0,0.15)'};
+    opacity: 0.85;
+    ${({ $primary }) => !$primary && 'background: rgba(0,0,0,0.02);'}
   }
 
-  svg { width: 13px; height: 13px; }
+  svg { width: 14px; height: 14px; }
 `;
 
-const EmptyState = styled.div`
-  border: 1.5px dashed rgba(0, 0, 0, 0.08);
+const EmptyBox = styled.div`
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
-  padding: 48px 24px;
+  padding: 56px 24px;
   text-align: center;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
 `;
 
-const EmptyIcon = styled.div`
+const EmptyCircle = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.03);
+  background: linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-  svg { width: 24px; height: 24px; color: rgba(0,0,0,0.2); }
+  margin: 0 auto 14px;
+  svg { width: 24px; height: 24px; color: #6366F1; }
 `;
 
-const EmptyText = styled.p`
-  font-size: 14px;
+const EmptyTitle = styled.p`
+  font-size: 15px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 4px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-weight: 500;
 `;
 
 const EmptyHint = styled.p`
   font-size: 13px;
-  margin: 0;
   color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0;
 `;
 
-import { Calendar as CalIcon, Clock as ClkIcon, Image as ImgIcon, Link as LinkIcon } from 'lucide-react';
+/* Purchase cards */
+
+const PurchaseCard = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  }
+
+  & + & { margin-top: 8px; }
+`;
+
+const PurchaseImg = styled.div`
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #F5F5F5;
+  flex-shrink: 0;
+  img { width: 100%; height: 100%; object-fit: cover; }
+`;
+
+const PurchaseDetails = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const PurchaseTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const PurchaseMeta = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin-top: 2px;
+`;
+
+const PurchasePriceTag = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin-right: 8px;
+`;
+
+/* Settings */
+
+const SettingsGroup = styled.div`
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 16px;
+`;
+
+const SettingsGroupTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+`;
+
+const SettingsRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+
+  &:last-child { margin-bottom: 0; }
+`;
+
+const SettingsLabel = styled.label`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  width: 80px;
+  flex-shrink: 0;
+`;
+
+const SettingsInput = styled.input`
+  flex: 1;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1F1F1F;
+  background: #FAFAFA;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus { border-color: rgba(0,0,0,0.2); background: #fff; }
+  &:read-only { opacity: 0.5; cursor: not-allowed; }
+`;
 
 const CREATE_TYPES = [
-  { key: 'calendar', label: 'Calendar', icon: CalIcon, gradient: 'linear-gradient(135deg, rgba(237,228,255,0.4) 0%, rgba(232,237,255,0.3) 100%)' },
-  { key: 'clock', label: 'Clock', icon: ClkIcon, gradient: 'linear-gradient(135deg, rgba(232,237,255,0.4) 0%, rgba(220,235,255,0.3) 100%)' },
-  { key: 'board', label: 'Board', icon: ImgIcon, gradient: 'linear-gradient(135deg, rgba(255,240,245,0.4) 0%, rgba(252,228,236,0.3) 100%)' },
+  { key: 'calendar', label: 'Calendar', hint: 'Monthly & weekly', icon: CalIcon, color: '#6366F1', bg: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.35) 100%)' },
+  { key: 'clock', label: 'Clock', hint: 'Analog & digital', icon: ClkIcon, color: '#3384F4', bg: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(220,235,255,0.35) 100%)' },
+  { key: 'board', label: 'Board', hint: 'Moodboards', icon: ImgIcon, color: '#EC4899', bg: 'linear-gradient(135deg, rgba(255,240,245,0.5) 0%, rgba(252,228,236,0.35) 100%)' },
 ];
 
 /* ── 1. DASHBOARD ── */
 
 const DashboardView: React.FC<{
   onNavigate: (view: DashboardView) => void;
-  onAddNew?: () => void;
   onCreateType?: (type: string) => void;
   onEditWidget?: (widget: SavedWidget) => void;
-}> = ({ onNavigate, onAddNew, onCreateType, onEditWidget }) => {
+}> = ({ onNavigate, onCreateType, onEditWidget }) => {
+  const navigate = useNavigate();
   const { isRegistered, user } = useAuth();
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
@@ -871,89 +1041,94 @@ const DashboardView: React.FC<{
 
   return (
     <Container>
-      {/* Hero */}
-      <HeroRow>
-        <HeroAvatar>{initials}</HeroAvatar>
-        <HeroInfo>
-          <HeroName>Hey, {firstName}</HeroName>
-          <HeroSub>Welcome to your studio</HeroSub>
-        </HeroInfo>
-        <PlanBadge>Free</PlanBadge>
-      </HeroRow>
+      <TopBar>
+        <PlanPill>Free</PlanPill>
+        <AvatarCircle>{initials}</AvatarCircle>
+      </TopBar>
 
-      {/* Create */}
-      <SectionHeading>
-        <SectionTitle>Create Widget</SectionTitle>
-      </SectionHeading>
-      <CreateGrid>
-        {CREATE_TYPES.map(t => (
-          <CreateTypeCard key={t.key} $gradient={t.gradient} onClick={() => onCreateType?.(t.key)}>
-            <t.icon />
-            <CreateTypeLabel>{t.label}</CreateTypeLabel>
-          </CreateTypeCard>
-        ))}
-      </CreateGrid>
+      <WelcomeTitle>Hey, {firstName}</WelcomeTitle>
+      <WelcomeSub>Create, customize, and manage your workspace</WelcomeSub>
+
+      {/* Quick actions */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 8 }}>
+        <CreateCard $bg="linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.35) 100%)" onClick={() => onNavigate('my-widgets')}>
+          <CreateIconWrap $color="#6366F1"><CalIcon /></CreateIconWrap>
+          <CreateCardText>
+            <CreateCardTitle>Explore Widgets</CreateCardTitle>
+            <CreateCardHint>Browse and customize styles</CreateCardHint>
+          </CreateCardText>
+        </CreateCard>
+        <CreateCard $bg="linear-gradient(135deg, rgba(255,240,245,0.5) 0%, rgba(252,228,236,0.35) 100%)" onClick={() => onNavigate('purchases')}>
+          <CreateIconWrap $color="#EC4899"><ImgIcon /></CreateIconWrap>
+          <CreateCardText>
+            <CreateCardTitle>My Templates</CreateCardTitle>
+            <CreateCardHint>Purchases and downloads</CreateCardHint>
+          </CreateCardText>
+        </CreateCard>
+      </div>
 
       {/* My Widgets */}
-      <OverviewSection>
+      <Section>
         <SectionHeading>
-          <SectionTitle>My Widgets <SectionCount>({widgets.length})</SectionCount></SectionTitle>
-          {widgets.length > 0 && <ViewLink onClick={() => onNavigate('my-widgets')}>Browse all</ViewLink>}
+          <SectionTitle>My Widgets <SectionCount>{widgets.length}</SectionCount></SectionTitle>
+          {widgets.length > 0 && <ViewAllBtn onClick={() => onNavigate('my-widgets')}>Browse all <ArrowRight /></ViewAllBtn>}
         </SectionHeading>
 
         {!loading && widgets.length === 0 ? (
-          <EmptyState>
-            <EmptyIcon><Plus /></EmptyIcon>
-            <EmptyText>No widgets yet</EmptyText>
-            <EmptyHint>Pick a type above to create your first widget</EmptyHint>
-          </EmptyState>
+          <EmptyBox onClick={() => onNavigate('my-widgets')}>
+            <EmptyCircle><Sparkles /></EmptyCircle>
+            <EmptyTitle>Create your first widget</EmptyTitle>
+            <EmptyHint>Browse widget styles and customize</EmptyHint>
+          </EmptyBox>
         ) : (
-          <Grid>
+          <BigGrid>
             {widgets.slice(0, 4).map((w, i) => (
-              <WidgetBigCard key={w.id} $index={i}>
-                <WidgetBigPreview>
+              <BigCard key={w.id} $index={i}>
+                <BigCardPreview onClick={() => onEditWidget?.(w)}>
+                  <BigCardLabel>{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</BigCardLabel>
                   <WidgetPreview type={w.type} style={w.style} />
-                </WidgetBigPreview>
-                <WidgetBigInfo>
-                  <WidgetBigName>{w.name}</WidgetBigName>
-                  <WidgetBigActions>
-                    <SmallActionBtn onClick={() => onEditWidget?.(w)}><Pencil /> Edit</SmallActionBtn>
-                    <SmallActionBtn $danger onClick={() => handleDelete(w.id)}><Trash2 /></SmallActionBtn>
-                  </WidgetBigActions>
-                </WidgetBigInfo>
-              </WidgetBigCard>
+                </BigCardPreview>
+                <BigCardBottom>
+                  <BigCardName>{w.name}</BigCardName>
+                  <BigCardActions>
+                    <ActionButton $primary onClick={() => onEditWidget?.(w)}><Pencil /> Edit</ActionButton>
+                    <ActionButton $danger onClick={() => handleDelete(w.id)}><Trash2 /></ActionButton>
+                  </BigCardActions>
+                </BigCardBottom>
+              </BigCard>
             ))}
-          </Grid>
+          </BigGrid>
         )}
-      </OverviewSection>
+      </Section>
 
       {/* Recent Purchases */}
-      <OverviewSection>
+      <Section>
         <SectionHeading>
-          <SectionTitle>Recent Purchases <SectionCount>({PURCHASES.length})</SectionCount></SectionTitle>
-          {PURCHASES.length > 0 && <ViewLink onClick={() => onNavigate('purchases')}>View all</ViewLink>}
+          <SectionTitle>Recent Purchases <SectionCount>{PURCHASES.length}</SectionCount></SectionTitle>
+          {PURCHASES.length > 0 && <ViewAllBtn onClick={() => onNavigate('purchases')}>View all <ArrowRight /></ViewAllBtn>}
         </SectionHeading>
         {PURCHASES.length === 0 ? (
-          <EmptyState>
-            <EmptyIcon><Download /></EmptyIcon>
-            <EmptyText>No purchases yet</EmptyText>
-            <EmptyHint>Browse templates to find planners for your Notion</EmptyHint>
-          </EmptyState>
+          <EmptyBox onClick={() => onNavigate('templates')}>
+            <EmptyCircle><Download /></EmptyCircle>
+            <EmptyTitle>No purchases yet</EmptyTitle>
+            <EmptyHint>Browse templates to find planners for Notion</EmptyHint>
+          </EmptyBox>
         ) : (
-          <PurchaseList>
+          <>
             {PURCHASES.slice(0, 3).map(p => (
-              <PurchaseRow key={p.id}>
-                <PurchaseThumb><img src={p.image} alt={p.name} /></PurchaseThumb>
-                <PurchaseInfo>
-                  <PurchaseName>{p.name}</PurchaseName>
-                  <PurchaseDate>{p.date}</PurchaseDate>
-                </PurchaseInfo>
-                <PurchasePrice>{p.price}</PurchasePrice>
-              </PurchaseRow>
+              <PurchaseCard key={p.id}>
+                <PurchaseImg><img src={p.image} alt={p.name} /></PurchaseImg>
+                <PurchaseDetails>
+                  <PurchaseTitle>{p.name}</PurchaseTitle>
+                  <PurchaseMeta>{p.date}</PurchaseMeta>
+                </PurchaseDetails>
+                <PurchasePriceTag>{p.price}</PurchasePriceTag>
+                <ActionButton><Download /></ActionButton>
+              </PurchaseCard>
             ))}
-          </PurchaseList>
+          </>
         )}
-      </OverviewSection>
+      </Section>
     </Container>
   );
 };
@@ -992,7 +1167,7 @@ const WidgetsGalleryView: React.FC<{ onAddNew?: () => void }> = ({ onAddNew }) =
   return (
     <Container>
       <Title>Widgets</Title>
-      <Subtitle>Choose a style and customize it</Subtitle>
+      <Subtitle>Choose a style and customize it for your Notion</Subtitle>
 
       <FilterRow>
         {EXPLORE_FILTERS.map(f => (
@@ -1002,56 +1177,89 @@ const WidgetsGalleryView: React.FC<{ onAddNew?: () => void }> = ({ onAddNew }) =
         ))}
       </FilterRow>
 
-      <Grid style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+      <BigGrid>
         {ALL_EXPLORE_WIDGETS
           .filter(w => filter === 'all' || w.type === filter)
           .map((s, i) => (
-            <WidgetBigCard key={`${s.type}-${s.style}`} $index={i}>
-              <WidgetBigPreview style={{ cursor: 'pointer' }} onClick={() => onAddNew?.()}>
+            <BigCard key={`${s.type}-${s.style}`} $index={i}>
+              <BigCardPreview onClick={() => onAddNew?.()}>
+                <BigCardLabel>{s.category}</BigCardLabel>
                 {renderPreview(s.type, s.style)}
-              </WidgetBigPreview>
-              <WidgetBigInfo>
-                <WidgetBigName>{s.label} <span style={{ fontWeight: 400, color: '#999', fontSize: 12 }}>{s.category}</span></WidgetBigName>
-                <SmallActionBtn onClick={() => onAddNew?.()}><Pencil /> Customize</SmallActionBtn>
-              </WidgetBigInfo>
-            </WidgetBigCard>
+              </BigCardPreview>
+              <BigCardBottom>
+                <BigCardName>{s.label}</BigCardName>
+                <ActionButton $primary onClick={() => onAddNew?.()}><Pencil /> Customize</ActionButton>
+              </BigCardBottom>
+            </BigCard>
           ))}
-      </Grid>
+      </BigGrid>
     </Container>
   );
 };
 
-/* ── 3. TEMPLATES (purchases) ── */
+/* ── 3. TEMPLATES (purchases + explore) ── */
+
+const BrowseShopBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(135deg, #1F1F1F 0%, #333 100%);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  margin-top: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  &:active { transform: translateY(0); }
+  svg { width: 16px; height: 16px; }
+`;
 
 const PurchasesView: React.FC = () => {
   const navigate = useNavigate();
   return (
     <Container>
       <Title>My Templates</Title>
-      <Subtitle>{PURCHASES.length} purchased templates</Subtitle>
+      <Subtitle>Your purchased Notion planners and templates</Subtitle>
+
       {PURCHASES.length === 0 ? (
-        <EmptyState>
-          <EmptyIcon><Download /></EmptyIcon>
-          <EmptyText>No templates yet</EmptyText>
-          <EmptyHint>Browse the template shop to find planners for Notion</EmptyHint>
-          <SmallActionBtn onClick={() => navigate('/templates')} style={{ margin: '16px auto 0' }}>Browse templates</SmallActionBtn>
-        </EmptyState>
+        <EmptyBox onClick={() => navigate('/templates')}>
+          <EmptyCircle><Download /></EmptyCircle>
+          <EmptyTitle>No templates yet</EmptyTitle>
+          <EmptyHint>Browse the shop to find planners for Notion</EmptyHint>
+        </EmptyBox>
       ) : (
-        <PurchaseList>
+        <>
           {PURCHASES.map(p => (
-            <PurchaseRow key={p.id}>
-              <PurchaseThumb><img src={p.image} alt={p.name} /></PurchaseThumb>
-              <PurchaseInfo>
-                <PurchaseName>{p.name}</PurchaseName>
-                <PurchaseDate>{p.order} · {p.date}</PurchaseDate>
-              </PurchaseInfo>
-              <PurchasePrice>{p.price}</PurchasePrice>
-              <SmallActionBtn><Download /> Download</SmallActionBtn>
-              <SmallActionBtn><LinkIcon /> Receipt</SmallActionBtn>
-            </PurchaseRow>
+            <PurchaseCard key={p.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/templates/${p.slug}`)}>
+              <PurchaseImg style={{ width: 64, height: 64 }}><img src={p.image} alt={p.name} /></PurchaseImg>
+              <PurchaseDetails>
+                <PurchaseTitle>{p.name}</PurchaseTitle>
+                <PurchaseMeta>{p.order} · {p.date}</PurchaseMeta>
+              </PurchaseDetails>
+              <PurchasePriceTag>{p.price}</PurchasePriceTag>
+              <ActionButton onClick={(e) => { e.stopPropagation(); }}><Download /> Download</ActionButton>
+            </PurchaseCard>
           ))}
-        </PurchaseList>
+        </>
       )}
+
+      <BrowseShopBtn onClick={() => navigate('/templates')}>
+        Browse template shop <ArrowRight />
+      </BrowseShopBtn>
     </Container>
   );
 };
@@ -1066,31 +1274,45 @@ const ProfileView: React.FC = () => {
   return (
     <Container>
       <Title>Settings</Title>
-      <Subtitle>Manage your account</Subtitle>
+      <Subtitle>Manage your account and subscription</Subtitle>
 
-      <ProfileCard>
-        <Avatar>{initials}</Avatar>
-        <ProfileForm>
-          <div>
-            <Label>Name</Label>
-            <Input defaultValue={user?.name || ''} />
+      <SettingsGroup>
+        <SettingsGroupTitle>Profile</SettingsGroupTitle>
+        <SettingsRow>
+          <AvatarCircle style={{ width: 48, height: 48, fontSize: 16 }}>{initials}</AvatarCircle>
+          <div style={{ flex: 1 }}>
+            <SettingsRow style={{ marginBottom: 12 }}>
+              <SettingsLabel>Name</SettingsLabel>
+              <SettingsInput defaultValue={user?.name || ''} />
+            </SettingsRow>
+            <SettingsRow style={{ marginBottom: 0 }}>
+              <SettingsLabel>Email</SettingsLabel>
+              <SettingsInput defaultValue={user?.email || ''} readOnly />
+            </SettingsRow>
           </div>
-          <div>
-            <Label>Email</Label>
-            <Input defaultValue={user?.email || ''} type="email" readOnly style={{ opacity: 0.5 }} />
-          </div>
-          <SaveBtn>Save Changes</SaveBtn>
-        </ProfileForm>
-      </ProfileCard>
+        </SettingsRow>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+          <ActionButton $primary>Save changes</ActionButton>
+        </div>
+      </SettingsGroup>
 
-      <ProfileCard style={{ marginTop: 16 }}>
-        <ProfileForm>
-          <Label style={{ marginBottom: 0, fontSize: 15, fontWeight: 600, color: '#1F1F1F' }}>Danger Zone</Label>
-          <SmallActionBtn $danger onClick={async () => { await logout(); navigate('/'); }} style={{ marginTop: 8 }}>
-            <LogOut /> Log out
-          </SmallActionBtn>
-        </ProfileForm>
-      </ProfileCard>
+      <SettingsGroup>
+        <SettingsGroupTitle>Subscription</SettingsGroupTitle>
+        <SettingsRow>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Free plan</div>
+            <div style={{ fontSize: 13, color: '#999', marginTop: 2 }}>3 widgets, basic customization</div>
+          </div>
+          <ActionButton $primary>Upgrade to Pro</ActionButton>
+        </SettingsRow>
+      </SettingsGroup>
+
+      <SettingsGroup>
+        <SettingsGroupTitle style={{ color: '#DC2828' }}>Danger zone</SettingsGroupTitle>
+        <ActionButton $danger onClick={async () => { await logout(); navigate('/'); }}>
+          <LogOut /> Log out
+        </ActionButton>
+      </SettingsGroup>
     </Container>
   );
 };
@@ -1107,7 +1329,7 @@ interface DashboardContentProps {
 
 export const DashboardContent: React.FC<DashboardContentProps> = ({ view, onAddNew, onCreateType, onEditWidget, onNavigate }) => {
   switch (view) {
-    case 'dashboard': return <DashboardView onNavigate={onNavigate || (() => {})} onAddNew={onAddNew} onCreateType={onCreateType} onEditWidget={onEditWidget} />;
+    case 'dashboard': return <DashboardView onNavigate={onNavigate || (() => {})} onCreateType={onCreateType} onEditWidget={onEditWidget} />;
     case 'my-widgets': return <WidgetsGalleryView onAddNew={onAddNew} />;
     case 'templates':
     case 'purchases': return <PurchasesView />;
