@@ -808,58 +808,58 @@ export const WidgetStudioPage: React.FC = () => {
         </WidgetGalleryGrid>
       </WidgetGallerySection>
 
-      {/* Built different — hidden for now */}
+      {/* Show How it works, Pricing, CTA only for non-logged-in users */}
+      {!isLoggedIn && (
+        <>
+          <HowItWorksSection showTitle={true} variant="widgets" />
 
-      {/* How it works */}
-      <HowItWorksSection showTitle={true} variant="widgets" />
+          <PricingSection>
+            <PricingTitle>Simple pricing</PricingTitle>
+            <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
+            <PricingGrid>
+              <PricingCard>
+                <PricingPlan>Free</PricingPlan>
+                <PricingPrice>$0</PricingPrice>
+                <PricingPeriod>forever</PricingPeriod>
+                <PricingFeatures>
+                  <li>3 widgets</li>
+                  <li>Basic widget types</li>
+                  <li>Limited customization</li>
+                  <li>Embed in Notion</li>
+                </PricingFeatures>
+                <PricingBtn onClick={handleLaunch}>Get started</PricingBtn>
+              </PricingCard>
+              <PricingCard $highlighted>
+                <PricingBadge>Popular</PricingBadge>
+                <PricingPlan>Pro</PricingPlan>
+                <PricingPrice>$9</PricingPrice>
+                <PricingPeriod>one-time</PricingPeriod>
+                <PricingFeatures>
+                  <li>Unlimited widgets</li>
+                  <li>All widget types</li>
+                  <li>Full customization</li>
+                  <li>Exclusive widget styles</li>
+                </PricingFeatures>
+                <PricingBtn $primary onClick={handleLaunch}>Get Pro</PricingBtn>
+              </PricingCard>
+            </PricingGrid>
+          </PricingSection>
 
-      {/* Pricing */}
-      <PricingSection>
-        <PricingTitle>Simple pricing</PricingTitle>
-        <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
-        <PricingGrid>
-          <PricingCard>
-            <PricingPlan>Free</PricingPlan>
-            <PricingPrice>$0</PricingPrice>
-            <PricingPeriod>forever</PricingPeriod>
-            <PricingFeatures>
-              <li>3 widgets</li>
-              <li>Basic widget types</li>
-              <li>Limited customization</li>
-              <li>Embed in Notion</li>
-            </PricingFeatures>
-            <PricingBtn onClick={handleLaunch}>Get started</PricingBtn>
-          </PricingCard>
-          <PricingCard $highlighted>
-            <PricingBadge>Popular</PricingBadge>
-            <PricingPlan>Pro</PricingPlan>
-            <PricingPrice>$9</PricingPrice>
-            <PricingPeriod>one-time</PricingPeriod>
-            <PricingFeatures>
-              <li>Unlimited widgets</li>
-              <li>All widget types</li>
-              <li>Full customization</li>
-              <li>Exclusive widget styles</li>
-            </PricingFeatures>
-            <PricingBtn $primary onClick={handleLaunch}>Get Pro</PricingBtn>
-          </PricingCard>
-        </PricingGrid>
-      </PricingSection>
-
-      {/* Bottom CTA */}
-      <BottomCTA>
-        <CTATitle>Ready to build?</CTATitle>
-        <CTADesc>Sign up and start creating widgets for your Notion.</CTADesc>
-        <EmailRow>
-          <EmailInput
-            type="email"
-            placeholder="Enter your email"
-          />
-          <HeroButton onClick={() => navigate('/login')}>
-            Get started <ArrowRight />
-          </HeroButton>
-        </EmailRow>
-      </BottomCTA>
+          <BottomCTA>
+            <CTATitle>Ready to build?</CTATitle>
+            <CTADesc>Sign up and start creating widgets for your Notion.</CTADesc>
+            <EmailRow>
+              <EmailInput
+                type="email"
+                placeholder="Enter your email"
+              />
+              <HeroButton onClick={() => navigate('/login')}>
+                Get started <ArrowRight />
+              </HeroButton>
+            </EmailRow>
+          </BottomCTA>
+        </>
+      )}
 
       <BigFooter onNavigate={(path) => navigate(path)} />
       </PageContent>

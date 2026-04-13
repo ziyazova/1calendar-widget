@@ -439,7 +439,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
   const [cartOpen, setCartOpen] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
   const { items, itemCount, removeItem } = useCart();
-  const { isLoggedIn, isRegistered } = useAuth();
+  const { isLoggedIn, isRegistered, user } = useAuth();
   const isLanding = location.pathname === '/';
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
