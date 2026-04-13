@@ -41,11 +41,11 @@ const Page = styled.div`
 `;
 
 const Container = styled.div`
-  max-width: 980px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 48px 64px;
+  padding: 48px 48px 64px;
 
-  @media (max-width: 768px) { padding: 24px 16px 32px; }
+  @media (max-width: 768px) { padding: 32px 24px 32px; }
 `;
 
 const cardAppear = keyframes`
@@ -55,7 +55,8 @@ const cardAppear = keyframes`
 
 /* Tab bar */
 const TabBar = styled.div`
-  display: flex;
+  display: inline-flex;
+  gap: 4px;
   background: #F5F5F5;
   border-radius: 12px;
   padding: 4px;
@@ -63,22 +64,23 @@ const TabBar = styled.div`
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 44px;
+  height: 40px;
+  padding: 0 28px;
   border: none;
   border-radius: 10px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: ${({ $active }) => $active ? 600 : 500};
   font-family: inherit;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   background: ${({ $active }) => $active ? '#fff' : 'transparent'};
-  color: ${({ $active }) => $active ? '#1F1F1F' : '#999'};
-  box-shadow: ${({ $active }) => $active ? '0 1px 4px rgba(0,0,0,0.06)' : 'none'};
+  color: ${({ $active }) => $active ? '#1F1F1F' : '#888'};
+  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' : 'none'};
 
   &:hover { color: #1F1F1F; }
 `;
@@ -404,6 +406,38 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       <TopNav activeLink="studio" />
 
       <Container>
+        {/* Welcome */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, marginTop: 8 }}>
+          <div>
+            <h1 style={{ fontSize: 28, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>
+              Welcome back, {user?.name?.split(' ')[0] || 'there'}
+            </h1>
+            <p style={{ fontSize: 15, color: '#999', margin: 0 }}>Manage your widgets and templates</p>
+          </div>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 16,
+            background: '#FAFAFA', borderRadius: 14, padding: '10px 16px',
+            border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 100, height: 6, borderRadius: 3, background: '#EBEBEB', overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min((widgets.length / 3) * 100, 100)}%`, height: '100%', borderRadius: 3, background: widgets.length >= 3 ? '#DC2828' : 'linear-gradient(90deg, #6366F1, #818CF8)', transition: 'width 0.3s' }} />
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
+            </div>
+            <button onClick={() => {}} style={{
+              fontSize: 13, fontWeight: 600, color: '#fff',
+              background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+              padding: '8px 20px', borderRadius: 10,
+              border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+              whiteSpace: 'nowrap' as const, transition: 'all 0.15s',
+              boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
+            }}>
+              Upgrade
+            </button>
+          </div>
+        </div>
+
         {/* Tab bar */}
         <TabBar>
           <Tab $active={tab === 'widgets'} onClick={() => setTab('widgets')}>Widgets</Tab>
@@ -413,18 +447,39 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {/* ── Widgets Tab ── */}
         {tab === 'widgets' && (
           <>
+            {/* Create new widget — gradient panel */}
+            <div
+              onClick={() => navigate('/widgets')}
+              style={{
+                background: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 40%, rgba(245,235,250,0.45) 100%)',
+                border: '1.5px solid rgba(200,195,230,0.2)',
+                borderRadius: 16,
+                padding: '28px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                marginBottom: 32,
+                transition: 'all 0.2s',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Create new widget</div>
+                <div style={{ fontSize: 13, color: '#777', marginTop: 4 }}>Browse styles, customize and embed in Notion</div>
+              </div>
+              <Btn $primary><Plus /> Browse widgets</Btn>
+            </div>
+
+            {/* Your widgets */}
             <SectionRow>
               <SectionTitle>Your widgets <SectionCount>{widgets.length}</SectionCount></SectionTitle>
-              <Btn $primary onClick={() => navigate('/widgets')}>
-                <Plus /> Browse widgets
-              </Btn>
             </SectionRow>
 
             {!loading && widgets.length === 0 ? (
               <EmptyCard onClick={() => navigate('/widgets')}>
                 <EmptyCircle><Plus /></EmptyCircle>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', margin: '0 0 4px' }}>Create your first widget</p>
-                <p style={{ fontSize: 13, color: '#999', margin: 0 }}>Browse widget styles and customize for your Notion</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', margin: '0 0 4px' }}>No widgets yet</p>
+                <p style={{ fontSize: 13, color: '#999', margin: 0 }}>Create your first widget from the gallery above</p>
               </EmptyCard>
             ) : (
               <WidgetGrid>

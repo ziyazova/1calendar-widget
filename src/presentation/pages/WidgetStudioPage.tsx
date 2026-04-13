@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { ArrowRight, Calendar, Clock, Image, Wand2 } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, Image, Pencil, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton } from '@/presentation/components/shared';
@@ -377,50 +377,75 @@ const WidgetGalleryGrid = styled.div`
   }
 `;
 
-const WidgetGalleryCardWrap = styled.div``;
+const WidgetGalleryCardWrap = styled.div`
+  background: #fff;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+`;
 
 const WidgetGalleryMeta = styled.div`
-  padding: 10px 2px 0;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
 const WidgetGalleryCardTitle = styled.span`
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
-const CustomizeBtn = styled.button`
+const CustomizeBtn = styled.button<{ $pro?: boolean }>`
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
-  background: #fff;
-  border: 1.5px solid rgba(0, 0, 0, 0.12);
-  border-radius: 10px;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ $pro }) => $pro ? '#6366F1' : '#fff'};
+  background: ${({ $pro }) => $pro ? 'rgba(99,102,241,0.08)' : '#1F1F1F'};
+  border: 1px solid ${({ $pro }) => $pro ? 'rgba(99,102,241,0.2)' : '#1F1F1F'};
+  border-radius: 8px;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
-  transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s;
   flex-shrink: 0;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.text.primary};
-    color: #fff;
-    border-color: ${({ theme }) => theme.colors.text.primary};
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: ${({ $pro }) => $pro ? 'rgba(99,102,241,0.12)' : '#333'};
+    border-color: ${({ $pro }) => $pro ? 'rgba(99,102,241,0.3)' : '#333'};
   }
 
-  svg { width: 14px; height: 14px; }
+  svg { width: 13px; height: 13px; }
+`;
+
+const ProBadge = styled.span`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6366F1;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  z-index: 1;
 `;
 
 const GalleryCardLabel = styled.span`
@@ -674,14 +699,14 @@ const FEATURED_ITEMS: { image: string; title: string }[] = [
   { image: '/gallery-camera.png', title: 'Camera Widget' },
 ];
 
-const GALLERY_ITEMS: { image: string; title: string; category: WidgetCategory }[] = [
+const GALLERY_ITEMS: { image: string; title: string; category: WidgetCategory; pro?: boolean }[] = [
   { image: '/gallery-calendar-classic.png', title: 'Classic Calendar', category: 'calendar' },
   { image: '/gallery-calendar-collage.png', title: 'Collage Calendar', category: 'calendar' },
-  { image: '/gallery-calendar-typewriter.png', title: 'Typewriter Calendar', category: 'calendar' },
+  { image: '/gallery-calendar-typewriter.png', title: 'Typewriter Calendar', category: 'calendar', pro: true },
   { image: '/gallery-clock-digital.png', title: 'Digital Clock', category: 'clock' },
   { image: '/gallery-clock-flower.png', title: 'Flower Clock', category: 'clock' },
-  { image: '/gallery-clock-alarm.png', title: 'Alarm Clock', category: 'clock' },
-  { image: '/gallery-clock-flip.png', title: 'Flip Clock', category: 'clock' },
+  { image: '/gallery-clock-alarm.png', title: 'Alarm Clock', category: 'clock', pro: true },
+  { image: '/gallery-clock-flip.png', title: 'Flip Clock', category: 'clock', pro: true },
   { image: '/gallery-camera.png', title: 'Camera', category: 'boards' },
 ];
 
@@ -695,6 +720,7 @@ export const WidgetStudioPage: React.FC = () => {
   const [galleryScrolled, setGalleryScrolled] = useState(false);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const { loginWithCode, login, loginWithGoogle, isLoggedIn } = useAuth();
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleLaunch = useCallback(() => {
     setExpanding(true);
@@ -712,6 +738,49 @@ export const WidgetStudioPage: React.FC = () => {
     }
   }, [codeInput, loginWithCode, handleLaunch]);
 
+  // Logged-in view — clean gallery matching /templates layout
+  if (isLoggedIn) {
+    return (
+      <PageWrapper>
+        <TopNav activeLink="studio" />
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 0' }}>
+          <BackButton onClick={() => navigate(-1 as any)} label="Back" />
+          <h1 style={{ fontSize: 32, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>Notion Widgets</h1>
+          <p style={{ fontSize: 14, color: '#999', margin: '0 0 28px', letterSpacing: '-0.01em' }}>Browse styles, customize and embed in your Notion workspace</p>
+          <FilterRow>
+            {GALLERY_FILTERS.map(f => (
+              <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
+                {f.label}
+              </FilterChip>
+            ))}
+          </FilterRow>
+        </div>
+        <WidgetGalleryGrid>
+          {(activeFilter === 'all' ? GALLERY_ITEMS : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
+            <WidgetGalleryCardWrap key={`wg-${i}`}>
+              <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
+                <GalleryCardLabel>{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : item.category === 'boards' ? 'Board' : 'Widget'}</GalleryCardLabel>
+                <GalleryImage src={item.image} alt={item.title} />
+              </div>
+              <WidgetGalleryMeta>
+                <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
+                {item.pro ? (
+                  <CustomizeBtn $pro onClick={() => setShowUpgrade(true)}><Lock /> Pro</CustomizeBtn>
+                ) : (
+                  <CustomizeBtn onClick={handleLaunch}><Pencil /> Customize</CustomizeBtn>
+                )}
+              </WidgetGalleryMeta>
+            </WidgetGalleryCardWrap>
+          ))}
+        </WidgetGalleryGrid>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 12px' }}>
+          <BigFooter onNavigate={(path) => navigate(path)} />
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  // Non-logged-in view — full landing
   return (
     <PageWrapper>
       <TopNav activeLink="studio" />
@@ -793,15 +862,17 @@ export const WidgetStudioPage: React.FC = () => {
         <WidgetGalleryGrid>
           {(activeFilter === 'all' ? GALLERY_ITEMS : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`wg-${i}`}>
-              <GalleryCard>
+              <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
                 <GalleryCardLabel>{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : item.category === 'boards' ? 'Board' : 'Widget'}</GalleryCardLabel>
                 <GalleryImage src={item.image} alt={item.title} />
-              </GalleryCard>
+              </div>
               <WidgetGalleryMeta>
                 <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
-                <CustomizeBtn onClick={handleLaunch}>
-                  <Wand2 /> Customize
-                </CustomizeBtn>
+                {item.pro ? (
+                  <CustomizeBtn $pro onClick={() => setShowUpgrade(true)}><Lock /> Pro</CustomizeBtn>
+                ) : (
+                  <CustomizeBtn onClick={handleLaunch}><Pencil /> Customize</CustomizeBtn>
+                )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
           ))}

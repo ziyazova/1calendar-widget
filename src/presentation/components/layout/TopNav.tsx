@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2 } from 'lucide-react';
+import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, LayoutDashboard } from 'lucide-react';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 
@@ -34,7 +34,7 @@ const NavInner = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 40px;
   max-width: 1200px;
   height: 100%;
   margin: 0 auto;
@@ -437,9 +437,11 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const avatarRef = useRef<HTMLDivElement>(null);
   const cartRef = useRef<HTMLDivElement>(null);
   const { items, itemCount, removeItem } = useCart();
-  const { isLoggedIn, isRegistered, user } = useAuth();
+  const { isLoggedIn, isRegistered, user, loginWithCode, logout } = useAuth();
   const isLanding = location.pathname === '/';
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
@@ -531,21 +533,63 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               </CartDropdown>
             )}
           </CartWrap>
-          {isRegistered ? (
-            <div
-              onClick={() => navigate('/studio')}
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 600, color: '#6366F1',
-                cursor: 'pointer', flexShrink: 0,
-              }}
-            >
-              {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+          {isLoggedIn ? (
+            <div ref={avatarRef} style={{ position: 'relative' }}>
+              <div
+                onClick={() => setAvatarOpen(!avatarOpen)}
+                style={{
+                  width: 34, height: 34, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: 600, color: '#6366F1',
+                  cursor: 'pointer', flexShrink: 0,
+                  border: avatarOpen ? '2px solid #6366F1' : '2px solid transparent',
+                  transition: 'border-color 0.15s',
+                }}
+              >
+                {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+              </div>
+              {avatarOpen && (
+                <>
+                  <div onClick={() => setAvatarOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 99 }} />
+                  <div style={{
+                    position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 100,
+                    background: '#fff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.08)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
+                    padding: '8px 0', minWidth: 200, overflow: 'hidden',
+                  }}>
+                    <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F' }}>{user?.name || 'User'}</div>
+                      <div style={{ fontSize: 12, color: '#999', marginTop: 1 }}>{user?.email || ''}</div>
+                    </div>
+                    <button onClick={() => { setAvatarOpen(false); navigate('/studio'); }} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px',
+                      border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                      color: '#1F1F1F', fontFamily: 'inherit', transition: 'background 0.1s',
+                    }} onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                      <LayoutDashboard style={{ width: 16, height: 16, color: '#888' }} /> Dashboard
+                    </button>
+                    <button onClick={() => { setAvatarOpen(false); navigate('/studio'); }} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px',
+                      border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                      color: '#1F1F1F', fontFamily: 'inherit', transition: 'background 0.1s',
+                    }} onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                      <Settings style={{ width: 16, height: 16, color: '#888' }} /> Settings
+                    </button>
+                    <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
+                    <button onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px',
+                      border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                      color: '#DC2828', fontFamily: 'inherit', transition: 'background 0.1s',
+                    }} onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                      <LogOut style={{ width: 16, height: 16 }} /> Log out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
-            <NavCTA onClick={() => navigate('/login')}>Log in</NavCTA>
+            <NavCTA onClick={() => { loginWithCode('PEACHY2026'); navigate('/studio'); }}>Log in</NavCTA>
           )}
         </NavLinks>
         <MobileRight>

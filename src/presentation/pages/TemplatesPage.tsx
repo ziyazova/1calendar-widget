@@ -247,7 +247,7 @@ export const TemplatesPage: React.FC = () => {
       <TopNav activeLink="templates" logoSub="Templates" />
 
       <Header>
-        <BackButton onClick={() => navigate('/')} />
+        <BackButton onClick={() => navigate(-1 as any)} label="Back" />
         <PageTitle>{activeCatConfig?.title || 'Templates'}</PageTitle>
         <PageSubtitle>{activeCatConfig?.subtitle || ''}</PageSubtitle>
         {/* TODO: unhide search when ready

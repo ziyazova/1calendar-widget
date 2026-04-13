@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const mode: AuthMode = supabaseUser ? 'registered' : isGuest ? 'guest' : null;
-  const user = profileFromUser(supabaseUser);
+  const user = supabaseUser ? profileFromUser(supabaseUser) : isGuest ? { name: 'Guest User', email: 'guest@peachy.studio', avatarUrl: undefined } : null;
 
   const loginWithCode = useCallback((code: string): boolean => {
     if (code.trim().toUpperCase() === GUEST_CODE) {
