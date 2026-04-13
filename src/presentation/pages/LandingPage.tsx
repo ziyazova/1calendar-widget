@@ -29,7 +29,7 @@ const Section = styled.div`
 
 const SectionTinted = styled.div`
   background: #FAFAFA;
-  padding: 80px 0 160px;
+  padding: 80px 0 161px;
 
   @media (max-width: 768px) {
     padding: 64px 0;
@@ -52,8 +52,7 @@ const GroupHero = styled.div`
 
 const GroupFooter = styled.div`
   background: #FAFAFA;
-  padding: 120px 0 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 64px 0 12px;
 
   @media (max-width: 768px) {
     padding: 64px 0 12px;
