@@ -197,7 +197,7 @@ const FeatureCardDesc = styled.p`
 `;
 
 const FeatureCardImage = styled.div`
-  flex: 0 1 58%;
+  flex: 1;
   min-width: 0;
   align-self: stretch;
   margin: 20px -1px -1px 0;
