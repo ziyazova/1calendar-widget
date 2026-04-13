@@ -172,6 +172,11 @@ const FeatureCardBody = styled.div`
 
 const FeatureCardText = styled.div`
   flex: 0 0 32%;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 const FeatureCardTitle = styled.h3`
