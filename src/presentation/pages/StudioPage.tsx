@@ -495,7 +495,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
           {/* Customization panel */}
           <div style={{
-            width: 280, flexShrink: 0, overflow: 'auto',
+            width: 300, flexShrink: 0, overflow: 'auto',
             background: '#fff',
           }}>
             <CustomizationPanel

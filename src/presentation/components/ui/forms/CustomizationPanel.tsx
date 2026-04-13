@@ -58,7 +58,7 @@ const PanelHeader = styled.div`
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 32px 24px 16px;
+  padding: 80px 24px 16px;
   border-bottom: none;
 `;
 
@@ -1124,12 +1124,6 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     <PanelContainer $mobileOpen={mobileOpen}>
       <PanelHeader>
         <PanelTitle>Design</PanelTitle>
-        {getWidgetInfo() && (
-          <WidgetBadge>
-            {React.createElement(getWidgetInfo()!.icon)}
-            <WidgetBadgeText>{getWidgetInfo()!.label}</WidgetBadgeText>
-          </WidgetBadge>
-        )}
       </PanelHeader>
       {panelContent}
     </PanelContainer>
