@@ -686,11 +686,10 @@ const CTADesc = styled.p`
 type WidgetCategory = 'all' | 'calendar' | 'clock' | 'boards' | 'buttons';
 
 const GALLERY_FILTERS: { key: WidgetCategory; label: string }[] = [
-  { key: 'all', label: 'Popular' },
+  { key: 'all', label: 'All' },
   { key: 'calendar', label: 'Calendar' },
   { key: 'clock', label: 'Clocks' },
   { key: 'boards', label: 'Boards' },
-  { key: 'buttons', label: 'Buttons' },
 ];
 
 const FEATURED_ITEMS: { image: string; title: string }[] = [

@@ -172,15 +172,11 @@ const FeatureCardBody = styled.div`
 
 const FeatureCardText = styled.div`
   flex: 0 0 32%;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    text-align: center;
-  }
+  text-align: left;
 `;
 
 const FeatureCardTitle = styled.h3`
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -213,7 +209,7 @@ const FeatureCardImage = styled.div`
     object-fit: cover;
     object-position: center;
     display: block;
-    transform: scale(1.05);
+    transform: scale(0.92);
   }
 
   @media (max-width: 768px) {

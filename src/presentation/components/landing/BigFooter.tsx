@@ -118,10 +118,12 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
         </NavGroup>
       </FooterNav>
     </FooterTop>
-    <div style={{ paddingTop: 24, textAlign: 'center' }}>
-      <FooterBottom>
-        © {new Date().getFullYear()} Peachy Studio. All rights reserved.
-      </FooterBottom>
+    <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 32 }}>
+      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 20, textAlign: 'center', width: 360 }}>
+        <FooterBottom>
+          © {new Date().getFullYear()} Peachy Studio. All rights reserved.
+        </FooterBottom>
+      </div>
     </div>
   </FooterWrapper>
   </FooterOuter>
