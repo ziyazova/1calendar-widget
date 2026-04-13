@@ -534,9 +534,12 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
             )}
           </CartWrap>
           {isLoggedIn ? (
-            <div ref={avatarRef} style={{ position: 'relative' }}>
+            <div ref={avatarRef} style={{ position: 'relative' }}
+              onMouseEnter={() => setAvatarOpen(true)}
+              onMouseLeave={() => setAvatarOpen(false)}
+            >
               <div
-                onClick={() => setAvatarOpen(!avatarOpen)}
+                onClick={() => navigate('/studio')}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   cursor: 'pointer',
@@ -558,7 +561,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               </div>
               {avatarOpen && (
                 <>
-                  <div onClick={() => setAvatarOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 99 }} />
                   <div style={{
                     position: 'absolute', top: 'calc(100% + 10px)', right: -8, zIndex: 100,
                     background: '#fff', borderRadius: 18, border: '1px solid rgba(0,0,0,0.05)',
