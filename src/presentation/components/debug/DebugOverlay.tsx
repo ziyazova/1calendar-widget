@@ -163,6 +163,9 @@ const RedlineLabel = styled.span<{ $color?: string }>`
 
 export const DebugOverlay: React.FC = () => {
   const debug = useDebugMode();
+  const isEmbed = typeof window !== 'undefined' && window.location.pathname.startsWith('/embed');
+
+  if (isEmbed) return null;
 
   return (
     <>

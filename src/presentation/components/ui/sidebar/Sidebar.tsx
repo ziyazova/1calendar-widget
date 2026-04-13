@@ -724,7 +724,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <BackButton onClick={handleLogoClick} title="Back">
               <ArrowLeft />
             </BackButton>
-            <LogoText $collapsed={collapsed}>Widget <LogoSub>Studio</LogoSub></LogoText>
+            <LogoText $collapsed={collapsed}>Peachy <LogoSub>Studio</LogoSub></LogoText>
             {onToggleCollapse && (
               <CollapseHeaderBtn onClick={onToggleCollapse} title="Collapse">
                 <PanelLeftClose />

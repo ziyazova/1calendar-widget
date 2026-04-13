@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, LayoutGrid, Grip, X, Menu, Palette, Settings2, Brush, Sliders, Save } from 'lucide-react';
+import { Copy, Check, Pencil, LayoutGrid, Grip, X, Menu, Palette, Settings2, Brush, Sliders, Save, Calendar, Clock, Image, ArrowLeft } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -733,6 +733,218 @@ const LayoutCheckArea = styled.div`
   position: relative;
 `;
 
+/* ── Type Picker (Create New Widget) ── */
+const typeCardAppear = keyframes`
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+`;
+
+const TypePickerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 48px 24px;
+  text-align: center;
+`;
+
+const TypePickerTitle = styled.h2`
+  font-size: 28px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  animation: ${typeCardAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+`;
+
+const TypePickerSubtitle = styled.p`
+  font-size: 15px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0 0 40px;
+  letter-spacing: -0.01em;
+  animation: ${typeCardAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+`;
+
+const TypePickerGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 560px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 280px;
+    gap: 14px;
+  }
+`;
+
+const TypePickerCard = styled.div<{ $index: number; $gradient: string }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 20px 28px;
+  background: ${({ $gradient }) => $gradient};
+  border: 1.5px solid rgba(200, 195, 230, 0.2);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: ${typeCardAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${({ $index }) => 0.1 + $index * 0.08}s both;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200, 195, 230, 0.4);
+    box-shadow: 0 12px 32px rgba(130, 120, 200, 0.12), 0 4px 12px rgba(130, 120, 200, 0.06);
+  }
+
+  &:active {
+    transform: translateY(-2px) scale(0.98);
+  }
+`;
+
+const TypePickerCardIcon = styled.div<{ $color: string }>`
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: ${({ $color }) => $color};
+    stroke-width: 1.8;
+  }
+`;
+
+const TypePickerCardLabel = styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+`;
+
+const TypePickerCardDesc = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  line-height: 1.4;
+  margin-top: -8px;
+`;
+
+const StylePickerBackBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  padding: 0;
+  margin-bottom: 8px;
+  transition: color 0.15s ease;
+
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
+  svg { width: 14px; height: 14px; }
+`;
+
+const StylePickerGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  max-width: 640px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+`;
+
+const StylePickerCard = styled.div<{ $index: number; $gradient: string }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 16px 24px;
+  background: ${({ $gradient }) => $gradient};
+  border: 1.5px solid rgba(200, 195, 230, 0.2);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: ${typeCardAppear} 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${({ $index }) => 0.08 + $index * 0.06}s both;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(200, 195, 230, 0.4);
+    box-shadow: 0 8px 24px rgba(130, 120, 200, 0.1);
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+`;
+
+const StylePickerCardIcon = styled.div<{ $color: string }>`
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  svg {
+    width: 22px;
+    height: 22px;
+    color: ${({ $color }) => $color};
+    stroke-width: 1.8;
+  }
+`;
+
+const STYLE_GRADIENTS: Record<string, { gradient: string; accent: string }> = {
+  calendar: { gradient: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 50%, rgba(245,235,250,0.45) 100%)', accent: '#6366F1' },
+  clock: { gradient: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(220,235,255,0.4) 50%, rgba(237,228,255,0.45) 100%)', accent: '#3384F4' },
+  board: { gradient: 'linear-gradient(135deg, rgba(255,240,245,0.5) 0%, rgba(252,228,236,0.4) 50%, rgba(237,228,255,0.45) 100%)', accent: '#EC4899' },
+};
+
+const WIDGET_TYPES = [
+  {
+    key: 'calendar',
+    label: 'Calendar',
+    desc: 'Monthly & weekly views',
+    icon: Calendar,
+    gradient: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 50%, rgba(245,235,250,0.45) 100%)',
+    accentColor: '#6366F1',
+  },
+  {
+    key: 'clock',
+    label: 'Clock',
+    desc: 'Analog & digital displays',
+    icon: Clock,
+    gradient: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(220,235,255,0.4) 50%, rgba(237,228,255,0.45) 100%)',
+    accentColor: '#3384F4',
+  },
+  {
+    key: 'board',
+    label: 'Board',
+    desc: 'Moodboards & canvases',
+    icon: Image,
+    gradient: 'linear-gradient(135deg, rgba(255,240,245,0.5) 0%, rgba(252,228,236,0.4) 50%, rgba(237,228,255,0.45) 100%)',
+    accentColor: '#EC4899',
+  },
+];
+
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [currentWidget, setCurrentWidget] = useState<Widget | null>(null);
   const [currentWidgetKey, setCurrentWidgetKey] = useState<string>('calendar-modern-grid-zoom-fixed');
@@ -752,6 +964,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editingWidgetName, setEditingWidgetName] = useState<string>('');
   const [stylePanel, setStylePanel] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [showTypePicker, setShowTypePicker] = useState(false);
+  const [showStylePicker, setShowStylePicker] = useState<string | null>(null);
   const navigate = useNavigate();
   const { isRegistered } = useAuth();
   const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>('my-widgets');
@@ -914,7 +1128,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 widgetType={stylePanel}
                 categoryLabel={cfg.label}
                 currentWidget={currentWidgetKey}
-                canEdit={isRegistered}
+                canEdit={true}
                 onWidgetChange={(type, style) => { setDashboardView(null); handleWidgetChange(type, style); }}
                 onEdit={async (type, style, name) => {
                   handleWidgetChange(type, style);
@@ -933,7 +1147,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   setTimeout(() => setEditorOpen(true), 250);
                 }}
                 onLockedEdit={() => navigate('/login')}
-                onClose={() => setStylePanel(null)}
+                onClose={() => {
+                  setStylePanel(null);
+                  if (!editorOpen && !editingWidgetId) {
+                    setShowTypePicker(true);
+                  }
+                }}
               />
             );
           })()}
@@ -956,7 +1175,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 exploreCategory={stylePanel}
                 onAddNew={() => {
                   setDashboardView(null);
-                  setStylePanel('calendar');
+                  setShowTypePicker(true);
+                  setStylePanel(null);
                   setEditorOpen(false);
                 }}
                 onEditWidget={(w) => {
@@ -971,6 +1191,67 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           ) : viewMode === 'editor' ? (
             <>
               <WidgetArea onClick={() => { if (mobileTab) setMobileTab(null); if (window.innerWidth <= 1024 && !sidebarCollapsed) setSidebarCollapsed(true); }}>
+                {showTypePicker ? (
+                  <TypePickerContainer>
+                    <TypePickerTitle>What would you like to create?</TypePickerTitle>
+                    <TypePickerSubtitle>Choose a widget type to get started</TypePickerSubtitle>
+                    <TypePickerGrid>
+                      {WIDGET_TYPES.map((wt, i) => (
+                        <TypePickerCard
+                          key={wt.key}
+                          $index={i}
+                          $gradient={wt.gradient}
+                          onClick={() => {
+                            setShowTypePicker(false);
+                            setShowStylePicker(null);
+                            const defaultStyle = wt.key === 'calendar' ? 'modern-grid-zoom-fixed' : wt.key === 'clock' ? 'classic' : 'grid';
+                            createWidgetWithStyle(wt.key, defaultStyle);
+                            setEditorOpen(true);
+                          }}
+                        >
+                          <TypePickerCardIcon $color={wt.accentColor}>
+                            <wt.icon />
+                          </TypePickerCardIcon>
+                          <TypePickerCardLabel>{wt.label}</TypePickerCardLabel>
+                          <TypePickerCardDesc>{wt.desc}</TypePickerCardDesc>
+                        </TypePickerCard>
+                      ))}
+                    </TypePickerGrid>
+                  </TypePickerContainer>
+                ) : showStylePicker ? (
+                  <TypePickerContainer>
+                    <StylePickerBackBtn onClick={() => { setShowStylePicker(null); setShowTypePicker(true); }}>
+                      <ArrowLeft /> Back
+                    </StylePickerBackBtn>
+                    <TypePickerTitle>Choose a style</TypePickerTitle>
+                    <TypePickerSubtitle>
+                      {showStylePicker === 'calendar' ? 'Calendar' : showStylePicker === 'clock' ? 'Clock' : 'Board'} styles
+                    </TypePickerSubtitle>
+                    <StylePickerGrid>
+                      {(showStylePicker === 'calendar' ? CALENDAR_STYLES : showStylePicker === 'clock' ? CLOCK_STYLES : BOARD_STYLES).map((s, i) => {
+                        const colors = STYLE_GRADIENTS[showStylePicker!] || STYLE_GRADIENTS.calendar;
+                        return (
+                          <StylePickerCard
+                            key={s.value}
+                            $index={i}
+                            $gradient={colors.gradient}
+                            onClick={() => {
+                              setShowStylePicker(null);
+                              createWidgetWithStyle(showStylePicker!, s.value);
+                              setEditorOpen(true);
+                            }}
+                          >
+                            <StylePickerCardIcon $color={colors.accent}>
+                              <s.icon />
+                            </StylePickerCardIcon>
+                            <TypePickerCardLabel>{s.label}</TypePickerCardLabel>
+                          </StylePickerCard>
+                        );
+                      })}
+                    </StylePickerGrid>
+                  </TypePickerContainer>
+                ) : (
+                <>
                 {editorOpen && (
                   <MobileEmbedFloating>
                     <MobileEmbedRow>
@@ -1055,9 +1336,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <Grip />
                   </GridToggle>
                 </TopRightControls>}
+                </>
+                )}
               </WidgetArea>
 
-              {editorOpen && (
+              {!showTypePicker && editorOpen && (
                 <CustomizationPanel
                   widget={currentWidget}
                   onSettingsChange={handleSettingsChange}

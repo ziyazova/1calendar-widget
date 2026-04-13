@@ -518,7 +518,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         </LogoRow>
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
-          <NavLink $active={activeLink === 'studio'} onClick={() => navigate(isLoggedIn ? '/studio' : '/widgets')}>Widget Studio</NavLink>
+          <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Notion Widgets</NavLink>
           <CartWrap ref={cartRef}>
             <CartButton aria-label="Cart" onClick={() => setCartOpen(!cartOpen)}>
               <ShoppingCart />
@@ -565,7 +565,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
     {menuOpen && (
       <MobileMenu>
         <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
-        <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav(isLoggedIn ? '/studio' : '/widgets')}>Widget Studio</MobileLink>
+        <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav('/widgets')}>Notion Widgets</MobileLink>
         <MobileCTA onClick={() => handleNav(isLoggedIn ? '/studio' : '/login')}>
           {isLoggedIn ? 'Studio' : 'Log in'}
         </MobileCTA>

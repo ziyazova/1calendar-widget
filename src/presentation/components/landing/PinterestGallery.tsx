@@ -1,22 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const PinterestGrid = styled.div`
+const PinterestGrid = styled.div<{ $rows?: number; $cols?: number }>`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: repeat(${({ $cols }) => $cols || 4}, 1fr);
+  grid-template-rows: repeat(${({ $rows }) => $rows || 4}, 1fr);
   gap: 16px;
-  height: 530px;
+  height: ${({ $rows }) => $rows === 2 ? '420px' : $rows === 3 ? '560px' : '530px'};
 
   @media (max-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    height: 450px;
+    grid-template-columns: repeat(${({ $cols }) => Math.min($cols || 3, 3)}, 1fr);
+    height: ${({ $rows }) => $rows === 2 ? '360px' : $rows === 3 ? '480px' : '450px'};
   }
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    height: 480px;
+    grid-template-rows: repeat(${({ $rows }) => $rows || 4}, 1fr);
+    height: ${({ $rows }) => $rows === 2 ? '340px' : $rows === 3 ? '440px' : '480px'};
     gap: 12px;
   }
 `;
@@ -29,6 +29,7 @@ const PinCard = styled.div<{ $col?: string; $row?: string; $mobileCol?: string; 
   grid-column: ${({ $col }) => $col || 'auto'};
   grid-row: ${({ $row }) => $row || 'auto'};
   position: relative;
+  min-height: 0;
 
   @media (max-width: 1024px) {
     display: ${({ $hideOnTablet }) => $hideOnTablet ? 'none' : 'block'};
@@ -63,7 +64,7 @@ const PinText = styled.div<{ $bg: string; $color?: string }>`
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
-    return `linear-gradient(150deg, rgba(${r},${g},${b},0.7) 0%, rgba(${r},${g},${b},0.5) 50%, rgba(${r},${g},${b},0.6) 100%)`;
+    return `linear-gradient(150deg, rgba(${r},${g},${b},1) 0%, rgba(${r},${g},${b},0.9) 50%, rgba(${r},${g},${b},0.95) 100%)`;
   }};
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
@@ -71,7 +72,7 @@ const PinText = styled.div<{ $bg: string; $color?: string }>`
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   overflow: hidden;
 
   @media (max-width: 768px) {
@@ -119,18 +120,22 @@ const PIN_SETS: Record<string, PinItem[]> = {
     { type: 'text', bg: '#FFF8E0', title: 'Built for both themes.', desc: 'Most templates adapt to light and dark mode.', col: '4', row: '4 / 5', hideOnMobile: true, hideOnTablet: true },
   ],
   Calendar: [
-    /* большое фото слева на 3 строки */
-    { type: 'image', image: '/widget-calendar.png', col: '1', row: '1 / 4', mobileCol: '1', mobileRow: '1 / 3' },
-    { type: 'text', bg: '#E8EDFF', title: 'Classic Style', desc: 'Clean month view with chevron navigation.', col: '1', row: '4 / 5', mobileCol: '1', mobileRow: '3 / 5' },
-    /* текст сверху, фото снизу */
-    { type: 'text', bg: '#F0E6FF', title: 'Modern Grid', desc: 'Zoom-fixed responsive layout.', col: '2', row: '1 / 2', mobileCol: '2', mobileRow: '1 / 2' },
-    { type: 'image', image: '/widget-calendar2.png', col: '2', row: '2 / 5', mobileCol: '2', mobileRow: '2 / 5' },
-    /* col 3: чередование */
-    { type: 'image', image: '/widget-calendar.png', col: '3', row: '1 / 3', hideOnMobile: true },
-    { type: 'text', bg: '#FFF8E0', title: 'Week View', desc: 'Focus on what matters this week.', col: '3', row: '3 / 5', hideOnMobile: true },
-    /* col 4: тёмная текстовая + фото */
-    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Dark Mode', desc: 'Auto-adapts to Notion themes.', col: '4', row: '1 / 3', hideOnMobile: true, hideOnTablet: true },
-    { type: 'image', image: '/widget-calendar2.png', col: '4', row: '3 / 5', hideOnMobile: true, hideOnTablet: true },
+    { type: 'image', image: '/gallery-calendar-typewriter.png', col: '1', row: '1 / 4', mobileCol: '1', mobileRow: '1 / 3' },
+    { type: 'text', bg: '#E8EDFF', title: 'Unique styles.', desc: 'Typewriter, collage, classic — pick the one that fits your vibe.', col: '1', row: '4 / 5', mobileCol: '1', mobileRow: '3 / 5' },
+    { type: 'text', bg: '#F0E6FF', title: 'Embed in seconds.', desc: 'Copy the link, paste in Notion. That\'s it.', col: '2', row: '1 / 2', mobileCol: '2', mobileRow: '1 / 2' },
+    { type: 'image', image: '/gallery-clock-flower.png', col: '2', row: '2 / 5', mobileCol: '2', mobileRow: '2 / 5' },
+    { type: 'image', image: '/gallery-camera.png', col: '3', row: '1 / 3', hideOnMobile: true },
+    { type: 'text', bg: '#FFF8E0', title: 'Fully customizable.', desc: 'Colors, borders, themes — make it yours.', col: '3', row: '3 / 5', hideOnMobile: true },
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Auto dark mode.', desc: 'Adapts to your Notion theme automatically.', col: '4', row: '1 / 3', hideOnMobile: true, hideOnTablet: true },
+    { type: 'image', image: '/gallery-clock-flip.png', col: '4', row: '3 / 5', hideOnMobile: true, hideOnTablet: true },
+  ],
+  WidgetFeatures: [
+    { type: 'image', image: '/gallery-hero-video.gif', col: '1', row: '1 / 3', mobileCol: '1', mobileRow: '1 / 3' },
+    { type: 'text', bg: '#E8EDFF', title: 'No iframe lag.', desc: 'Instant load, no spinner, no white flash. Your widgets just appear.', col: '1', row: '3 / 4', mobileCol: '1', mobileRow: '3 / 4' },
+    { type: 'text', bg: '#1F1F1F', color: '#fff', title: 'Pixel-perfect.', desc: 'Designed to match Notion\'s own UI language. Feels native.', col: '2', row: '1 / 2', mobileCol: '2', mobileRow: '1 / 2' },
+    { type: 'image', image: '/gallery-studio-clock.png', col: '2', row: '2 / 4', mobileCol: '2', mobileRow: '2 / 4' },
+    { type: 'image', image: '/gallery-studio-sidebar.png', col: '3', row: '1 / 3', hideOnMobile: true },
+    { type: 'text', bg: '#FFF8E0', title: 'One link.', desc: 'Copy. Paste. Done. Works in any Notion page, database, or toggle.', col: '3', row: '3 / 4', hideOnMobile: true },
   ],
   Clocks: [
     /* col 1: текст + фото */
@@ -179,12 +184,14 @@ const PIN_SETS: Record<string, PinItem[]> = {
 
 interface PinterestGalleryProps {
   filter?: string;
+  rows?: number;
+  cols?: number;
 }
 
-export const PinterestGallery: React.FC<PinterestGalleryProps> = ({ filter = 'All' }) => {
+export const PinterestGallery: React.FC<PinterestGalleryProps> = ({ filter = 'All', rows, cols }) => {
   const items = PIN_SETS[filter] || PIN_SETS.Featured;
   return (
-    <PinterestGrid>
+    <PinterestGrid $rows={rows} $cols={cols}>
       {items.map((pin, i) => (
         <PinCard key={i} $col={pin.col} $row={pin.row} $mobileCol={pin.mobileCol} $mobileRow={pin.mobileRow} $hideOnMobile={pin.hideOnMobile} $hideOnTablet={pin.hideOnTablet}>
           {pin.type === 'image' ? (

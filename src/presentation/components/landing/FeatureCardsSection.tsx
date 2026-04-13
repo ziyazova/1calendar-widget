@@ -236,21 +236,21 @@ const FEATURE_CARDS = [
     color: '#3B82F6',
     title: 'Built to work.',
     desc: 'Automations, dashboards, pre-filled sections. Plus video guides so you\'re never stuck.',
-    image: '/widget-calendar.png',
+    image: '/feature-functionality.png',
   },
   {
     tab: 'Design',
     color: '#8B5CF6',
     title: 'Clean by default.',
     desc: 'Open it and it just feels right. Everything where you\'d expect it to be.',
-    image: '/template-dashboard.png',
+    image: '/feature-design.png',
   },
   {
     tab: 'Payment',
     color: '#E8926A',
     title: 'Pay once. Keep forever.',
     desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.',
-    image: '/template-main.png',
+    image: '/feature-pricing.png',
   },
 ];
 

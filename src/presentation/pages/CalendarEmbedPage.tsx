@@ -122,7 +122,8 @@ export const CalendarEmbedPage: React.FC = () => {
   }, []);
 
   const notionTheme = useResolvedTheme('auto');
-  const containerBg = notionTheme === 'dark' ? NOTION_DARK_BG : '#ffffff';
+  const isTransparent = new URLSearchParams(window.location.search).has('nobg');
+  const containerBg = isTransparent ? 'transparent' : (notionTheme === 'dark' ? NOTION_DARK_BG : '#ffffff');
 
   if (loading) {
     return (
