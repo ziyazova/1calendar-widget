@@ -82,7 +82,7 @@ const NavLink = styled.span`
 `;
 
 const FooterBottom = styled.div`
-  font-size: 12px;
+  font-size: 13px;
   color: ${({ theme }) => theme.colors.text.muted};
   letter-spacing: -0.01em;
 `;
@@ -118,7 +118,7 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
         </NavGroup>
       </FooterNav>
     </FooterTop>
-    <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 24 }}>
+    <div style={{ paddingTop: 24, textAlign: 'center' }}>
       <FooterBottom>
         © {new Date().getFullYear()} Peachy Studio. All rights reserved.
       </FooterBottom>
