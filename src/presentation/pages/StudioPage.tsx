@@ -435,7 +435,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               whiteSpace: 'nowrap' as const, transition: 'all 0.15s',
               boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
             }}>
-              Upgrade
+              Upgrade now
             </button>
           </div>
         </div>
@@ -572,8 +572,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 </ul>
                 <div style={{ marginTop: 20, padding: '10px 0', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6366F1', background: 'rgba(99,102,241,0.06)', borderRadius: 10 }}>Your current plan</div>
               </div>
-              <div style={{ border: '2px solid #1F1F1F', borderRadius: 18, padding: '28px 22px', position: 'relative', background: '#FAFAFA' }}>
-                <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: '#1F1F1F', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 14px', borderRadius: 20 }}>Most popular</div>
+              <div style={{ border: '1.5px solid rgba(99,102,241,0.3)', borderRadius: 18, padding: '28px 22px', position: 'relative', background: 'rgba(99,102,241,0.02)' }}>
+                <div style={{ position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 14px', borderRadius: 20 }}>Most popular</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: '#999', marginBottom: 8 }}>Pro</div>
                 <div style={{ fontSize: 36, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em' }}>$4.99</div>
                 <div style={{ fontSize: 13, color: '#bbb', marginBottom: 20 }}>one-time payment</div>
