@@ -11,7 +11,7 @@ const CTACard = styled.div`
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-radius: 0;
-  padding: 265px 48px 245px;
+  padding: 200px 48px 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
