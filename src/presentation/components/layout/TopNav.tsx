@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home } from 'lucide-react';
+import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, ChevronDown } from 'lucide-react';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 
@@ -83,7 +83,7 @@ const LogoSub = styled.span`
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
   flex-shrink: 0;
 
   @media (max-width: 768px) {
@@ -561,6 +561,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#6366F1' : '#666', transition: 'color 0.2s' }}>Dashboard</span>
+                <ChevronDown style={{ width: 14, height: 14, color: '#bbb', transition: 'transform 0.2s', transform: avatarOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
               </div>
               {avatarOpen && (
                 <>
