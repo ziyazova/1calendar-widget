@@ -398,38 +398,84 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
   };
 
-  // If editing, show editor (full screen with artboard)
+  // If editing, show full-screen editor (Figma-style artboard)
   if (editorOpen && editingWidget) {
     const embedUrl = diContainer.getWidgetEmbedUrlUseCase.execute(editingWidget);
     return (
-      <Page>
-        <TopNav activeLink="studio" />
-        <Container style={{ maxWidth: 1200 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <Btn onClick={() => setEditorOpen(false)}>Back</Btn>
-            <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Edit Widget</h2>
+      <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: '#fff' }}>
+        {/* Editor top bar */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 20px', height: 56, borderBottom: '1px solid rgba(0,0,0,0.06)',
+          background: '#fff', flexShrink: 0, zIndex: 10,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button onClick={() => setEditorOpen(false)} style={{
+              display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px',
+              border: '1px solid rgba(0,0,0,0.1)', borderRadius: 8, background: '#fff',
+              fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: '#666', cursor: 'pointer',
+            }}>
+              <ArrowRight style={{ width: 14, height: 14, transform: 'rotate(180deg)' }} /> Back
+            </button>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.01em' }}>
+              {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            </span>
           </div>
-          <div style={{ display: 'flex', gap: 24 }}>
-            <div style={{ flex: 1, background: '#FAFAF9', borderRadius: 16, border: '1px solid rgba(0,0,0,0.06)', padding: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-              <WidgetDisplay widget={editingWidget} />
-            </div>
-            <div style={{ width: 300, flexShrink: 0 }}>
-              <CustomizationPanel
-                widget={editingWidget}
-                onSettingsChange={(settings) => {
-                  if (!editingWidget) return;
-                  const updated = editingWidget.updateSettings(settings as CalendarSettings | ClockSettings | BoardSettings);
-                  setEditingWidget(updated);
-                }}
-              />
-            </div>
-          </div>
-          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input readOnly value={embedUrl} style={{ flex: 1, height: 36, padding: '0 12px', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 8, fontSize: 12, fontFamily: 'monospace', color: '#666', background: '#FAFAFA' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input readOnly value={embedUrl} style={{
+              width: 200, height: 32, padding: '0 10px', border: 'none', borderRadius: 6,
+              background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#888',
+            }} onClick={e => (e.target as HTMLInputElement).select()} />
             <Btn $primary onClick={() => { navigator.clipboard.writeText(embedUrl); }}><Copy /> Copy</Btn>
           </div>
-        </Container>
-      </Page>
+        </div>
+
+        {/* Editor body */}
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          {/* Artboard */}
+          <div style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'relative', overflow: 'hidden',
+            background: `
+              radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
+              radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+              #F8F8F7`,
+            margin: '16px 0 16px 16px',
+            borderRadius: 20,
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            {/* Dot grid */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px)',
+              backgroundSize: '24px 24px', pointerEvents: 'none',
+            }} />
+            <div style={{
+              transform: 'scale(0.85) translateY(-24px)', transformOrigin: 'center center',
+              filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04))',
+            }}>
+              <WidgetDisplay widget={editingWidget} />
+            </div>
+          </div>
+
+          {/* Customization panel */}
+          <div style={{
+            width: 290, flexShrink: 0, overflow: 'auto',
+            borderLeft: '1px solid rgba(0,0,0,0.06)',
+            background: '#fff',
+          }}>
+            <CustomizationPanel
+              widget={editingWidget}
+              onSettingsChange={(settings) => {
+                if (!editingWidget) return;
+                const updated = editingWidget.updateSettings(settings as CalendarSettings | ClockSettings | BoardSettings);
+                setEditingWidget(updated);
+              }}
+            />
+          </div>
+        </div>
+      </div>
     );
   }
 
