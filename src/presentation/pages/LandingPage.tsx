@@ -29,7 +29,7 @@ const Section = styled.div`
 
 const SectionTinted = styled.div`
   background: #FAFAFA;
-  padding: 80px 0;
+  padding: 80px 0 160px;
 
   @media (max-width: 768px) {
     padding: 64px 0;
