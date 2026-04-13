@@ -551,7 +551,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 }}
               >
                 <div style={{
-                  width: 32, height: 32, borderRadius: 10,
+                  width: 32, height: 32, borderRadius: '50%',
                   background: 'linear-gradient(135deg, #6366F1, #818CF8)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700, color: '#fff',
