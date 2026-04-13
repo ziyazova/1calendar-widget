@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 const FooterOuter = styled.div`
   margin-top: 120px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 48px;
 `;
 
 const FooterWrapper = styled.footer`
@@ -87,15 +89,16 @@ const FooterBottom = styled.div`
 
 interface BigFooterProps {
   onNavigate: (path: string) => void;
+  noDivider?: boolean;
 }
 
-export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate }) => (
-  <FooterOuter>
+export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) => (
+  <FooterOuter style={noDivider ? { marginTop: 0, borderTop: 'none', paddingTop: 0 } : undefined}>
   <FooterWrapper>
     <FooterTop>
       <FooterBrand>
         <img src="/PeachyLogo.png" alt="Peachy" width="24" height="24" style={{ objectFit: 'contain' }} />
-        <BrandName>Peachy Studio</BrandName>
+        <BrandName>Peachy</BrandName>
       </FooterBrand>
       <FooterNav>
         <NavGroup>

@@ -92,7 +92,7 @@ export const LandingPage: React.FC = () => {
       </div>
 
       <GroupFooter>
-        <BigFooter onNavigate={(path) => navigate(path)} />
+        <BigFooter onNavigate={(path) => navigate(path)} noDivider />
       </GroupFooter>
     </Page>
   );
