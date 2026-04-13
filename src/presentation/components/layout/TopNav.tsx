@@ -539,12 +539,12 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 onClick={() => setAvatarOpen(!avatarOpen)}
                 style={{
                   width: 34, height: 34, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
+                  background: avatarOpen ? '#6366F1' : 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 600, color: '#6366F1',
+                  fontSize: 12, fontWeight: 600, color: avatarOpen ? '#fff' : '#6366F1',
                   cursor: 'pointer', flexShrink: 0,
-                  border: avatarOpen ? '2px solid #6366F1' : '2px solid transparent',
-                  transition: 'border-color 0.15s',
+                  transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
+                  boxShadow: avatarOpen ? '0 0 0 3px rgba(99,102,241,0.2)' : 'none',
                 }}
               >
                 {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
@@ -553,37 +553,71 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 <>
                   <div onClick={() => setAvatarOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 99 }} />
                   <div style={{
-                    position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 100,
-                    background: '#fff', borderRadius: 14, border: '1px solid rgba(0,0,0,0.08)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
-                    padding: '8px 0', minWidth: 200, overflow: 'hidden',
+                    position: 'absolute', top: 'calc(100% + 10px)', right: -8, zIndex: 100,
+                    background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,0.06)',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06)',
+                    padding: 0, minWidth: 220, overflow: 'hidden',
+                    animation: 'avatarDropIn 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F' }}>{user?.name || 'User'}</div>
-                      <div style={{ fontSize: 12, color: '#999', marginTop: 1 }}>{user?.email || ''}</div>
+                    <style>{`@keyframes avatarDropIn { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
+
+                    {/* User info */}
+                    <div style={{ padding: '16px 18px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #EDE4FF, #E0E8FF)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 13, fontWeight: 600, color: '#6366F1', flexShrink: 0,
+                      }}>
+                        {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.name || 'User'}</div>
+                        <div style={{ fontSize: 12, color: '#999', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.email || ''}</div>
+                      </div>
                     </div>
-                    <button onClick={() => { setAvatarOpen(false); navigate('/studio'); }} style={{
-                      display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px',
-                      border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-                      color: '#1F1F1F', fontFamily: 'inherit', transition: 'background 0.1s',
-                    }} onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                      <LayoutDashboard style={{ width: 16, height: 16, color: '#888' }} /> Dashboard
-                    </button>
-                    <button onClick={() => { setAvatarOpen(false); navigate('/studio'); }} style={{
-                      display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px',
-                      border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-                      color: '#1F1F1F', fontFamily: 'inherit', transition: 'background 0.1s',
-                    }} onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                      <Settings style={{ width: 16, height: 16, color: '#888' }} /> Settings
-                    </button>
-                    <div style={{ height: 1, background: 'rgba(0,0,0,0.06)', margin: '4px 0' }} />
-                    <button onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }} style={{
-                      display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 16px',
-                      border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-                      color: '#DC2828', fontFamily: 'inherit', transition: 'background 0.1s',
-                    }} onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                      <LogOut style={{ width: 16, height: 16 }} /> Log out
-                    </button>
+
+                    <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
+
+                    {/* Menu items */}
+                    <div style={{ padding: '6px 6px' }}>
+                      {[
+                        { icon: LayoutDashboard, label: 'Dashboard', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
+                        { icon: Settings, label: 'Settings', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
+                      ].map(item => (
+                        <button
+                          key={item.label}
+                          onClick={item.onClick}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
+                            border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                            color: '#444', fontFamily: 'inherit', borderRadius: 8, transition: 'background 0.1s',
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        >
+                          <item.icon style={{ width: 15, height: 15, color: '#999' }} /> {item.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />
+
+                    {/* Logout */}
+                    <div style={{ padding: '6px 6px' }}>
+                      <button
+                        onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
+                          border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                          color: '#DC2828', fontFamily: 'inherit', borderRadius: 8, transition: 'background 0.1s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <LogOut style={{ width: 15, height: 15 }} /> Log out
+                      </button>
+                    </div>
                   </div>
                 </>
               )}
