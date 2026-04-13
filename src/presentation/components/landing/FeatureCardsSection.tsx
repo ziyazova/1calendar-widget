@@ -177,7 +177,7 @@ const FeatureCardText = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: center;
-  margin-top: -40px;
+  margin-top: -80px;
 `;
 
 const FeatureCardTitle = styled.h3`
@@ -201,7 +201,7 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 20px -1px -1px 0;
+  margin: 20px 0 -1px 0;
   border-radius: 16px 0 0 0;
   overflow: hidden;
   border: none;
