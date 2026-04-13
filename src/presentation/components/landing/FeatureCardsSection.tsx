@@ -171,12 +171,12 @@ const FeatureCardBody = styled.div`
 `;
 
 const FeatureCardText = styled.div`
-  flex: 0 0 32%;
+  flex: 0 0 36%;
   text-align: left;
-  min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-self: center;
 `;
 
 const FeatureCardTitle = styled.h3`
@@ -197,7 +197,7 @@ const FeatureCardDesc = styled.p`
 `;
 
 const FeatureCardImage = styled.div`
-  flex: 1;
+  flex: 0 1 58%;
   min-width: 0;
   align-self: stretch;
   margin: 20px -1px -1px 0;

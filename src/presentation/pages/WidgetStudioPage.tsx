@@ -779,9 +779,7 @@ export const WidgetStudioPage: React.FC = () => {
             </WidgetGalleryCardWrap>
           ))}
         </WidgetGalleryGrid>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 12px' }}>
-          <BigFooter onNavigate={(path) => navigate(path)} />
-        </div>
+        <BigFooter onNavigate={(path) => navigate(path)} />
 
         {/* Name Modal */}
         {nameModal && (
