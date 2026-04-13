@@ -401,32 +401,26 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   // If editing, show full-screen editor (Figma-style artboard)
   if (editorOpen && editingWidget) {
     const embedUrl = diContainer.getWidgetEmbedUrlUseCase.execute(editingWidget);
+    const [copied, setCopied] = [false, (_v: boolean) => {}]; // placeholder
     return (
       <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: '#fff' }}>
-        {/* Editor top bar */}
+        {/* Editor top bar — clean, no bottom border */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 20px', height: 56, borderBottom: '1px solid rgba(0,0,0,0.06)',
-          background: '#fff', flexShrink: 0, zIndex: 10,
+          padding: '0 24px', height: 52, background: '#fff', flexShrink: 0, zIndex: 10,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button onClick={() => setEditorOpen(false)} style={{
-              display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px',
-              border: '1px solid rgba(0,0,0,0.1)', borderRadius: 8, background: '#fff',
-              fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: '#666', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
+              border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, background: '#fff',
+              fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: '#555', cursor: 'pointer',
+              transition: 'all 0.15s',
             }}>
               <ArrowRight style={{ width: 14, height: 14, transform: 'rotate(180deg)' }} /> Back
             </button>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input readOnly value={embedUrl} style={{
-              width: 200, height: 32, padding: '0 10px', border: 'none', borderRadius: 6,
-              background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#888',
-            }} onClick={e => (e.target as HTMLInputElement).select()} />
-            <Btn $primary onClick={() => { navigator.clipboard.writeText(embedUrl); }}><Copy /> Copy</Btn>
           </div>
         </div>
 
@@ -441,7 +435,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
               radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
               #F8F8F7`,
-            margin: '16px 0 16px 16px',
+            margin: '0 0 16px 16px',
             borderRadius: 20,
             border: '1px solid rgba(0,0,0,0.06)',
           }}>
@@ -449,20 +443,39 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             <div style={{
               position: 'absolute', inset: 0,
               backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px)',
-              backgroundSize: '24px 24px', pointerEvents: 'none',
+              backgroundSize: '24px 24px', pointerEvents: 'none', opacity: 0.6,
             }} />
+
+            {/* Widget */}
             <div style={{
-              transform: 'scale(0.85) translateY(-24px)', transformOrigin: 'center center',
+              transform: 'scale(0.9) translateY(-32px)', transformOrigin: 'center center',
               filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04))',
             }}>
               <WidgetDisplay widget={editingWidget} />
+            </div>
+
+            {/* Floating toolbar — bottom center */}
+            <div style={{
+              position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(0,0,0,0.08)', borderRadius: 14,
+              padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            }}>
+              <input readOnly value={embedUrl} style={{
+                width: 180, height: 28, padding: '0 10px', border: 'none', borderRadius: 6,
+                background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#888',
+                outline: 'none',
+              }} onClick={e => (e.target as HTMLInputElement).select()} />
+              <Btn $primary style={{ height: 30, padding: '0 12px', fontSize: 12 }} onClick={() => { navigator.clipboard.writeText(embedUrl); }}>
+                <Copy /> Copy
+              </Btn>
             </div>
           </div>
 
           {/* Customization panel */}
           <div style={{
-            width: 290, flexShrink: 0, overflow: 'auto',
-            borderLeft: '1px solid rgba(0,0,0,0.06)',
+            width: 280, flexShrink: 0, overflow: 'auto',
             background: '#fff',
           }}>
             <CustomizationPanel
