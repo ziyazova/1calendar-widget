@@ -498,8 +498,30 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           {/* Customization panel */}
           <div style={{
             width: 300, flexShrink: 0, overflow: 'auto',
-            background: '#fff',
+            background: '#fff', display: 'flex', flexDirection: 'column' as const,
           }}>
+            {/* Status bar — top of right panel */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '14px 16px 12px',
+              borderBottom: '1px solid rgba(0,0,0,0.05)',
+              flexShrink: 0,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <div style={{ width: 60, height: 4, borderRadius: 2, background: '#EBEBEB', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.min((widgets.length / 3) * 100, 100)}%`, height: '100%', borderRadius: 2, background: widgets.length >= 3 ? '#DC2828' : 'linear-gradient(90deg, #6366F1, #818CF8)', transition: 'width 0.3s' }} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
+              </div>
+              <button onClick={() => setShowUpgrade(true)} style={{
+                fontSize: 11, fontWeight: 600, color: '#6366F1',
+                background: 'none', padding: 0, border: 'none',
+                cursor: 'pointer', fontFamily: 'inherit',
+                whiteSpace: 'nowrap' as const,
+              }}>
+                Upgrade
+              </button>
+            </div>
             <CustomizationPanel
               widget={editingWidget}
               onSettingsChange={(settings) => {

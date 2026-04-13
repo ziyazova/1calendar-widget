@@ -58,7 +58,7 @@ const PanelHeader = styled.div`
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 80px 32px 16px 12px;
+  padding: 20px 32px 16px 12px;
   border-bottom: none;
 `;
 

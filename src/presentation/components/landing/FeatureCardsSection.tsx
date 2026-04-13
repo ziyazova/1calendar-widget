@@ -177,6 +177,7 @@ const FeatureCardText = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: center;
+  margin-top: -40px;
 `;
 
 const FeatureCardTitle = styled.h3`
