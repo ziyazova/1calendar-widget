@@ -541,23 +541,26 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               <div
                 onClick={() => navigate('/studio')}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
+                  display: 'flex', alignItems: 'center', gap: 10,
                   cursor: 'pointer',
+                  padding: '6px 14px 6px 6px',
+                  borderRadius: 12,
+                  background: avatarOpen ? 'rgba(99,102,241,0.06)' : 'transparent',
+                  border: '1px solid rgba(0,0,0,0.08)',
                   transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
                 <div style={{
-                  width: 34, height: 34, borderRadius: '50%',
-                  background: avatarOpen ? '#6366F1' : 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
+                  width: 32, height: 32, borderRadius: 10,
+                  background: 'linear-gradient(135deg, #6366F1, #818CF8)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, color: avatarOpen ? '#fff' : '#6366F1',
+                  fontSize: 11, fontWeight: 700, color: '#fff',
                   flexShrink: 0, letterSpacing: '0.02em',
-                  boxShadow: avatarOpen ? '0 0 0 3px rgba(99,102,241,0.15)' : 'none',
-                  transition: 'all 0.2s',
+                  boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
                 }}>
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#6366F1' : '#555', transition: 'color 0.2s' }}>Dashboard</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: avatarOpen ? '#6366F1' : '#1F1F1F', transition: 'color 0.2s', letterSpacing: '-0.01em' }}>Dashboard</span>
               </div>
               {avatarOpen && (
                 <>

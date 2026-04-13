@@ -716,8 +716,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <>
             {/* Browse banner — top */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(240,240,248,0.6) 0%, rgba(235,238,250,0.5) 40%, rgba(245,240,250,0.45) 100%)',
-              border: '1.5px solid rgba(200,200,220,0.25)', borderRadius: 16, padding: '32px 32px',
+              background: 'linear-gradient(135deg, rgba(252,235,225,0.45) 0%, rgba(255,245,235,0.4) 30%, rgba(237,228,255,0.35) 70%, rgba(232,237,255,0.4) 100%)',
+              border: '1.5px solid rgba(220,200,210,0.25)', borderRadius: 16, padding: '32px 32px',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32,
             }}>
               <div>
