@@ -22,12 +22,12 @@ const Nav = styled.nav`
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  height: 64px;
+  height: 72px;
   padding-top: env(safe-area-inset-top, 0px);
 `;
 
 const NavSpacer = styled.div`
-  height: calc(57px + env(safe-area-inset-top, 0px));
+  height: calc(65px + env(safe-area-inset-top, 0px));
 `;
 
 const NavInner = styled.div`
