@@ -5,18 +5,20 @@ import { ArrowLeft } from 'lucide-react';
 const BackButtonWrap = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.secondary};
   background: none;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 6px 12px;
   cursor: pointer;
   font-family: inherit;
-  margin-bottom: 16px;
-  transition: color 0.15s ease;
-  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
-  svg { width: 13px; height: 13px; }
+  margin-bottom: 20px;
+  transition: all 0.15s ease;
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; border-color: rgba(0, 0, 0, 0.15); }
+  svg { width: 14px; height: 14px; }
 `;
 
 interface BackButtonProps {

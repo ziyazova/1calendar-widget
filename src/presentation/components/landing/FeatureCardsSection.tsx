@@ -173,6 +173,10 @@ const FeatureCardBody = styled.div`
 const FeatureCardText = styled.div`
   flex: 0 0 32%;
   text-align: left;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 const FeatureCardTitle = styled.h3`

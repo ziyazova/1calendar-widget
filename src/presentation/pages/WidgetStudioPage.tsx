@@ -377,12 +377,18 @@ const WidgetGalleryGrid = styled.div`
   }
 `;
 
-const WidgetGalleryCardWrap = styled.div`
+const widgetCardAppear = keyframes`
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
   background: #fff;
   border: 1.5px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.2s;
+  animation: ${widgetCardAppear} 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${({ $i }) => 0.05 + ($i || 0) * 0.04}s both;
 
   &:hover {
     border-color: rgba(0, 0, 0, 0.1);
@@ -742,7 +748,7 @@ export const WidgetStudioPage: React.FC = () => {
   if (isLoggedIn) {
     return (
       <PageWrapper>
-        <TopNav activeLink="studio" />
+        <TopNav activeLink="studio" logoSub="Widgets" />
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 0' }}>
           <BackButton onClick={() => navigate(-1 as any)} label="Back" />
           <h1 style={{ fontSize: 32, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>Notion Widgets</h1>
@@ -756,8 +762,8 @@ export const WidgetStudioPage: React.FC = () => {
           </FilterRow>
         </div>
         <WidgetGalleryGrid>
-          {(activeFilter === 'all' ? GALLERY_ITEMS : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
-            <WidgetGalleryCardWrap key={`wg-${i}`}>
+          {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
+            <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
                 <GalleryCardLabel>{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : item.category === 'boards' ? 'Board' : 'Widget'}</GalleryCardLabel>
                 <GalleryImage src={item.image} alt={item.title} />
@@ -987,8 +993,8 @@ export const WidgetStudioPage: React.FC = () => {
           </WidgetGalleryFilterRow>
         </WidgetGalleryHeader>
         <WidgetGalleryGrid>
-          {(activeFilter === 'all' ? GALLERY_ITEMS : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
-            <WidgetGalleryCardWrap key={`wg-${i}`}>
+          {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
+            <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
                 <GalleryCardLabel>{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : item.category === 'boards' ? 'Board' : 'Widget'}</GalleryCardLabel>
                 <GalleryImage src={item.image} alt={item.title} />
