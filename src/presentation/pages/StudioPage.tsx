@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
@@ -323,6 +323,7 @@ type StudioTab = 'widgets' | 'templates';
 
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isRegistered, user } = useAuth();
   const [tab, setTab] = useState<StudioTab>('widgets');
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
@@ -343,6 +344,35 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   }, [isRegistered]);
 
   useEffect(() => { loadWidgets(); }, [loadWidgets]);
+
+  // Handle incoming newWidget from /widgets Customize flow
+  useEffect(() => {
+    const state = location.state as { newWidget?: { name: string; type: string; style: string } } | null;
+    if (state?.newWidget) {
+      const { name, type, style } = state.newWidget;
+      // Clear state so it doesn't re-trigger
+      window.history.replaceState({}, '');
+      // Create widget and open editor
+      (async () => {
+        try {
+          const widget = await diContainer.createWidgetUseCase.execute(type);
+          let updated;
+          if (type === 'calendar') {
+            updated = widget.updateSettings(new CalendarSettings({ style: style as CalendarSettings['style'] }));
+          } else if (type === 'clock') {
+            updated = widget.updateSettings(new ClockSettings({ style: style as ClockSettings['style'] }));
+          } else {
+            updated = widget.updateSettings(new BoardSettings({ layout: style as BoardSettings['layout'] }));
+          }
+          setEditingWidget(updated);
+          setEditingWidgetKey(`${type}-${style}`);
+          setEditorOpen(true);
+        } catch (err) {
+          Logger.error('StudioPage', 'Failed to create widget from nav state', err);
+        }
+      })();
+    }
+  }, [location.state, diContainer]);
 
   const handleDelete = async (id: string) => {
     await WidgetStorageService.deleteWidget(id);

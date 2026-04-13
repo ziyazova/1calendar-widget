@@ -686,7 +686,7 @@ const CTADesc = styled.p`
 type WidgetCategory = 'all' | 'calendar' | 'clock' | 'boards' | 'buttons';
 
 const GALLERY_FILTERS: { key: WidgetCategory; label: string }[] = [
-  { key: 'all', label: 'Featured' },
+  { key: 'all', label: 'Popular' },
   { key: 'calendar', label: 'Calendar' },
   { key: 'clock', label: 'Clocks' },
   { key: 'boards', label: 'Boards' },
@@ -699,15 +699,14 @@ const FEATURED_ITEMS: { image: string; title: string }[] = [
   { image: '/gallery-camera.png', title: 'Camera Widget' },
 ];
 
-const GALLERY_ITEMS: { image: string; title: string; category: WidgetCategory; pro?: boolean }[] = [
-  { image: '/gallery-calendar-classic.png', title: 'Classic Calendar', category: 'calendar' },
-  { image: '/gallery-calendar-collage.png', title: 'Collage Calendar', category: 'calendar' },
-  { image: '/gallery-calendar-typewriter.png', title: 'Typewriter Calendar', category: 'calendar', pro: true },
-  { image: '/gallery-clock-digital.png', title: 'Digital Clock', category: 'clock' },
-  { image: '/gallery-clock-flower.png', title: 'Flower Clock', category: 'clock' },
-  { image: '/gallery-clock-alarm.png', title: 'Alarm Clock', category: 'clock', pro: true },
-  { image: '/gallery-clock-flip.png', title: 'Flip Clock', category: 'clock', pro: true },
-  { image: '/gallery-camera.png', title: 'Camera', category: 'boards' },
+const GALLERY_ITEMS: { image: string; title: string; category: WidgetCategory; type: string; style: string; pro?: boolean }[] = [
+  { image: '/gallery-calendar-classic.png', title: 'Classic Calendar', category: 'calendar', type: 'calendar', style: 'classic' },
+  { image: '/gallery-calendar-collage.png', title: 'Collage Calendar', category: 'calendar', type: 'calendar', style: 'collage' },
+  { image: '/gallery-calendar-typewriter.png', title: 'Typewriter Calendar', category: 'calendar', type: 'calendar', style: 'typewriter', pro: true },
+  { image: '/gallery-clock-digital.png', title: 'Digital Clock', category: 'clock', type: 'clock', style: 'classic' },
+  { image: '/gallery-clock-flower.png', title: 'Flower Clock', category: 'clock', type: 'clock', style: 'flower', pro: true },
+  { image: '/gallery-clock-flip.png', title: 'Flip Clock', category: 'clock', type: 'clock', style: 'classic' },
+  { image: '/gallery-camera.png', title: 'Camera', category: 'boards', type: 'board', style: 'grid' },
 ];
 
 export const WidgetStudioPage: React.FC = () => {
@@ -721,7 +720,7 @@ export const WidgetStudioPage: React.FC = () => {
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const { loginWithCode, login, loginWithGoogle, isLoggedIn } = useAuth();
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const [nameModal, setNameModal] = useState<{ title: string; category: string } | null>(null);
+  const [nameModal, setNameModal] = useState<{ title: string; category: string; type: string; style: string } | null>(null);
   const [widgetName, setWidgetName] = useState('');
 
   const handleLaunch = useCallback(() => {
@@ -769,7 +768,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {item.pro ? (
                   <CustomizeBtn $pro onClick={() => setShowUpgrade(true)}>✦ Pro</CustomizeBtn>
                 ) : (
-                  <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
+                  <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
@@ -827,9 +826,10 @@ export const WidgetStudioPage: React.FC = () => {
                 }}>Cancel</button>
                 <button
                   onClick={() => {
-                    if (widgetName.trim()) {
+                    if (widgetName.trim() && nameModal) {
+                      const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
                       setNameModal(null);
-                      navigate('/studio');
+                      navigate('/studio', { state: { newWidget: data } });
                     }
                   }}
                   style={{
@@ -999,7 +999,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {item.pro ? (
                   <CustomizeBtn $pro onClick={() => setShowUpgrade(true)}>✦ Pro</CustomizeBtn>
                 ) : (
-                  <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
+                  <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
