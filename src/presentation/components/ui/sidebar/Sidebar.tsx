@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { keyframes, css } from 'styled-components';
-import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, LayoutGrid, Home, Settings, LogOut } from 'lucide-react';
+import { ChevronRight, PanelLeftClose, Calendar, Clock, Image, ArrowLeft, LayoutGrid, Home, Settings, LogOut, ShoppingBag, Plus } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../widgetConfig';
 import { useAuth } from '@/presentation/context/AuthContext';
 import type { WidgetStyleConfig } from '../widgetConfig';
 
-export type DashboardView = 'my-widgets' | 'templates' | 'purchases' | 'profile' | null;
+export type DashboardView = 'dashboard' | 'my-widgets' | 'templates' | 'purchases' | 'profile' | null;
 
 interface SidebarProps {
   availableWidgets: string[];
@@ -735,63 +735,84 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </SidebarHeader>
 
       <NavSection $collapsed={collapsed}>
-        {isRegistered && (
-          <WidgetCategory $collapsed={collapsed}>
-            <CategoryHeader
-              $expanded={dashboardView === 'my-widgets'}
-              $collapsed={collapsed}
-              onClick={() => onDashboardViewChange?.(dashboardView === 'my-widgets' ? null : 'my-widgets')}
-            >
-              <CategoryIcon $active={dashboardView === 'my-widgets'}>
-                <Home />
-              </CategoryIcon>
-              <CategoryText $collapsed={collapsed}>My Widgets</CategoryText>
-              {collapsed && <Tooltip>My Widgets</Tooltip>}
-            </CategoryHeader>
-          </WidgetCategory>
-        )}
+        <WidgetCategory $collapsed={collapsed}>
+          <CategoryHeader
+            $expanded={dashboardView === 'dashboard'}
+            $collapsed={collapsed}
+            onClick={() => onDashboardViewChange?.('dashboard')}
+          >
+            <CategoryIcon $active={dashboardView === 'dashboard'}>
+              <Home />
+            </CategoryIcon>
+            <CategoryText $collapsed={collapsed}>Dashboard</CategoryText>
+            {collapsed && <Tooltip>Dashboard</Tooltip>}
+          </CategoryHeader>
+        </WidgetCategory>
 
-        <SectionLabel $collapsed={collapsed}>Widgets</SectionLabel>
-        {renderCategory('calendar', 'Calendar', Calendar, CALENDAR_STYLES, calendarRef)}
-        {renderCategory('clock', 'Clock', Clock, CLOCK_STYLES, clockRef)}
-        {renderCategory('board', 'Canvas', Image, BOARD_STYLES, boardRef)}
+        <WidgetCategory $collapsed={collapsed}>
+          <CategoryHeader
+            $expanded={dashboardView === 'my-widgets'}
+            $collapsed={collapsed}
+            onClick={() => onDashboardViewChange?.('my-widgets')}
+          >
+            <CategoryIcon $active={dashboardView === 'my-widgets'}>
+              <Calendar />
+            </CategoryIcon>
+            <CategoryText $collapsed={collapsed}>Widgets</CategoryText>
+            {collapsed && <Tooltip>Widgets</Tooltip>}
+          </CategoryHeader>
+        </WidgetCategory>
+
+        <WidgetCategory $collapsed={collapsed}>
+          <CategoryHeader
+            $expanded={dashboardView === 'purchases'}
+            $collapsed={collapsed}
+            onClick={() => onDashboardViewChange?.('purchases')}
+          >
+            <CategoryIcon $active={dashboardView === 'purchases'}>
+              <ShoppingBag />
+            </CategoryIcon>
+            <CategoryText $collapsed={collapsed}>Templates</CategoryText>
+            {collapsed && <Tooltip>Templates</Tooltip>}
+          </CategoryHeader>
+        </WidgetCategory>
+
+        <SectionLabel $collapsed={collapsed}>Account</SectionLabel>
+
+        <WidgetCategory $collapsed={collapsed}>
+          <CategoryHeader
+            $expanded={dashboardView === 'profile'}
+            $collapsed={collapsed}
+            onClick={() => onDashboardViewChange?.('profile')}
+          >
+            <CategoryIcon $active={dashboardView === 'profile'}>
+              <Settings />
+            </CategoryIcon>
+            <CategoryText $collapsed={collapsed}>Settings</CategoryText>
+            {collapsed && <Tooltip>Settings</Tooltip>}
+          </CategoryHeader>
+        </WidgetCategory>
       </NavSection>
 
       {isRegistered && (
         <ProfileFooter $collapsed={collapsed}>
-          <ProfileAvatar onClick={() => setProfileOpen(!profileOpen)}>
+          <ProfileAvatar>
             {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
           </ProfileAvatar>
           {!collapsed && (
-            <ProfileInfo onClick={() => setProfileOpen(!profileOpen)}>
-              <ProfileName>{user?.name || 'User'}</ProfileName>
-              <ProfileEmail>{user?.email || ''}</ProfileEmail>
-            </ProfileInfo>
-          )}
-          {profileOpen && (
-            <ProfilePopup>
-              <ProfilePopupItem onClick={() => { setProfileOpen(false); onDashboardViewChange?.('profile'); }}>
-                <Settings /> Settings
+            <>
+              <ProfileInfo>
+                <ProfileName>{user?.name || 'User'}</ProfileName>
+                <ProfileEmail>{user?.email || ''}</ProfileEmail>
+              </ProfileInfo>
+              <ProfilePopupItem onClick={async () => { await logout(); navigate('/'); }} style={{ marginLeft: 'auto', padding: '0 8px', background: 'none', border: 'none' }}>
+                <LogOut />
               </ProfilePopupItem>
-              <ProfilePopupItem onClick={async () => { await logout(); navigate('/'); }}>
-              <LogOut /> Log out
-            </ProfilePopupItem>
-          </ProfilePopup>
-        )}
-      </ProfileFooter>
+            </>
+          )}
+        </ProfileFooter>
       )}
 
-      {collapsed && popover && (
-        <CategoryPopover
-          title={popover.title}
-          styles={popover.styles}
-          widgetType={popover.type}
-          currentWidget={currentWidget}
-          onWidgetChange={onWidgetChange}
-          anchorTop={popover.top}
-          onClose={closePopover}
-        />
-      )}
     </SidebarContainer>
   );
 };

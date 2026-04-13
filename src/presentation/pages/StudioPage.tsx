@@ -968,7 +968,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [showStylePicker, setShowStylePicker] = useState<string | null>(null);
   const navigate = useNavigate();
   const { isRegistered } = useAuth();
-  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>('my-widgets');
+  const [dashboardView, setDashboardView] = useState<import('../components/ui/sidebar/Sidebar').DashboardView>('dashboard');
 
   const handleLogoClick = useCallback(() => {
     setTransitioning(true);
@@ -1106,13 +1106,24 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             collapsed={window.innerWidth > 768 && window.innerWidth <= 1024 ? sidebarCollapsed : false}
             onToggleCollapse={window.innerWidth > 768 && window.innerWidth <= 1024 ? () => setSidebarCollapsed(!sidebarCollapsed) : undefined}
             dashboardView={dashboardView}
-            onDashboardViewChange={(v) => { setDashboardView(v); if (v) { setStylePanel(null); setEditorOpen(false); } }}
-            expandedCategory={stylePanel}
-            onCategoryToggle={(cat) => {
-              setStylePanel(cat);
-              if (cat) setEditorOpen(false);
-              // Don't close dashboard — panel opens alongside it
+            onDashboardViewChange={(v) => {
+              setDashboardView(v);
+              setStylePanel(null);
+              if (v) {
+                setEditorOpen(false);
+                setShowTypePicker(false);
+                setShowStylePicker(null);
+              } else {
+                // "Widgets" clicked — show editor if widget exists, or type picker
+                if (currentWidget) {
+                  setEditorOpen(true);
+                } else {
+                  setShowTypePicker(true);
+                }
+              }
             }}
+            expandedCategory={stylePanel}
+            onCategoryToggle={() => {}}
           />
           {stylePanel && (() => {
             const stylesMap: Record<string, { styles: typeof CALENDAR_STYLES; label: string }> = {
@@ -1172,12 +1183,21 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             <WidgetArea style={{ overflow: 'auto', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
               <DashboardContent
                 view={dashboardView}
-                exploreCategory={stylePanel}
+                onNavigate={(v) => setDashboardView(v)}
                 onAddNew={() => {
                   setDashboardView(null);
                   setShowTypePicker(true);
                   setStylePanel(null);
                   setEditorOpen(false);
+                }}
+                onCreateType={(type) => {
+                  const defaultStyle = type === 'calendar' ? 'modern-grid-zoom-fixed' : type === 'clock' ? 'classic' : 'grid';
+                  createWidgetWithStyle(type, defaultStyle);
+                  setDashboardView(null);
+                  setShowTypePicker(false);
+                  setShowStylePicker(null);
+                  setStylePanel(null);
+                  setEditorOpen(true);
                 }}
                 onEditWidget={(w) => {
                   handleWidgetChange(w.type, w.style);
