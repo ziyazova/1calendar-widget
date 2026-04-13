@@ -159,8 +159,8 @@ const FeatureTabActions = styled.div`
 const FeatureCardBody = styled.div`
   display: flex;
   align-items: center;
-  gap: 32px;
-  padding: 32px 0 0 40px;
+  gap: 28px;
+  padding: 24px 0 0 36px;
   flex: 1;
 
   @media (max-width: 768px) {
@@ -180,7 +180,7 @@ const FeatureCardText = styled.div`
 `;
 
 const FeatureCardTitle = styled.h3`
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -200,7 +200,7 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 12px -1px -1px 0;
+  margin: 20px -1px -1px 0;
   border-radius: 16px 0 0 0;
   overflow: hidden;
   border: none;
@@ -213,7 +213,7 @@ const FeatureCardImage = styled.div`
     object-fit: cover;
     object-position: center;
     display: block;
-    transform: scale(0.92);
+    transform: scale(1);
   }
 
   @media (max-width: 768px) {
