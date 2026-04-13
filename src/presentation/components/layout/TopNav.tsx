@@ -538,16 +538,23 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               <div
                 onClick={() => setAvatarOpen(!avatarOpen)}
                 style={{
-                  width: 36, height: 36, borderRadius: '50%',
-                  background: avatarOpen ? '#6366F1' : 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 700, color: avatarOpen ? '#fff' : '#6366F1',
-                  cursor: 'pointer', flexShrink: 0, letterSpacing: '0.02em',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  cursor: 'pointer',
                   transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
-                  boxShadow: avatarOpen ? '0 0 0 3px rgba(99,102,241,0.15)' : 'none',
                 }}
               >
-                {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                <div style={{
+                  width: 34, height: 34, borderRadius: '50%',
+                  background: avatarOpen ? '#6366F1' : 'linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 11, fontWeight: 700, color: avatarOpen ? '#fff' : '#6366F1',
+                  flexShrink: 0, letterSpacing: '0.02em',
+                  boxShadow: avatarOpen ? '0 0 0 3px rgba(99,102,241,0.15)' : 'none',
+                  transition: 'all 0.2s',
+                }}>
+                  {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#6366F1' : '#555', transition: 'color 0.2s' }}>Dashboard</span>
               </div>
               {avatarOpen && (
                 <>
