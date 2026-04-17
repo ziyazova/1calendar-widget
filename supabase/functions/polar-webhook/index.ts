@@ -18,14 +18,12 @@
 // subscription.canceled, subscription.revoked.
 
 // @ts-expect-error
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
-// @ts-expect-error
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const Deno: any;
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 });
 
   const POLAR_WEBHOOK_SECRET = Deno.env.get('POLAR_WEBHOOK_SECRET');

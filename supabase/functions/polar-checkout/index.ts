@@ -13,9 +13,7 @@
 //   const { data, error } = await supabase.functions.invoke('polar-checkout', { body: {} });
 //   if (data?.url) window.location.href = data.url;
 
-// @ts-expect-error — Deno runtime types available in Supabase Edge Functions.
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
-// @ts-expect-error
+// @ts-expect-error — esm.sh imports resolved by Supabase Edge Runtime (Deno).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,7 +25,7 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
   }
