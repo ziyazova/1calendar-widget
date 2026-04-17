@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
 import { FilterChip } from '../shared';
+import { TEMPLATES, type Category } from '@/presentation/data/templates';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -117,12 +118,22 @@ const FilterRow = styled.div`
 `;
 
 
-const TEMPLATE_CATEGORIES = [
-  { label: 'All', tag: '' },
-  { label: 'Life', tag: 'life' },
-  { label: 'Student', tag: 'students' },
-  { label: 'Wellness', tag: 'bestsellers' },
+// Filter chips for the "Top templates" row. Each chip maps to a Category
+// from `data/templates.ts`, so filtering is derived from the same source of
+// truth as the full shop at `/templates` — no duplicate data.
+const TEMPLATE_CATEGORIES: { label: string; category: Category | null }[] = [
+  { label: 'All', category: null },
+  { label: 'Life', category: 'planners' },
+  { label: 'Student', category: 'student' },
+  { label: 'Wellness', category: 'health' },
 ];
+
+// Curated presentation order for the landing marquee. IDs reference
+// `TEMPLATES` — no duplicated card data lives in this file.
+const LANDING_TEMPLATE_IDS = ['1', '2', '6', '8', '3', '7', '12', '10', '4', '9', '11', '13', '5'];
+const LANDING_TEMPLATES = LANDING_TEMPLATE_IDS
+  .map(id => TEMPLATES.find(t => t.id === id))
+  .filter((t): t is NonNullable<typeof t> => Boolean(t));
 
 const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
   display: flex;
@@ -249,21 +260,9 @@ const TemplateCardPrice = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-const TEMPLATE_ROW_1 = [
-  { id: '1', image: '/template-cherry-planner.png', title: 'Ultimate Life Planner', price: '$18.99', tags: ['bestsellers', 'life'] },
-  { id: '2', image: '/template-wellness.png', title: 'Ultimate Wellness Planner', price: '$14.99', tags: ['bestsellers', 'life'] },
-  { id: '6', image: '/template-mystic.png', title: 'Mystic Life Planner', price: '$16.99', tags: ['life'] },
-  { id: '8', image: '/template-glowup.png', title: 'Glow Up Planner', price: '$12.99', tags: ['bestsellers', 'life'] },
-  { id: '3', image: '/template-academic-dark.png', title: 'Academic Planner Dark', price: '$9.99', tags: ['students'] },
-  { id: '7', image: '/template-academia-light.png', title: 'Light Academia Planner', price: '$11.99', tags: ['students'] },
-  { id: '12', image: '/template-dark-academia.png', title: 'Dark Academia Student', price: '$11.99', tags: ['students'] },
-  { id: '10', image: '/template-cherub.png', title: 'Cherub Planner', price: '$12.99', tags: ['life'] },
-  { id: '4', image: '/template-green-life.png', title: 'Green Life Planner', price: '$14.99', tags: ['life'] },
-  { id: '9', image: '/template-life-olive.png', title: 'Olive Life Planner', price: '$14.99', tags: ['life'] },
-  { id: '11', image: '/template-minimalist-green.png', title: 'Minimalist Green Planner', price: '$13.99', tags: ['life'] },
-  { id: '13', image: '/template-university-dark.png', title: 'University Planner', price: '$9.99', tags: ['students'] },
-  { id: '5', image: '/template-student-light.png', title: 'Student Planner Light', price: '$8.99', tags: ['students'] },
-];
+// TEMPLATE_ROW_1 previously held a hand-maintained copy of the catalog that
+// drifted from data/templates.ts over time. All rendering now derives from
+// LANDING_TEMPLATES (above), which references TEMPLATES directly.
 
 interface TemplatesGalleryProps {
   onNavigate: (path: string) => void;
@@ -271,13 +270,25 @@ interface TemplatesGalleryProps {
 
 export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }) => {
   const [templateScrolled, setTemplateScrolled] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('');
+  const [activeFilter, setActiveFilter] = useState<Category | null>(null);
   const [featuredIdx, setFeaturedIdx] = useState(0);
   const templateWrapRef = useRef<HTMLDivElement>(null);
 
-  const filteredTemplates = activeFilter
-    ? TEMPLATE_ROW_1.filter(t => t.tags.includes(activeFilter))
-    : TEMPLATE_ROW_1;
+  // A template with multi-category assignment would otherwise render twice
+  // if its id were in the array twice; LANDING_TEMPLATE_IDS is unique by
+  // construction, but we keep a Set-based dedupe on the filtered output to
+  // be explicit about intent.
+  const filteredTemplates = (() => {
+    const base = activeFilter
+      ? LANDING_TEMPLATES.filter(t => t.category.includes(activeFilter))
+      : LANDING_TEMPLATES;
+    const seen = new Set<string>();
+    return base.filter(t => {
+      if (seen.has(t.id)) return false;
+      seen.add(t.id);
+      return true;
+    });
+  })();
 
   return (
     <TemplatesGallerySection data-ux="Templates Gallery">
@@ -291,8 +302,8 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
           {TEMPLATE_CATEGORIES.map(c => (
             <FilterChip
               key={c.label}
-              $active={activeFilter === c.tag}
-              onClick={() => setActiveFilter(c.tag)}
+              $active={activeFilter === c.category}
+              onClick={() => setActiveFilter(c.category)}
             >
               {c.label}
             </FilterChip>
@@ -312,8 +323,8 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
         }}
       >
         <TemplateMarqueeTrack $duration={60}>
-          {[...filteredTemplates, ...filteredTemplates].map((t, i) => (
-            <TemplateCardWrap key={`tr1-${i}`} onClick={() => onNavigate(`/templates/${t.id}`)}>
+          {filteredTemplates.map((t) => (
+            <TemplateCardWrap key={t.id} onClick={() => onNavigate(`/templates/${t.id}`)}>
               <TemplateCard data-ux="Template Card">
                 <TemplateCardImage src={t.image} alt={t.title} />
               </TemplateCard>

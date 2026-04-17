@@ -48,6 +48,13 @@ const Toast = styled.div<{ $visible: boolean }>`
 
 /* ── Layout ── */
 
+const NavOverride = styled.div`
+  nav > div {
+    max-width: none;
+    padding: 0 24px;
+  }
+`;
+
 const PageWrap = styled.div`
   display: flex;
   min-height: 100vh;
@@ -1224,7 +1231,9 @@ export const DesignSystemPage: React.FC = () => {
 
   return (
     <>
-      <TopNav logoSub="Design System" activeLink="dev" />
+      <NavOverride>
+        <TopNav logoSub="Design System" activeLink="dev" />
+      </NavOverride>
       <PageWrap>
         {/* Sidebar */}
         <Sidebar>

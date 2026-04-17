@@ -1,0 +1,346 @@
+import React from 'react';
+import styled from 'styled-components';
+import { FileText, UserCheck, Shield, Ban, Layers, Link2, CreditCard, Activity, XCircle, AlertCircle, FileEdit, Scale, Mail } from 'lucide-react';
+import { TopNav } from '../components/layout/TopNav';
+import { Footer } from '../components/shared/Footer';
+
+const Page = styled.div`
+  min-height: 100vh;
+  background: #fff;
+  font-family: ${({ theme }) => theme.typography.fonts.primary};
+`;
+
+const Hero = styled.section`
+  padding: 120px 32px 56px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 70%, rgba(236,72,153,0.04) 0%, transparent 55%),
+    #fff;
+
+  @media (max-width: 768px) { padding: 88px 20px 40px; }
+`;
+
+const HeroInner = styled.div`
+  max-width: 760px;
+  margin: 0 auto;
+`;
+
+const Kicker = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6366F1;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(99,102,241,0.08);
+  margin-bottom: 20px;
+
+  svg { width: 12px; height: 12px; }
+`;
+
+const Title = styled.h1`
+  font-size: 56px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: #1F1F1F;
+  margin: 0 0 16px;
+  line-height: 1.05;
+
+  @media (max-width: 768px) { font-size: 40px; }
+`;
+
+const Lead = styled.p`
+  font-size: 17px;
+  line-height: 1.65;
+  color: #444;
+  margin: 0 0 24px;
+  letter-spacing: -0.005em;
+`;
+
+const MetaRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: #999;
+  flex-wrap: wrap;
+
+  span + span::before {
+    content: '·';
+    margin-right: 16px;
+    color: #ccc;
+  }
+`;
+
+const Body = styled.section`
+  padding: 48px 32px 96px;
+
+  @media (max-width: 768px) { padding: 32px 20px 64px; }
+`;
+
+const BodyInner = styled.article`
+  max-width: 760px;
+  margin: 0 auto;
+`;
+
+const Section = styled.section`
+  padding: 32px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+
+  &:first-child { padding-top: 8px; }
+  &:last-child { border-bottom: none; }
+`;
+
+const SectionHead = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+const SectionIcon = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.5));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg { width: 18px; height: 18px; color: #6366F1; }
+`;
+
+const H2 = styled.h2`
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1F1F1F;
+  margin: 0;
+`;
+
+const P = styled.p`
+  font-size: 15px;
+  line-height: 1.72;
+  color: #444;
+  margin: 0 0 14px;
+
+  &:last-child { margin-bottom: 0; }
+
+  strong { color: #1F1F1F; font-weight: 600; }
+`;
+
+const List = styled.ul`
+  margin: 4px 0 14px;
+  padding-left: 22px;
+
+  li {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #444;
+    margin-bottom: 8px;
+  }
+  strong { color: #1F1F1F; font-weight: 600; }
+`;
+
+const ContactLink = styled.a`
+  color: #6366F1;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(99,102,241,0.25);
+  transition: border-color 0.15s;
+  &:hover { border-bottom-color: #6366F1; }
+`;
+
+export const TermsPage: React.FC = () => (
+  <Page>
+    <TopNav />
+
+    <Hero>
+      <HeroInner>
+        <Kicker><FileText /> Legal</Kicker>
+        <Title>Terms of Use</Title>
+        <Lead>
+          The agreement between you and Peachy Studio when you use our service to create widgets
+          and embed them in Notion. Please read these carefully.
+        </Lead>
+        <MetaRow>
+          <span>Last updated 17 April 2026</span>
+          <span>Governed by Swedish law</span>
+        </MetaRow>
+      </HeroInner>
+    </Hero>
+
+    <Body>
+      <BodyInner>
+      <Section>
+        <SectionHead>
+          <SectionIcon><UserCheck /></SectionIcon>
+          <H2>1. Eligibility</H2>
+        </SectionHead>
+        <P>
+          You must be at least 16 years old to use Peachy. By using the service you confirm that you
+          meet this requirement and that the information you provide is accurate.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Shield /></SectionIcon>
+          <H2>2. Your account</H2>
+        </SectionHead>
+        <List>
+          <li>You are responsible for keeping your login credentials secure.</li>
+          <li>You must not share your account or use another user's account without permission.</li>
+          <li>You must notify us if you become aware of any unauthorised use of your account.</li>
+        </List>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Ban /></SectionIcon>
+          <H2>3. Acceptable use</H2>
+        </SectionHead>
+        <P>When using Peachy you agree not to:</P>
+        <List>
+          <li>Use the service for any unlawful, fraudulent, harmful or abusive purpose.</li>
+          <li>Upload or embed content that is illegal, defamatory, infringing, or violates the rights of others.</li>
+          <li>Attempt to probe, scan, or test the vulnerability of the service or bypass any authentication.</li>
+          <li>Reverse engineer, decompile, or attempt to extract the source code of Peachy, beyond what is permitted by law.</li>
+          <li>Interfere with the operation of Peachy, including by sending excessive requests or disrupting other users.</li>
+        </List>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Layers /></SectionIcon>
+          <H2>4. Your content</H2>
+        </SectionHead>
+        <P>
+          You retain all rights to the widgets and content you create in Peachy ("Your Content").
+          By using the service, you grant us a limited, worldwide, non-exclusive licence to host,
+          display, and deliver Your Content solely for the purpose of providing the service to you
+          (for example, rendering your widget inside Notion through an embed URL).
+        </P>
+        <P>You are responsible for Your Content and must ensure you have the right to use it.</P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><FileText /></SectionIcon>
+          <H2>5. Our intellectual property</H2>
+        </SectionHead>
+        <P>
+          The Peachy name, logo, website, and the underlying software are the property of
+          Peachy Studio. Nothing in these terms grants you ownership of any of them.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Link2 /></SectionIcon>
+          <H2>6. Third-party services</H2>
+        </SectionHead>
+        <P>
+          Peachy uses third-party providers (for example Supabase, Vercel, and Google) to operate.
+          When you embed a widget in Notion, you are also subject to Notion's terms. We are not
+          responsible for third-party services or their content.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><CreditCard /></SectionIcon>
+          <H2>7. Paid plans (if applicable)</H2>
+        </SectionHead>
+        <P>
+          Peachy may offer paid subscriptions in the future. If you subscribe, you agree to pay the
+          applicable fees and taxes. Fees are billed in advance, are non-refundable except where
+          required by law, and will renew automatically unless you cancel before the next billing cycle.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Activity /></SectionIcon>
+          <H2>8. Service availability</H2>
+        </SectionHead>
+        <P>
+          We aim for Peachy to be available at all times but do not guarantee uninterrupted access.
+          The service is provided on an "as is" and "as available" basis. We may modify, suspend,
+          or discontinue features at any time, with reasonable notice where possible.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><XCircle /></SectionIcon>
+          <H2>9. Termination</H2>
+        </SectionHead>
+        <P>
+          You can stop using Peachy and delete your account at any time from your account settings.
+          We may suspend or terminate your account if you breach these terms or use the service in a
+          way that harms us or other users.
+        </P>
+        <P>
+          On termination your widgets and profile are removed from our systems as described in our{' '}
+          <ContactLink href="/privacy">Privacy Policy</ContactLink>.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><AlertCircle /></SectionIcon>
+          <H2>10. Disclaimer and liability</H2>
+        </SectionHead>
+        <P>
+          To the maximum extent permitted by law, Peachy is provided without warranties of any kind,
+          either express or implied. We are not liable for any indirect, incidental, or consequential
+          damages arising out of your use of the service. Nothing in these terms limits liability for
+          matters that cannot be excluded under applicable law.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><FileEdit /></SectionIcon>
+          <H2>11. Changes to these terms</H2>
+        </SectionHead>
+        <P>
+          We may update these terms from time to time. If we make material changes, we will update the
+          "Last updated" date above and, where appropriate, notify you by email or inside the product
+          before the changes take effect.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Scale /></SectionIcon>
+          <H2>12. Governing law</H2>
+        </SectionHead>
+        <P>
+          These terms are governed by the laws of Sweden. Any disputes will be resolved in the
+          competent courts of Stockholm, Sweden, unless mandatory consumer protection laws provide otherwise.
+        </P>
+      </Section>
+
+      <Section>
+        <SectionHead>
+          <SectionIcon><Mail /></SectionIcon>
+          <H2>13. Contact</H2>
+        </SectionHead>
+        <P>
+          Questions about these terms:{' '}
+          <ContactLink href="mailto:ziyazovaa@gmail.com">ziyazovaa@gmail.com</ContactLink>.
+        </P>
+      </Section>
+      </BodyInner>
+    </Body>
+
+    <Footer />
+  </Page>
+);

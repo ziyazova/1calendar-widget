@@ -16,9 +16,16 @@ import { BoardEmbedPage } from './presentation/pages/BoardEmbedPage';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 import { DebugOverlay } from './presentation/components/debug/DebugOverlay';
 import { DesignSystemPage } from './presentation/pages/DesignSystemPage';
+import { PrivacyPage } from './presentation/pages/PrivacyPage';
+import { TermsPage } from './presentation/pages/TermsPage';
+import { SettingsPage } from './presentation/pages/SettingsPage';
+import { ResetPasswordPage } from './presentation/pages/ResetPasswordPage';
+import { VerifyEmailPage } from './presentation/pages/VerifyEmailPage';
 import { PageTransition } from './presentation/components/shared/PageTransition';
+import { ConsentBanner } from './presentation/components/shared/ConsentBanner';
 import { CartProvider } from './presentation/context/CartContext';
 import { AuthProvider } from './presentation/context/AuthContext';
+import { UpgradeModalProvider } from './presentation/context/UpgradeModalContext';
 
 import { DIContainer } from './infrastructure/di/DIContainer';
 
@@ -64,6 +71,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyles />
         <AuthProvider>
+        <UpgradeModalProvider>
         <CartProvider>
           <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <ScrollToTop />
@@ -81,11 +89,18 @@ function App() {
                 <Route path="/embed/clock" element={<ClockEmbedPage />} />
                 <Route path="/embed/board" element={<BoardEmbedPage />} />
                 <Route path="/dev" element={<DesignSystemPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
                 <Route path="*" element={<LandingPage />} />
               </Routes>
             </PageTransition>
+            <ConsentBanner />
           </Router>
         </CartProvider>
+        </UpgradeModalProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

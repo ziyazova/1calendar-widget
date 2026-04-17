@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const FooterWrap = styled.footer`
   max-width: 1200px;
@@ -23,6 +24,21 @@ const FooterText = styled.span`
   letter-spacing: -0.01em;
 `;
 
+const FooterLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 18px;
+`;
+
+const FooterLink = styled(Link)`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.muted};
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: color 0.15s;
+  &:hover { color: ${({ theme }) => theme.colors.text.secondary}; }
+`;
+
 interface FooterProps {
   left?: string;
   right?: string;
@@ -31,6 +47,10 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ left = 'Peachy Studio', right }) => (
   <FooterWrap>
     <FooterText>{left}</FooterText>
-    {right && <FooterText>{right}</FooterText>}
+    <FooterLinks>
+      <FooterLink to="/privacy">Privacy</FooterLink>
+      <FooterLink to="/terms">Terms</FooterLink>
+      {right && <FooterText>{right}</FooterText>}
+    </FooterLinks>
   </FooterWrap>
 );

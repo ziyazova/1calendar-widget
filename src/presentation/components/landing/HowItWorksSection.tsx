@@ -113,7 +113,7 @@ export const HowItWorksSection: React.FC<HowItWorksProps> = ({ showTitle = true,
   <Section data-ux="How It Works">
     {showTitle && (
       <>
-        <SectionTitle>How it works.</SectionTitle>
+        <SectionTitle>How it works</SectionTitle>
         {/* subtitle removed */}
       </>
     )}

@@ -113,8 +113,8 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
         </NavGroup>
         <NavGroup>
           <NavTitle>Legal</NavTitle>
-          <NavLink>Privacy</NavLink>
-          <NavLink>Terms</NavLink>
+          <NavLink onClick={() => onNavigate('/privacy')}>Privacy</NavLink>
+          <NavLink onClick={() => onNavigate('/terms')}>Terms</NavLink>
         </NavGroup>
       </FooterNav>
     </FooterTop>

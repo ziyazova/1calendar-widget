@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Download, ExternalLink, Pencil, Trash2, LogOut, Search } from 'lucide-react';
+import { Plus, Download, ExternalLink, Pencil, Trash2, LogOut, Search, FileDown, AlertTriangle, KeyRound, Lock, Eye, EyeOff, CheckCircle2, Check, UserCircle, Sparkles as SparkIcon, Shield as ShieldIcon, ShieldAlert } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../ui/widgetConfig';
 import type { DashboardView } from '../ui/sidebar/Sidebar';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { WidgetStorageService, type SavedWidget } from '@/infrastructure/services/WidgetStorageService';
+import { AccountService } from '@/infrastructure/services/AccountService';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -425,9 +426,10 @@ const SaveBtn = styled.button`
 
 const PREVIEW_TIME = new Date(2026, 2, 25, 10, 42, 15);
 
-const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style }) => {
+const WidgetPreview: React.FC<{ type: string; style: string; savedSettings?: Record<string, unknown> }> = ({ type, style, savedSettings }) => {
+  const saved = (savedSettings || {}) as Record<string, unknown>;
   if (type === 'calendar') {
-    const settings = new CalendarSettings({ style: style as CalendarSettings['style'] });
+    const settings = new CalendarSettings({ ...saved, style: style as CalendarSettings['style'] });
     switch (style) {
       case 'classic': return <PreviewScale><ClassicCalendar settings={settings} /></PreviewScale>;
       case 'collage': return <PreviewScale><CollageCalendar settings={settings} /></PreviewScale>;
@@ -436,7 +438,7 @@ const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style 
     }
   }
   if (type === 'clock') {
-    const settings = new ClockSettings({ style: style as ClockSettings['style'] });
+    const settings = new ClockSettings({ ...saved, style: style as ClockSettings['style'] });
     const textColor = getContrastColor(settings.backgroundColor);
     switch (style) {
       case 'flower': return <ClockPreviewScale><FlowerClock settings={settings} time={PREVIEW_TIME} textColor={textColor} /></ClockPreviewScale>;
@@ -445,7 +447,7 @@ const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style 
     }
   }
   if (type === 'board') {
-    const settings = new BoardSettings({ layout: style as BoardSettings['layout'] });
+    const settings = new BoardSettings({ ...saved, layout: style as BoardSettings['layout'] });
     return <BoardPreviewScale><InspirationBoard settings={settings} /></BoardPreviewScale>;
   }
   return null;
@@ -970,6 +972,52 @@ const SettingsGroupTitle = styled.h3`
   margin: 0 0 20px;
 `;
 
+/* Minimalist Settings sections — no colourful badges, consistent typography. */
+
+const SectionBlock = styled.div<{ $danger?: boolean }>`
+  padding: 48px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+
+  &:first-of-type { padding-top: 24px; }
+  &:last-of-type { border-bottom: none; padding-bottom: 24px; }
+`;
+
+const SectionBlockHead = styled.div`
+  margin-bottom: 24px;
+`;
+
+const SectionBlockTitle = styled.h3`
+  font-size: 17px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+`;
+
+const SectionBlockSub = styled.p`
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+`;
+
+const SectionBlockBody = styled.div``;
+
+const SectionDivider = styled.div`
+  height: 1px;
+  background: rgba(0,0,0,0.05);
+  margin: 18px 0;
+`;
+
+const SettingsRowSplit = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+
+  > :last-child { flex-shrink: 0; }
+`;
+
 const SettingsRow = styled.div`
   display: flex;
   align-items: center;
@@ -1086,7 +1134,7 @@ const DashboardView: React.FC<{
               <BigCard key={w.id} $index={i}>
                 <BigCardPreview onClick={() => onEditWidget?.(w)}>
                   <BigCardLabel>{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</BigCardLabel>
-                  <WidgetPreview type={w.type} style={w.style} />
+                  <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                 </BigCardPreview>
                 <BigCardBottom>
                   <BigCardName>{w.name}</BigCardName>
@@ -1268,51 +1316,404 @@ const PurchasesView: React.FC = () => {
 
 const ProfileView: React.FC = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, supabaseUser, updatePassword } = useAuth();
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U';
+  const [exporting, setExporting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Change password modal
+  const [showPwModal, setShowPwModal] = useState(false);
+  const [newPw, setNewPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [pwSubmitting, setPwSubmitting] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+
+  // Detect if the user signed up with Google only (no password set).
+  // Providers array on the user includes 'email' for password accounts.
+  const hasPasswordLogin = Boolean(
+    supabaseUser?.identities?.some(i => i.provider === 'email')
+  );
+  const pwChecks = [
+    { label: 'At least 8 characters', met: newPw.length >= 8 },
+    { label: 'Contains a letter', met: /[a-zA-Z]/.test(newPw) },
+    { label: 'Contains a number', met: /\d/.test(newPw) },
+    { label: 'Passwords match', met: confirmPw.length > 0 && newPw === confirmPw },
+  ];
+  const pwValid = pwChecks.every(c => c.met);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const payload = await AccountService.buildExportPayload();
+      if (!payload) return;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const date = new Date().toISOString().slice(0, 10);
+      a.download = `peachy-export-${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    const err = await AccountService.deleteOwnAccount();
+    if (err) {
+      setDeleteError(err);
+      setDeleting(false);
+      return;
+    }
+    // Local auth state is refreshed by onAuthStateChange when signOut fires.
+    navigate('/');
+  };
 
   return (
     <Container>
       <Title>Settings</Title>
-      <Subtitle>Manage your account and subscription</Subtitle>
+      <Subtitle>Manage your account, security and subscription</Subtitle>
 
-      <SettingsGroup>
-        <SettingsGroupTitle>Profile</SettingsGroupTitle>
-        <SettingsRow>
-          <AvatarCircle style={{ width: 48, height: 48, fontSize: 16 }}>{initials}</AvatarCircle>
-          <div style={{ flex: 1 }}>
-            <SettingsRow style={{ marginBottom: 12 }}>
-              <SettingsLabel>Name</SettingsLabel>
-              <SettingsInput defaultValue={user?.name || ''} />
-            </SettingsRow>
-            <SettingsRow style={{ marginBottom: 0 }}>
-              <SettingsLabel>Email</SettingsLabel>
-              <SettingsInput defaultValue={user?.email || ''} readOnly />
-            </SettingsRow>
+      {/* Profile */}
+      <SectionBlock>
+        <SectionBlockHead>
+          <SectionBlockTitle>Profile</SectionBlockTitle>
+          <SectionBlockSub>Your name and email address</SectionBlockSub>
+        </SectionBlockHead>
+        <SectionBlockBody>
+          <SettingsRow style={{ marginBottom: 14 }}>
+            <SettingsLabel>Name</SettingsLabel>
+            <SettingsInput defaultValue={user?.name || ''} />
+          </SettingsRow>
+          <SettingsRow style={{ marginBottom: 0 }}>
+            <SettingsLabel>Email</SettingsLabel>
+            <SettingsInput defaultValue={user?.email || ''} readOnly />
+          </SettingsRow>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+            <ActionButton $primary>Save changes</ActionButton>
           </div>
-        </SettingsRow>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-          <ActionButton $primary>Save changes</ActionButton>
+        </SectionBlockBody>
+      </SectionBlock>
+
+      {/* Security */}
+      <SectionBlock>
+        <SectionBlockHead>
+          <SectionBlockTitle>Security</SectionBlockTitle>
+          <SectionBlockSub>Password and sign-in methods</SectionBlockSub>
+        </SectionBlockHead>
+        <SectionBlockBody>
+          <SettingsRowSplit>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Password</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4, lineHeight: 1.5 }}>
+                {hasPasswordLogin
+                  ? 'Change the password you use to sign in with email.'
+                  : "You signed up with Google, so there's no password on this account yet. Set one to also sign in with email."}
+              </div>
+            </div>
+            <ActionButton onClick={() => { setShowPwModal(true); setNewPw(''); setConfirmPw(''); setPwError(null); setPwSuccess(false); }}>
+              {hasPasswordLogin ? 'Change password' : 'Set a password'}
+            </ActionButton>
+          </SettingsRowSplit>
+        </SectionBlockBody>
+      </SectionBlock>
+
+      {/* Subscription */}
+      <SectionBlock>
+        <SectionBlockHead>
+          <SectionBlockTitle>Subscription</SectionBlockTitle>
+          <SectionBlockSub>Your current plan and billing</SectionBlockSub>
+        </SectionBlockHead>
+        <SectionBlockBody>
+          <SettingsRowSplit>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Free plan</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>3 widgets, basic customization</div>
+            </div>
+            <ActionButton $primary>Upgrade to Pro</ActionButton>
+          </SettingsRowSplit>
+        </SectionBlockBody>
+      </SectionBlock>
+
+      {/* Privacy & data */}
+      <SectionBlock>
+        <SectionBlockHead>
+          <SectionBlockTitle>Privacy &amp; data</SectionBlockTitle>
+          <SectionBlockSub>Export or review how we handle your data</SectionBlockSub>
+        </SectionBlockHead>
+        <SectionBlockBody>
+          <SettingsRowSplit>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Download my data</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Export your profile and saved widgets as a JSON file.</div>
+            </div>
+            <ActionButton onClick={handleExport} disabled={exporting}>
+              {exporting ? 'Preparing…' : 'Download JSON'}
+            </ActionButton>
+          </SettingsRowSplit>
+          <SectionDivider />
+          <SettingsRowSplit>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Privacy policy</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Read how we handle your data.</div>
+            </div>
+            <ActionButton onClick={() => navigate('/privacy')}>
+              Read policy
+            </ActionButton>
+          </SettingsRowSplit>
+        </SectionBlockBody>
+      </SectionBlock>
+
+      {/* Danger zone */}
+      <SectionBlock>
+        <SectionBlockHead>
+          <SectionBlockTitle style={{ color: '#B91C1C' }}>Danger zone</SectionBlockTitle>
+          <SectionBlockSub>Actions here cannot be undone. Proceed carefully.</SectionBlockSub>
+        </SectionBlockHead>
+        <SectionBlockBody>
+          <SettingsRowSplit>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Log out</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>End your session on this device.</div>
+            </div>
+            <ActionButton $danger onClick={async () => { await logout(); navigate('/'); }}>
+              Log out
+            </ActionButton>
+          </SettingsRowSplit>
+          <SectionDivider />
+          <SettingsRowSplit>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Delete account</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Permanently remove your profile and all widgets. This cannot be undone.</div>
+            </div>
+            <ActionButton $danger onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(''); setDeleteError(null); }}>
+              Delete account
+            </ActionButton>
+          </SettingsRowSplit>
+        </SectionBlockBody>
+      </SectionBlock>
+
+      {showPwModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            onClick={() => !pwSubmitting && setShowPwModal(false)}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+          />
+          <div style={{
+            position: 'relative', background: '#fff', borderRadius: 24, padding: '32px 28px 28px',
+            width: 440, maxWidth: '92vw',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
+          }}>
+            {pwSuccess ? (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 20, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em', marginBottom: 8 }}>
+                  Password updated
+                </div>
+                <div style={{ fontSize: 14, color: '#666', lineHeight: 1.5, marginBottom: 20 }}>
+                  You can use your new password the next time you sign in with email.
+                </div>
+                <button
+                  onClick={() => setShowPwModal(false)}
+                  style={{
+                    width: '100%', height: 44, background: '#1F1F1F', color: '#fff',
+                    border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 600,
+                    fontFamily: 'inherit', cursor: 'pointer',
+                  }}
+                >Done</button>
+              </div>
+            ) : (
+              <>
+                <div style={{ fontSize: 20, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em', marginBottom: 6 }}>
+                  {hasPasswordLogin ? 'Change password' : 'Set a password'}
+                </div>
+                <div style={{ fontSize: 14, color: '#777', lineHeight: 1.5, marginBottom: 18 }}>
+                  Choose a strong password you haven't used before.
+                </div>
+                {pwError && (
+                  <div style={{
+                    fontSize: 13, color: '#DC2828',
+                    background: 'rgba(220,40,40,0.06)',
+                    border: '1px solid rgba(220,40,40,0.15)',
+                    padding: '10px 12px', borderRadius: 10, marginBottom: 12,
+                  }}>{pwError}</div>
+                )}
+                <form onSubmit={async e => {
+                  e.preventDefault();
+                  setPwError(null);
+                  if (!pwValid) {
+                    setPwError('Password does not meet the requirements or does not match.');
+                    return;
+                  }
+                  setPwSubmitting(true);
+                  try {
+                    const err = await updatePassword(newPw);
+                    if (err) {
+                      setPwError(err.toLowerCase().includes('same as') ? 'New password must be different from your current one.' : err);
+                      return;
+                    }
+                    setPwSuccess(true);
+                  } finally {
+                    setPwSubmitting(false);
+                  }
+                }}>
+                  <div style={{ position: 'relative', marginBottom: 10 }}>
+                    <Lock style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#999' }} />
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      autoFocus
+                      placeholder="New password"
+                      value={newPw}
+                      onChange={e => setNewPw(e.target.value)}
+                      autoComplete="new-password"
+                      minLength={8}
+                      style={{
+                        width: '100%', height: 46, padding: '0 44px',
+                        border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
+                        fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
+                        background: '#FAFAFA', outline: 'none', boxSizing: 'border-box',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(!showPw)}
+                      style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: 0, display: 'flex' }}
+                    >
+                      {showPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
+                    </button>
+                  </div>
+                  <div style={{ position: 'relative', marginBottom: 12 }}>
+                    <Lock style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#999' }} />
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      placeholder="Confirm new password"
+                      value={confirmPw}
+                      onChange={e => setConfirmPw(e.target.value)}
+                      autoComplete="new-password"
+                      minLength={8}
+                      style={{
+                        width: '100%', height: 46, padding: '0 44px',
+                        border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
+                        fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
+                        background: '#FAFAFA', outline: 'none', boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+
+                  {newPw.length > 0 && (
+                    <div style={{
+                      padding: '10px 12px', background: 'rgba(0,0,0,0.02)',
+                      borderRadius: 10, marginBottom: 16,
+                      display: 'flex', flexDirection: 'column', gap: 4,
+                    }}>
+                      {pwChecks.map(c => (
+                        <div key={c.label} style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          fontSize: 12, color: c.met ? '#16A34A' : '#999',
+                        }}>
+                          {c.met
+                            ? <CheckCircle2 style={{ width: 12, height: 12 }} />
+                            : <Check style={{ width: 12, height: 12, opacity: 0.3 }} />}
+                          {c.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowPwModal(false)}
+                      disabled={pwSubmitting}
+                      style={{
+                        flex: 1, height: 44, background: '#fff', color: '#555',
+                        border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
+                        fontSize: 14, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer',
+                      }}
+                    >Cancel</button>
+                    <button
+                      type="submit"
+                      disabled={pwSubmitting || !pwValid}
+                      style={{
+                        flex: 1, height: 44, background: '#1F1F1F', color: '#fff',
+                        border: 'none', borderRadius: 12,
+                        fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
+                        opacity: (pwSubmitting || !pwValid) ? 0.5 : 1,
+                      }}
+                    >
+                      {pwSubmitting ? 'Updating…' : 'Update password'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
         </div>
-      </SettingsGroup>
+      )}
 
-      <SettingsGroup>
-        <SettingsGroupTitle>Subscription</SettingsGroupTitle>
-        <SettingsRow>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Free plan</div>
-            <div style={{ fontSize: 13, color: '#999', marginTop: 2 }}>3 widgets, basic customization</div>
+      {showDeleteConfirm && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            onClick={() => !deleting && setShowDeleteConfirm(false)}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+          />
+          <div style={{
+            position: 'relative', background: '#fff', borderRadius: 24, padding: '36px 32px 28px',
+            width: 460, maxWidth: '92vw',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
+          }}>
+            <div style={{ fontSize: 20, fontWeight: 600, color: '#B91C1C', letterSpacing: '-0.02em', marginBottom: 10 }}>
+              Delete account?
+            </div>
+            <div style={{ fontSize: 14, color: '#555', lineHeight: 1.55, marginBottom: 20 }}>
+              We'll permanently remove your profile and all saved widgets from our servers. You can always sign up again later with the same email.
+              To confirm, please type <strong>delete</strong> below.
+            </div>
+            <input
+              type="text"
+              autoFocus
+              value={deleteConfirmText}
+              onChange={e => setDeleteConfirmText(e.target.value)}
+              placeholder='Type "delete" to confirm'
+              style={{
+                width: '100%', height: 42, padding: '0 14px',
+                border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
+                background: '#FAFAFA', outline: 'none', marginBottom: deleteError ? 8 : 20,
+                boxSizing: 'border-box',
+              }}
+            />
+            {deleteError && (
+              <div style={{ fontSize: 12, color: '#DC2828', marginBottom: 16 }}>{deleteError}</div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <ActionButton onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
+                Cancel
+              </ActionButton>
+              <ActionButton
+                $danger
+                onClick={handleDelete}
+                disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
+                style={{
+                  background: '#DC2828', color: '#fff', borderColor: '#DC2828',
+                  opacity: (deleting || deleteConfirmText.trim().toLowerCase() !== 'delete') ? 0.5 : 1,
+                }}
+              >
+                <Trash2 /> {deleting ? 'Deleting…' : 'Delete forever'}
+              </ActionButton>
+            </div>
           </div>
-          <ActionButton $primary>Upgrade to Pro</ActionButton>
-        </SettingsRow>
-      </SettingsGroup>
-
-      <SettingsGroup>
-        <SettingsGroupTitle style={{ color: '#DC2828' }}>Danger zone</SettingsGroupTitle>
-        <ActionButton $danger onClick={async () => { await logout(); navigate('/'); }}>
-          <LogOut /> Log out
-        </ActionButton>
-      </SettingsGroup>
+        </div>
+      )}
     </Container>
   );
 };

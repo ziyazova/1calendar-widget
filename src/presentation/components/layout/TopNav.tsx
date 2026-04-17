@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, ChevronDown } from 'lucide-react';
+import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, ChevronDown, ArrowUpRight } from 'lucide-react';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
+import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 
 interface TopNavProps {
   logoPressed?: boolean;
@@ -441,22 +442,40 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
   const avatarRef = useRef<HTMLDivElement>(null);
   const cartRef = useRef<HTMLDivElement>(null);
   const { items, itemCount, removeItem } = useCart();
-  const { isLoggedIn, isRegistered, user, loginWithCode, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
+  const { open: openUpgrade } = useUpgradeModal();
   const isLanding = location.pathname === '/';
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
+  // Click-outside for the click-opened dropdowns (cart + account). Both open
+  // on click now — account was hover-only before, which made the two menus
+  // behave differently on desktop. Mobile cart uses a bottom sheet, which has
+  // its own backdrop, so we skip the listener there.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (cartRef.current && !cartRef.current.contains(target)) {
+      if (cartOpen && cartRef.current && !cartRef.current.contains(target)) {
         setCartOpen(false);
       }
+      if (avatarOpen && avatarRef.current && !avatarRef.current.contains(target)) {
+        setAvatarOpen(false);
+      }
     };
-    if (cartOpen && !isMobile) {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (cartOpen) setCartOpen(false);
+      if (avatarOpen) setAvatarOpen(false);
+    };
+    const needsListener = (cartOpen && !isMobile) || avatarOpen;
+    if (needsListener) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEsc);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [cartOpen, isMobile]);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [cartOpen, avatarOpen, isMobile]);
 
   const handleLogo = () => {
     setMenuOpen(false);
@@ -534,12 +553,19 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
             )}
           </CartWrap>}
           {isLoggedIn ? (
-            <div ref={avatarRef} style={{ position: 'relative' }}
-              onMouseEnter={() => setAvatarOpen(true)}
-              onMouseLeave={() => setAvatarOpen(false)}
-            >
+            <div ref={avatarRef} style={{ position: 'relative' }}>
               <div
-                onClick={() => navigate('/studio')}
+                onClick={() => setAvatarOpen(v => !v)}
+                role="button"
+                aria-haspopup="menu"
+                aria-expanded={avatarOpen}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setAvatarOpen(v => !v);
+                  }
+                }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
                   cursor: 'pointer',
@@ -552,15 +578,15 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               >
                 <div style={{
                   width: 32, height: 32, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                  background: 'linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700, color: '#fff',
                   flexShrink: 0, letterSpacing: '0.02em',
-                  boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
+                  boxShadow: '0 2px 8px rgba(255, 160, 140, 0.28)',
                 }}>
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#6366F1' : '#666', transition: 'color 0.2s' }}>Dashboard</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#1F1F1F' : '#666', transition: 'color 0.2s' }}>Dashboard</span>
                 <ChevronDown style={{ width: 14, height: 14, color: '#bbb', transition: 'transform 0.2s', transform: avatarOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
               </div>
               {avatarOpen && (
@@ -574,76 +600,112 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                   }}>
                     <style>{`@keyframes avatarDropIn { from { opacity: 0; transform: translateY(-10px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
 
-                    {/* User info — gradient header */}
+                    {/* User info — compact, no cheap inline pill anymore; Upgrade
+                        lives as a proper first-class menu item below. */}
                     <div style={{
-                      padding: '20px 20px 16px',
+                      padding: '16px 16px 14px',
                       background: 'linear-gradient(135deg, rgba(237,228,255,0.3) 0%, rgba(232,237,255,0.2) 100%)',
+                      borderBottom: '1px solid rgba(0,0,0,0.04)',
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{
-                          width: 40, height: 40, borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                          width: 36, height: 36, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 14, fontWeight: 700, color: '#fff', flexShrink: 0,
-                          boxShadow: '0 2px 8px rgba(99,102,241,0.3)',
+                          fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+                          boxShadow: '0 2px 8px rgba(255, 160, 140, 0.28)',
+                          letterSpacing: '0.02em',
                         }}>
                           {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.name || 'User'}</div>
-                          <div style={{ fontSize: 12, color: '#888', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.email || ''}</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#1F1F1F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.name || 'User'}</div>
+                          <div style={{ fontSize: 11.5, color: '#8E8E93', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.email || ''}</div>
                         </div>
-                      </div>
-                      {/* Plan badge */}
-                      <div style={{
-                        marginTop: 12, padding: '6px 12px', borderRadius: 8,
-                        background: '#fff', border: '1px solid rgba(0,0,0,0.06)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      }}>
-                        <span style={{ fontSize: 11, fontWeight: 500, color: '#999' }}>Free plan</span>
-                        <span style={{ fontSize: 10, fontWeight: 600, color: '#6366F1', cursor: 'pointer' }}
-                          onClick={() => { setAvatarOpen(false); navigate('/studio'); }}
-                        >Upgrade</span>
                       </div>
                     </div>
 
+                    {/* Upgrade to Pro — headline CTA in the menu */}
+                    <div style={{ padding: '8px 8px 4px' }}>
+                      <button
+                        onClick={() => { setAvatarOpen(false); openUpgrade(); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px',
+                          border: '1px solid rgba(99, 102, 241, 0.18)', cursor: 'pointer',
+                          background: 'linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%)',
+                          color: '#4F46E5', fontFamily: 'inherit', borderRadius: 10,
+                          fontSize: 12.5, fontWeight: 600, letterSpacing: '-0.005em',
+                          transition: 'transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.36)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.16)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.18)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <ArrowUpRight style={{ width: 14, height: 14, strokeWidth: 2, color: '#6366F1', flexShrink: 0 }} />
+                        <span style={{ flex: 1, textAlign: 'left' }}>Upgrade to Pro</span>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const,
+                          color: '#6366F1', background: 'rgba(255,255,255,0.65)',
+                          padding: '2px 6px', borderRadius: 4,
+                        }}>$4/mo</span>
+                      </button>
+                    </div>
+
                     {/* Menu items */}
-                    <div style={{ padding: '8px 8px' }}>
+                    <div style={{ padding: '4px 8px 8px' }}>
                       {[
                         { icon: Home, label: 'Dashboard', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
-                        { icon: Settings, label: 'Settings', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
+                        { icon: Settings, label: 'Settings', onClick: () => { setAvatarOpen(false); navigate('/settings'); } },
                       ].map(item => (
                         <button
                           key={item.label}
                           onClick={item.onClick}
                           style={{
-                            display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 14px',
-                            border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 500,
-                            color: '#333', fontFamily: 'inherit', borderRadius: 10, transition: 'background 0.1s',
+                            display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
+                            border: 'none', background: 'transparent', cursor: 'pointer',
+                            fontSize: 13, fontWeight: 500, color: '#1F1F1F',
+                            fontFamily: 'inherit', borderRadius: 9, transition: 'background 0.12s',
+                            letterSpacing: '-0.005em',
                           }}
-                          onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F5')}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.035)')}
                           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                         >
-                          <item.icon style={{ width: 16, height: 16, color: '#999' }} /> {item.label}
+                          <item.icon style={{ width: 15, height: 15, strokeWidth: 1.75, color: '#8E8E93', flexShrink: 0 }} />
+                          {item.label}
                         </button>
                       ))}
                     </div>
 
-                    <div style={{ height: 1, margin: '2px 16px', background: 'rgba(0,0,0,0.05)' }} />
+                    <div style={{ height: 1, margin: '0 12px', background: 'rgba(0,0,0,0.04)' }} />
 
-                    {/* Logout */}
+                    {/* Logout — peach hover, not red, per brand */}
                     <div style={{ padding: '8px 8px' }}>
                       <button
                         onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 14px',
-                          border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 14, fontWeight: 500,
-                          color: '#DC2828', fontFamily: 'inherit', borderRadius: 10, transition: 'background 0.1s',
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
+                          border: 'none', background: 'transparent', cursor: 'pointer',
+                          fontSize: 13, fontWeight: 500, color: '#8E8E93',
+                          fontFamily: 'inherit', borderRadius: 9,
+                          transition: 'background 0.12s, color 0.12s',
+                          letterSpacing: '-0.005em',
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#FEF2F2')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = 'rgba(255, 160, 110, 0.12)';
+                          e.currentTarget.style.color = '#B4623A';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.color = '#8E8E93';
+                        }}
                       >
-                        <LogOut style={{ width: 16, height: 16 }} /> Log out
+                        <LogOut style={{ width: 15, height: 15, strokeWidth: 1.75, flexShrink: 0 }} />
+                        Log out
                       </button>
                     </div>
                   </div>
@@ -651,7 +713,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               )}
             </div>
           ) : (
-            <NavCTA onClick={() => { loginWithCode('PEACHY2026'); navigate('/studio'); }}>Log in</NavCTA>
+            <NavCTA onClick={() => navigate('/login')}>Log in</NavCTA>
           )}
         </NavLinks>
         <MobileRight>

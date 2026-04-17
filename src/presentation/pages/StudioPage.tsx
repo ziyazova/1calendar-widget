@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2 } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -9,9 +9,11 @@ import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
+import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
+import { useUpgradeModal } from '../context/UpgradeModalContext';
 import { WidgetStorageService, type SavedWidget } from '../../infrastructure/services/WidgetStorageService';
 import { getContrastColor } from '../themes/colors';
 
@@ -291,9 +293,10 @@ const PURCHASES = [
   { id: 'p3', name: 'Student Planner', price: '$3.99', date: 'Mar 15, 2026', order: '#PY-1025', image: '/template-main.png', slug: 'student-planner' },
 ];
 
-const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style }) => {
+const WidgetPreview: React.FC<{ type: string; style: string; savedSettings?: Record<string, unknown> }> = ({ type, style, savedSettings }) => {
+  const saved = (savedSettings || {}) as Record<string, unknown>;
   if (type === 'calendar') {
-    const s = new CalendarSettings({ style: style as CalendarSettings['style'] });
+    const s = new CalendarSettings({ ...saved, style: style as CalendarSettings['style'] });
     switch (style) {
       case 'classic': return <PreviewScale><ClassicCalendar settings={s} /></PreviewScale>;
       case 'collage': return <PreviewScale><CollageCalendar settings={s} /></PreviewScale>;
@@ -302,7 +305,7 @@ const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style 
     }
   }
   if (type === 'clock') {
-    const s = new ClockSettings({ style: style as ClockSettings['style'] });
+    const s = new ClockSettings({ ...saved, style: style as ClockSettings['style'] });
     const tc = getContrastColor(s.backgroundColor);
     switch (style) {
       case 'flower': return <PreviewScale><FlowerClock settings={s} time={PREVIEW_TIME} textColor={tc} /></PreviewScale>;
@@ -311,7 +314,7 @@ const WidgetPreview: React.FC<{ type: string; style: string }> = ({ type, style 
     }
   }
   if (type === 'board') {
-    const s = new BoardSettings({ layout: style as BoardSettings['layout'] });
+    const s = new BoardSettings({ ...saved, layout: style as BoardSettings['layout'] });
     return <PreviewScale><InspirationBoard settings={s} /></PreviewScale>;
   }
   return null;
@@ -324,12 +327,13 @@ type StudioTab = 'widgets' | 'templates';
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isRegistered, user } = useAuth();
+  const { isRegistered, isGuest, user } = useAuth();
   const [tab, setTab] = useState<StudioTab>('widgets');
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [showUpgrade, setShowUpgrade] = useState(false);
+  const { open: openUpgrade } = useUpgradeModal();
+  const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
 
   // Editing state
   const [editingWidget, setEditingWidget] = useState<Widget | null>(null);
@@ -339,6 +343,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [studioZoom, setStudioZoom] = useState(1.2);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const lastSavedRef = useRef<string>('');
+  const savedStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Convert class-based settings instance into plain JSON-safe object for storage.
+  const serializeSettings = (widget: Widget): Record<string, unknown> =>
+    JSON.parse(JSON.stringify(widget.settings));
 
   // Local storage helpers for widget simulation
   const LOCAL_KEY = 'peachy_local_widgets';
@@ -386,16 +397,17 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           setEditingWidget(updated);
           setEditingWidgetKey(`${type}-${style}`);
           setEditingWidgetName(name);
-          // Auto-save locally on create
-          const newId = saveWidgetLocal(name, type, style);
-          setEditingWidgetId(newId || null);
+          setEditingWidgetId(null);
+          setSaveStatus('idle');
+          // Reset saved fingerprint so the first auto-save creates the record.
+          lastSavedRef.current = '';
           setEditorOpen(true);
         } catch (err) {
           Logger.error('StudioPage', 'Failed to create widget from nav state', err);
         }
       })();
     }
-  }, [location.state, diContainer]);
+  }, [location.state, diContainer, isRegistered]);
 
   // Save widget locally (simulation)
   const saveWidgetLocal = (name: string, type: string, style: string, settings: Record<string, unknown> = {}, editId?: string) => {
@@ -423,6 +435,57 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
   };
 
+  // Persist current editing widget — to Supabase for registered users, localStorage for guests.
+  const persist = useCallback(async (widget: Widget, name: string) => {
+    const settings = serializeSettings(widget);
+    const style = editingWidgetKey.split('-').slice(1).join('-');
+
+    if (savedStatusTimerRef.current) clearTimeout(savedStatusTimerRef.current);
+    setSaveStatus('saving');
+
+    try {
+      if (isRegistered) {
+        if (editingWidgetId) {
+          const ok = await WidgetStorageService.updateWidget(editingWidgetId, { name, settings });
+          if (!ok) throw new Error('update failed');
+        } else {
+          const saved = await WidgetStorageService.saveWidget({ name, type: widget.type, style, settings });
+          if (!saved) throw new Error('insert failed');
+          setEditingWidgetId(saved.id);
+        }
+        // Refresh list in background — don't block save status UI.
+        WidgetStorageService.getUserWidgets().then(setWidgets).catch(() => { /* ignore */ });
+      } else {
+        if (editingWidgetId) {
+          saveWidgetLocal(name, widget.type, style, settings, editingWidgetId);
+        } else {
+          const newId = saveWidgetLocal(name, widget.type, style, settings);
+          if (newId) setEditingWidgetId(newId);
+        }
+      }
+      setSaveStatus('saved');
+      savedStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 1800);
+    } catch (err) {
+      Logger.error('StudioPage', 'Auto-save failed', err);
+      setSaveStatus('error');
+      savedStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  }, [isRegistered, editingWidgetId, editingWidgetKey]);
+
+  // Debounced auto-save: fires 1.5s after the last settings or name change while editor is open.
+  useEffect(() => {
+    if (!editorOpen || !editingWidget) return;
+    const fingerprint = JSON.stringify(serializeSettings(editingWidget)) + '|' + editingWidgetName;
+    if (fingerprint === lastSavedRef.current) return;
+
+    const timer = setTimeout(() => {
+      persist(editingWidget, editingWidgetName);
+      lastSavedRef.current = fingerprint;
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [editingWidget, editingWidgetName, editorOpen, persist]);
+
   const handleDelete = async (id: string) => {
     if (isRegistered) {
       await WidgetStorageService.deleteWidget(id);
@@ -436,18 +499,22 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const handleEdit = async (w: SavedWidget) => {
     try {
       const widget = await diContainer.createWidgetUseCase.execute(w.type);
+      const savedSettings = (w.settings || {}) as Record<string, unknown>;
       let updated;
       if (w.type === 'calendar') {
-        updated = widget.updateSettings(new CalendarSettings({ style: w.style as CalendarSettings['style'] }));
+        updated = widget.updateSettings(new CalendarSettings({ ...savedSettings, style: w.style as CalendarSettings['style'] }));
       } else if (w.type === 'clock') {
-        updated = widget.updateSettings(new ClockSettings({ style: w.style as ClockSettings['style'] }));
+        updated = widget.updateSettings(new ClockSettings({ ...savedSettings, style: w.style as ClockSettings['style'] }));
       } else {
-        updated = widget.updateSettings(new BoardSettings({ layout: w.style as BoardSettings['layout'] }));
+        updated = widget.updateSettings(new BoardSettings({ ...savedSettings, layout: w.style as BoardSettings['layout'] }));
       }
       setEditingWidget(updated);
       setEditingWidgetKey(`${w.type}-${w.style}`);
       setEditingWidgetId(w.id);
       setEditingWidgetName(w.name);
+      setSaveStatus('idle');
+      // Mark current state as saved so the first debounced auto-save does not re-fire on open.
+      lastSavedRef.current = JSON.stringify(serializeSettings(updated)) + '|' + w.name;
       setEditorOpen(true);
     } catch (err) {
       Logger.error('StudioPage', 'Failed to load widget for editing', err);
@@ -455,11 +522,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   };
 
   const handleEditorBack = () => {
-    // Save on exit
-    if (editingWidgetId && editingWidget) {
-      const type = editingWidget.type;
-      const style = editingWidgetKey.split('-').slice(1).join('-');
-      saveWidgetLocal(editingWidgetName, type, style, {}, editingWidgetId);
+    // Flush any pending auto-save on exit so the user never loses unsaved edits.
+    if (editingWidget) {
+      const fingerprint = JSON.stringify(serializeSettings(editingWidget)) + '|' + editingWidgetName;
+      if (fingerprint !== lastSavedRef.current) {
+        persist(editingWidget, editingWidgetName);
+        lastSavedRef.current = fingerprint;
+      }
     }
     setEditorOpen(false);
     setEditingWidgetId(null);
@@ -488,6 +557,22 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             <span style={{ fontSize: 15, fontWeight: 600, color: '#6366F1', letterSpacing: '-0.02em' }}>
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
+            {/* Save status — mirrors Figma/Notion auto-save indicator */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              height: 28, padding: '0 10px', borderRadius: 8,
+              background: saveStatus === 'error' ? 'rgba(220,40,40,0.08)' : 'rgba(0,0,0,0.04)',
+              color: saveStatus === 'error' ? '#DC2828' : saveStatus === 'saved' ? '#16A34A' : '#888',
+              fontSize: 12, fontWeight: 500, letterSpacing: '-0.01em',
+              opacity: saveStatus === 'idle' ? 0 : 1,
+              transition: 'opacity 0.2s ease, color 0.2s ease, background 0.2s ease',
+              minWidth: 84, justifyContent: 'center',
+            }}>
+              {saveStatus === 'saving' && (<><Loader2 style={{ width: 12, height: 12, animation: 'spin 1s linear infinite' }} /> Saving…</>)}
+              {saveStatus === 'saved' && (<><Check style={{ width: 12, height: 12 }} /> Saved</>)}
+              {saveStatus === 'error' && (<><Cloud style={{ width: 12, height: 12 }} /> Retry…</>)}
+            </div>
+            <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
           </div>
           {/* Status + Upgrade — right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -504,7 +589,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </svg>
               <span style={{ fontSize: 12, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length}/3</span>
             </div>
-            <button onClick={() => setShowUpgrade(true)} style={{
+            <button onClick={() => openUpgrade()} style={{
               display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 16px',
               border: 'none', borderRadius: 10,
               background: 'linear-gradient(135deg, #6366F1, #818CF8)',
@@ -591,7 +676,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               }}
               widgetCount={widgets.length}
               widgetLimit={3}
-              onUpgrade={() => setShowUpgrade(true)}
+              onUpgrade={() => openUpgrade()}
             />
           </div>
         </div>
@@ -602,6 +687,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   return (
     <Page>
       <TopNav activeLink="studio" />
+      <EmailVerificationBanner />
 
       <Container>
         {/* Welcome */}
@@ -629,7 +715,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </svg>
               <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
             </div>
-            <button onClick={() => setShowUpgrade(true)} style={{
+            <button onClick={() => openUpgrade()} style={{
               fontSize: 14, fontWeight: 600, color: '#fff',
               background: 'linear-gradient(135deg, #6366F1, #818CF8)',
               padding: '10px 28px', borderRadius: 12,
@@ -695,7 +781,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   <WidgetCard key={w.id} $i={i}>
                     <WidgetPreviewWrap onClick={() => handleEdit(w)}>
                       <WidgetLabel>{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</WidgetLabel>
-                      <WidgetPreview type={w.type} style={w.style} />
+                      <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                     </WidgetPreviewWrap>
                     <WidgetBottom>
                       <WidgetName>{w.name}</WidgetName>
@@ -763,85 +849,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         )}
       </Container>
 
-      {/* Upgrade Modal */}
-      {showUpgrade && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div onClick={() => setShowUpgrade(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }} />
-          <div style={{
-            position: 'relative', background: '#fff', borderRadius: 28, padding: '48px 40px 40px',
-            width: 620, maxWidth: '92vw',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
-            animation: 'modalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
-          }}>
-            <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
-            <button onClick={() => setShowUpgrade(false)} style={{
-              position: 'absolute', top: 20, right: 20, width: 36, height: 36, border: 'none',
-              background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer', fontSize: 20, color: '#bbb',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
-            }}>×</button>
-
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: 36 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg, #6366F1, #818CF8)', marginBottom: 16, boxShadow: '0 4px 16px rgba(99,102,241,0.25)' }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" /></svg>
-              </div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
-              <div style={{ fontSize: 15, color: '#999', marginTop: 8, lineHeight: 1.5 }}>Unlock all styles and unlimited widgets</div>
-            </div>
-
-            {/* Plans */}
-            <div style={{ display: 'grid', gridTemplateColumns: '5fr 6fr', gap: 16, alignItems: 'stretch' }}>
-              {/* Free */}
-              <div style={{
-                border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 20, padding: '28px 24px',
-                display: 'flex', flexDirection: 'column' as const,
-              }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#bbb', marginBottom: 12, textTransform: 'uppercase' as const, letterSpacing: '0.05em', minHeight: 27, display: 'flex', alignItems: 'center' }}>Free</div>
-                <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</div>
-                <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>forever</div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column' as const, gap: 14, flex: 1 }}>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> 3 widgets</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Basic widget types</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Limited customization</li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> Embed in Notion</li>
-                </ul>
-                <button onClick={() => setShowUpgrade(false)} style={{
-                  marginTop: 28, width: '100%', height: 46, border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 14,
-                  background: '#fff', color: '#555', fontSize: 14, fontWeight: 600,
-                  fontFamily: 'inherit', cursor: 'pointer', transition: 'all 0.15s',
-                }}>Current plan</button>
-              </div>
-
-              {/* Pro */}
-              <div style={{
-                border: '1.5px solid rgba(99,102,241,0.2)', borderRadius: 20, padding: '28px 24px',
-                background: 'linear-gradient(160deg, rgba(99,102,241,0.04) 0%, rgba(236,72,153,0.03) 100%)',
-                display: 'flex', flexDirection: 'column' as const, position: 'relative',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Pro</div>
-                  <div style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 20 }}>Popular</div>
-                </div>
-                <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$4</div>
-                <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>/month</div>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#444', display: 'flex', flexDirection: 'column' as const, gap: 14, flex: 1 }}>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Unlimited widgets</strong></li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>All widget types</strong></li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Full customization</strong></li>
-                  <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Exclusive styles</strong></li>
-                </ul>
-                <button style={{
-                  marginTop: 28, width: '100%', height: 46, border: 'none', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff', fontSize: 14, fontWeight: 600,
-                  fontFamily: 'inherit', cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                  transition: 'all 0.15s',
-                }}>Get Pro</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Upgrade modal is rendered globally via UpgradeModalProvider (see App.tsx). */}
     </Page>
   );
 };

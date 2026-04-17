@@ -795,8 +795,7 @@ export const TemplateDetailPage: React.FC = () => {
 
             {/* Carousel */}
             <CarouselWrap style={{ background: 'linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%)' }}>
-              <CarouselImage src={template.image} alt={`Preview ${activeSlide + 1}`} />
-              <CarouselLabel>Preview {activeSlide + 1}</CarouselLabel>
+              <CarouselImage src={template.image} alt={template.title} />
               <CarouselBtn $side="left" onClick={() => setActiveSlide(i => i > 0 ? i - 1 : slides.length - 1)}>
                 <ChevronLeft />
               </CarouselBtn>
@@ -805,11 +804,13 @@ export const TemplateDetailPage: React.FC = () => {
               </CarouselBtn>
             </CarouselWrap>
 
+            {/* Thumbnails hidden until real images are added
             <Thumbnails>
               {slides.map(i => (
                 <Thumb key={i} $active={activeSlide === i} onClick={() => setActiveSlide(i)} />
               ))}
             </Thumbnails>
+            */}
           </TopSection>
 
           <BottomSection>
