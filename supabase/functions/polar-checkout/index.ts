@@ -34,9 +34,11 @@ Deno.serve(async (req: Request) => {
   }
 
   const POLAR_ACCESS_TOKEN = Deno.env.get('POLAR_ACCESS_TOKEN');
-  const POLAR_PRO_PRICE_ID = Deno.env.get('POLAR_PRO_PRICE_ID');
+  // Kept the env var name for backwards-compat; we now pass it as a product id
+  // via the new `products: [id]` field which the current Polar API expects.
+  const POLAR_PRO_ID = Deno.env.get('POLAR_PRO_PRICE_ID');
   const APP_BASE_URL = Deno.env.get('APP_BASE_URL');
-  if (!POLAR_ACCESS_TOKEN || !POLAR_PRO_PRICE_ID || !APP_BASE_URL) {
+  if (!POLAR_ACCESS_TOKEN || !POLAR_PRO_ID || !APP_BASE_URL) {
     return json({ error: 'missing_env' }, 500);
   }
 
@@ -59,7 +61,7 @@ Deno.serve(async (req: Request) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      product_price_id: POLAR_PRO_PRICE_ID,
+      products: [POLAR_PRO_ID],
       customer_email: user.email,
       success_url: `${APP_BASE_URL}/settings?upgraded=1`,
       metadata: {

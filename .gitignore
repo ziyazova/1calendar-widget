@@ -189,3 +189,4 @@ bundle-report.html
 # yarn.lock
 # pnpm-lock.yaml 
 .npm-cache/
+.vercel
