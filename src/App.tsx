@@ -71,36 +71,37 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyles />
         <AuthProvider>
-        <UpgradeModalProvider>
         <CartProvider>
           <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <ScrollToTop />
-            <DebugOverlay />
-            <PageTransition>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/widgets" element={<WidgetStudioPage />} />
-                <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
-                <Route path="/templates" element={<TemplatesPage />} />
-                <Route path="/templates/:id" element={<TemplateDetailPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
-                <Route path="/embed/clock" element={<ClockEmbedPage />} />
-                <Route path="/embed/board" element={<BoardEmbedPage />} />
-                <Route path="/dev" element={<DesignSystemPage />} />
-                <Route path="/privacy" element={<PrivacyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/verify-email" element={<VerifyEmailPage />} />
-                <Route path="*" element={<LandingPage />} />
-              </Routes>
-            </PageTransition>
-            <ConsentBanner />
+            {/* UpgradeModalProvider needs Router context (uses useNavigate), so it sits inside <Router>. */}
+            <UpgradeModalProvider>
+              <ScrollToTop />
+              <DebugOverlay />
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/widgets" element={<WidgetStudioPage />} />
+                  <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
+                  <Route path="/templates" element={<TemplatesPage />} />
+                  <Route path="/templates/:id" element={<TemplateDetailPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
+                  <Route path="/embed/clock" element={<ClockEmbedPage />} />
+                  <Route path="/embed/board" element={<BoardEmbedPage />} />
+                  <Route path="/dev" element={<DesignSystemPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="/verify-email" element={<VerifyEmailPage />} />
+                  <Route path="*" element={<LandingPage />} />
+                </Routes>
+              </PageTransition>
+              <ConsentBanner />
+            </UpgradeModalProvider>
           </Router>
         </CartProvider>
-        </UpgradeModalProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
