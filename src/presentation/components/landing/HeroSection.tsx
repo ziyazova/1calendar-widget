@@ -242,7 +242,7 @@ const TrustRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 16px;
   margin-top: 32px;
   font-size: 13px;
   color: rgba(60, 60, 75, 0.38);
@@ -258,7 +258,7 @@ const TrustRow = styled.div`
 const TrustItem = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 `;
 
 const TrustDot = styled.span`

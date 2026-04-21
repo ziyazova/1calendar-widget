@@ -388,7 +388,7 @@ const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }
   flex: 1;
   min-width: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px;
+  gap: 4px;
   height: 48px;
   border: none;
   background: ${({ $active, $disabled }) =>

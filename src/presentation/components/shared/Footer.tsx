@@ -29,7 +29,7 @@ const FooterText = styled.span`
 const FooterLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   flex-wrap: wrap;
 
   @media (max-width: 540px) {

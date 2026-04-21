@@ -2127,7 +2127,7 @@ const TestimonialCardDemo = styled.div`
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(43, 35, 32, 0.06);
   border-radius: 20px;
-  padding: 22px;
+  padding: 24px;
   box-shadow: 0 2px 6px rgba(43, 35, 32, 0.04), 0 12px 28px -16px rgba(43, 35, 32, 0.1);
 `;
 

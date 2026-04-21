@@ -88,7 +88,7 @@ const PinTextTitle = styled.div`
 
   @media (max-width: 768px) {
     font-size: 13px;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
   }
 `;
 

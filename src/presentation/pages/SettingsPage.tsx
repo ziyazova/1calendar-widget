@@ -174,7 +174,7 @@ const Section = styled.section`
 const SectionHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   margin-bottom: 16px;
 `;
 

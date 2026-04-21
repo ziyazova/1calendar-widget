@@ -133,7 +133,7 @@ const Card = styled.div`
 
 const Stars = styled.div`
   display: flex;
-  gap: 3px;
+  gap: 4px;
   margin-bottom: 14px;
   color: #F5A623;
   font-size: 12px;

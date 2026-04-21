@@ -137,7 +137,7 @@ const P = styled.p`
 
 const List = styled.ul`
   margin: 4px 0 14px;
-  padding-left: 22px;
+  padding-left: 24px;
 
   li {
     font-size: 14px;

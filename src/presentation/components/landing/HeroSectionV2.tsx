@@ -233,7 +233,7 @@ const SecondaryBtn = styled(BtnBase)`
 const Meta = styled.div`
   margin-top: 32px;
   display: flex;
-  gap: 22px;
+  gap: 24px;
   flex-wrap: wrap;
   justify-content: center;
   font-size: 13px;

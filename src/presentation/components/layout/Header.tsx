@@ -43,7 +43,7 @@ const TabGroup = styled.div`
   align-items: center;
   background: rgba(0, 0, 0, 0.04);
   border-radius: 12px;
-  padding: 3px;
+  padding: 4px;
   gap: 2px;
 `;
 
