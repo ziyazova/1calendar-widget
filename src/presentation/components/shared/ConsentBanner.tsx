@@ -21,7 +21,7 @@ const Wrap = styled.div`
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
   padding: 16px 18px;
   display: flex;
@@ -80,7 +80,7 @@ const AcceptBtn = styled.button`
   height: 34px;
   padding: 0 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #1F1F1F;
   color: #fff;
   font-size: 13px;

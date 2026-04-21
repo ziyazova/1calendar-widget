@@ -68,7 +68,7 @@ const CategoryChip = styled.div<{ $color: string }>`
     content: '';
     width: 8px;
     height: 8px;
-    border-radius: 3px;
+    border-radius: 4px;
     background: ${({ $color }) => $color};
     flex-shrink: 0;
     transition: transform 0.25s ease;

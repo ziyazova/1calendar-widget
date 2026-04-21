@@ -182,7 +182,7 @@ const BtnBase = styled.button`
   align-items: center;
   gap: 10px;
   padding: 17px 26px;
-  border-radius: 14px;
+  border-radius: 16px;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -452,7 +452,7 @@ const TaskRow = styled.div<{ $done?: boolean }>`
 const Checkbox = styled.div<{ $on?: boolean }>`
   width: 14px;
   height: 14px;
-  border-radius: 2.5px;
+  border-radius: 4px;
   border: 1.2px solid ${({ $on }) => ($on ? '#7B9FD1' : '#E2DED5')};
   background: ${({ $on }) => ($on ? '#7B9FD1' : '#fff')};
   flex-shrink: 0;
@@ -503,7 +503,7 @@ const HabitName = styled.div`
   .ic {
     width: 12px;
     height: 12px;
-    border-radius: 2.5px;
+    border-radius: 4px;
     background: #F7F2EC;
     display: flex;
     align-items: center;
@@ -530,7 +530,7 @@ const Ticks = styled.div`
   i {
     width: 14px;
     height: 14px;
-    border-radius: 2.5px;
+    border-radius: 4px;
     background: #F1ECE4;
     display: block;
     position: relative;

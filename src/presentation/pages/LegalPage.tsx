@@ -115,7 +115,7 @@ const SectionHead = styled.div`
 const SectionIcon = styled.div`
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.5));
   display: flex;
   align-items: center;

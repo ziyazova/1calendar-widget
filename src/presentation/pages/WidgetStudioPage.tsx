@@ -70,7 +70,7 @@ const HeroIcons = styled.div`
 const HeroIcon = styled.div<{ $delay: string }>`
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 16px;
 
   @media (max-width: 768px) {
     width: 40px;
@@ -125,7 +125,7 @@ const HeroButton = styled.button`
   background: #2B2320;
   color: #ffffff;
   border: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -158,7 +158,7 @@ const EmailInput = styled.input`
   height: 52px;
   padding: 0 18px;
   border: 1px solid rgba(26, 22, 19, 0.14);
-  border-radius: 14px;
+  border-radius: 16px;
   font-size: 14px;
   font-family: inherit;
   color: #2B2320;
@@ -481,7 +481,7 @@ const CustomizeBtn = styled.button<{ $pro?: boolean }>`
   color: ${({ $pro }) => $pro ? '#2B2320' : '#fff'};
   background: ${({ $pro }) => $pro ? 'transparent' : '#2B2320'};
   border: 1px solid ${({ $pro }) => $pro ? '#2B2320' : 'transparent'};
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
@@ -867,7 +867,7 @@ export const WidgetStudioPage: React.FC = () => {
               <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
               <button onClick={() => setNameModal(null)} style={{
                 position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
-                background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
+                background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer', fontSize: 18, color: '#999',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>×</button>
               <div style={{ fontSize: 11, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: 8 }}>

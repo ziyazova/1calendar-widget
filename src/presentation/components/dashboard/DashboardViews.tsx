@@ -228,7 +228,7 @@ const OverlayBtn = styled.button<{ $danger?: boolean }>`
   padding: 0 18px;
   background: ${({ $danger }) => $danger ? 'rgba(220, 40, 40, 0.9)' : 'rgba(255, 255, 255, 0.95)'};
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -247,7 +247,7 @@ const OverlayBtn = styled.button<{ $danger?: boolean }>`
 
 const AddCard = styled.div`
   border: 2px dashed rgba(51, 132, 244, 0.25);
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -702,7 +702,7 @@ const CreateCard = styled.button<{ $bg: string }>`
   padding: 20px;
   background: ${({ $bg }) => $bg};
   border: 1.5px solid rgba(0,0,0,0.04);
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
@@ -903,7 +903,7 @@ const PurchaseCard = styled.div`
   padding: 16px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 14px;
+  border-radius: 16px;
   transition: all 0.15s;
 
   &:hover {
@@ -917,7 +917,7 @@ const PurchaseCard = styled.div`
 const PurchaseImg = styled.div`
   width: 56px;
   height: 56px;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   background: #F5F5F5;
   flex-shrink: 0;
@@ -1034,7 +1034,7 @@ const SettingsInput = styled.input`
   height: 40px;
   padding: 0 14px;
   border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
   color: #1F1F1F;
@@ -1605,7 +1605,7 @@ const ProfileView: React.FC = () => {
                     fontSize: 13, color: '#DC2828',
                     background: 'rgba(220,40,40,0.06)',
                     border: '1px solid rgba(220,40,40,0.15)',
-                    padding: '10px 12px', borderRadius: 10, marginBottom: 12,
+                    padding: '10px 12px', borderRadius: 12, marginBottom: 12,
                   }}>{pwError}</div>
                 )}
                 <form onSubmit={async e => {
@@ -1673,7 +1673,7 @@ const ProfileView: React.FC = () => {
                   {newPw.length > 0 && (
                     <div style={{
                       padding: '10px 12px', background: 'rgba(0,0,0,0.02)',
-                      borderRadius: 10, marginBottom: 16,
+                      borderRadius: 12, marginBottom: 16,
                       display: 'flex', flexDirection: 'column', gap: 4,
                     }}>
                       {pwChecks.map(c => (
@@ -1747,7 +1747,7 @@ const ProfileView: React.FC = () => {
               placeholder='Type "delete" to confirm'
               style={{
                 width: '100%', height: 42, padding: '0 14px',
-                border: '1px solid rgba(0,0,0,0.1)', borderRadius: 10,
+                border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
                 fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
                 background: '#FAFAFA', outline: 'none', marginBottom: deleteError ? 8 : 20,
                 boxSizing: 'border-box',

@@ -143,7 +143,7 @@ const Bar = styled.div`
   font-size: 12px;
   z-index: 2147483645;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   width: 220px;
   animation: ${slideIn} 0.25s ease-out;

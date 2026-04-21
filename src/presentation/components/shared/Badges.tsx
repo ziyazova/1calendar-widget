@@ -13,8 +13,8 @@ import styled from 'styled-components';
     solid with hairline inner highlight, used at most once per screen.
 */
 
-// Brand accent — project's #6E7FF2 (softer than #6366F1 vivid).
-export const BADGE_ACCENT = '#6E7FF2';
+// Brand accent — project's #6366F1 (softer than #6366F1 vivid).
+export const BADGE_ACCENT = '#6366F1';
 export const BADGE_ACCENT_SOFT_BG = 'rgba(110, 127, 242, 0.1)';
 export const BADGE_ACCENT_TEXT = '#4F57C9';
 

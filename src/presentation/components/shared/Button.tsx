@@ -180,7 +180,7 @@ const xsStyles = css`
 const smStyles = css`
   height: 32px;
   padding: 0 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 12px;
   svg { width: 14px; height: 14px; }
 `;
@@ -188,7 +188,7 @@ const smStyles = css`
 const mdStyles = css`
   height: 36px;
   padding: 0 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 13px;
   svg { width: 14px; height: 14px; }
 `;

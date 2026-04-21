@@ -593,7 +593,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 <>
                   <div style={{
                     position: 'absolute', top: 'calc(100% + 10px)', right: -8, zIndex: 100,
-                    background: '#fff', borderRadius: 18, border: '1px solid rgba(0,0,0,0.05)',
+                    background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)',
                     boxShadow: '0 16px 48px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04)',
                     padding: 0, minWidth: 240, overflow: 'hidden',
                     animation: 'avatarDropIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
@@ -630,7 +630,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                       <div style={{ padding: '8px 8px 4px' }}>
                         <div style={{
                           display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px',
-                          borderRadius: 10,
+                          borderRadius: 12,
                           background: 'linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%)',
                           border: '1px solid rgba(99, 102, 241, 0.18)',
                         }}>
@@ -654,7 +654,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                           display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px',
                           border: '1px solid rgba(99, 102, 241, 0.18)', cursor: 'pointer',
                           background: 'linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%)',
-                          color: '#4F46E5', fontFamily: 'inherit', borderRadius: 10,
+                          color: '#4F46E5', fontFamily: 'inherit', borderRadius: 12,
                           fontSize: 12.5, fontWeight: 600, letterSpacing: '-0.005em',
                           transition: 'transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease',
                         }}
@@ -690,7 +690,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                             display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
                             border: 'none', background: 'transparent', cursor: 'pointer',
                             fontSize: 13, fontWeight: 500, color: '#1F1F1F',
-                            fontFamily: 'inherit', borderRadius: 9, transition: 'background 0.12s',
+                            fontFamily: 'inherit', borderRadius: 8, transition: 'background 0.12s',
                             letterSpacing: '-0.005em',
                           }}
                           onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.035)')}
@@ -712,7 +712,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                           display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
                           border: 'none', background: 'transparent', cursor: 'pointer',
                           fontSize: 13, fontWeight: 500, color: '#8E8E93',
-                          fontFamily: 'inherit', borderRadius: 9,
+                          fontFamily: 'inherit', borderRadius: 8,
                           transition: 'background 0.12s, color 0.12s',
                           letterSpacing: '-0.005em',
                         }}

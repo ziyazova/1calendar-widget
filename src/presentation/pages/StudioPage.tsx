@@ -74,7 +74,7 @@ const Tab = styled.button<{ $active: boolean }>`
   height: 40px;
   padding: 0 28px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
@@ -270,7 +270,7 @@ const PurchaseCard = styled.div`
   padding: 16px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.15s;
   &:hover { border-color: rgba(0,0,0,0.1); box-shadow: 0 2px 12px rgba(0,0,0,0.03); }
@@ -278,7 +278,7 @@ const PurchaseCard = styled.div`
 `;
 
 const PurchaseImg = styled.div`
-  width: 56px; height: 56px; border-radius: 10px; overflow: hidden; background: #F5F5F5; flex-shrink: 0;
+  width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: #F5F5F5; flex-shrink: 0;
   img { width: 100%; height: 100%; object-fit: cover; }
 `;
 
@@ -305,7 +305,7 @@ const MobileBackBtn = styled.button`
   display: flex; align-items: center; justify-content: center;
   width: 36px; height: 36px;
   border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
   color: #555;
   cursor: pointer;
@@ -332,7 +332,7 @@ const MobileCopyBtn = styled.button<{ $copied: boolean }>`
   height: 36px;
   padding: 0 14px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: ${({ $copied }) => $copied ? '#22C55E' : 'linear-gradient(135deg, #3384F4, #5BA0F7)'};
   color: #fff;
   font-size: 13px;
@@ -396,7 +396,7 @@ const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }
   color: ${({ $active, $disabled }) =>
     $disabled ? '#C8C8C8' : $active ? '#3384F4' : '#777'};
   opacity: ${({ $disabled }) => $disabled ? 0.55 : 1};
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
   font-family: inherit;
@@ -440,7 +440,7 @@ const MobileSheetHandle = styled.div`
   &::after {
     content: '';
     width: 40px; height: 5px;
-    border-radius: 3px;
+    border-radius: 4px;
     background: rgba(0,0,0,0.15);
   }
 `;
@@ -929,7 +929,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button onClick={handleEditorBack} style={{
               display: 'flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
-              border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, background: '#fff',
+              border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, background: '#fff',
               fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: '#555', cursor: 'pointer',
               transition: 'all 0.15s',
             }}>
@@ -981,7 +981,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 </div>
                 <button onClick={() => openUpgrade()} style={{
                   display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 16px',
-                  border: 'none', borderRadius: 10,
+                  border: 'none', borderRadius: 12,
                   background: 'linear-gradient(135deg, #6366F1, #818CF8)',
                   fontSize: 13, fontWeight: 600, fontFamily: 'inherit', color: '#fff', cursor: 'pointer',
                   transition: 'all 0.15s',
@@ -1043,7 +1043,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               }} onClick={e => (e.target as HTMLInputElement).select()} />
               <button onClick={() => { navigator.clipboard.writeText(embedUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); }} style={{
                 display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 18px',
-                border: 'none', borderRadius: 10,
+                border: 'none', borderRadius: 12,
                 background: copied ? '#22C55E' : 'linear-gradient(135deg, #3384F4, #5BA0F7)',
                 color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
                 cursor: 'pointer', boxShadow: copied ? '0 2px 8px rgba(34,197,94,0.3)' : '0 2px 8px rgba(51,132,244,0.3)',
@@ -1150,7 +1150,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           {planLoading ? null : isPro ? (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              background: '#FAFAFA', borderRadius: 14, padding: '10px 16px',
+              background: '#FAFAFA', borderRadius: 16, padding: '10px 16px',
               border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
             }}>
               <span style={{
@@ -1167,7 +1167,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           ) : (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 16,
-              background: '#FAFAFA', borderRadius: 14, padding: '10px 16px',
+              background: '#FAFAFA', borderRadius: 16, padding: '10px 16px',
               border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

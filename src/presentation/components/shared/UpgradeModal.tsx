@@ -67,7 +67,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 48, height: 48, borderRadius: 14,
+            width: 48, height: 48, borderRadius: 16,
             background: 'linear-gradient(135deg, #6366F1, #818CF8)',
             marginBottom: 16, boxShadow: '0 4px 16px rgba(99,102,241,0.25)',
           }}>
@@ -92,7 +92,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
             </ul>
             <button
               onClick={onClose}
-              style={{ marginTop: 28, width: '100%', height: 46, border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 14, background: '#fff', color: '#555', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}
+              style={{ marginTop: 28, width: '100%', height: 46, border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: 16, background: '#fff', color: '#555', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}
             >
               Current plan
             </button>
@@ -118,7 +118,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
               onClick={handleGetPro}
               disabled={submitting}
               style={{
-                marginTop: 28, width: '100%', height: 46, border: 'none', borderRadius: 14,
+                marginTop: 28, width: '100%', height: 46, border: 'none', borderRadius: 16,
                 background: 'linear-gradient(135deg, #1F1F1F, #333)', color: '#fff',
                 fontSize: 14, fontWeight: 600, fontFamily: 'inherit',
                 cursor: submitting ? 'default' : 'pointer',

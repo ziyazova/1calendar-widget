@@ -185,7 +185,7 @@ const RequirementsList = styled.div`
   gap: 4px;
   padding: 10px 12px;
   background: rgba(0,0,0,0.02);
-  border-radius: 10px;
+  border-radius: 12px;
   margin-top: -4px;
 `;
 
@@ -213,7 +213,7 @@ const ConfirmCard = styled.div`
 const ConfirmIcon = styled.div`
   width: 64px;
   height: 64px;
-  border-radius: 18px;
+  border-radius: 16px;
   background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08));
   display: flex;
   align-items: center;
@@ -589,7 +589,7 @@ export const LoginPage: React.FC = () => {
             fontSize: 12, color: '#555',
             background: 'rgba(99,102,241,0.06)',
             border: '1px solid rgba(99,102,241,0.15)',
-            padding: '10px 12px', borderRadius: 10, marginBottom: 8, lineHeight: 1.5,
+            padding: '10px 12px', borderRadius: 12, marginBottom: 8, lineHeight: 1.5,
           }}>
             Did you sign up with Google? This email may not have a password set. Try{' '}
             <button

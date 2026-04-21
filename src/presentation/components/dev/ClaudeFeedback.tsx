@@ -468,7 +468,7 @@ const DevPanel = styled.div`
   font-size: 12px;
   z-index: 2147483600;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   animation: ${slideInPanel} 0.28s ease-out;
 `;
@@ -570,7 +570,7 @@ const HoverBox = styled.div`
   top: 0;
   left: 0;
   pointer-events: none;
-  border: 2px solid #6E7FF2;
+  border: 2px solid #6366F1;
   background: rgba(110, 127, 242, 0.12);
   border-radius: 4px;
   z-index: 2147483500;
@@ -645,7 +645,7 @@ const TargetInfo = styled.div`
   margin-bottom: 12px;
   font-size: 12px;
   code {
-    color: #6E7FF2;
+    color: #6366F1;
     font-family: ui-monospace, monospace;
     word-break: break-all;
   }
@@ -692,17 +692,17 @@ const Chip = styled.button<{ $active: boolean }>`
   gap: 4px;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid ${({ $active }) => ($active ? '#6E7FF2' : '#ddd')};
+  border: 1px solid ${({ $active }) => ($active ? '#6366F1' : '#ddd')};
   background: ${({ $active }) => ($active ? 'rgba(110,127,242,0.12)' : '#fff')};
-  color: ${({ $active }) => ($active ? '#6E7FF2' : '#666')};
+  color: ${({ $active }) => ($active ? '#6366F1' : '#666')};
   font-size: 12px;
   font-family: inherit;
   font-weight: ${({ $active }) => ($active ? 600 : 500)};
   cursor: pointer;
   transition: all 0.12s ease;
   &:hover {
-    border-color: #6E7FF2;
-    color: #6E7FF2;
+    border-color: #6366F1;
+    color: #6366F1;
   }
 `;
 
@@ -717,7 +717,7 @@ const Textarea = styled.textarea`
   resize: vertical;
   outline: none;
   box-sizing: border-box;
-  &:focus { border-color: #6E7FF2; }
+  &:focus { border-color: #6366F1; }
 `;
 
 const PanelFooter = styled.div`
@@ -774,7 +774,7 @@ const CommentList = styled.div`
 const CommentRow = styled.div<{ $status: Status }>`
   border: 1px solid ${({ $status }) => ($status === 'fixed' ? '#10b981' : '#eee')};
   background: ${({ $status }) => ($status === 'fixed' ? 'rgba(16, 185, 129, 0.05)' : '#fff')};
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px 12px;
   font-size: 13px;
 `;
@@ -801,7 +801,7 @@ const RowTarget = styled.div`
   font-size: 11px;
   margin-bottom: 6px;
   code {
-    color: #6E7FF2;
+    color: #6366F1;
     font-family: ui-monospace, monospace;
     word-break: break-all;
   }
@@ -832,8 +832,8 @@ const GhostBtn = styled.button<{ $danger?: boolean }>`
   font-family: inherit;
   cursor: pointer;
   &:hover {
-    border-color: ${({ $danger }) => ($danger ? '#ef4444' : '#6E7FF2')};
-    color: ${({ $danger }) => ($danger ? '#ef4444' : '#6E7FF2')};
+    border-color: ${({ $danger }) => ($danger ? '#ef4444' : '#6366F1')};
+    color: ${({ $danger }) => ($danger ? '#ef4444' : '#6366F1')};
   }
 `;
 

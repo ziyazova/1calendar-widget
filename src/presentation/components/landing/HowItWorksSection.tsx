@@ -77,7 +77,7 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
   z-index: 1;
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 16px;
   background: ${({ $bg }) => $bg};
   display: flex;
   align-items: center;

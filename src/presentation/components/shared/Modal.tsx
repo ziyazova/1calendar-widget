@@ -101,7 +101,7 @@ const CloseBtn = styled.button`
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
   background: transparent;
   color: ${({ theme }) => theme.colors.text.body};

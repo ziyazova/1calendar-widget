@@ -112,7 +112,7 @@ export function PlanUpgradeBar({
           style={{
             width: 32,
             height: 32,
-            borderRadius: 10,
+            borderRadius: 12,
             background: 'linear-gradient(135deg, #6366F1, #818CF8)',
             display: 'inline-flex',
             alignItems: 'center',

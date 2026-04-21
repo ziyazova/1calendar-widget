@@ -24,7 +24,7 @@ const DebugTooltip = styled.div<{ $locked?: boolean }>`
   font-size: 11px;
   font-family: 'SF Mono', 'Fira Code', monospace;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   z-index: 99999;
   pointer-events: ${({ $locked }) => $locked ? 'auto' : 'none'};
   max-width: 600px;
@@ -156,7 +156,7 @@ const RedlineLabel = styled.span<{ $color?: string }>`
   font-weight: 600;
   font-family: 'SF Mono', monospace;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: 4px;
   white-space: nowrap;
   line-height: 14px;
 `;

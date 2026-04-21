@@ -1104,7 +1104,7 @@ const CustomizeBtnDemo = styled.button<{ $pro?: boolean }>`
   color: ${({ $pro }) => $pro ? '#2B2320' : '#fff'};
   background: ${({ $pro }) => $pro ? 'transparent' : '#2B2320'};
   border: 1px solid ${({ $pro }) => $pro ? '#2B2320' : 'transparent'};
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
@@ -1175,7 +1175,7 @@ const DropdownRowUpgrade = styled.button`
   background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
   color: #4F46E5;
   font-family: inherit;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.005em;
@@ -1225,7 +1225,7 @@ const AvatarDropdownFull = styled.div`
   width: 260px;
   max-width: 100%;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.04);
   overflow: hidden;
@@ -1287,7 +1287,7 @@ const DropdownMenuItem = styled.button`
   font-size: 13px;
   font-weight: 500;
   color: #1F1F1F;
-  border-radius: 9px;
+  border-radius: 8px;
   letter-spacing: -0.005em;
   transition: background 0.12s;
 
@@ -1315,7 +1315,7 @@ const DropdownLogoutItem = styled.button`
   font-size: 13px;
   font-weight: 500;
   color: #8E8E93;
-  border-radius: 9px;
+  border-radius: 8px;
   letter-spacing: -0.005em;
   transition: background 0.12s, color 0.12s;
 
@@ -1331,7 +1331,7 @@ const DropdownPlanRow = styled.div`
   gap: 10px;
   width: 100%;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
   border: 1px solid rgba(99, 102, 241, 0.18);
 `;
@@ -1372,7 +1372,7 @@ const CategoryChipDemo = styled.div<{ $color: string }>`
     content: '';
     width: 8px;
     height: 8px;
-    border-radius: 3px;
+    border-radius: 4px;
     background: ${({ $color }) => $color};
     flex-shrink: 0;
   }
@@ -1487,7 +1487,7 @@ const SocialBadgeText = styled.span`
 const GlassStage = styled.div`
   background: ${({ theme }) => theme.colors.background.mesh};
   padding: 24px 20px;
-  border-radius: 14px;
+  border-radius: 16px;
   display: inline-flex;
   gap: 16px;
   flex-wrap: wrap;
@@ -1631,7 +1631,7 @@ const AcceptBtnDemo = styled.button`
   height: 34px;
   padding: 0 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #1F1F1F;
   color: #fff;
   font-size: 13px;
@@ -1673,7 +1673,7 @@ const OverlayBtnDemo = styled.button<{ $danger?: boolean }>`
   padding: 0 18px;
   background: ${({ $danger }) => ($danger ? 'rgba(220, 40, 40, 0.9)' : 'rgba(255, 255, 255, 0.95)')};
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -1693,7 +1693,7 @@ const OverlayBtnDemo = styled.button<{ $danger?: boolean }>`
 const OverlayStage = styled.div`
   background: linear-gradient(135deg, #4a3a55 0%, #5a4258 40%, #6b4846 100%);
   padding: 18px 20px;
-  border-radius: 14px;
+  border-radius: 16px;
   display: inline-flex;
   gap: 10px;
 `;
@@ -1799,7 +1799,7 @@ const ModalCompare = styled.div`
 const PlanCol = styled.div<{ $highlight?: boolean }>`
   position: relative;
   padding: 16px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid ${({ $highlight }) => $highlight ? '#6366F1' : 'rgba(0,0,0,0.08)'};
   background: ${({ $highlight }) => $highlight ? 'linear-gradient(180deg, #F4F3FF, #fff)' : '#fff'};
 `;
@@ -1850,12 +1850,12 @@ const ModalInput = styled.input`
   height: 42px;
   padding: 0 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
   margin-bottom: 16px;
   outline: none;
-  &:focus { border-color: #6E7FF2; }
+  &:focus { border-color: #6366F1; }
 `;
 
 const ModalActions = styled.div`
@@ -1914,7 +1914,7 @@ const VerifyBar = styled.div`
   padding: 12px 20px;
   background: linear-gradient(180deg, #FFF4E6, #FFE8CE);
   border: 1px solid rgba(244, 166, 114, 0.3);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 13px;
   color: #5C3D20;
 
@@ -2116,7 +2116,7 @@ const PricingCardDemo = styled.div<{ $highlighted?: boolean }>`
   position: relative;
   width: 220px;
   padding: 24px;
-  border-radius: 18px;
+  border-radius: 16px;
   background: #fff;
   border: 1px solid ${({ $highlighted }) => $highlighted ? '#6366F1' : 'rgba(0,0,0,0.08)'};
   box-shadow: ${({ $highlighted }) => $highlighted ? '0 6px 32px rgba(100, 80, 200, 0.1)' : '0 1px 3px rgba(0,0,0,0.04)'};
@@ -2179,36 +2179,36 @@ const FormInput = styled.input`
   height: 42px;
   padding: 0 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  &:focus { border-color: #6E7FF2; }
+  &:focus { border-color: #6366F1; }
 `;
 
 const FormTextarea = styled.textarea`
   padding: 10px 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
   outline: none;
   resize: vertical;
-  &:focus { border-color: #6E7FF2; }
+  &:focus { border-color: #6366F1; }
 `;
 
 const FormSelect = styled.select`
   height: 42px;
   padding: 0 14px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
   outline: none;
   background: #fff;
   cursor: pointer;
   max-width: 280px;
-  &:focus { border-color: #6E7FF2; }
+  &:focus { border-color: #6366F1; }
 `;
 
 const FormHint = styled.span`
@@ -2219,7 +2219,7 @@ const FormHint = styled.span`
 
 const FormRange = styled.input`
   width: 100%;
-  accent-color: #6E7FF2;
+  accent-color: #6366F1;
 `;
 
 const CheckboxRow = styled.label`
@@ -2235,7 +2235,7 @@ const FormCheckbox = styled.input`
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #6E7FF2;
+  accent-color: #6366F1;
 `;
 
 const ColorSwatchDemo = styled.button<{ $color: string; $active?: boolean }>`
@@ -2266,7 +2266,7 @@ const DropdownButton = styled.button`
   gap: 8px;
   height: 40px;
   padding: 0 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid rgba(31, 31, 31, 0.1);
   background: #fff;
   color: ${({ theme }) => theme.colors.text.primary};
@@ -3222,7 +3222,7 @@ export const DesignSystemPage: React.FC = () => {
                   </ComponentFrameHeader>
                   <ColorPickerMini>
                     <ColorSwatch $color="#3384F4" />
-                    <ColorSwatch $color="#6E7FF2" />
+                    <ColorSwatch $color="#6366F1" />
                     <ColorSwatch $color="#7C63B8" />
                     <ColorSwatch $color="#E89A78" />
                     <ColorHexInput>#3384F4</ColorHexInput>
@@ -3858,7 +3858,7 @@ export const DesignSystemPage: React.FC = () => {
                     <ComponentFrameUsage>Customization panel color selectors</ComponentFrameUsage>
                   </ComponentFrameHeader>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    {['#6E7FF2', '#7C63B8', '#E89A78', '#F4A672', '#7FA96B', '#3B82F6'].map((c, i) => (
+                    {['#6366F1', '#7C63B8', '#E89A78', '#F4A672', '#7FA96B', '#3B82F6'].map((c, i) => (
                       <ColorSwatchDemo key={c} $color={c} $active={i === 0} data-ux={`Demo ColorSwatch ${c}`} />
                     ))}
                   </div>

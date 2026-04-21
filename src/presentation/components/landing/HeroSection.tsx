@@ -217,7 +217,7 @@ const HeroSubtitle = styled.p`
 
 const HeroPrimary = styled(PrimaryButton)`
   height: 48px;
-  border-radius: 14px;
+  border-radius: 16px;
   background: #1A1A1E;
   padding: 0 26px;
   font-size: 14px;
@@ -279,7 +279,7 @@ const GhostButton = styled.button`
   background: #ffffff;
   color: ${({ theme }) => theme.colors.text.primary};
   border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: 14px;
+  border-radius: 16px;
   font-size: 14px;
   font-weight: 500;
   font-family: inherit;

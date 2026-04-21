@@ -392,7 +392,7 @@ const MobilePickerHandleArea = styled.div`
 const MobilePickerHandle = styled.div`
   width: 40px;
   height: 5px;
-  border-radius: 3px;
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.15);
 `;
 

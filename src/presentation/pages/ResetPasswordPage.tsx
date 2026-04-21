@@ -128,7 +128,7 @@ const RequirementsList = styled.div`
   gap: 4px;
   padding: 10px 12px;
   background: rgba(0,0,0,0.02);
-  border-radius: 10px;
+  border-radius: 12px;
 `;
 
 const Requirement = styled.div<{ $met: boolean }>`
@@ -147,7 +147,7 @@ const ErrorText = styled.div`
   background: rgba(220,40,40,0.06);
   border: 1px solid rgba(220,40,40,0.15);
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 8px;
 `;
 

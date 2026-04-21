@@ -181,7 +181,7 @@ const SectionHeader = styled.div`
 const SectionIcon = styled.div`
   width: 34px;
   height: 34px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #F5F5F2;
   display: flex;
   align-items: center;
@@ -231,7 +231,7 @@ const Input = styled.input`
   height: 38px;
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 10px;
+  border-radius: 12px;
   background: #FAFAFA;
   font-size: 13px;
   font-family: inherit;
@@ -307,7 +307,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' | 'danger' | 'dang
   gap: 6px;
   height: 32px;
   padding: 0 12px;
-  border-radius: 9px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -459,7 +459,7 @@ const ModalInput = styled.input`
 
 const PwChecks = styled.div`
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px 12px;
   margin-bottom: 16px;
   display: flex;
@@ -483,7 +483,7 @@ const ErrorText = styled.div`
   background: rgba(220, 40, 40, 0.06);
   border: 1px solid rgba(220, 40, 40, 0.15);
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 12px;
 `;
 

@@ -287,7 +287,7 @@ const ToggleText = styled.span`
 const ToggleSwitch = styled.div<{ $checked: boolean }>`
   width: 40px;
   height: 22px;
-  border-radius: 11px;
+  border-radius: 12px;
   background: ${({ $checked }) => $checked
     ? 'linear-gradient(135deg, #3384F4, #5BA0F7)'
     : 'rgba(0, 0, 0, 0.08)'};
@@ -312,7 +312,7 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
   @media (max-width: 768px) {
     width: 46px;
     height: 26px;
-    border-radius: 13px;
+    border-radius: 12px;
 
     &::after {
       width: 22px;
@@ -620,7 +620,7 @@ const LayoutOptions = styled.div`
 const CompactOptions = styled.div`
   width: 96px;
   height: 27px;
-  border-radius: 14px;
+  border-radius: 16px;
   background: rgba(0, 0, 0, 0.08);
   border: none;
   box-shadow: ${({ theme }) => theme.shadows.form};

@@ -180,7 +180,7 @@ const CardList = styled.div`
 const CardOuter = styled.div<{ $active: boolean; $index: number }>`
   position: relative;
   border: 1.5px solid ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.06)'};
-  border-radius: 14px;
+  border-radius: 16px;
   background: #ffffff;
   overflow: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -268,7 +268,7 @@ const EditButton = styled.button`
   height: 34px;
   padding: 0 18px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.95);
   color: #1F1F1F;
   font-size: 13px;
@@ -297,7 +297,7 @@ const LockedButton = styled.button`
   height: 34px;
   padding: 0 18px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.95);
   color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: 13px;
@@ -443,7 +443,7 @@ const ModalCancelBtn = styled.button`
   height: 40px;
   padding: 0 20px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(0, 0, 0, 0.05);
   color: #6B6B6B;
   font-size: 14px;
@@ -459,7 +459,7 @@ const ModalConfirmBtn = styled.button`
   height: 40px;
   padding: 0 24px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #1F1F1F;
   color: #fff;
   font-size: 14px;

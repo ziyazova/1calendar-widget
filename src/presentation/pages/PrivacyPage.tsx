@@ -110,7 +110,7 @@ const SectionHead = styled.div`
 const SectionIcon = styled.div`
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.5));
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@ const List = styled.ul`
 const FactCard = styled.div<{ $accent?: 'purple' | 'green' | 'blue' }>`
   margin: 16px 0 4px;
   padding: 18px 20px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid ${({ $accent }) =>
     $accent === 'green' ? 'rgba(34,197,94,0.18)' :
     $accent === 'blue' ? 'rgba(51,132,244,0.18)' :

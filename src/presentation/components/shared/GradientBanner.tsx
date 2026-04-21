@@ -87,7 +87,7 @@ export const BannerIcon = styled.div<{ $tone?: BannerTone }>`
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
