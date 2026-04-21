@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, CreditCard, Trash2 } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper } from '@/presentation/components/shared';
+import { PageWrapper, Button, Card } from '@/presentation/components/shared';
 import { useCart } from '@/presentation/context/CartContext';
 
 const Content = styled.div`
@@ -18,25 +18,6 @@ const Content = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['12']};
   }
-`;
-
-const BackBtn = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  padding: 0;
-  margin-bottom: ${({ theme }) => theme.spacing['6']};
-  transition: color ${({ theme }) => theme.transitions.fast};
-
-  svg { width: 14px; height: 14px; }
-
-  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 const Title = styled.h1`
@@ -241,22 +222,6 @@ const PromoInput = styled.input`
   &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
 `;
 
-const PromoBtn = styled.button`
-  height: 40px;
-  padding: 0 ${({ theme }) => theme.spacing['4']};
-  background: ${({ theme }) => theme.colors.background.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: inherit;
-  color: ${({ theme }) => theme.colors.text.primary};
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.fast};
-
-  &:hover { background: ${({ theme }) => theme.colors.interactive.hover}; }
-`;
-
 const SummaryFooter = styled.div`
   padding: ${({ theme }) => theme.spacing['5']};
   border-top: 1px solid ${({ theme }) => theme.colors.border.light};
@@ -275,31 +240,6 @@ const SummaryRow = styled.div<{ $bold?: boolean }>`
 
 const SummaryLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.tertiary};
-`;
-
-const PayBtn = styled.button`
-  width: 100%;
-  height: 52px;
-  margin-top: ${({ theme }) => theme.spacing['4']};
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #fff;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${({ theme }) => theme.spacing['2']};
-  letter-spacing: -0.01em;
-  transition: all ${({ theme }) => theme.transitions.base};
-
-  svg { width: 16px; height: 16px; }
-
-  &:hover { background: #333; }
-  &:active { transform: scale(0.99); }
 `;
 
 const SecureNote = styled.div`
@@ -368,22 +308,6 @@ const EmptyState = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.base};
 `;
 
-const EmptyBtn = styled.button`
-  margin-top: ${({ theme }) => theme.spacing['4']};
-  height: 44px;
-  padding: 0 ${({ theme }) => theme.spacing['6']};
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #fff;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: inherit;
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.base};
-
-  &:hover { background: #333; }
-`;
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -403,7 +327,14 @@ export const CheckoutPage: React.FC = () => {
           <EmptyState>
             Your cart is empty
             <br />
-            <EmptyBtn onClick={() => navigate('/templates')}>Browse Templates</EmptyBtn>
+            <Button
+              $variant="primary"
+              $size="lg"
+              onClick={() => navigate('/templates')}
+              style={{ marginTop: 16 }}
+            >
+              Browse Templates
+            </Button>
           </EmptyState>
         </Content>
       </PageWrapper>
@@ -415,9 +346,14 @@ export const CheckoutPage: React.FC = () => {
       <TopNav logoSub="Checkout" />
 
       <Content>
-        <BackBtn onClick={() => navigate(-1)}>
+        <Button
+          $variant="ghost"
+          $size="sm"
+          onClick={() => navigate(-1)}
+          style={{ marginBottom: 24 }}
+        >
           <ArrowLeft /> Back
-        </BackBtn>
+        </Button>
         <Title>Checkout</Title>
 
         <TwoCol>
@@ -491,7 +427,7 @@ export const CheckoutPage: React.FC = () => {
               ))}
               <PromoWrap>
                 <PromoInput placeholder="Promo code" />
-                <PromoBtn>Apply</PromoBtn>
+                <Button $variant="secondary" $size="md">Apply</Button>
               </PromoWrap>
               <SummaryFooter>
                 <SummaryRow>
@@ -506,9 +442,14 @@ export const CheckoutPage: React.FC = () => {
                   <span>Total</span>
                   <span>{subtotal === 0 ? 'Free' : `$${subtotal.toFixed(2)}`}</span>
                 </SummaryRow>
-                <PayBtn>
+                <Button
+                  $variant="primary"
+                  $size="xl"
+                  $fullWidth
+                  style={{ marginTop: 16 }}
+                >
                   <Lock /> {subtotal === 0 ? 'Get for Free' : `Pay $${subtotal.toFixed(2)}`}
-                </PayBtn>
+                </Button>
                 <SecureNote>
                   <Lock /> Secure checkout powered by Stripe
                 </SecureNote>
