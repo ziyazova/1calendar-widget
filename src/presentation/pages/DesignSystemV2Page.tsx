@@ -74,18 +74,20 @@ export const DesignSystemV2Page: React.FC = () => {
             {ALL_SIZES.length} sizes — all used in the app.
           </SectionMeta>
         </SectionHeader>
-        <Row>
-          {ALL_SIZES.map((s) => (
-            <SizeCol key={s}>
-              <Button $variant="primary" $size={s}>Button</Button>
-              <SizeCaption>
-                <b>{s}</b> · {buttonSizeTokens[s].height}
-                <br />
-                <small>{sizeUsage(s)}</small>
-              </SizeCaption>
-            </SizeCol>
-          ))}
-        </Row>
+        <SurfaceCard>
+          <SizeRow>
+            {ALL_SIZES.map((s) => (
+              <SizeCol key={s}>
+                <Button $variant="primary" $size={s}>Button</Button>
+                <SizeCaption>
+                  <b>{s}</b> · {buttonSizeTokens[s].height}
+                  <br />
+                  <small>{sizeUsage(s)}</small>
+                </SizeCaption>
+              </SizeCol>
+            ))}
+          </SizeRow>
+        </SurfaceCard>
       </Section>
 
       {/* ─────── Options ─────── */}
@@ -94,14 +96,16 @@ export const DesignSystemV2Page: React.FC = () => {
           <SectionTitle>Options</SectionTitle>
           <SectionMeta>Icons · pill · icon-only · disabled.</SectionMeta>
         </SectionHeader>
-        <Row>
-          <Button $variant="primary" $size="md"><Plus /> Create</Button>
-          <Button $variant="outline" $size="md">Continue <ArrowRight /></Button>
-          <Button $variant="accent" $size="md" $pill>pill</Button>
-          <Button $variant="outline" $size="md" $iconOnly aria-label="Copy"><Copy /></Button>
-          <Button $variant="danger" $size="md" $iconOnly aria-label="Delete"><Trash2 /></Button>
-          <Button $variant="primary" $size="md" disabled>disabled</Button>
-        </Row>
+        <SurfaceCard>
+          <Row>
+            <Button $variant="primary" $size="md"><Plus /> Create</Button>
+            <Button $variant="outline" $size="md">Continue <ArrowRight /></Button>
+            <Button $variant="accent" $size="md" $pill>pill</Button>
+            <Button $variant="outline" $size="md" $iconOnly aria-label="Copy"><Copy /></Button>
+            <Button $variant="danger" $size="md" $iconOnly aria-label="Delete"><Trash2 /></Button>
+            <Button $variant="primary" $size="md" disabled>disabled</Button>
+          </Row>
+        </SurfaceCard>
       </Section>
 
       {/* ─────── Patterns ─────── */}
@@ -249,7 +253,7 @@ export const DesignSystemV2Page: React.FC = () => {
           </SectionMeta>
         </SectionHeader>
 
-        <SubSection>
+        <SurfaceCard>
           <FilterRow>
             {['all', 'planners', 'student', 'wellness', 'finance', 'focus'].map((c) => (
               <FilterChip
@@ -261,7 +265,7 @@ export const DesignSystemV2Page: React.FC = () => {
               </FilterChip>
             ))}
           </FilterRow>
-        </SubSection>
+        </SurfaceCard>
       </Section>
 
       {/* ─────── How to edit ─────── */}
@@ -370,16 +374,16 @@ const Page = styled.div`
   color: ${({ theme }) => theme.colors.text.primary};
   min-height: 100vh;
   font-family: ${({ theme }) => theme.typography.fonts.primary};
-  padding: 48px 48px 120px;
+  padding: 64px 48px 140px;
 
   @media (max-width: 900px) {
-    padding: 32px 24px 80px;
+    padding: 40px 20px 80px;
   }
 `;
 
 const Hero = styled.header`
   max-width: 1100px;
-  margin: 0 auto 64px;
+  margin: 0 auto 80px;
 `;
 
 const Pill = styled.div`
@@ -392,7 +396,7 @@ const Pill = styled.div`
   font-weight: 500;
   letter-spacing: 0.04em;
   color: ${({ theme }) => theme.colors.text.body};
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 
   code {
     font-family: inherit;
@@ -402,10 +406,10 @@ const Pill = styled.div`
 `;
 
 const H1 = styled.h1`
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 600;
   letter-spacing: -0.03em;
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   line-height: 1.05;
 
   @media (max-width: 900px) {
@@ -415,9 +419,9 @@ const H1 = styled.h1`
 
 const Lead = styled.p`
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: ${({ theme }) => theme.colors.text.body};
-  max-width: 720px;
+  max-width: 640px;
   margin: 0;
 
   code {
@@ -433,25 +437,27 @@ const Lead = styled.p`
 
 const Section = styled.section`
   max-width: 1100px;
-  margin: 0 auto 72px;
+  margin: 0 auto 80px;
 `;
 
 const SectionHeader = styled.div`
   margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 24px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0 0 6px;
 `;
 
 const SectionMeta = styled.div`
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-size: 15px;
+  line-height: 1.55;
+  color: ${({ theme }) => theme.colors.text.body};
+  max-width: 640px;
 
   code {
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
@@ -459,32 +465,53 @@ const SectionMeta = styled.div`
     padding: 1px 5px;
     border-radius: 5px;
     font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 12px;
+    font-size: 13px;
     color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
+/* Surface card — used to group related demos (Options, Sizes, each Pattern).
+   Gives every block a clean, bounded shape so the page stops feeling like a
+   loose stream of rows. */
+const SurfaceCard = styled.div`
+  padding: 28px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 16px;
+
+  @media (max-width: 900px) {
+    padding: 20px;
+  }
+`;
+
 const SubSection = styled.div`
-  margin-top: 32px;
+  padding: 24px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 14px;
+
+  & + & { margin-top: 16px; }
+
+  @media (max-width: 900px) {
+    padding: 18px;
+  }
 `;
 
 const SubTitle = styled.h3`
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0 0 6px;
 
   code {
     font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 12px;
+    font-size: 13px;
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
     padding: 1px 5px;
     border-radius: 4px;
     color: ${({ theme }) => theme.colors.text.primary};
-    text-transform: none;
-    letter-spacing: 0;
+    font-weight: 500;
   }
 `;
 
@@ -499,7 +526,7 @@ const PatternMeta = styled.p`
   font-size: 13px;
   line-height: 1.55;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: -4px 0 14px;
+  margin: 0 0 18px;
   max-width: 640px;
 
   code {
@@ -696,17 +723,25 @@ const SegmentItem = styled.button<{ $active?: boolean }>`
 const VariantGallery = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  gap: 14px;
 `;
 
 const VariantTile = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px 18px;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 20px 18px;
   background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 12px;
+  border-radius: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.border.medium};
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
 `;
 
 const VariantTileMeta = styled.div`
@@ -728,17 +763,24 @@ const VariantMeta = styled.div`
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
-/* ── Size column (button + caption stacked) ── */
+/* ── Size row (all 4 sizes across one baseline) ── */
+
+const SizeRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 32px 40px;
+`;
 
 const SizeCol = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
 `;
 
 const SizeCaption = styled.div`
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
   color: ${({ theme }) => theme.colors.text.tertiary};
 
@@ -749,7 +791,7 @@ const SizeCaption = styled.div`
   }
 
   small {
-    font-size: 10px;
+    font-size: 11px;
   }
 `;
 
@@ -757,17 +799,18 @@ const SizeCaption = styled.div`
 
 const Tip = styled.div`
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 20px;
-  padding: 16px 20px;
-  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  padding: 18px 22px;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: 12px;
-  margin-bottom: 8px;
+
+  & + & { margin-top: 10px; }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: 6px;
   }
 `;
 
@@ -775,17 +818,18 @@ const TipKey = styled.div`
   font-size: 13px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.01em;
 `;
 
 const TipVal = styled.div`
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: ${({ theme }) => theme.colors.text.body};
 
   code {
     font-family: ui-monospace, SFMono-Regular, monospace;
     font-size: 12px;
-    background: ${({ theme }) => theme.colors.background.elevated};
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
     border: 1px solid ${({ theme }) => theme.colors.border.light};
     padding: 1px 5px;
     border-radius: 4px;
