@@ -45,6 +45,7 @@ interface AuthContextType {
   hasGoogleLogin: boolean;
   plan: Plan;
   isPro: boolean;
+  planLoading: boolean;
   refreshPlan: () => Promise<void>;
 }
 
@@ -76,24 +77,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGuest, setIsGuest] = useState(() => localStorage.getItem(GUEST_KEY) === 'true');
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<Plan>(DEFAULT_PLAN);
+  // planLoading stays true until the first getPlan() resolves — surfaces
+  // cleanly gate Pro-only UI so a logged-in user doesn't see a flash of
+  // free-tier state (upgrade ring, Upgrade button) on hard refresh.
+  const [planLoading, setPlanLoading] = useState(true);
 
   const refreshPlan = useCallback(async () => {
     if (!supabaseUser) {
       setPlan(DEFAULT_PLAN);
+      setPlanLoading(false);
       return;
     }
+    setPlanLoading(true);
     const next = await SubscriptionService.getPlan();
     setPlan(next);
+    setPlanLoading(false);
   }, [supabaseUser]);
 
-  // Keep plan state in sync with auth state — refresh on sign-in, clear on
-  // sign-out. Webhook updates hit profiles table; any subsequent read sees
-  // the new row.
   useEffect(() => {
     if (supabaseUser) {
       void refreshPlan();
+      // Claim any prior guest purchases bought under this email before the
+      // user had an account. The SQL function is idempotent and only
+      // touches rows with user_id IS NULL, so running it on every sign-in
+      // is harmless but self-heals if the first call was missed.
+      if (supabaseUser.email) {
+        void supabase.rpc('link_purchases_to_user', {
+          p_user_id: supabaseUser.id,
+          p_email: supabaseUser.email,
+        });
+      }
     } else {
       setPlan(DEFAULT_PLAN);
+      setPlanLoading(false);
     }
   }, [supabaseUser, refreshPlan]);
 
@@ -316,6 +332,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       hasGoogleLogin,
       plan,
       isPro: plan.isPro,
+      planLoading,
       refreshPlan,
     }}>
       {children}

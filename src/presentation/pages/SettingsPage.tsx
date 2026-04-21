@@ -24,6 +24,8 @@ import { EmailVerificationBanner } from '../components/shared/EmailVerificationB
 import { useAuth } from '../context/AuthContext';
 import { useUpgradeModal } from '../context/UpgradeModalContext';
 import { AccountService } from '@/infrastructure/services/AccountService';
+import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
+import { PlanBadge } from '@/presentation/components/shared';
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '';
@@ -156,21 +158,6 @@ const ProfileEmail = styled.div`
   color: #8E8E93;
   letter-spacing: -0.005em;
   margin: 0 0 8px;
-`;
-
-const PlanBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-  padding: 0 9px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: #F2F2EF;
-  color: #6E6E73;
-  border: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
 /* ────────────────── Section cards ────────────────── */
@@ -732,7 +719,7 @@ export const SettingsPage: React.FC = () => {
           <ProfileMeta>
             <ProfileName>{user.name || 'Peachy member'}</ProfileName>
             <ProfileEmail>{user.email}</ProfileEmail>
-            <PlanBadge>{isPro ? 'Pro plan' : 'Free plan'}</PlanBadge>
+            <PlanBadge $pro={isPro}>{isPro ? 'Pro' : 'Free'}</PlanBadge>
           </ProfileMeta>
           {!isPro && (
             <Button $variant="upgrade" onClick={openUpgrade}>
@@ -907,13 +894,15 @@ export const SettingsPage: React.FC = () => {
                   }
                 </RowDesc>
               </RowLabel>
-              <Button onClick={() => {
-                // For MVP: billing is managed from the receipt email Polar
-                // sends. A dedicated customer-portal Edge Function is on the
-                // roadmap (see docs/SUBSCRIPTION.md).
-                window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
+              <Button onClick={async () => {
+                // Billing + cancellation live in Polar's customer portal. The
+                // Edge Function mints a signed portal URL for this specific
+                // user; fall back to polar.sh if the call fails so the button
+                // never becomes a dead-end.
+                const ok = await SubscriptionService.openCustomerPortal();
+                if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
               }}>
-                Manage on Polar
+                Cancel or manage subscription
               </Button>
             </Row>
           ) : (

@@ -169,7 +169,7 @@ export const TermsPage: React.FC = () => (
           and embed them in Notion. Please read these carefully.
         </Lead>
         <MetaRow>
-          <span>Last updated 17 April 2026</span>
+          <span>Last updated 18 April 2026</span>
           <span>Governed by Swedish law</span>
         </MetaRow>
       </HeroInner>
@@ -255,12 +255,56 @@ export const TermsPage: React.FC = () => (
       <Section>
         <SectionHead>
           <SectionIcon><CreditCard /></SectionIcon>
-          <H2>7. Paid plans (if applicable)</H2>
+          <H2>7. Paid plans and subscriptions</H2>
         </SectionHead>
+
+        <P><strong>Peachy Pro</strong> is a recurring monthly subscription at $4/month (or the local
+        currency equivalent at purchase time). It unlocks unlimited widgets and Pro-only widget styles.</P>
+
         <P>
-          Peachy may offer paid subscriptions in the future. If you subscribe, you agree to pay the
-          applicable fees and taxes. Fees are billed in advance, are non-refundable except where
-          required by law, and will renew automatically unless you cancel before the next billing cycle.
+          <strong>Merchant of Record.</strong> Payments are processed by{' '}
+          <strong>Polar Software Inc.</strong>, acting as our reseller and Merchant of Record. Polar
+          collects and remits all applicable VAT, GST, and sales tax on our behalf. Your card
+          statement will show a charge like <strong>POLAR*PEACHY</strong>. Polar's own{' '}
+          <ContactLink href="https://polar.sh" target="_blank" rel="noopener noreferrer">terms</ContactLink>{' '}
+          apply to the payment transaction itself; these Peachy Terms apply to the service you receive.
+        </P>
+
+        <P>
+          <strong>Automatic renewal.</strong> Your subscription renews every month at the then-current
+          price until you cancel. We will not change the price during an active billing period without
+          at least 30 days' advance notice and an opportunity to cancel before the new price applies.
+        </P>
+
+        <P>
+          <strong>14-day right of withdrawal — and the waiver.</strong> Under the EU Consumer Rights
+          Directive, consumers have 14 days to withdraw from a distance contract. Because Pro access
+          begins immediately after payment, at checkout we ask you to tick a box confirming:{' '}
+          <em>"I consent to immediate performance and acknowledge that I will lose my 14-day right
+          of withdrawal once the service begins."</em> Ticking the box waives the statutory withdrawal
+          right (CRD Art. 16(m)). If you do not tick it, you keep the 14-day right. See our{' '}
+          <ContactLink href="/refund">Refund &amp; Cancellation Policy</ContactLink> for details.
+        </P>
+
+        <P>
+          <strong>Cancellation.</strong> You may cancel at any time from Settings → Subscription, or
+          from the persistent <em>Cancel subscription</em> link in the site footer when signed in as
+          Pro. Both open Polar's customer portal where the cancellation is processed. After cancelling,
+          Pro access continues until the end of the current billing period — no further charges are
+          taken.
+        </P>
+
+        <P>
+          <strong>What happens when Pro ends (cancel or downgrade).</strong> Your widgets stay. Existing
+          embeds — including those using Pro-only styles — keep rendering forever (widget configuration
+          is URL-encoded, so there is no ongoing hosting cost). You will not be able to create{' '}
+          <em>new</em> widgets past the 3-widget free limit, and you cannot switch an existing widget
+          to a Pro-only style until you resubscribe.
+        </P>
+
+        <P>
+          Refund rules and dispute handling are covered in our{' '}
+          <ContactLink href="/refund">Refund Policy</ContactLink>.
         </P>
       </Section>
 
@@ -320,11 +364,31 @@ export const TermsPage: React.FC = () => (
       <Section>
         <SectionHead>
           <SectionIcon><Scale /></SectionIcon>
-          <H2>12. Governing law</H2>
+          <H2>12. Governing law and consumer protection</H2>
         </SectionHead>
         <P>
           These terms are governed by the laws of Sweden. Any disputes will be resolved in the
-          competent courts of Stockholm, Sweden, unless mandatory consumer protection laws provide otherwise.
+          competent courts of Stockholm, Sweden.
+        </P>
+        <P>
+          <strong>EU consumers</strong> retain the protection of mandatory consumer-protection
+          rules of their country of residence — nothing in this clause overrides those rights.
+          If you bought as a consumer in the EU, you may also bring an action in the courts of
+          your home country.
+        </P>
+        <P>
+          <strong>EU online dispute resolution:</strong> the European Commission hosts an
+          online dispute resolution platform at{' '}
+          <ContactLink href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
+            ec.europa.eu/consumers/odr
+          </ContactLink>.
+          We prefer to resolve complaints directly — please email us first at{' '}
+          <ContactLink href="mailto:ziyazovaa@gmail.com">ziyazovaa@gmail.com</ContactLink>.
+        </P>
+        <P>
+          Additional disclosures required under the e-Commerce Directive (operator identity,
+          registration, supervisory authority) are listed in our{' '}
+          <ContactLink href="/legal">Legal Notice</ContactLink>.
         </P>
       </Section>
 

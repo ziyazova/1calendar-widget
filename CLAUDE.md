@@ -148,6 +148,28 @@ Vercel protects non-production deployments (preview, branch) with authentication
 
 **If the production domain changes:** update `VITE_EMBED_BASE_URL` in `.env.production` and redeploy.
 
+## Vendor abstraction rule (Supabase, Polar)
+
+Decision (Apr 18, 2026): **stay on Supabase + Polar for the foreseeable
+future.** Full port/adapter abstraction (see `docs/ROADMAP.md` →
+"Vendor-portable architecture") is **deferred** — we'll build it only if a
+real migration is on the table. In the meantime, one cheap rule keeps
+future-us's options open:
+
+**New Supabase or Polar calls must live in `src/infrastructure/services/`,
+not directly in pages, contexts, or hooks.**
+
+- Pages / contexts / hooks consume these services; they never `import { supabase }`
+  or Polar SDK themselves.
+- Existing direct imports (`AuthContext`, `LoginPage`, `ResetPasswordPage`)
+  are grandfathered tech debt. Migrate them **opportunistically when
+  touching those files**, not as a separate refactor.
+- The three existing services already follow this pattern:
+  `SubscriptionService`, `AccountService`, `WidgetStorageService`. Add new
+  siblings rather than one-off SDK calls.
+
+PR review grep: `import { supabase }` under `src/presentation/` = flag.
+
 ## Styling System
 
 - **Theme** (`theme.ts`): Apple-inspired tokens — 8px spacing grid, SF Pro font, cubic-bezier transitions, z-index layers, shadow presets

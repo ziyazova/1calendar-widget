@@ -86,8 +86,8 @@ export const WidgetStudioSection: React.FC<WidgetStudioSectionProps> = ({ onNavi
     <Section data-ux="Widgets Section">
       <Header>
         <TitleRow>
-          <Title>Made to make sense</Title>
-          <Subtitle>Everything in its place. So you can focus on what matters.</Subtitle>
+          <Title>Why people love Peachy</Title>
+          <Subtitle>Aesthetic and organized. Finally, both.</Subtitle>
         </TitleRow>
       </Header>
       <FeatureCardsSection />

@@ -15,9 +15,12 @@ import { ClockEmbedPage } from './presentation/pages/ClockEmbedPage';
 import { BoardEmbedPage } from './presentation/pages/BoardEmbedPage';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 import { DebugOverlay } from './presentation/components/debug/DebugOverlay';
+import { ClaudeFeedback } from './presentation/components/dev/ClaudeFeedback';
 import { DesignSystemPage } from './presentation/pages/DesignSystemPage';
 import { PrivacyPage } from './presentation/pages/PrivacyPage';
 import { TermsPage } from './presentation/pages/TermsPage';
+import { RefundPage } from './presentation/pages/RefundPage';
+import { LegalPage } from './presentation/pages/LegalPage';
 import { SettingsPage } from './presentation/pages/SettingsPage';
 import { ResetPasswordPage } from './presentation/pages/ResetPasswordPage';
 import { VerifyEmailPage } from './presentation/pages/VerifyEmailPage';
@@ -77,6 +80,7 @@ function App() {
             <UpgradeModalProvider>
               <ScrollToTop />
               <DebugOverlay />
+              {import.meta.env.DEV && <ClaudeFeedback />}
               <PageTransition>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
@@ -92,6 +96,8 @@ function App() {
                   <Route path="/dev" element={<DesignSystemPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/refund" element={<RefundPage />} />
+                  <Route path="/legal" element={<LegalPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/verify-email" element={<VerifyEmailPage />} />

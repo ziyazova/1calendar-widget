@@ -180,6 +180,9 @@ bundle-report.html
 # Local development
 .local
 
+# Claude Code dev feedback tool — runtime state
+.claude-feedback/
+
 # Backup files
 *.backup
 *.bak

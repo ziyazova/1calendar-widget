@@ -256,7 +256,7 @@ export const PrivacyPage: React.FC = () => (
           to export or delete it at any time.
         </Lead>
         <MetaRow>
-          <span>Last updated 17 April 2026</span>
+          <span>Last updated 18 April 2026</span>
           <span>GDPR-compliant</span>
           <span>Stored in EU (Ireland)</span>
         </MetaRow>
@@ -348,10 +348,21 @@ export const PrivacyPage: React.FC = () => (
             <div>Only if you choose "Sign in with Google"</div>
           </ProcessorCard>
           <ProcessorCard>
+            <div>Polar</div>
+            <div>Payments &amp; Merchant of Record · USA</div>
+          </ProcessorCard>
+          <ProcessorCard>
             <div>No one else</div>
             <div>No advertisers, no analytics, no data brokers</div>
           </ProcessorCard>
         </ProcessorGrid>
+        <P>
+          <strong>International transfers.</strong> Polar Software Inc. and some sub-processors
+          used by Supabase and Vercel are based in the United States. These transfers rely on the
+          EU-US Data Privacy Framework (DPF) adequacy decision, to which Supabase, Vercel, Google
+          and Polar are all certified. Where the DPF does not apply, transfers use the European
+          Commission's Standard Contractual Clauses (SCCs, 2021/914).
+        </P>
       </Section>
 
       <Section>
@@ -363,6 +374,7 @@ export const PrivacyPage: React.FC = () => (
           <li><strong>Account &amp; widgets</strong> — for as long as your account is active.</li>
           <li><strong>After you delete your account</strong> — your profile and all saved widgets are permanently removed within 24 hours.</li>
           <li><strong>Server logs</strong> — retained by our hosting providers for up to 30 days.</li>
+          <li><strong>Billing records</strong> — if you subscribed to Pro, Swedish bookkeeping law (Bokföringslagen 1999:1078) requires us (and Polar as Merchant of Record) to retain invoice and payment records for <strong>7 years</strong>. Account deletion does not erase this minimum retention — we keep only what the law requires.</li>
         </List>
       </Section>
 
@@ -378,7 +390,13 @@ export const PrivacyPage: React.FC = () => (
           <li><strong>Deletion</strong> — permanently erase your data. Use <em>Delete account</em> in settings, or email us.</li>
           <li><strong>Portability</strong> — our JSON export is designed for this.</li>
           <li><strong>Objection</strong> — to how we process your data, by contacting us.</li>
-          <li><strong>Complaint</strong> — you can also complain to the Swedish Authority for Privacy Protection (IMY).</li>
+          <li>
+            <strong>Complaint</strong> — you can complain to the Swedish Authority for Privacy
+            Protection (IMY) at{' '}
+            <ContactLink href="https://www.imy.se" target="_blank" rel="noopener noreferrer">
+              imy.se
+            </ContactLink>, or to the supervisory authority in your EU country of residence.
+          </li>
         </List>
       </Section>
 

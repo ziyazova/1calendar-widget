@@ -8,6 +8,9 @@ import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, FAQ_ITEMS } from '@/presentation/data/templates';
 import { useCart } from '@/presentation/context/CartContext';
+import { useAuth } from '@/presentation/context/AuthContext';
+import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
+import { FEATURES } from '@/config/features';
 
 /* ── Layout ── */
 
@@ -393,6 +396,7 @@ const ActionBtn = styled.button<{ $variant: 'outline' | 'primary' | 'ghost' }>`
   letter-spacing: -0.01em;
   transition: all ${({ theme }) => theme.transitions.base};
   white-space: nowrap;
+  text-decoration: none;
 
   svg { width: 16px; height: 16px; }
 
@@ -434,6 +438,14 @@ const AddedBtn = styled(ActionBtn)`
     .added-label { display: none; }
     .remove-label { display: inline-flex; }
   }
+`;
+
+const EtsyDisclosure = styled.p`
+  margin: 10px 0 0;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  line-height: 1.4;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  text-align: center;
 `;
 
 /* Pages included */
@@ -732,6 +744,7 @@ const MobileBuyBtn = styled.button<{ $added?: boolean }>`
   transition: all ${({ theme }) => theme.transitions.base};
   background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.text.primary};
   color: #fff;
+  text-decoration: none;
 
   svg { width: 16px; height: 16px; }
 
@@ -744,9 +757,12 @@ export const TemplateDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem, removeItem, hasItem } = useCart();
+  const { isRegistered } = useAuth();
   const [activeSlide, setActiveSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showAllPages, setShowAllPages] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
+  const [buying, setBuying] = useState(false);
   const slides = [0, 1, 2, 3, 4, 5];
 
   const template = TEMPLATES.find(t => t.id === id);
@@ -779,6 +795,24 @@ export const TemplateDetailPage: React.FC = () => {
       price: template.price,
       image: template.image,
     });
+  };
+
+  const handleBuyNow = async () => {
+    if (!template.polarProductId) return;
+    // Guests can buy too — Polar collects the email on its checkout page,
+    // the webhook records the purchase by email, and the buyer can link it
+    // to an account later (AuthContext back-fills on sign-in).
+    setBuyError(null);
+    setBuying(true);
+    try {
+      await SubscriptionService.startCheckout({
+        productId: template.polarProductId,
+        successPath: `/studio?purchased=${template.polarProductId}`,
+      });
+    } catch (e) {
+      setBuyError(e instanceof Error ? e.message : 'Checkout failed. Please try again.');
+      setBuying(false);
+    }
   };
 
   return (
@@ -851,20 +885,47 @@ export const TemplateDetailPage: React.FC = () => {
               <BenefitRow><Check /> Lifetime Updates</BenefitRow>
 
               <BtnGroup>
-                {inCart ? (
-                  <AddedBtn $variant="primary" onClick={() => removeItem(template.id)}>
-                    <span className="added-label"><Check /> Added to Cart</span>
-                    <span className="remove-label">Remove from Cart</span>
-                  </AddedBtn>
-                ) : (
-                  <ActionBtn $variant="outline" onClick={handleAddToCart}>
-                    <ShoppingCart />
-                    {isFree ? 'Get for Free' : 'Add to Cart'}
+                {template.polarProductId && !isFree && (
+                  <ActionBtn
+                    $variant="primary"
+                    onClick={handleBuyNow}
+                    disabled={buying}
+                  >
+                    {buying ? 'Opening checkout…' : `Buy Now · ${template.price}`}
                   </ActionBtn>
                 )}
-                <ActionBtn $variant="primary" onClick={() => window.open('https://www.etsy.com/shop/PeachyStudio', '_blank')}>
-                  Buy on Etsy {!isFree && template.price}
-                </ActionBtn>
+                {/* Free download still uses the cart/Add-to-Cart path */}
+                {isFree && FEATURES.ENABLE_LOCAL_CHECKOUT && (
+                  inCart ? (
+                    <AddedBtn $variant="primary" onClick={() => removeItem(template.id)}>
+                      <span className="added-label"><Check /> Added</span>
+                      <span className="remove-label">Remove</span>
+                    </AddedBtn>
+                  ) : (
+                    <ActionBtn $variant="primary" onClick={handleAddToCart}>
+                      <ShoppingCart /> Get for Free
+                    </ActionBtn>
+                  )
+                )}
+                {buyError && (
+                  <EtsyDisclosure style={{ color: '#DC2626' }}>{buyError}</EtsyDisclosure>
+                )}
+                {template.etsyUrl && (
+                  <>
+                    <ActionBtn
+                      as="a"
+                      href={template.etsyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      $variant="outline"
+                    >
+                      Buy on Etsy
+                    </ActionBtn>
+                    <EtsyDisclosure>
+                      Etsy is an alternative if you prefer — prices may vary by location and their terms apply.
+                    </EtsyDisclosure>
+                  </>
+                )}
               </BtnGroup>
             </SidebarCard>
 
@@ -903,22 +964,38 @@ export const TemplateDetailPage: React.FC = () => {
 
       <BigFooter onNavigate={(path) => navigate(path)} />
 
-      {/* Mobile sticky buy bar */}
-      <MobileBuyBar>
-        <MobileBuyPrice>
-          <MobileBuyPriceValue>{isFree ? 'Free' : template.price}</MobileBuyPriceValue>
-          <MobileBuyPriceLabel>one-time</MobileBuyPriceLabel>
-        </MobileBuyPrice>
-        {inCart ? (
-          <MobileBuyBtn $added onClick={() => removeItem(template.id)}>
-            <Check /> Added
-          </MobileBuyBtn>
-        ) : (
-          <MobileBuyBtn onClick={() => window.open('https://www.etsy.com/shop/PeachyStudio', '_blank')}>
-            {isFree ? 'Get for Free' : 'Buy on Etsy'}
-          </MobileBuyBtn>
-        )}
-      </MobileBuyBar>
+      {/* Mobile sticky buy bar — only rendered when we have somewhere to send
+          the buyer (Etsy URL, or local checkout is enabled post-Polar). */}
+      {(template.polarProductId || template.etsyUrl || FEATURES.ENABLE_LOCAL_CHECKOUT) && (
+        <MobileBuyBar>
+          <MobileBuyPrice>
+            <MobileBuyPriceValue>{isFree ? 'Free' : template.price}</MobileBuyPriceValue>
+            <MobileBuyPriceLabel>one-time</MobileBuyPriceLabel>
+          </MobileBuyPrice>
+          {FEATURES.ENABLE_LOCAL_CHECKOUT && inCart ? (
+            <MobileBuyBtn $added onClick={() => removeItem(template.id)}>
+              <Check /> Added
+            </MobileBuyBtn>
+          ) : template.polarProductId && !isFree ? (
+            <MobileBuyBtn onClick={handleBuyNow} disabled={buying}>
+              {buying ? 'Opening…' : 'Buy Now'}
+            </MobileBuyBtn>
+          ) : template.etsyUrl ? (
+            <MobileBuyBtn
+              as="a"
+              href={template.etsyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {isFree ? 'Get for Free' : 'Buy on Etsy'}
+            </MobileBuyBtn>
+          ) : (
+            <MobileBuyBtn onClick={handleAddToCart}>
+              {isFree ? 'Get for Free' : 'Add to Cart'}
+            </MobileBuyBtn>
+          )}
+        </MobileBuyBar>
+      )}
     </PageWrapper>
   );
 };

@@ -34,39 +34,69 @@ Deno.serve(async (req: Request) => {
   }
 
   const POLAR_ACCESS_TOKEN = Deno.env.get('POLAR_ACCESS_TOKEN');
-  // Kept the env var name for backwards-compat; we now pass it as a product id
-  // via the new `products: [id]` field which the current Polar API expects.
+  // POLAR_PRO_PRICE_ID is the default product (Pro subscription) — used when
+  // the caller doesn't pass an explicit productId. Template checkouts pass
+  // their own id in the request body.
   const POLAR_PRO_ID = Deno.env.get('POLAR_PRO_PRICE_ID');
   const APP_BASE_URL = Deno.env.get('APP_BASE_URL');
-  if (!POLAR_ACCESS_TOKEN || !POLAR_PRO_ID || !APP_BASE_URL) {
+  // POLAR_API_URL lets us swap between production and sandbox without a code
+  // change. Defaults to prod. For sandbox testing set it to
+  // `https://sandbox-api.polar.sh` and also swap to a sandbox access token.
+  const POLAR_API_URL = (Deno.env.get('POLAR_API_URL') ?? 'https://api.polar.sh').replace(/\/$/, '');
+  if (!POLAR_ACCESS_TOKEN || !APP_BASE_URL) {
     return json({ error: 'missing_env' }, 500);
   }
 
-  // Verify the caller is authenticated (JWT in Authorization: Bearer …).
+  // Optional productId + successPath override from the client body. Falls back
+  // to the subscription product for backwards compat.
+  let body: { productId?: string; successPath?: string } = {};
+  try {
+    const raw = await req.text();
+    if (raw) body = JSON.parse(raw);
+  } catch { /* empty body is fine */ }
+
+  const productId = body.productId ?? POLAR_PRO_ID;
+  if (!productId) return json({ error: 'missing_product_id' }, 400);
+
+  const isSubscription = productId === POLAR_PRO_ID;
+
+  // Subscriptions require auth (we need the Supabase user to bind the
+  // plan to). One-time template purchases allow guests — Polar collects
+  // an email on its checkout page, the webhook records the purchase by
+  // email, and the account linkage happens later if the buyer signs up.
   const authHeader = req.headers.get('Authorization') ?? '';
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_ANON_KEY')!,
     { global: { headers: { Authorization: authHeader } } },
   );
-  const { data: { user }, error: userErr } = await supabase.auth.getUser();
-  if (userErr || !user) return json({ error: 'unauthorized' }, 401);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (isSubscription && !user) return json({ error: 'unauthorized' }, 401);
 
-  // Ask Polar to open a checkout session. The metadata field survives to the
-  // webhook, which is how we link the Polar customer back to the Supabase user.
-  const polarRes = await fetch('https://api.polar.sh/v1/checkouts/', {
+  // Default success path: subscription returns to Settings with ?upgraded=1;
+  // template purchases return to /studio?purchased=<productId>.
+  const defaultSuccessPath = isSubscription ? '/settings?upgraded=1' : `/studio?purchased=${productId}`;
+  const successPath = body.successPath ?? defaultSuccessPath;
+
+  // Build metadata conditionally — Polar copies this through to the
+  // subscription / order, and our webhook pulls user id + product id
+  // back out from here.
+  const metadata: Record<string, string> = { product_id: productId };
+  if (user) metadata.supabase_user_id = user.id;
+
+  // Ask Polar to open a checkout session. Pre-fill the email when we know
+  // the signed-in user; otherwise Polar's checkout page will collect it.
+  const polarRes = await fetch(`${POLAR_API_URL}/v1/checkouts/`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${POLAR_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      products: [POLAR_PRO_ID],
-      customer_email: user.email,
-      success_url: `${APP_BASE_URL}/settings?upgraded=1`,
-      metadata: {
-        supabase_user_id: user.id,
-      },
+      products: [productId],
+      ...(user?.email ? { customer_email: user.email } : {}),
+      success_url: `${APP_BASE_URL}${successPath}`,
+      metadata,
     }),
   });
 

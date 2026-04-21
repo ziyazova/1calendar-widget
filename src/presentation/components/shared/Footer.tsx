@@ -10,6 +10,8 @@ const FooterWrap = styled.footer`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 
   @media (max-width: 768px) {
     padding: 24px;
@@ -28,6 +30,12 @@ const FooterLinks = styled.div`
   display: flex;
   align-items: center;
   gap: 18px;
+  flex-wrap: wrap;
+
+  @media (max-width: 540px) {
+    gap: 14px;
+    justify-content: center;
+  }
 `;
 
 const FooterLink = styled(Link)`
@@ -44,13 +52,17 @@ interface FooterProps {
   right?: string;
 }
 
-export const Footer: React.FC<FooterProps> = ({ left = 'Peachy Studio', right }) => (
-  <FooterWrap>
-    <FooterText>{left}</FooterText>
-    <FooterLinks>
-      <FooterLink to="/privacy">Privacy</FooterLink>
-      <FooterLink to="/terms">Terms</FooterLink>
-      {right && <FooterText>{right}</FooterText>}
-    </FooterLinks>
-  </FooterWrap>
-);
+export const Footer: React.FC<FooterProps> = ({ left = 'Peachy Studio', right }) => {
+  return (
+    <FooterWrap>
+      <FooterText>{left}</FooterText>
+      <FooterLinks>
+        <FooterLink to="/privacy">Privacy</FooterLink>
+        <FooterLink to="/terms">Terms</FooterLink>
+        <FooterLink to="/refund">Refund</FooterLink>
+        <FooterLink to="/legal">Imprint</FooterLink>
+        {right && <FooterText>{right}</FooterText>}
+      </FooterLinks>
+    </FooterWrap>
+  );
+};

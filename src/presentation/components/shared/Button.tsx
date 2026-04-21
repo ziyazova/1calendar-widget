@@ -12,6 +12,7 @@ const primaryStyles = css<ButtonTransientProps>`
   background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
+  box-shadow: 0 8px 22px -8px rgba(26, 22, 19, 0.55);
 `;
 
 const secondaryStyles = css<ButtonTransientProps>`
@@ -70,9 +71,8 @@ const primarySmHover = css`
 
 const primaryLgHover = css`
   &:hover {
-    background: #3384F4;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(51, 132, 244, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -10px rgba(26, 22, 19, 0.6);
   }
 `;
 

@@ -39,12 +39,18 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   background: #ffffff;
   border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border: 1px solid ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.35)`;
+  }};
   box-shadow: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
     return behind === 0
-      ? '0 4px 24px rgba(0, 0, 0, 0.06)'
-      : '0 2px 16px rgba(0, 0, 0, 0.04)';
+      ? '0 2px 4px rgba(26, 22, 19, 0.04), 0 12px 32px -8px rgba(26, 22, 19, 0.12), 0 28px 56px -16px rgba(26, 22, 19, 0.18)'
+      : '0 1px 3px rgba(26, 22, 19, 0.03), 0 8px 20px -6px rgba(26, 22, 19, 0.08), 0 18px 40px -16px rgba(26, 22, 19, 0.1)';
   }};
   cursor: pointer;
   position: absolute;
@@ -59,7 +65,8 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   top: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
     const base = ($total - 1) * 50;
-    return `${base - behind * 50}px`;
+    const offset = behind === 0 ? ($index === 0 ? -2 : -5) : 0;
+    return `${base - behind * 50 + offset}px`;
   }};
   transform: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
@@ -85,7 +92,9 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     opacity: 1;
     box-shadow: ${({ $index, $activeIdx, $total }) => {
       const behind = ($index - $activeIdx + $total) % $total;
-      return behind === 0 ? '0 6px 28px rgba(0, 0, 0, 0.08)' : '0 4px 20px rgba(0, 0, 0, 0.05)';
+      return behind === 0
+        ? '0 2px 6px rgba(26, 22, 19, 0.05), 0 16px 40px -10px rgba(26, 22, 19, 0.16), 0 36px 72px -20px rgba(26, 22, 19, 0.22)'
+        : '0 1px 4px rgba(26, 22, 19, 0.04), 0 10px 24px -8px rgba(26, 22, 19, 0.1), 0 22px 48px -18px rgba(26, 22, 19, 0.14)';
     }};
     top: ${({ $index, $activeIdx, $total }) => {
       const behind = ($index - $activeIdx + $total) % $total;
@@ -125,7 +134,6 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
     const b = parseInt(hex.slice(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${$intensity * 0.6})`;
   }};
-  border-bottom: none;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -171,13 +179,13 @@ const FeatureCardBody = styled.div`
 `;
 
 const FeatureCardText = styled.div`
-  flex: 0 0 36%;
+  flex: 0 0 calc(30% - 24px);
   text-align: left;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-self: center;
-  margin-top: -100px;
+  margin-top: -130px;
 `;
 
 const FeatureCardTitle = styled.h3`
@@ -201,12 +209,11 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 20px 0 -1px 0;
-  border-radius: 16px 0 0 0;
+  margin: 20px 0 0 0;
   overflow: hidden;
   border: none;
-  background: ${({ theme }) => theme.colors.background.surface};
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+  background: transparent;
+  position: relative;
 
   img {
     width: 100%;
@@ -214,7 +221,6 @@ const FeatureCardImage = styled.div`
     object-fit: cover;
     object-position: center;
     display: block;
-    transform: scale(1);
   }
 
   @media (max-width: 768px) {
@@ -240,22 +246,22 @@ const FEATURE_CARDS = [
   {
     tab: 'Functionality',
     color: '#3B82F6',
-    title: 'Built to work.',
-    desc: 'Automations, dashboards, pre-filled sections. Plus video guides so you\'re never stuck.',
+    title: 'Works like it was built for you.',
+    desc: 'Automations, dashboards, pre-filled sections. Ready the moment you open it.',
     image: '/feature-functionality.png',
   },
   {
     tab: 'Design',
-    color: '#8B5CF6',
-    title: 'Clean by default.',
-    desc: 'Open it and it just feels right. Everything where you\'d expect it to be.',
+    color: '#7FA96B',
+    title: 'Looks exactly how you\'d want it.',
+    desc: 'Clean, aesthetic, thoughtful. Open it and it just feels right.',
     image: '/feature-design.png',
   },
   {
     tab: 'Payment',
-    color: '#E8926A',
-    title: 'Pay once. Keep forever.',
-    desc: 'Buy it once and it\'s yours — come back to it whenever you need, for as long as you want.',
+    color: '#F4A672',
+    title: 'Pay once, yours forever.',
+    desc: 'One payment. It lives in your Notion for as long as you need.',
     image: '/feature-pricing.png',
   },
 ];
@@ -276,7 +282,7 @@ export const FeatureCardsSection: React.FC = () => {
             $color={f.color}
             onClick={() => setActiveFeature(i === activeFeature ? (i + 1) % FEATURE_CARDS.length : i)}
           >
-            <FeatureCardTab $color={f.color} $intensity={i === activeFeature ? 0.48 : 0.32} data-ux="Feature Card Tab">
+            <FeatureCardTab $color={f.color} $intensity={i === activeFeature ? 0.43 : 0.29} data-ux="Feature Card Tab">
               <FeatureTabDot $color={f.color} />
               <FeatureTabTitle>{f.tab}</FeatureTabTitle>
               <FeatureTabActions>

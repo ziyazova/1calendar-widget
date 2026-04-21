@@ -7,7 +7,7 @@ const CTASectionWrap = styled.section`
 `;
 
 const CTACard = styled.div`
-  background: linear-gradient(150deg, rgba(237, 228, 255, 0.7) 0%, rgba(232, 237, 255, 0.65) 25%, rgba(238, 234, 255, 0.6) 50%, rgba(245, 235, 250, 0.65) 75%, rgba(255, 240, 245, 0.7) 100%);
+  background: linear-gradient(150deg, rgba(237, 228, 255, 0.4) 0%, rgba(232, 237, 255, 0.36) 25%, rgba(238, 234, 255, 0.32) 50%, rgba(245, 235, 250, 0.36) 75%, rgba(255, 240, 245, 0.4) 100%);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-radius: 0;
@@ -65,13 +65,13 @@ export const CTASection: React.FC<CTASectionProps> = ({ onBrowseTemplates, onExp
   return (
     <CTASectionWrap data-ux="CTA Section">
       <CTACard>
-        <CTATitle>Start building your workspace.</CTATitle>
-        <CTASubtitle>Everything you need to make Notion yours.</CTASubtitle>
+        <CTATitle>Your Notion is waiting.</CTATitle>
+        <CTASubtitle>50+ templates, ready to use. Starting from $8.</CTASubtitle>
         <ButtonRow>
           <PrimaryButton onClick={onBrowseTemplates}>
-            Browse Templates
+            Shop Templates
           </PrimaryButton>
-          <SecondaryButton onClick={onExploreWidgets} style={{ background: '#fff' }}>Explore Widgets</SecondaryButton>
+          <SecondaryButton onClick={onExploreWidgets} style={{ background: '#fff' }}>See Widgets</SecondaryButton>
         </ButtonRow>
       </CTACard>
     </CTASectionWrap>

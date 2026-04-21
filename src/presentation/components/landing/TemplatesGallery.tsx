@@ -210,13 +210,26 @@ const TemplateCard = styled.div`
   border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
   cursor: pointer;
-  border: 1.5px solid rgba(200, 195, 230, 0.25);
+  border: 1px solid rgba(43, 35, 32, 0.06);
   background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 6px rgba(43, 35, 32, 0.04),
+    0 12px 28px -16px rgba(43, 35, 32, 0.12);
+  transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
+
+  ${TemplateCardWrap}:hover & {
+    border-color: rgba(43, 35, 32, 0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 4px 10px rgba(43, 35, 32, 0.06),
+      0 20px 44px -18px rgba(43, 35, 32, 0.2);
+  }
 
   @media (max-width: 768px) {
     border-radius: ${({ theme }) => theme.radii.md};
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 `;
 
@@ -238,9 +251,10 @@ const TemplateCardImage = styled.img`
 
 const TemplateCardMeta = styled.div`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  padding: 4px 6px 0;
+  gap: 12px;
+  padding: 6px;
 `;
 
 const TemplateCardTitle = styled.span`
@@ -248,6 +262,11 @@ const TemplateCardTitle = styled.span`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 
   @media (max-width: 768px) {
     font-size: 13px;
@@ -255,9 +274,16 @@ const TemplateCardTitle = styled.span`
 `;
 
 const TemplateCardPrice = styled.span`
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.secondary};
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
 // TEMPLATE_ROW_1 previously held a hand-maintained copy of the catalog that

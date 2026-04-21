@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { ArrowRight, Calendar, Clock, Image, Pencil, Lock } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
 import { PinterestGallery } from '@/presentation/components/landing/PinterestGallery';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
+import { useWidgetQuota } from '@/presentation/hooks/useWidgetQuota';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
@@ -18,17 +19,19 @@ const PageContent = styled.div<{ $hide?: boolean }>`
 `;
 
 /* ── Hero Card ── */
-const HeroCard = styled.div`rjkmwj ult ghj
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 48px;
+const HeroCard = styled.div`
+  max-width: 920px;
+  margin: 8px auto 0;
+  padding: 16px 48px 40px;
   text-align: center;
   position: relative;
   z-index: 3;
-  animation: ${fadeUp} 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 
-  @media (max-width: 1024px) { padding: 60px 36px; }
-  @media (max-width: 768px) { padding: 48px 24px; }
+  @media (max-width: 900px) {
+    margin-top: 116px;
+    padding: 12px 20px 24px;
+  }
 `;
 
 const HeroInner = styled.div<{ $expanding?: boolean }>`
@@ -87,61 +90,58 @@ const HeroIcon = styled.div<{ $delay: string }>`
 `;
 
 const HeroTitle = styled.h1`
-  font-size: 56px;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(42px, 5.6vw, 74px);
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.035em;
-  margin: 0 0 12px;
-  line-height: 1.1;
+  color: #2B2320;
+  letter-spacing: -0.04em;
+  margin: 0;
+  line-height: 1.16;
 
-  @media (max-width: 1024px) {
-    font-size: 44px;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 32px;
+  em {
+    font-style: normal;
+    font-weight: 600;
+    color: #2B2320;
   }
 `;
 
 const HeroDesc = styled.p`
-  font-size: 18px;
+  margin: 22px auto 32px;
+  font-size: 16px;
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.tertiary};
+  color: #9B9790;
   line-height: 1.6;
-  margin: 0 auto 40px;
-  max-width: 500px;
-  letter-spacing: -0.01em;
-
-  @media (max-width: 768px) {
-    font-size: 16px;
-    margin-bottom: 32px;
-  }
+  max-width: 440px;
+  letter-spacing: -0.005em;
 `;
 
 const HeroButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  height: 44px;
-  padding: 0 20px;
-  background: ${({ theme }) => theme.colors.text.primary};
+  padding: 17px 26px;
+  background: #2B2320;
   color: #ffffff;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 14px;
-  font-weight: 500;
+  border: 0;
+  border-radius: 14px;
+  font-size: 15.5px;
+  font-weight: 600;
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 8px 22px -8px rgba(26, 22, 19, 0.55);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 
   &:hover {
-    background: #333;
+    background: #1F1814;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -10px rgba(43, 35, 32, 0.6);
   }
 
-  svg { width: 14px; height: 14px; }
+  svg { width: 16px; height: 16px; transition: transform 0.2s ease; }
+  &:hover svg { transform: translateX(3px); }
 `;
 
 const EmailRow = styled.div`
@@ -149,48 +149,51 @@ const EmailRow = styled.div`
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 320px;
+  max-width: 380px;
   margin: 0 auto;
 `;
 
 const EmailInput = styled.input`
   width: 100%;
-  height: 44px;
-  padding: 0 16px;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 14px;
+  height: 52px;
+  padding: 0 18px;
+  border: 1px solid rgba(26, 22, 19, 0.14);
+  border-radius: 14px;
+  font-size: 15px;
   font-family: inherit;
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: #2B2320;
   background: #fff;
   outline: none;
-  letter-spacing: -0.01em;
-  transition: border-color 0.2s;
+  letter-spacing: -0.005em;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 4px 12px rgba(26, 22, 19, 0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
 
   &::placeholder {
-    color: ${({ theme }) => theme.colors.text.muted};
+    color: #B5B1A9;
   }
 
   &:focus {
-    border-color: rgba(0, 0, 0, 0.16);
+    border-color: rgba(26, 22, 19, 0.32);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 4px 14px rgba(26, 22, 19, 0.08);
   }
 `;
 
 const AuthDivider = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  max-width: 320px;
-  margin: 16px auto 16px;
-  color: ${({ theme }) => theme.colors.text.muted};
-  font-size: 11px;
+  max-width: 380px;
+  margin: 20px auto;
+  color: #B5B1A9;
+  font-size: 12px;
+  letter-spacing: 0.02em;
 
   &::before, &::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: ${({ theme }) => theme.colors.border.light};
+    background: rgba(26, 22, 19, 0.08);
   }
 `;
 
@@ -218,9 +221,9 @@ const GoogleButton = styled.button`
   gap: 8px;
   margin: 0 auto;
   height: 44px;
-  padding: 0 24px;
-  background: #ffffff;
-  border: 1.5px solid rgba(200, 195, 230, 0.3);
+  padding: 0 20px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-weight: 500;
@@ -228,11 +231,10 @@ const GoogleButton = styled.button`
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: all 0.2s;
+  transition: background 0.15s ease, border-color 0.15s ease;
 
   &:hover {
     background: ${({ theme }) => theme.colors.background.surface};
-    border-color: rgba(0, 0, 0, 0.12);
   }
 
   svg { width: 16px; height: 16px; }
@@ -240,27 +242,72 @@ const GoogleButton = styled.button`
 
 /* ── Floating Widgets ── */
 const float1 = keyframes`
-  0%, 100% { transform: translateY(0px) rotate3d(1, 0.5, 0, 0deg); }
-  50% { transform: translateY(-22px) rotate3d(1, 0.5, 0, 5deg); }
+  0%   { transform: translateX(0px) rotate(-5deg); }
+  50%  { transform: translateX(8px) rotate(-2deg); }
+  100% { transform: translateX(0px) rotate(-5deg); }
 `;
 const float2 = keyframes`
-  0%, 100% { transform: translateY(0px) rotate3d(0.5, -1, 0, 0deg); }
-  50% { transform: translateY(-26px) rotate3d(0.5, -1, 0, 6deg); }
+  0%   { transform: translateX(0px) rotate(6deg); }
+  50%  { transform: translateX(-10px) rotate(3deg); }
+  100% { transform: translateX(0px) rotate(6deg); }
 `;
 const float3 = keyframes`
-  0%, 100% { transform: translateY(0px) rotate3d(-1, 0.5, 0, 0deg); }
-  50% { transform: translateY(-20px) rotate3d(-1, 0.5, 0, 5.5deg); }
+  0%   { transform: translateX(5px) rotate(-4deg); }
+  50%  { transform: translateX(-5px) rotate(-7deg); }
+  100% { transform: translateX(5px) rotate(-4deg); }
+`;
+const float4 = keyframes`
+  0%   { transform: translateX(-4px) rotate(5deg); }
+  50%  { transform: translateX(6px) rotate(8deg); }
+  100% { transform: translateX(-4px) rotate(5deg); }
+`;
+
+/* ──────────────────────────────────────────────────────────────
+   Те же token'ы вертикального ритма что и на главном лендинге.
+   Одно место на всю страницу.
+   ────────────────────────────────────────────────────────────── */
+const SECTION_Y = {
+  flush: '0',
+  sm: '48px',
+  md: '80px',
+  lg: '120px',
+  gap: '70px', // 70 + 70 = 140px между соседями
+} as const;
+
+const Section = styled.section<{
+  $size?: keyof typeof SECTION_Y;
+  $tint?: boolean;
+  $bleedTop?: boolean;
+  $bleedBottom?: boolean;
+}>`
+  padding-top: ${({ $size = 'md', $bleedTop }) => ($bleedTop ? '0' : SECTION_Y[$size])};
+  padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
+  ${({ $tint }) => $tint && 'background: #FAFAFA;'}
+
+  @media (max-width: 768px) {
+    padding-top: ${({ $size = 'md', $bleedTop }) =>
+      $bleedTop ? '0' : $size === 'flush' ? '0' : '48px'};
+    padding-bottom: ${({ $size = 'md', $bleedBottom }) =>
+      $bleedBottom ? '0' : $size === 'flush' ? '0' : '48px'};
+  }
+`;
+
+/* Заливка hero — тот же #FAFAFA что и на /?hero=v2 */
+const Hero = styled.div`
+  background: #FAFAFA;
 `;
 
 const HeroScene = styled.div`
   position: relative;
   max-width: 1200px;
+  min-height: 728px;
   margin: 0 auto;
-  padding: 0 48px;
-  padding-bottom: 40px;
+  padding: 88px 48px 49px;
+  background: #FAFAFA;
 
   @media (max-width: 768px) {
-    padding: 0 24px 24px;
+    min-height: 0;
+    padding: 64px 24px 49px;
   }
 `;
 
@@ -284,10 +331,21 @@ const FloatingWidget = styled.div<{ $left?: string; $right?: string; $top: strin
     width: 100%;
     display: block;
     filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.08)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.04));
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  animation: ${({ $anim }) => $anim === 1 ? float1 : $anim === 2 ? float2 : float3} ${({ $anim }) => $anim === 1 ? '6s' : $anim === 2 ? '7s' : '5.5s'} ease-in-out infinite both;
+  &:hover {
+    animation-play-state: paused;
+    z-index: 4;
+  }
+  &:hover img {
+    transform: scale(1.06);
+    filter: drop-shadow(0 32px 56px rgba(0, 0, 0, 0.12)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.06));
+  }
+
+  animation: ${({ $anim }) => $anim === 1 ? float1 : $anim === 2 ? float2 : $anim === 3 ? float3 : float4}
+    ${({ $anim }) => $anim === 1 ? '7.3s' : $anim === 2 ? '10.7s' : $anim === 3 ? '9.1s' : '8.6s'}
+    ease-in-out infinite both;
   animation-delay: ${({ $delay }) => $delay};
   will-change: transform;
 
@@ -309,13 +367,13 @@ const WidgetGallerySection = styled.section`
 const WidgetGalleryHeader = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px 0;
+  padding: 0 48px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 
   @media (max-width: 768px) {
-    padding: 64px 24px 0;
+    padding: 0 24px;
   }
 `;
 
@@ -415,42 +473,41 @@ const WidgetGalleryCardTitle = styled.span`
 const CustomizeBtn = styled.button<{ $pro?: boolean }>`
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   height: 30px;
-  padding: 0 12px;
+  padding: 0 13px;
   font-size: 12px;
   font-weight: 600;
-  color: ${({ $pro }) => $pro ? '#6366F1' : '#fff'};
-  background: ${({ $pro }) => $pro ? 'rgba(99,102,241,0.08)' : '#1F1F1F'};
-  border: 1px solid ${({ $pro }) => $pro ? 'rgba(99,102,241,0.2)' : '#1F1F1F'};
-  border-radius: 8px;
+  color: ${({ $pro }) => $pro ? '#2B2320' : '#fff'};
+  background: ${({ $pro }) => $pro ? 'transparent' : '#2B2320'};
+  border: 1px solid ${({ $pro }) => $pro ? '#2B2320' : 'transparent'};
+  border-radius: 10px;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
-  transition: all 0.15s;
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease;
   flex-shrink: 0;
 
   &:hover {
-    background: ${({ $pro }) => $pro ? 'rgba(99,102,241,0.12)' : '#333'};
-    border-color: ${({ $pro }) => $pro ? 'rgba(99,102,241,0.3)' : '#333'};
+    background: ${({ $pro }) => $pro ? '#2B2320' : '#1F1814'};
+    color: ${({ $pro }) => $pro ? '#fff' : '#fff'};
+    border-color: ${({ $pro }) => $pro ? '#2B2320' : 'transparent'};
   }
 
-  svg { width: 13px; height: 13px; }
+  svg {
+    width: 13px;
+    height: 13px;
+    fill: currentColor;
+  }
 `;
 
-const ProBadge = styled.span`
+/* Overlay badge — glass white + accent text. Sits on card thumbnails.
+   Matches the unified badge system defined in /dev → Labels & Badges. */
+const GalleryProBadgeSlot = styled.span`
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  color: #6366F1;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  padding: 3px 8px;
-  border-radius: 6px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  top: 12px;
+  right: 12px;
   z-index: 1;
 `;
 
@@ -560,10 +617,10 @@ const FeatureDesc = styled.p`
 const PricingSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 48px;
+  padding: 0 48px;
   text-align: center;
 
-  @media (max-width: 768px) { padding: 48px 24px; }
+  @media (max-width: 768px) { padding: 0 24px; }
 `;
 
 const PricingTitle = styled.h2`
@@ -599,18 +656,6 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
   text-align: left;
   position: relative;
   ${({ $highlighted }) => $highlighted && 'box-shadow: 0 6px 32px rgba(100, 80, 200, 0.08);'}
-`;
-
-const PricingBadge = styled.span`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 999px;
 `;
 
 const PricingPlan = styled.div`
@@ -665,14 +710,30 @@ const PricingBtn = styled.button<{ $primary?: boolean }>`
   &:hover { opacity: 0.85; }
 `;
 
+/* Kill FooterOuter's 120px margin-top for flush layout */
+const FooterFlush = styled.div`
+  background: #FAFAFA;
+  & > div:first-child { margin-top: 0; }
+`;
+
 /* ── Bottom CTA ── */
 const BottomCTA = styled.section`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 48px;
+  width: 100%;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(150deg, rgba(237, 228, 255, 0.7) 0%, rgba(232, 237, 255, 0.65) 25%, rgba(238, 234, 255, 0.6) 50%, rgba(245, 235, 250, 0.65) 75%, rgba(255, 240, 245, 0.7) 100%);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  padding: 96px 48px;
   text-align: center;
 
-  @media (max-width: 768px) { padding: 48px 24px; }
+  @media (max-width: 768px) {
+    min-height: 440px;
+    padding: 72px 24px;
+  }
 `;
 
 const CTATitle = styled.h2`
@@ -725,6 +786,7 @@ export const WidgetStudioPage: React.FC = () => {
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const { loginWithCode, login, loginWithGoogle, isLoggedIn } = useAuth();
   const { open: openUpgrade } = useUpgradeModal();
+  const quota = useWidgetQuota();
   const [nameModal, setNameModal] = useState<{ title: string; category: string; type: string; style: string } | null>(null);
   const [widgetName, setWidgetName] = useState('');
 
@@ -777,13 +839,13 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                {item.pro && <ProBadge>Pro</ProBadge>}
+                {item.pro && <GalleryProBadgeSlot><ProPill><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill></GalleryProBadgeSlot>}
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>
                 <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
-                {item.pro ? (
-                  <CustomizeBtn $pro onClick={openUpgrade}>✦ Upgrade</CustomizeBtn>
+                {(item.pro && !quota.isPro) || quota.atLimit ? (
+                  <CustomizeBtn $pro onClick={openUpgrade}><span>✦</span>Upgrade</CustomizeBtn>
                 ) : (
                   <CustomizeBtn onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</CustomizeBtn>
                 )}
@@ -869,25 +931,26 @@ export const WidgetStudioPage: React.FC = () => {
     <PageWrapper>
       <TopNav activeLink="studio" />
 
-      {/* Hero with floating widgets */}
+      {/* Hero with floating widgets — фон #FAFAFA как на /?hero=v2 */}
+      <Hero>
       <HeroScene>
         {/* Floating widget PNGs with transparent bg */}
-        <FloatingWidget $left="-20px" $top="66px" $delay="0s" $anim={1} data-float data-speed="1.2" style={{ width: 257 }}>
+        <FloatingWidget $left="-104px" $top="64px" $delay="0s" $anim={1} data-float data-speed="1.2" style={{ width: 256 }}>
           <img src="/float-typewriter.png" alt="Typewriter Calendar" />
         </FloatingWidget>
-        <FloatingWidget $right="-10px" $top="58px" $delay="0.5s" $anim={2} data-float data-speed="0.8" style={{ width: 280 }}>
+        <FloatingWidget $right="-94px" $top="74px" $delay="-3.4s" $anim={2} data-float data-speed="0.8" style={{ width: 296 }}>
           <img src="/float-collage.png" alt="Collage Calendar" />
         </FloatingWidget>
-        <FloatingWidget $left="60px" $top="330px" $delay="1s" $anim={3} data-float data-speed="1.5" style={{ width: 335 }}>
+        <FloatingWidget $left="-44px" $top="380px" $delay="-5.8s" $anim={3} data-float data-speed="1.5" style={{ width: 307 }}>
           <img src="/float-clock.png" alt="Flower Clock" />
         </FloatingWidget>
-        <FloatingWidget $right="20px" $top="350px" $delay="0.3s" $anim={1} data-float data-speed="1" style={{ width: 275 }}>
+        <FloatingWidget $right="-46px" $top="396px" $delay="-2.1s" $anim={4} data-float data-speed="1" style={{ width: 279 }}>
           <img src="/float-camera.png" alt="Camera Widget" />
         </FloatingWidget>
 
         <HeroCard>
-            <HeroTitle>The widgets<br />your Notion is missing.</HeroTitle>
-            <HeroDesc>Pick. Customize. Paste. That's it.</HeroDesc>
+            <HeroTitle>The <em>widgets</em> your<br />Notion is missing</HeroTitle>
+            <HeroDesc>Pick a widget you love. Tweak it until it feels like yours. Paste the link into Notion. That's it.</HeroDesc>
             {isLoggedIn ? (
               <EmailRow>
                 <HeroButton onClick={handleLaunch}>
@@ -921,10 +984,12 @@ export const WidgetStudioPage: React.FC = () => {
             )}
         </HeroCard>
       </HeroScene>
+      </Hero>
 
       <PageContent $hide={expanding}>
 
       {/* Widget Gallery — horizontal scroll like Top Templates */}
+      <Section $size="gap" style={{ paddingTop: 80 }}>
       <WidgetGallerySection>
         <WidgetGalleryHeader>
           <WidgetGalleryTitleRow>
@@ -947,7 +1012,7 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                {item.pro && <ProBadge>Pro</ProBadge>}
+                {item.pro && <GalleryProBadgeSlot><ProPill><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill></GalleryProBadgeSlot>}
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>
@@ -961,12 +1026,16 @@ export const WidgetStudioPage: React.FC = () => {
           ))}
         </WidgetGalleryGrid>
       </WidgetGallerySection>
+      </Section>
 
       {/* Show How it works, Pricing, CTA only for non-logged-in users */}
       {!isLoggedIn && (
         <>
-          <HowItWorksSection showTitle={true} variant="widgets" />
+          <Section $size="gap">
+            <HowItWorksSection showTitle={true} variant="widgets" />
+          </Section>
 
+          <Section $size="gap" style={{ paddingTop: 80, paddingBottom: 160 }}>
           <PricingSection>
             <PricingTitle>Simple pricing</PricingTitle>
             <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
@@ -984,10 +1053,10 @@ export const WidgetStudioPage: React.FC = () => {
                 <PricingBtn onClick={handleLaunch}>Get started</PricingBtn>
               </PricingCard>
               <PricingCard $highlighted>
-                <PricingBadge>Popular</PricingBadge>
+                <PopularPill>Popular</PopularPill>
                 <PricingPlan>Pro</PricingPlan>
-                <PricingPrice>$9</PricingPrice>
-                <PricingPeriod>one-time</PricingPeriod>
+                <PricingPrice>$4</PricingPrice>
+                <PricingPeriod>monthly</PricingPeriod>
                 <PricingFeatures>
                   <li>Unlimited widgets</li>
                   <li>All widget types</li>
@@ -998,6 +1067,7 @@ export const WidgetStudioPage: React.FC = () => {
               </PricingCard>
             </PricingGrid>
           </PricingSection>
+          </Section>
 
           <BottomCTA>
             <CTATitle>Ready to build?</CTATitle>
@@ -1015,7 +1085,11 @@ export const WidgetStudioPage: React.FC = () => {
         </>
       )}
 
-      <BigFooter onNavigate={(path) => navigate(path)} />
+      <Section $size="gap" $bleedTop $bleedBottom style={{ background: '#FAFAFA' }}>
+        <FooterFlush>
+          <BigFooter onNavigate={(path) => navigate(path)} />
+        </FooterFlush>
+      </Section>
       </PageContent>
     </PageWrapper>
   );

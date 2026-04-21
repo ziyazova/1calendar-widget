@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
-import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2 } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, FileText, Palette, LayoutGrid, Sparkles, ChevronLeft } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -11,10 +11,11 @@ import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
-import { CustomizationPanel } from '../components/ui/forms/CustomizationPanel';
+import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
 import { useUpgradeModal } from '../context/UpgradeModalContext';
-import { WidgetStorageService, type SavedWidget } from '../../infrastructure/services/WidgetStorageService';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { WidgetStorageService, WidgetTierError, type SavedWidget } from '../../infrastructure/services/WidgetStorageService';
 import { getContrastColor } from '../themes/colors';
 
 /* Widget previews */
@@ -75,14 +76,17 @@ const Tab = styled.button<{ $active: boolean }>`
   border: none;
   border-radius: 10px;
   font-size: 14px;
-  font-weight: ${({ $active }) => $active ? 600 : 500};
+  font-weight: 600;
   font-family: inherit;
   letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   background: ${({ $active }) => $active ? '#fff' : 'transparent'};
   color: ${({ $active }) => $active ? '#1F1F1F' : '#888'};
-  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' : 'none'};
+  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' : '0 0 0 rgba(0,0,0,0)'};
 
   &:hover { color: #1F1F1F; }
 `;
@@ -207,7 +211,7 @@ const Btn = styled.button<{ $primary?: boolean; $danger?: boolean }>`
   transition: all 0.15s;
   border: 1px solid ${({ $primary, $danger }) => $primary ? '#1F1F1F' : $danger ? 'rgba(220,40,40,0.2)' : 'rgba(0,0,0,0.1)'};
   background: ${({ $primary }) => $primary ? '#1F1F1F' : 'transparent'};
-  color: ${({ $primary, $danger }) => $primary ? '#fff' : $danger ? '#DC2828' : '#666'};
+  color: ${({ $primary, $danger }) => $primary ? '#fff' : $danger ? '#F49B8B' : '#666'};
   &:hover { opacity: 0.85; }
   svg { width: 14px; height: 14px; }
 `;
@@ -278,6 +282,202 @@ const PurchaseImg = styled.div`
   img { width: 100%; height: 100%; object-fit: cover; }
 `;
 
+/* ── Mobile editor (≤768) ── */
+const MobileEditorWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: #fff;
+  overflow: hidden;
+`;
+
+const MobileTopBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+`;
+
+const MobileBackBtn = styled.button`
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  svg { width: 18px; height: 18px; }
+`;
+
+const MobileWidgetName = styled.div`
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6366F1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const MobileCopyBtn = styled.button<{ $copied: boolean }>`
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: ${({ $copied }) => $copied ? '#22C55E' : 'linear-gradient(135deg, #3384F4, #5BA0F7)'};
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  svg { width: 14px; height: 14px; }
+`;
+
+const MobileArtboard = styled.div`
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+    #F8F8F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const MobileDotGrid = styled.div`
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  opacity: 0.5;
+`;
+
+const MobileWidgetScale = styled.div`
+  transform: scale(0.7);
+  transform-origin: center center;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04));
+`;
+
+const MobileSectionTabs = styled.div`
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  flex-shrink: 0;
+`;
+
+const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }>`
+  flex: 1;
+  min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  height: 48px;
+  border: none;
+  background: ${({ $active, $disabled }) =>
+    $disabled ? 'transparent' : $active ? 'rgba(51,132,244,0.08)' : 'transparent'};
+  color: ${({ $active, $disabled }) =>
+    $disabled ? '#C8C8C8' : $active ? '#3384F4' : '#777'};
+  opacity: ${({ $disabled }) => $disabled ? 0.55 : 1};
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  padding: 0;
+  svg { width: 18px; height: 18px; }
+`;
+
+const MobileSheetBackdrop = styled.div<{ $open: boolean }>`
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 39;
+  opacity: ${({ $open }) => $open ? 1 : 0};
+  pointer-events: ${({ $open }) => $open ? 'auto' : 'none'};
+  transition: opacity 0.25s ease;
+`;
+
+const MobileSheet = styled.div<{ $open: boolean }>`
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  max-height: 70vh;
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.1);
+  transform: ${({ $open }) => $open ? 'translateY(0)' : 'translateY(100%)'};
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+`;
+
+const MobileSheetHandle = styled.div`
+  display: flex; justify-content: center;
+  padding: 10px 0 6px;
+  flex-shrink: 0;
+  &::after {
+    content: '';
+    width: 40px; height: 5px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.15);
+  }
+`;
+
+const MobileSheetHeader = styled.div`
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 20px 12px;
+  flex-shrink: 0;
+`;
+
+const MobileSheetTitle = styled.h3`
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+`;
+
+const MobileSheetClose = styled.button`
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.04);
+  color: #777;
+  cursor: pointer;
+  padding: 0;
+  svg { width: 14px; height: 14px; }
+`;
+
+const MobileSheetBody = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+`;
+
 /* Preview helpers */
 const PreviewScale = styled.div`
   transform: scale(0.55);
@@ -320,6 +520,64 @@ const WidgetPreview: React.FC<{ type: string; style: string; savedSettings?: Rec
   return null;
 };
 
+/* ── Downgrade banner ── */
+// Shown after the user clicks "Cancel" in Polar's portal but before the
+// current period ends — Pro features still work, but they need to know
+// access lapses on the renewal date so the upgrade prompt doesn't feel
+// like it appeared out of nowhere.
+
+const DowngradeBannerWrap = styled.div`
+  max-width: 1200px;
+  margin: 12px auto 0;
+  padding: 0 48px;
+  @media (max-width: 768px) { padding: 0 24px; }
+`;
+
+const DowngradeBannerInner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #92400E;
+  letter-spacing: -0.005em;
+  flex-wrap: wrap;
+`;
+
+const DowngradeBanner: React.FC<{
+  isPro: boolean;
+  status: string | null;
+  endsAt: string | null;
+}> = ({ isPro, status, endsAt }) => {
+  if (!isPro || status !== 'canceled' || !endsAt) return null;
+  const d = new Date(endsAt);
+  if (Number.isNaN(d.getTime())) return null;
+  const formatted = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return (
+    <DowngradeBannerWrap>
+      <DowngradeBannerInner>
+        <span>
+          <strong>Pro ends {formatted}.</strong>{' '}
+          After that, editing is locked until you renew. Existing widgets keep working — embeds won't break.
+        </span>
+        <a
+          href="/settings#subscription"
+          style={{
+            color: '#92400E', fontWeight: 600, textDecoration: 'none',
+            borderBottom: '1px solid currentColor', paddingBottom: 1,
+          }}
+        >
+          Manage in Settings →
+        </a>
+      </DowngradeBannerInner>
+    </DowngradeBannerWrap>
+  );
+};
+
 /* ── Component ── */
 
 type StudioTab = 'widgets' | 'templates';
@@ -327,10 +585,16 @@ type StudioTab = 'widgets' | 'templates';
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isRegistered, isGuest, user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { isRegistered, isGuest, user, plan, isPro, planLoading } = useAuth();
+  // `?purchased=<polarProductId>` lands here from Polar after a successful
+  // template checkout. Show a banner + optional signup CTA for guests.
+  const [purchasedProductId, setPurchasedProductId] = useState<string | null>(() => searchParams.get('purchased'));
   const [tab, setTab] = useState<StudioTab>('widgets');
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
+  const [mobileSection, setMobileSection] = useState<PanelSection>(null);
 
   const { open: openUpgrade } = useUpgradeModal();
   const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
@@ -466,11 +730,21 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       setSaveStatus('saved');
       savedStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 1800);
     } catch (err) {
+      // Server-side tier enforcement blocked the write — either the free
+      // user hit the 3-widget cap racing past the client check, or they
+      // tried to save a Pro-only style. Open the upgrade modal instead of
+      // showing a generic error toast.
+      if (err instanceof WidgetTierError) {
+        Logger.info('StudioPage', 'Save blocked by tier policy', err.message);
+        setSaveStatus('idle');
+        openUpgrade();
+        return;
+      }
       Logger.error('StudioPage', 'Auto-save failed', err);
       setSaveStatus('error');
       savedStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 3000);
     }
-  }, [isRegistered, editingWidgetId, editingWidgetKey]);
+  }, [isRegistered, editingWidgetId, editingWidgetKey, openUpgrade]);
 
   // Debounced auto-save: fires 1.5s after the last settings or name change while editor is open.
   useEffect(() => {
@@ -538,6 +812,113 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   if (editorOpen && editingWidget) {
     const embedUrl = diContainer.getWidgetEmbedUrlUseCase.execute(editingWidget);
     // copied state is declared at component level
+
+    // ── Mobile editor (≤768): stacked layout + bottom sheet panel ──
+    // Desktop code below stays intact. Mobile path duplicates state usage
+    // but uses a completely separate JSX tree to avoid cross-viewport CSS risk.
+    if (isMobile) {
+      const calStyle = editingWidget.type === 'calendar' ? (editingWidget.settings as CalendarSettings).style : '';
+      const clkStyle = editingWidget.type === 'clock' ? (editingWidget.settings as ClockSettings).style : '';
+      const isBoardW = editingWidget.type === 'board';
+      const isCollageW = calStyle === 'collage' || calStyle === 'typewriter' || clkStyle === 'flower';
+      const isFlowerW = clkStyle === 'flower';
+
+      // Panel sections — all four tabs are always shown in the bottom bar
+      // for visual consistency; tabs unavailable for this widget type are
+      // rendered greyed-out and do not open the sheet on tap.
+      const sections: { key: Exclude<PanelSection, null>; label: string; icon: React.ReactNode; disabled?: boolean }[] = [
+        { key: 'style', label: 'Style', icon: <Sparkles />, disabled: !(isFlowerW || isBoardW) },
+        { key: 'content', label: 'Content', icon: <FileText /> },
+        { key: 'color', label: 'Color', icon: <Palette />, disabled: isBoardW },
+        { key: 'layout', label: 'Layout', icon: <LayoutGrid />, disabled: isCollageW || isBoardW },
+      ];
+
+      const sheetOpen = mobileSection !== null;
+      const openSection = (s: Exclude<PanelSection, null>, disabled?: boolean) => {
+        if (disabled) return;
+        setMobileSection(prev => prev === s ? null : s);
+      };
+      const closeSheet = () => setMobileSection(null);
+
+      return (
+        <MobileEditorWrap>
+          <MobileTopBar>
+            <MobileBackBtn onClick={handleEditorBack} aria-label="Back">
+              <ChevronLeft />
+            </MobileBackBtn>
+            <MobileWidgetName>
+              {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            </MobileWidgetName>
+            {/* Save status dot — non-intrusive */}
+            {saveStatus === 'saving' && <Loader2 style={{ width: 14, height: 14, color: '#888', animation: 'spin 1s linear infinite' }} />}
+            {saveStatus === 'saved' && <Check style={{ width: 14, height: 14, color: '#16A34A' }} />}
+            <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+            <MobileCopyBtn
+              $copied={copied}
+              onClick={() => {
+                navigator.clipboard.writeText(embedUrl).then(() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                });
+              }}
+            >
+              {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
+            </MobileCopyBtn>
+          </MobileTopBar>
+
+          <MobileArtboard>
+            <MobileDotGrid />
+            <MobileWidgetScale>
+              <WidgetDisplay widget={editingWidget} />
+            </MobileWidgetScale>
+          </MobileArtboard>
+
+          <MobileSectionTabs>
+            {sections.map(s => (
+              <MobileSectionTab
+                key={s.key}
+                $active={mobileSection === s.key && !s.disabled}
+                $disabled={s.disabled}
+                disabled={s.disabled}
+                aria-disabled={s.disabled}
+                onClick={() => openSection(s.key, s.disabled)}
+              >
+                {s.icon}
+                {s.label}
+              </MobileSectionTab>
+            ))}
+          </MobileSectionTabs>
+
+          <MobileSheetBackdrop $open={sheetOpen} onClick={closeSheet} />
+          <MobileSheet $open={sheetOpen} aria-hidden={!sheetOpen}>
+            <MobileSheetHandle />
+            <MobileSheetHeader>
+              <MobileSheetTitle>{mobileSection ?? ''}</MobileSheetTitle>
+              <MobileSheetClose onClick={closeSheet} aria-label="Close">
+                <ArrowRight style={{ transform: 'rotate(90deg)' }} />
+              </MobileSheetClose>
+            </MobileSheetHeader>
+            <MobileSheetBody>
+              {mobileSection && (
+                <CustomizationPanel
+                  widget={editingWidget}
+                  onSettingsChange={(settings) => {
+                    if (!editingWidget) return;
+                    const updated = editingWidget.updateSettings(settings as CalendarSettings | ClockSettings | BoardSettings);
+                    setEditingWidget(updated);
+                  }}
+                  visibleSection={mobileSection}
+                  widgetCount={widgets.length}
+                  widgetLimit={3}
+                  onUpgrade={() => openUpgrade()}
+                />
+              )}
+            </MobileSheetBody>
+          </MobileSheet>
+        </MobileEditorWrap>
+      );
+    }
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: '#fff' }}>
         {/* Editor top bar */}
@@ -562,7 +943,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               display: 'flex', alignItems: 'center', gap: 6,
               height: 28, padding: '0 10px', borderRadius: 8,
               background: saveStatus === 'error' ? 'rgba(220,40,40,0.08)' : 'rgba(0,0,0,0.04)',
-              color: saveStatus === 'error' ? '#DC2828' : saveStatus === 'saved' ? '#16A34A' : '#888',
+              color: saveStatus === 'error' ? '#F49B8B' : saveStatus === 'saved' ? '#16A34A' : '#888',
               fontSize: 12, fontWeight: 500, letterSpacing: '-0.01em',
               opacity: saveStatus === 'idle' ? 0 : 1,
               transition: 'opacity 0.2s ease, color 0.2s ease, background 0.2s ease',
@@ -576,29 +957,40 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </div>
           {/* Status + Upgrade — right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {/* Circular progress ring */}
-              <svg width="24" height="24" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="2.5" />
-                <circle cx="12" cy="12" r="9" fill="none"
-                  stroke={widgets.length >= 3 ? '#DC2828' : '#6366F1'}
-                  strokeWidth="2.5" strokeLinecap="round"
-                  strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
-                  style={{ transition: 'stroke-dasharray 0.3s' }}
-                />
-              </svg>
-              <span style={{ fontSize: 12, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length}/3</span>
-            </div>
-            <button onClick={() => openUpgrade()} style={{
-              display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 16px',
-              border: 'none', borderRadius: 10,
-              background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-              fontSize: 13, fontWeight: 600, fontFamily: 'inherit', color: '#fff', cursor: 'pointer',
-              transition: 'all 0.15s',
-              boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
-            }}>
-              Upgrade now
-            </button>
+            {planLoading ? null : isPro ? (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', height: 22, padding: '0 10px',
+                borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                textTransform: 'uppercase' as const,
+                color: '#fff', background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                boxShadow: '0 1px 4px rgba(99,102,241,0.25)',
+              }}>Pro</span>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="3" />
+                    <circle cx="12" cy="12" r="9" fill="none"
+                      stroke={widgets.length >= 3 ? '#F49B8B' : '#6366F1'}
+                      strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
+                      style={{ transition: 'stroke-dasharray 0.3s' }}
+                    />
+                  </svg>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length}/3</span>
+                </div>
+                <button onClick={() => openUpgrade()} style={{
+                  display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 16px',
+                  border: 'none', borderRadius: 10,
+                  background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                  fontSize: 13, fontWeight: 600, fontFamily: 'inherit', color: '#fff', cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
+                }}>
+                  Upgrade now
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -688,44 +1080,120 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     <Page>
       <TopNav activeLink="studio" />
       <EmailVerificationBanner />
+      <DowngradeBanner isPro={isPro} status={plan.status} endsAt={plan.currentPeriodEnd} />
+
+      {purchasedProductId && (
+        <div style={{
+          margin: '12px 48px 0',
+          padding: '14px 18px',
+          borderRadius: 12,
+          border: '1px solid rgba(34, 197, 94, 0.25)',
+          background: 'linear-gradient(135deg, #F0FDF4 0%, #E8F7EE 100%)',
+          color: '#15803D',
+          fontSize: 14,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          flexWrap: 'wrap' as const,
+        }}>
+          <span style={{ flex: 1, minWidth: 220 }}>
+            <strong>✓ Purchase confirmed.</strong> A download link was emailed to you
+            {user?.email ? <> at <strong>{user.email}</strong></> : null}.
+            {!isRegistered && <> Wrong email? <a href="mailto:support@peachyplanner.com" style={{ color: '#15803D', fontWeight: 600 }}>Contact support</a>.</>}
+          </span>
+          {!isRegistered && (
+            <button
+              onClick={() => navigate(`/login?returnTo=${encodeURIComponent('/studio?view=purchases')}`)}
+              style={{
+                background: '#15803D', color: '#fff', border: 'none', borderRadius: 8,
+                padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              Create account to save this purchase
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setPurchasedProductId(null);
+              const next = new URLSearchParams(searchParams);
+              next.delete('purchased');
+              setSearchParams(next, { replace: true });
+            }}
+            style={{
+              background: 'transparent', border: 'none', fontSize: 18, cursor: 'pointer',
+              color: '#15803D', lineHeight: 1, padding: 4,
+            }}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <Container>
         {/* Welcome */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, marginTop: 8 }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
+          alignItems: isMobile ? 'stretch' : 'flex-start',
+          justifyContent: 'space-between',
+          gap: isMobile ? 16 : 0,
+          marginBottom: 32,
+          marginTop: 8,
+        }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>
               Welcome 👋
             </h1>
             <p style={{ fontSize: 15, color: '#999', margin: 0 }}>Manage your widgets and templates</p>
           </div>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 16,
-            background: '#FAFAFA', borderRadius: 14, padding: '10px 16px',
-            border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
-                <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="2.5" />
-                <circle cx="12" cy="12" r="9" fill="none"
-                  stroke={widgets.length >= 3 ? '#DC2828' : '#6366F1'}
-                  strokeWidth="2.5" strokeLinecap="round"
-                  strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
-                  style={{ transition: 'stroke-dasharray 0.3s' }}
-                />
-              </svg>
-              <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
-            </div>
-            <button onClick={() => openUpgrade()} style={{
-              fontSize: 14, fontWeight: 600, color: '#fff',
-              background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-              padding: '10px 28px', borderRadius: 12,
-              border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              whiteSpace: 'nowrap' as const, transition: 'all 0.15s',
-              boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
+          {planLoading ? null : isPro ? (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: '#FAFAFA', borderRadius: 14, padding: '10px 16px',
+              border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
             }}>
-              Upgrade now
-            </button>
-          </div>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', height: 22, padding: '0 10px',
+                borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                textTransform: 'uppercase' as const,
+                color: '#fff', background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                boxShadow: '0 1px 4px rgba(99,102,241,0.25)',
+              }}>Pro</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#555', whiteSpace: 'nowrap' as const }}>
+                {widgets.length} {widgets.length === 1 ? 'widget' : 'widgets'} · unlimited
+              </span>
+            </div>
+          ) : (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 16,
+              background: '#FAFAFA', borderRadius: 14, padding: '10px 16px',
+              border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="3" />
+                  <circle cx="12" cy="12" r="9" fill="none"
+                    stroke={widgets.length >= 3 ? '#F49B8B' : '#6366F1'}
+                    strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
+                    style={{ transition: 'stroke-dasharray 0.3s' }}
+                  />
+                </svg>
+                <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
+              </div>
+              <button onClick={() => openUpgrade()} style={{
+                fontSize: 14, fontWeight: 600, color: '#fff',
+                background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                padding: '10px 28px', borderRadius: 12,
+                border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                whiteSpace: 'nowrap' as const, transition: 'all 0.15s',
+                boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
+              }}>
+                Upgrade now
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Tab bar */}
@@ -743,10 +1211,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 background: 'linear-gradient(135deg, rgba(237,228,255,0.6) 0%, rgba(232,237,255,0.5) 40%, rgba(245,235,250,0.55) 100%)',
                 border: '1.5px solid rgba(200,195,230,0.3)',
                 borderRadius: 16,
-                padding: '32px 32px',
+                padding: isMobile ? '24px 20px' : '32px 32px',
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
+                alignItems: isMobile ? 'stretch' : 'center',
                 justifyContent: 'space-between',
+                gap: isMobile ? 16 : 0,
                 marginBottom: 32,
               }}
             >
@@ -755,12 +1225,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 <div style={{ fontSize: 14, color: '#666', marginTop: 6 }}>Browse styles, customize and embed in Notion</div>
               </div>
               <button onClick={() => navigate('/widgets')} style={{
-                display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 24px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, padding: '0 24px',
                 border: 'none', borderRadius: 12,
                 background: '#1F1F1F', color: '#fff', fontSize: 14, fontWeight: 600,
                 fontFamily: 'inherit', cursor: 'pointer',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
                 transition: 'all 0.15s',
+                width: isMobile ? '100%' : 'auto',
               }}><Plus style={{ width: 16, height: 16 }} /> Browse widgets</button>
             </div>
 
@@ -803,19 +1274,26 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             {/* Browse banner — top */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(252,235,225,0.45) 0%, rgba(255,245,235,0.4) 30%, rgba(237,228,255,0.35) 70%, rgba(232,237,255,0.4) 100%)',
-              border: '1.5px solid rgba(220,200,210,0.25)', borderRadius: 16, padding: '32px 32px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32,
+              border: '1.5px solid rgba(220,200,210,0.25)', borderRadius: 16,
+              padding: isMobile ? '24px 20px' : '32px 32px',
+              display: 'flex',
+              flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
+              alignItems: isMobile ? 'stretch' : 'center',
+              justifyContent: 'space-between',
+              gap: isMobile ? 16 : 0,
+              marginBottom: 32,
             }}>
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Browse template shop</div>
                 <div style={{ fontSize: 14, color: '#666', marginTop: 6 }}>Notion planners, trackers & productivity systems</div>
               </div>
               <button onClick={() => navigate('/templates')} style={{
-                display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 24px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, padding: '0 24px',
                 border: 'none', borderRadius: 12,
                 background: '#1F1F1F', color: '#fff', fontSize: 14, fontWeight: 600,
                 fontFamily: 'inherit', cursor: 'pointer',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                width: isMobile ? '100%' : 'auto',
               }}><ArrowRight style={{ width: 16, height: 16 }} /> Browse</button>
             </div>
 

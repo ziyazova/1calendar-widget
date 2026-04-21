@@ -51,11 +51,15 @@ export const SubscriptionService = {
   /**
    * Asks the `polar-checkout` Edge Function for a hosted checkout URL and
    * redirects the browser. Throws a human-readable error on failure.
+   *
+   * Pass `productId` to buy a specific template (catalogue item). When
+   * omitted, defaults to the Pro subscription product server-side.
+   * `successPath` lets callers override the post-checkout landing page.
    */
-  async startCheckout(): Promise<void> {
+  async startCheckout(opts?: { productId?: string; successPath?: string }): Promise<void> {
     const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
       'polar-checkout',
-      { body: {} },
+      { body: opts ?? {} },
     );
     if (error) {
       Logger.error('Subscription', 'Checkout invoke failed', error);
@@ -66,5 +70,32 @@ export const SubscriptionService = {
       throw new Error(data?.error ?? 'Checkout did not return a URL.');
     }
     window.location.href = data.url;
+  },
+
+  /**
+   * Opens Polar's customer portal in a new tab. This is the real
+   * cancel/manage entry point (German FCCA Kündigungsbutton target) — the
+   * Edge Function mints a signed portal URL tied to the user's own
+   * subscription, rather than dropping them on the Polar marketing site.
+   *
+   * Returns false when the user has no Polar customer record yet (they've
+   * never completed a checkout). Callers can use that to nudge them to
+   * upgrade instead.
+   */
+  async openCustomerPortal(): Promise<boolean> {
+    const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
+      'polar-customer-portal',
+      { body: {} },
+    );
+    if (error) {
+      Logger.error('Subscription', 'Portal invoke failed', error);
+      return false;
+    }
+    if (!data?.url) {
+      Logger.error('Subscription', 'Portal returned no URL', data);
+      return false;
+    }
+    window.open(data.url, '_blank', 'noopener,noreferrer');
+    return true;
   },
 };

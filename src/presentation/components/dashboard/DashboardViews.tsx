@@ -5,10 +5,15 @@ import { Plus, Download, ExternalLink, Pencil, Trash2, LogOut, Search, FileDown,
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../ui/widgetConfig';
 import type { DashboardView } from '../ui/sidebar/Sidebar';
 import { useAuth } from '@/presentation/context/AuthContext';
+import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 import { WidgetStorageService, type SavedWidget } from '@/infrastructure/services/WidgetStorageService';
 import { AccountService } from '@/infrastructure/services/AccountService';
+import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
+import { PurchaseService, type Purchase } from '@/infrastructure/services/PurchaseService';
+import { TEMPLATES } from '@/presentation/data/templates';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
+import { PlanPill } from '@/presentation/components/shared';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
 import { getContrastColor } from '@/presentation/themes/colors';
 
@@ -668,17 +673,6 @@ const AvatarCircle = styled.div`
   flex-shrink: 0;
 `;
 
-const PlanPill = styled.span<{ $pro?: boolean }>`
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  background: ${({ $pro }) => $pro ? '#1F1F1F' : '#F5F5F5'};
-  color: ${({ $pro }) => $pro ? '#fff' : '#999'};
-`;
-
 const WelcomeTitle = styled.h1`
   font-size: 28px;
   font-weight: 600;
@@ -1278,30 +1272,83 @@ const BrowseShopBtn = styled.button`
 
 const PurchasesView: React.FC = () => {
   const navigate = useNavigate();
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const rows = await PurchaseService.getMyPurchases();
+      if (!cancelled) {
+        setPurchases(rows);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Resolve a card image + slug by looking up the polar product id in the
+  // local catalogue. Falls back to a generic placeholder if the product
+  // isn't on the site yet (legacy purchase or new Polar product).
+  const enrich = (p: Purchase) => {
+    const template = TEMPLATES.find(t => t.polarProductId === p.polarProductId);
+    return {
+      image: template?.image ?? '/template-main.png',
+      slug: template?.id,
+      title: template?.title ?? p.productName ?? 'Template purchase',
+    };
+  };
+
+  const formatPrice = (cents: number | null, currency: string) => {
+    if (cents == null) return '';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(cents / 100);
+  };
+
+  const formatDate = (iso: string) => {
+    try {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch { return iso; }
+  };
+
   return (
     <Container>
-      <Title>My Templates</Title>
-      <Subtitle>Your purchased Notion planners and templates</Subtitle>
+      <Title>My Purchases</Title>
+      <Subtitle>Your purchased Notion planners and templates. Download links are also in your email.</Subtitle>
 
-      {PURCHASES.length === 0 ? (
+      {loading ? (
+        <EmptyBox><EmptyHint>Loading your purchases…</EmptyHint></EmptyBox>
+      ) : purchases.length === 0 ? (
         <EmptyBox onClick={() => navigate('/templates')}>
           <EmptyCircle><Download /></EmptyCircle>
-          <EmptyTitle>No templates yet</EmptyTitle>
+          <EmptyTitle>No purchases yet</EmptyTitle>
           <EmptyHint>Browse the shop to find planners for Notion</EmptyHint>
         </EmptyBox>
       ) : (
         <>
-          {PURCHASES.map(p => (
-            <PurchaseCard key={p.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/templates/${p.slug}`)}>
-              <PurchaseImg style={{ width: 64, height: 64 }}><img src={p.image} alt={p.name} /></PurchaseImg>
-              <PurchaseDetails>
-                <PurchaseTitle>{p.name}</PurchaseTitle>
-                <PurchaseMeta>{p.order} · {p.date}</PurchaseMeta>
-              </PurchaseDetails>
-              <PurchasePriceTag>{p.price}</PurchasePriceTag>
-              <ActionButton onClick={(e) => { e.stopPropagation(); }}><Download /> Download</ActionButton>
-            </PurchaseCard>
-          ))}
+          {purchases.map(p => {
+            const info = enrich(p);
+            return (
+              <PurchaseCard key={p.id} style={{ cursor: info.slug ? 'pointer' : 'default' }} onClick={() => info.slug && navigate(`/templates/${info.slug}`)}>
+                <PurchaseImg style={{ width: 64, height: 64 }}><img src={info.image} alt={info.title} /></PurchaseImg>
+                <PurchaseDetails>
+                  <PurchaseTitle>{info.title}</PurchaseTitle>
+                  <PurchaseMeta>#{p.polarOrderId.slice(-8)} · {formatDate(p.createdAt)}{p.status === 'refunded' ? ' · refunded' : ''}</PurchaseMeta>
+                </PurchaseDetails>
+                <PurchasePriceTag>{formatPrice(p.amountCents, p.currency)}</PurchasePriceTag>
+                <ActionButton onClick={(e) => {
+                  e.stopPropagation();
+                  // Download links live in the Polar email delivery. Open the
+                  // Polar customer portal where the buyer can redownload.
+                  void SubscriptionService.openCustomerPortal().then(ok => {
+                    if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
+                  });
+                }}><Download /> Download</ActionButton>
+              </PurchaseCard>
+            );
+          })}
         </>
       )}
 
@@ -1316,7 +1363,8 @@ const PurchasesView: React.FC = () => {
 
 const ProfileView: React.FC = () => {
   const navigate = useNavigate();
-  const { user, logout, supabaseUser, updatePassword } = useAuth();
+  const { user, logout, supabaseUser, updatePassword, isPro, plan } = useAuth();
+  const { open: openUpgrade } = useUpgradeModal();
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U';
   const [exporting, setExporting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -1437,10 +1485,23 @@ const ProfileView: React.FC = () => {
         <SectionBlockBody>
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Free plan</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>3 widgets, basic customization</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>{isPro ? 'Pro plan · $4 / month' : 'Free plan'}</div>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+                {isPro
+                  ? (plan.currentPeriodEnd
+                      ? `Next billing on ${new Date(plan.currentPeriodEnd).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}. Unlimited widgets, all styles.`
+                      : 'Unlimited widgets, all styles, full customization.')
+                  : '3 widgets, basic customization'}
+              </div>
             </div>
-            <ActionButton $primary>Upgrade to Pro</ActionButton>
+            {isPro ? (
+              <ActionButton onClick={async () => {
+                const ok = await SubscriptionService.openCustomerPortal();
+                if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
+              }}>Manage</ActionButton>
+            ) : (
+              <ActionButton $primary onClick={openUpgrade}>Upgrade to Pro</ActionButton>
+            )}
           </SettingsRowSplit>
         </SectionBlockBody>
       </SectionBlock>

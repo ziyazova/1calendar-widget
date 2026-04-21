@@ -10,10 +10,10 @@ const FooterOuter = styled.div`
 const FooterWrapper = styled.footer`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 48px 40px;
+  padding: 68px 48px 0;
 
   @media (max-width: 768px) {
-    padding: 32px 24px;
+    padding: 52px 24px 0;
   }
 `;
 

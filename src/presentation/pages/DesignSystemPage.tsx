@@ -7,7 +7,18 @@ import { FilterChip } from '@/presentation/components/shared/FilterChip';
 import { BackButton } from '@/presentation/components/shared/BackButton';
 import { SectionHeader } from '@/presentation/components/shared/SectionHeader';
 import { Footer } from '@/presentation/components/shared/Footer';
-import { Search, Check, Star, User, Home, Settings, Calendar, Clock, ToggleLeft, ToggleRight, Type } from 'lucide-react';
+import {
+  ProPill,
+  NewPill,
+  FreePill,
+  LimitedPill,
+  PopularPill,
+  PlanPill,
+  PlanBadge,
+  BADGE_ACCENT_TEXT,
+  badgeBase,
+} from '@/presentation/components/shared';
+import { Search, Check, Star, User, Home, Settings, Calendar, Clock, ToggleLeft, ToggleRight, Type, Lock, Pencil, Trash2, Sparkles, ChevronDown, LogOut, ArrowUpRight, ShoppingBag, Menu, X, ArrowRight, ExternalLink, Plus } from 'lucide-react';
 
 /* ── Toast animation ── */
 
@@ -1079,6 +1090,621 @@ const MobileTabItem = styled.div<{ $active?: boolean }>`
   }
 `;
 
+/* ── Upgrade button + dropdown demos (1:1 copies of production styles) ── */
+
+// 1:1 copy of CustomizeBtn from WidgetStudioPage.tsx:473
+const CustomizeBtnDemo = styled.button<{ $pro?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 13px;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ $pro }) => $pro ? '#2B2320' : '#fff'};
+  background: ${({ $pro }) => $pro ? 'transparent' : '#2B2320'};
+  border: 1px solid ${({ $pro }) => $pro ? '#2B2320' : 'transparent'};
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: ${({ $pro }) => $pro ? '#2B2320' : '#1F1814'};
+    color: #fff;
+    border-color: ${({ $pro }) => $pro ? '#2B2320' : 'transparent'};
+  }
+
+  svg { width: 13px; height: 13px; }
+`;
+
+const UpgradeStateGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const UpgradeStateCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: ${({ theme }) => theme.colors.background.page};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+`;
+
+const UpgradeStateLabel = styled.div`
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+`;
+
+// Mock of the TopNav avatar dropdown container
+const DropdownMock = styled.div`
+  width: 240px;
+  max-width: 100%;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+// 1:1 copy of the "Upgrade to Pro" dropdown row from TopNav.tsx:651
+const DropdownRowUpgrade = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  cursor: pointer;
+  background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
+  color: #4F46E5;
+  font-family: inherit;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.36);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.16);
+  }
+`;
+
+const DropdownUpgradeBadge = styled.span`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6366F1;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 2px 6px;
+  border-radius: 4px;
+`;
+
+const DropdownRowPlain = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+`;
+
+/* ── Full avatar dropdown mock (TopNav.tsx:592) ── */
+
+const AvatarDropdownFull = styled.div`
+  width: 260px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+`;
+
+const DropdownUserCard = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 14px;
+  background: linear-gradient(135deg, rgba(237, 228, 255, 0.3) 0%, rgba(232, 237, 255, 0.2) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+`;
+
+const DropdownAvatarCircle = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(255, 160, 140, 0.28);
+`;
+
+const DropdownUserName = styled.div`
+  font-size: 13px;
+  font-weight: 600;
+  color: #1F1F1F;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const DropdownUserEmail = styled.div`
+  font-size: 11.5px;
+  color: #8E8E93;
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const DropdownMenuItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1F1F1F;
+  border-radius: 9px;
+  letter-spacing: -0.005em;
+  transition: background 0.12s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.035);
+  }
+`;
+
+const DropdownDivider = styled.div`
+  height: 1px;
+  margin: 0 12px;
+  background: rgba(0, 0, 0, 0.04);
+`;
+
+const DropdownLogoutItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8E8E93;
+  border-radius: 9px;
+  letter-spacing: -0.005em;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: rgba(220, 60, 60, 0.08);
+    color: #C23B3B;
+  }
+`;
+
+const DropdownPlanRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+`;
+
+// DropdownPlanBadge removed — uses shared PlanBadge with $pro prop now.
+
+/* ── Additional label demos (1:1 copies from site) ── */
+
+// 1:1 copy of CategoryChip from CategoriesMarquee.tsx:38
+const CategoryChipDemo = styled.div<{ $color: string }>`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.08)`;
+  }};
+  border: 1px solid ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.12)`;
+  }};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    background: ${({ $color }) => $color};
+    flex-shrink: 0;
+  }
+`;
+
+// 1:1 copy of CardBadge from TemplatesPage.tsx:172 — overlay badge on template card
+const CardBadgeDemo = styled.span`
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  color: ${({ theme }) => theme.colors.text.primary};
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 500;
+`;
+
+// 1:1 copy of WidgetLabel from StudioPage.tsx:167 — overlay on studio widget cards
+const WidgetLabelDemo = styled.span`
+  font-size: 11px;
+  font-weight: 600;
+  color: #6366F1;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 3px 10px;
+  border-radius: 6px;
+`;
+
+// 1:1 copy of CategoryTag from TemplateDetailPage.tsx:520 — inline metadata tag
+const CategoryTagDemo = styled.span`
+  display: inline-block;
+  padding: 2px 10px;
+  background: ${({ theme }) => theme.colors.background.surface};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+// 1:1 copy of SectionLabel from HeroSectionV2.tsx:414 — tiny eyebrow label
+const SectionLabelDemo = styled.div`
+  font-size: 9.5px;
+  color: #9B9790;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+// SocialBadge compound (HeroSection.tsx:110) — avatars + divider + stars + text
+const SocialBadgeDemo = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 5px 5px;
+  background: rgba(255, 255, 255, 0.44);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 2px rgba(20, 20, 40, 0.03),
+    0 4px 12px -4px rgba(20, 20, 40, 0.05);
+`;
+
+const SocialAvatarStack = styled.div`
+  display: inline-flex;
+  align-items: center;
+`;
+
+const SocialAvatar = styled.div<{ $bg: string; $i: number }>`
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: ${({ $bg }) => $bg};
+  border: 1.5px solid #fff;
+  margin-left: ${({ $i }) => ($i === 0 ? '0' : '-7px')};
+  z-index: ${({ $i }) => 10 - $i};
+`;
+
+const SocialBadgeDivider = styled.span`
+  width: 1px;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.1);
+`;
+
+const SocialBadgeStars = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: #8B7FD6;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.5px;
+`;
+
+const SocialBadgeText = styled.span`
+  font-size: 12.5px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+
+  strong {
+    color: ${({ theme }) => theme.colors.text.primary};
+    font-weight: 600;
+  }
+`;
+
+// Mesh-backed stage so glass variants (SocialBadge, WidgetLabel, CardBadge) read correctly
+const GlassStage = styled.div`
+  background: ${({ theme }) => theme.colors.background.mesh};
+  padding: 24px 20px;
+  border-radius: 14px;
+  display: inline-flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+`;
+
+/* ── Button demos (1:1 copies of production button variants) ── */
+
+// 1:1 copy of NavCTA from TopNav.tsx:109
+const NavCTADemo = styled.button`
+  height: 34px;
+  padding: 0 16px;
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: #ffffff;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.button};
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: all ${({ theme }) => theme.transitions.base};
+  white-space: nowrap;
+
+  &:hover {
+    background: #333;
+    transform: translateY(-1px);
+  }
+`;
+
+// 1:1 copy of MobileCTA from TopNav.tsx:193
+const MobileCTADemo = styled.button`
+  width: 260px;
+  height: 48px;
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: #ffffff;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+
+  &:hover { background: #333; }
+`;
+
+// 1:1 copy of BurgerButton from TopNav.tsx:131
+const BurgerButtonDemo = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.primary};
+
+  svg { width: 20px; height: 20px; }
+`;
+
+// 1:1 copy of CartButton from TopNav.tsx:213
+const CartButtonDemo = styled.button`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.primary};
+  transition: all ${({ theme }) => theme.transitions.fast};
+
+  svg { width: 18px; height: 18px; }
+  &:hover { opacity: 0.7; }
+`;
+
+// 1:1 copy of CartRemoveBtn from TopNav.tsx:358
+const CartRemoveBtnDemo = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.muted};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  transition: all ${({ theme }) => theme.transitions.fast};
+  flex-shrink: 0;
+
+  svg { width: 14px; height: 14px; }
+  &:hover {
+    color: ${({ theme }) => theme.colors.destructive};
+    background: rgba(220, 40, 40, 0.06);
+  }
+`;
+
+// 1:1 copy of CartCheckoutBtn from TopNav.tsx:405
+const CartCheckoutBtnDemo = styled.button`
+  width: 260px;
+  height: 44px;
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: #fff;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.button};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover { background: #333; }
+`;
+
+// 1:1 copy of ResendBtn from EmailVerificationBanner.tsx:36
+const ResendBtnDemo = styled.button`
+  height: 30px;
+  padding: 0 14px;
+  background: #fff;
+  border: 1px solid rgba(180, 98, 58, 0.28);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #6B3A1F;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover { background: #FFF9F2; border-color: rgba(180, 98, 58, 0.42); }
+`;
+
+// 1:1 copy of AcceptBtn from ConsentBanner.tsx:79
+const AcceptBtnDemo = styled.button`
+  height: 34px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  background: #1F1F1F;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  letter-spacing: -0.01em;
+
+  &:hover { background: #333; }
+`;
+
+// 1:1 copy of ActionButton from SectionHeader.tsx:44 — the canonical dark-with-icon action.
+// WidgetStudioSection.AccessBtn and TemplatesGallery.ExploreBtn are visual duplicates of this.
+const ActionButtonDemo = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: ${({ theme }) => theme.colors.text.primary};
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.button};
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &:hover { background: #333; }
+  svg { width: 14px; height: 14px; }
+`;
+
+// 1:1 copy of OverlayBtn from DashboardViews.tsx:226 — used on widget card hover overlays.
+const OverlayBtnDemo = styled.button<{ $danger?: boolean }>`
+  height: 34px;
+  padding: 0 18px;
+  background: ${({ $danger }) => ($danger ? 'rgba(220, 40, 40, 0.9)' : 'rgba(255, 255, 255, 0.95)')};
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: ${({ $danger }) => ($danger ? '#fff' : '#1F1F1F')};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+
+  svg { width: 14px; height: 14px; }
+  &:hover { transform: scale(1.04); }
+  &:active { transform: scale(0.95); }
+`;
+
+// Dark stage so the semi-transparent OverlayBtn demos read like they do over card art.
+const OverlayStage = styled.div`
+  background: linear-gradient(135deg, #4a3a55 0%, #5a4258 40%, #6b4846 100%);
+  padding: 18px 20px;
+  border-radius: 14px;
+  display: inline-flex;
+  gap: 10px;
+`;
+
+const BadgeRowTight = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
 /* ── Rules cards ── */
 
 const RulesGrid = styled.div`
@@ -1128,6 +1754,581 @@ const RuleDescription = styled.div`
   line-height: ${({ theme }) => theme.typography.lineHeights.normal};
 `;
 
+/* ── Modals / Badges / Cards / Forms styled demos ── */
+
+const ModalStage = styled.div`
+  background: rgba(26, 22, 19, 0.28);
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 260px;
+`;
+
+const ModalCardDemo = styled.div`
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+`;
+
+const ModalTitle = styled.h3`
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const ModalSubtitle = styled.p`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0 0 20px;
+  line-height: 1.5;
+`;
+
+const ModalCompare = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+`;
+
+const PlanCol = styled.div<{ $highlight?: boolean }>`
+  position: relative;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid ${({ $highlight }) => $highlight ? '#6366F1' : 'rgba(0,0,0,0.08)'};
+  background: ${({ $highlight }) => $highlight ? 'linear-gradient(180deg, #F4F3FF, #fff)' : '#fff'};
+`;
+
+const PlanTitle = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const PlanPrice = styled.div`
+  font-size: 28px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+
+  span {
+    font-size: 13px;
+    font-weight: 500;
+    color: ${({ theme }) => theme.colors.text.tertiary};
+    margin-left: 2px;
+  }
+`;
+
+const PlanSub = styled.div`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin-bottom: 12px;
+`;
+
+const PlanLi = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  padding: 4px 0;
+  &::before {
+    content: '✓';
+    color: #7FA96B;
+    margin-right: 6px;
+  }
+`;
+
+const ModalInput = styled.input`
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  margin-bottom: 16px;
+  outline: none;
+  &:focus { border-color: #6E7FF2; }
+`;
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+`;
+
+const ModalBtn = styled.button<{ $primary?: boolean }>`
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid ${({ $primary }) => $primary ? '#1F1F1F' : 'rgba(0,0,0,0.1)'};
+  background: ${({ $primary }) => $primary ? '#1F1F1F' : '#fff'};
+  color: ${({ $primary }) => $primary ? '#fff' : '#1F1F1F'};
+  &:hover { opacity: 0.88; }
+`;
+
+const ConsentBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: rgba(26, 22, 19, 0.92);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 13px;
+  max-width: 680px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+
+  span { flex: 1; }
+`;
+
+const ConsentBtn = styled.button`
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #fff;
+  color: #1F1F1F;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  &:hover { background: #F4F2EF; }
+`;
+
+const VerifyBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #FFF4E6, #FFE8CE);
+  border: 1px solid rgba(244, 166, 114, 0.3);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #5C3D20;
+
+  span { flex: 1; }
+`;
+
+const VerifyDot = styled.i`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F4A672;
+  flex-shrink: 0;
+`;
+
+const VerifyAction = styled.button`
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #B5743A;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  &:hover { color: #8A5624; }
+`;
+
+const ToastPill = styled.div<{ $danger?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: ${({ $danger }) => $danger ? '#DC2828' : '#1F1F1F'};
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  svg { width: 14px; height: 14px; }
+`;
+
+/* ── Badges, pills, overlay labels ──
+   Master-UI design language:
+   • One geometry for every badge — same radius, height, padding, type.
+   • Two color families: brand accent (purple) and ink-neutral.
+   • Visual differentiation comes from *texture* not more colors:
+     leading dots, subtle outlines, gentle gradients.
+   • No aggressive solid fills. The loudest variant is a soft-accent
+     solid with hairline inner highlight, used at most once per screen.
+*/
+
+// Badge components (ProPill, NewPill, FreePill, LimitedPill, PopularPill,
+// PlanPill) are imported from @/presentation/components/shared and are the
+// single source of truth — site and DS render the exact same atoms.
+
+const EyebrowDemo = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 0.5px solid rgba(26, 22, 19, 0.08);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 1px 2px rgba(20, 20, 40, 0.03), 0 4px 12px -4px rgba(20, 20, 40, 0.05);
+  font-size: 13px;
+  color: #4A433D;
+  font-weight: 500;
+`;
+
+const AvatarStack = styled.div`
+  display: flex;
+`;
+
+const MiniAvatar = styled.i<{ $bg: string }>`
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: block;
+  background: ${({ $bg }) => $bg};
+  &:not(:first-child) { margin-left: -6px; }
+`;
+
+const EyebrowStars = styled.span`
+  color: #F4A672;
+  font-size: 12px;
+  letter-spacing: 1px;
+`;
+
+/* Card overlay labels — sit ON images, so need a glass base instead of tint.
+   Same geometry/typography as all other badges. Shared overlay styling:
+   white-transparent bg + hairline outline + accent text = legible on any image. */
+const overlayGlass = `
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+  color: ${BADGE_ACCENT_TEXT};
+`;
+
+const WidgetLabelPill = styled.span`
+  ${badgeBase}
+  ${overlayGlass}
+`;
+
+const GalleryLabelPill = styled.span`
+  ${badgeBase}
+  ${overlayGlass}
+`;
+
+const LockedPill = styled.span`
+  ${badgeBase}
+  ${overlayGlass}
+`;
+
+/* ── Cards demos ── */
+
+const TemplateCardDemo = styled.div`
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const TemplateCardImg = styled.div`
+  width: 100%;
+  aspect-ratio: 288 / 220;
+  border-radius: 20px;
+  border: 1px solid rgba(43, 35, 32, 0.06);
+  box-shadow: 0 2px 6px rgba(43, 35, 32, 0.04), 0 12px 28px -16px rgba(43, 35, 32, 0.12);
+  position: relative;
+`;
+
+const TemplateMeta = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+`;
+
+const TemplateName = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const TemplatePrice = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const WidgetCardDemo = styled.div`
+  width: 280px;
+  background: #fff;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+`;
+
+const WidgetPreview = styled.div`
+  aspect-ratio: 4 / 3;
+  position: relative;
+`;
+
+const WidgetBottomBar = styled.div`
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+`;
+
+const WidgetCardName = styled.div`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const IconBtn = styled.button<{ $danger?: boolean }>`
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  color: ${({ $danger }) => $danger ? '#DC2828' : '#6B6B6B'};
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  &:hover { background: #F4F2EF; }
+  svg { width: 14px; height: 14px; }
+`;
+
+const PricingCardDemo = styled.div<{ $highlighted?: boolean }>`
+  position: relative;
+  width: 220px;
+  padding: 24px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid ${({ $highlighted }) => $highlighted ? '#6366F1' : 'rgba(0,0,0,0.08)'};
+  box-shadow: ${({ $highlighted }) => $highlighted ? '0 6px 32px rgba(100, 80, 200, 0.1)' : '0 1px 3px rgba(0,0,0,0.04)'};
+`;
+
+const TestimonialCardDemo = styled.div`
+  max-width: 340px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(43, 35, 32, 0.06);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 2px 6px rgba(43, 35, 32, 0.04), 0 12px 28px -16px rgba(43, 35, 32, 0.1);
+`;
+
+const TestimonialTextDemo = styled.p`
+  font-size: 14px;
+  line-height: 1.55;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin: 0 0 16px;
+`;
+
+const TestimonialDivider = styled.div`
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
+`;
+
+const TestimonialAuthor = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+/* ── Form demos ── */
+
+const FormStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 420px;
+`;
+
+const FormRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const FormLabel = styled.label`
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  letter-spacing: 0.02em;
+`;
+
+const FormInput = styled.input`
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  &:focus { border-color: #6E7FF2; }
+`;
+
+const FormTextarea = styled.textarea`
+  padding: 10px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  &:focus { border-color: #6E7FF2; }
+`;
+
+const FormSelect = styled.select`
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+  cursor: pointer;
+  max-width: 280px;
+  &:focus { border-color: #6E7FF2; }
+`;
+
+const FormHint = styled.span`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-weight: 500;
+`;
+
+const FormRange = styled.input`
+  width: 100%;
+  accent-color: #6E7FF2;
+`;
+
+const CheckboxRow = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.primary};
+  cursor: pointer;
+`;
+
+const FormCheckbox = styled.input`
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #6E7FF2;
+`;
+
+const ColorSwatchDemo = styled.button<{ $color: string; $active?: boolean }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+  border: 2px solid ${({ $active }) => $active ? '#1F1F1F' : 'transparent'};
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s;
+  &:hover { transform: scale(1.1); }
+`;
+
+/* ── Dropdown menu demo ── */
+
+const DropdownWrap = styled.div`
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const DropdownButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(31, 31, 31, 0.1);
+  background: #fff;
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  &:hover {
+    border-color: rgba(31, 31, 31, 0.2);
+    background: #FAFAFA;
+  }
+  svg { width: 14px; height: 14px; color: ${({ theme }) => theme.colors.text.tertiary}; }
+`;
+
+const DropdownMenu = styled.div`
+  background: #fff;
+  border: 1px solid rgba(31, 31, 31, 0.08);
+  border-radius: 12px;
+  padding: 6px;
+  min-width: 200px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px -6px rgba(0, 0, 0, 0.12);
+`;
+
+const DropdownItem = styled.button<{ $danger?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: ${({ $danger, theme }) => $danger ? '#DC2828' : theme.colors.text.primary};
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+  &:hover { background: ${({ $danger }) => $danger ? 'rgba(220, 40, 40, 0.06)' : 'rgba(31, 31, 31, 0.05)'}; }
+  svg { width: 14px; height: 14px; color: ${({ $danger, theme }) => $danger ? '#DC2828' : theme.colors.text.tertiary}; }
+`;
+
+const DropdownSeparator = styled.div`
+  height: 1px;
+  background: rgba(31, 31, 31, 0.06);
+  margin: 4px 2px;
+`;
+
+const DropdownLabel = styled.div`
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+`;
+
 /* ── Sections nav data ── */
 
 const SECTIONS = [
@@ -1146,6 +2347,10 @@ const SECTIONS = [
   { id: 'transitions', label: 'Transitions', dot: '#7C63B8' },
   { id: 'components', label: 'Components', dot: '#E89A78' },
   { id: 'sitecomponents', label: 'Site Components', dot: '#EC4899' },
+  { id: 'modals', label: 'Modals & Banners', dot: '#F97316' },
+  { id: 'badges', label: 'Labels & Badges', dot: '#6366F1' },
+  { id: 'cards', label: 'Cards', dot: '#14B8A6' },
+  { id: 'forms', label: 'Form Elements', dot: '#A855F7' },
   { id: 'rules', label: 'Rules', dot: '#22C55E' },
 ];
 
@@ -1720,6 +2925,8 @@ export const DesignSystemPage: React.FC = () => {
           <Section id="buttons">
             <SectionCard>
               <SectionTitle>Buttons</SectionTitle>
+
+              {/* Shared Button component — primary / secondary / ghost × sm / lg */}
               <ButtonGrid>
                 {(['primary', 'secondary', 'ghost'] as const).map((variant) =>
                   (['sm', 'lg'] as const).map((size) =>
@@ -1738,6 +2945,90 @@ export const DesignSystemPage: React.FC = () => {
                   ),
                 )}
               </ButtonGrid>
+
+              {/* Nav CTAs */}
+              {matchesFilter('nav cta topnav login mobile', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Nav CTAs</ComponentFrameName>
+                    <ComponentFrameUsage>TopNav — desktop (34px) and mobile menu (48px full-width)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <NavCTADemo>Log in</NavCTADemo>
+                    <MobileCTADemo>Log in</MobileCTADemo>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Action button with icon */}
+              {matchesFilter('action button icon dark section header', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Action Button (dark + icon)</ComponentFrameName>
+                    <ComponentFrameUsage>
+                      SectionHeader / WidgetStudioSection.AccessBtn / TemplatesGallery.ExploreBtn — same visual, 3 call sites
+                    </ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <ActionButtonDemo>View all<ArrowRight /></ActionButtonDemo>
+                    <ActionButtonDemo><ExternalLink />Explore</ActionButtonDemo>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Banner CTAs */}
+              {matchesFilter('banner cta consent cookie email verification resend accept', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Banner CTAs</ComponentFrameName>
+                    <ComponentFrameUsage>ConsentBanner (AcceptBtn) · EmailVerificationBanner (ResendBtn, warm outline pill)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <AcceptBtnDemo>Got it</AcceptBtnDemo>
+                    <ResendBtnDemo>Resend email</ResendBtnDemo>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Icon-only buttons */}
+              {matchesFilter('icon only cart burger close menu', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Icon-only buttons</ComponentFrameName>
+                    <ComponentFrameUsage>TopNav cart / burger · cart item remove (danger hover)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <BurgerButtonDemo title="Menu"><Menu /></BurgerButtonDemo>
+                    <CartButtonDemo title="Cart"><ShoppingBag /></CartButtonDemo>
+                    <CartRemoveBtnDemo title="Remove (danger on hover)"><Trash2 /></CartRemoveBtnDemo>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Cart checkout — full-width dark CTA */}
+              {matchesFilter('cart checkout full width cta', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Cart Checkout (full-width)</ComponentFrameName>
+                    <ComponentFrameUsage>TopNav cart footer — 44px full-width dark</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <CartCheckoutBtnDemo>Checkout · $12</CartCheckoutBtnDemo>
+                </ComponentFrame>
+              )}
+
+              {/* Card overlay actions — dashboard */}
+              {matchesFilter('overlay card dashboard action edit delete danger', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Card Overlay Actions</ComponentFrameName>
+                    <ComponentFrameUsage>DashboardViews widget cards — shown over card art on hover, default + danger variant</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <OverlayStage>
+                    <OverlayBtnDemo><Pencil />Edit</OverlayBtnDemo>
+                    <OverlayBtnDemo $danger><Trash2 />Delete</OverlayBtnDemo>
+                  </OverlayStage>
+                </ComponentFrame>
+              )}
             </SectionCard>
           </Section>
 
@@ -1971,6 +3262,606 @@ export const DesignSystemPage: React.FC = () => {
                     <MobileTabItem><Clock /><span>Clock</span></MobileTabItem>
                     <MobileTabItem><Settings /><span>Settings</span></MobileTabItem>
                   </MobileTabBarMini>
+                </ComponentFrame>
+              )}
+
+              {/* Upgrade Button (studio gallery card) */}
+              {matchesFilter('upgrade pro customize studio button', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Gallery Card Action (Upgrade / Customize)</ComponentFrameName>
+                    <ComponentFrameUsage>Used in: WidgetStudioPage widget gallery cards — swaps on plan</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <UpgradeStateGrid>
+                    <UpgradeStateCell>
+                      <UpgradeStateLabel>Free / quota reached</UpgradeStateLabel>
+                      <CustomizeBtnDemo $pro><span>✦</span>Upgrade</CustomizeBtnDemo>
+                    </UpgradeStateCell>
+                    <UpgradeStateCell>
+                      <UpgradeStateLabel>Pro / within quota</UpgradeStateLabel>
+                      <CustomizeBtnDemo><Pencil /> Customize</CustomizeBtnDemo>
+                    </UpgradeStateCell>
+                  </UpgradeStateGrid>
+                </ComponentFrame>
+              )}
+
+              {/* Full Nav Avatar Dropdown — all rows, both Pro/Free states */}
+              {matchesFilter('avatar dropdown nav menu user profile upgrade pro free plan logout', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Nav Avatar Dropdown (full)</ComponentFrameName>
+                    <ComponentFrameUsage>
+                      TopNav.tsx:592 — complete menu. Rows: user card · plan widget (Pro) / Upgrade CTA (Free) · Dashboard · Settings · divider · Logout (destructive)
+                    </ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <UpgradeStateGrid>
+                    <UpgradeStateCell>
+                      <UpgradeStateLabel>Free plan</UpgradeStateLabel>
+                      <AvatarDropdownFull>
+                        <DropdownUserCard>
+                          <DropdownAvatarCircle>AK</DropdownAvatarCircle>
+                          <div style={{ minWidth: 0 }}>
+                            <DropdownUserName>Aliya Kovacs</DropdownUserName>
+                            <DropdownUserEmail>aliya@example.com</DropdownUserEmail>
+                          </div>
+                        </DropdownUserCard>
+                        <div style={{ padding: '8px 8px 4px' }}>
+                          <DropdownRowUpgrade>
+                            <ArrowUpRight style={{ width: 14, height: 14, strokeWidth: 2, color: '#6366F1', flexShrink: 0 }} />
+                            <span style={{ flex: 1, textAlign: 'left' }}>Upgrade to Pro</span>
+                            <DropdownUpgradeBadge>$4/mo</DropdownUpgradeBadge>
+                          </DropdownRowUpgrade>
+                        </div>
+                        <div style={{ padding: '4px 8px 8px' }}>
+                          <DropdownMenuItem>
+                            <Home style={{ width: 15, height: 15, strokeWidth: 1.75, color: '#8E8E93', flexShrink: 0 }} />
+                            Dashboard
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Settings style={{ width: 15, height: 15, strokeWidth: 1.75, color: '#8E8E93', flexShrink: 0 }} />
+                            Settings
+                          </DropdownMenuItem>
+                        </div>
+                        <DropdownDivider />
+                        <div style={{ padding: '8px' }}>
+                          <DropdownLogoutItem>
+                            <LogOut style={{ width: 15, height: 15, strokeWidth: 1.75, flexShrink: 0 }} />
+                            Log out
+                          </DropdownLogoutItem>
+                        </div>
+                      </AvatarDropdownFull>
+                    </UpgradeStateCell>
+                    <UpgradeStateCell>
+                      <UpgradeStateLabel>Pro plan</UpgradeStateLabel>
+                      <AvatarDropdownFull>
+                        <DropdownUserCard>
+                          <DropdownAvatarCircle>AK</DropdownAvatarCircle>
+                          <div style={{ minWidth: 0 }}>
+                            <DropdownUserName>Aliya Kovacs</DropdownUserName>
+                            <DropdownUserEmail>aliya@example.com</DropdownUserEmail>
+                          </div>
+                        </DropdownUserCard>
+                        <div style={{ padding: '8px 8px 4px' }}>
+                          <DropdownPlanRow>
+                            <PlanBadge $pro>Pro</PlanBadge>
+                            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#4F46E5' }}>Unlimited widgets</span>
+                          </DropdownPlanRow>
+                        </div>
+                        <div style={{ padding: '4px 8px 8px' }}>
+                          <DropdownMenuItem>
+                            <Home style={{ width: 15, height: 15, strokeWidth: 1.75, color: '#8E8E93', flexShrink: 0 }} />
+                            Dashboard
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Settings style={{ width: 15, height: 15, strokeWidth: 1.75, color: '#8E8E93', flexShrink: 0 }} />
+                            Settings
+                          </DropdownMenuItem>
+                        </div>
+                        <DropdownDivider />
+                        <div style={{ padding: '8px' }}>
+                          <DropdownLogoutItem>
+                            <LogOut style={{ width: 15, height: 15, strokeWidth: 1.75, flexShrink: 0 }} />
+                            Log out
+                          </DropdownLogoutItem>
+                        </div>
+                      </AvatarDropdownFull>
+                    </UpgradeStateCell>
+                  </UpgradeStateGrid>
+                </ComponentFrame>
+              )}
+            </SectionCard>
+          </Section>
+
+          {/* ═══════ 17. MODALS & BANNERS ═══════ */}
+          <Section id="modals">
+            <SectionCard>
+              <SectionTitle>Modals & Banners</SectionTitle>
+
+              {matchesFilter('upgrade modal pro', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>UpgradeModal</ComponentFrameName>
+                    <ComponentFrameUsage>Studio quota reached, Pro-locked styles</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <ModalStage data-ux="Demo UpgradeModal">
+                    <ModalCardDemo>
+                      <ModalTitle>Upgrade to Pro</ModalTitle>
+                      <ModalSubtitle>Unlock unlimited widgets, all styles, and premium features.</ModalSubtitle>
+                      <ModalCompare>
+                        <PlanCol>
+                          <PlanTitle>Free</PlanTitle>
+                          <PlanPrice>$0</PlanPrice>
+                          <PlanLi>3 widgets</PlanLi>
+                          <PlanLi>Basic styles</PlanLi>
+                        </PlanCol>
+                        <PlanCol $highlight>
+                          <PopularPill>Popular</PopularPill>
+                          <PlanTitle>Pro</PlanTitle>
+                          <PlanPrice>$4<span>/mo</span></PlanPrice>
+                          <PlanLi>Unlimited widgets</PlanLi>
+                          <PlanLi>All premium styles</PlanLi>
+                        </PlanCol>
+                      </ModalCompare>
+                    </ModalCardDemo>
+                  </ModalStage>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('name widget modal rename dialog', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Name Widget Modal</ComponentFrameName>
+                    <ComponentFrameUsage>StylePickerPanel when creating/renaming a widget</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <ModalStage data-ux="Demo NameModal">
+                    <ModalCardDemo style={{ maxWidth: 360 }}>
+                      <ModalTitle style={{ fontSize: 18 }}>Name your widget</ModalTitle>
+                      <ModalInput placeholder="My new widget" defaultValue="Spring Planner" />
+                      <ModalActions>
+                        <ModalBtn>Cancel</ModalBtn>
+                        <ModalBtn $primary>Create</ModalBtn>
+                      </ModalActions>
+                    </ModalCardDemo>
+                  </ModalStage>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('consent cookie banner bar', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>ConsentBanner (Cookies)</ComponentFrameName>
+                    <ComponentFrameUsage>Global — first visit only</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+                    <ConsentBar data-ux="Demo ConsentBanner">
+                      <span>We use cookies to make Peachy better. Only essentials are loaded by default.</span>
+                      <ConsentBtn>Got it</ConsentBtn>
+                    </ConsentBar>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('email verification banner', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>EmailVerificationBanner</ComponentFrameName>
+                    <ComponentFrameUsage>Top of page when email unverified</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <VerifyBar data-ux="Demo EmailVerificationBanner">
+                    <VerifyDot />
+                    <span>Please verify your email — we sent a link to ziyazovaa@gmail.com</span>
+                    <VerifyAction>Resend</VerifyAction>
+                  </VerifyBar>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('toast snackbar alert notification', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Toasts</ComponentFrameName>
+                    <ComponentFrameUsage>Copy confirmations, save notifications, errors</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    <ToastPill data-ux="Demo Toast Success"><Check /> Saved</ToastPill>
+                    <ToastPill data-ux="Demo Toast Copy"><Check /> Link copied</ToastPill>
+                    <ToastPill $danger data-ux="Demo Toast Error">Failed to save</ToastPill>
+                  </div>
+                </ComponentFrame>
+              )}
+            </SectionCard>
+          </Section>
+
+          {/* ═══════ 18. LABELS & BADGES ═══════ */}
+          <Section id="badges">
+            <SectionCard>
+              <SectionTitle>Labels & Badges</SectionTitle>
+
+              {matchesFilter('pro badge premium', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Status Badges</ComponentFrameName>
+                    <ComponentFrameUsage>Pro / New / Free / Limited — each represents tier/state</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <ProPill data-ux="Demo ProBadge"><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill>
+                    <NewPill data-ux="Demo NewBadge">NEW</NewPill>
+                    <FreePill data-ux="Demo FreeBadge">FREE</FreePill>
+                    <LimitedPill data-ux="Demo LimitedBadge">Limited</LimitedPill>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('plan pill pricing popular', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Plan / Popular pills</ComponentFrameName>
+                    <ComponentFrameUsage>Pricing cards, dashboard plan indicator</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', position: 'relative', height: 40 }}>
+                    <PopularPill style={{ position: 'static' }} data-ux="Demo PopularBadge">Popular</PopularPill>
+                    <PlanPill $pro data-ux="Demo PlanPill Pro">PRO</PlanPill>
+                    <PlanPill data-ux="Demo PlanPill Free">FREE</PlanPill>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {/* Compact plan badge — used inside cards (Settings, avatar dropdown) */}
+              {matchesFilter('plan badge compact gradient settings dropdown', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Plan Badge (compact, inside cards)</ComponentFrameName>
+                    <ComponentFrameUsage>SettingsPage profile card · TopNav avatar dropdown Pro row. Smaller+bolder than PlanPill.</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <PlanBadge $pro>Pro</PlanBadge>
+                    <PlanBadge>Free</PlanBadge>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Category chip (landing marquee) */}
+              {matchesFilter('category chip marquee landing tag', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Category Chip</ComponentFrameName>
+                    <ComponentFrameUsage>CategoriesMarquee on landing — color-tinted per category, leading square dot</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <CategoryChipDemo $color="#6366F1">Productivity</CategoryChipDemo>
+                    <CategoryChipDemo $color="#F4A672">Planning</CategoryChipDemo>
+                    <CategoryChipDemo $color="#7FA96B">Study</CategoryChipDemo>
+                    <CategoryChipDemo $color="#E89B9B">Wellness</CategoryChipDemo>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Category tag (template detail metadata) */}
+              {matchesFilter('category tag template detail metadata', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Category Tag</ComponentFrameName>
+                    <ComponentFrameUsage>TemplateDetailPage info meta — inline metadata tag, surface-bg</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <BadgeRowTight>
+                    <CategoryTagDemo>Productivity</CategoryTagDemo>
+                    <CategoryTagDemo>Notion</CategoryTagDemo>
+                  </BadgeRowTight>
+                </ComponentFrame>
+              )}
+
+              {/* Overlay card labels — sit over card art, need a visible stage */}
+              {matchesFilter('overlay card label widget template glass', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Overlay Card Labels</ComponentFrameName>
+                    <ComponentFrameUsage>
+                      CardBadge (TemplatesPage card) · WidgetLabel (StudioPage card) — glassy overlays pinned top-left of card art
+                    </ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <GlassStage>
+                    <CardBadgeDemo>New</CardBadgeDemo>
+                    <WidgetLabelDemo>Calendar</WidgetLabelDemo>
+                  </GlassStage>
+                </ComponentFrame>
+              )}
+
+              {/* Section label (eyebrow) */}
+              {matchesFilter('section label eyebrow hero micro', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Section Label (eyebrow)</ComponentFrameName>
+                    <ComponentFrameUsage>HeroSectionV2 panel sections — tiny 9.5px muted label above groupings</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <SectionLabelDemo>FEATURED BY</SectionLabelDemo>
+                </ComponentFrame>
+              )}
+
+              {/* Social badge compound (hero) */}
+              {matchesFilter('social badge hero featured proof avatars stars', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Social Proof Badge (compound)</ComponentFrameName>
+                    <ComponentFrameUsage>HeroSection — avatars + divider + stars + text, glassy pill over mesh background</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <GlassStage>
+                    <SocialBadgeDemo>
+                      <SocialAvatarStack>
+                        <SocialAvatar $bg="#FFB3A0" $i={0} />
+                        <SocialAvatar $bg="#B8E0D2" $i={1} />
+                        <SocialAvatar $bg="#C4A8FF" $i={2} />
+                      </SocialAvatarStack>
+                      <SocialBadgeDivider />
+                      <SocialBadgeStars>★★★★★</SocialBadgeStars>
+                      <SocialBadgeDivider />
+                      <SocialBadgeText>Loved by <strong>2,400+ users</strong></SocialBadgeText>
+                    </SocialBadgeDemo>
+                  </GlassStage>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('filter chip category', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>FilterChip</ComponentFrameName>
+                    <ComponentFrameUsage>Templates gallery filters, Style picker</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <ButtonCellRow>
+                    <FilterChip $active>All</FilterChip>
+                    <FilterChip $active={false}>Life</FilterChip>
+                    <FilterChip $active={false}>Student</FilterChip>
+                    <FilterChip $active={false}>Wellness</FilterChip>
+                  </ButtonCellRow>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('eyebrow social proof', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Eyebrow (Social Proof)</ComponentFrameName>
+                    <ComponentFrameUsage>HeroSectionV2 above headline</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <EyebrowDemo data-ux="Demo Eyebrow">
+                    <AvatarStack>
+                      <MiniAvatar $bg="linear-gradient(135deg, #F8E3D0, #EFCAAB)" />
+                      <MiniAvatar $bg="linear-gradient(135deg, #F2D8D8, #E4BEBE)" />
+                      <MiniAvatar $bg="linear-gradient(135deg, #DAE0EC, #B9C4D8)" />
+                    </AvatarStack>
+                    <EyebrowStars>★★★★★</EyebrowStars>
+                    <span>Loved by 11,000+ people</span>
+                  </EyebrowDemo>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('card overlay label lock widget', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Card overlay labels</ComponentFrameName>
+                    <ComponentFrameUsage>Studio widget thumbnails, TemplatesGallery, locked variants</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <WidgetLabelPill data-ux="Demo WidgetLabel">Calendar</WidgetLabelPill>
+                    <GalleryLabelPill data-ux="Demo GalleryCardLabel">Planner</GalleryLabelPill>
+                    <LockedPill data-ux="Demo LockedPill"><Lock /> Pro</LockedPill>
+                  </div>
+                </ComponentFrame>
+              )}
+            </SectionCard>
+          </Section>
+
+          {/* ═══════ 19. CARDS ═══════ */}
+          <Section id="cards">
+            <SectionCard>
+              <SectionTitle>Cards</SectionTitle>
+
+              {matchesFilter('template card shop price', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>TemplateCard</ComponentFrameName>
+                    <ComponentFrameUsage>/templates shop, landing TemplatesGallery</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                    <TemplateCardDemo data-ux="Demo TemplateCard Regular">
+                      <TemplateCardImg style={{ background: 'linear-gradient(135deg, #FFE4CC, #F9C89E)' }} />
+                      <TemplateMeta>
+                        <TemplateName>Daily Planner</TemplateName>
+                        <TemplatePrice>$10.00</TemplatePrice>
+                      </TemplateMeta>
+                    </TemplateCardDemo>
+                    <TemplateCardDemo data-ux="Demo TemplateCard Pro">
+                      <TemplateCardImg style={{ background: 'linear-gradient(135deg, #EADFF5, #D3C6E8)' }}>
+                        <ProPill style={{ position: 'absolute', top: 12, right: 12 }}><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill>
+                      </TemplateCardImg>
+                      <TemplateMeta>
+                        <TemplateName>Life OS</TemplateName>
+                        <TemplatePrice>$24.00</TemplatePrice>
+                      </TemplateMeta>
+                    </TemplateCardDemo>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('widget card studio dashboard', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>WidgetCard</ComponentFrameName>
+                    <ComponentFrameUsage>Studio My Widgets grid</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <WidgetCardDemo data-ux="Demo WidgetCard">
+                    <WidgetPreview style={{ background: '#FAFAF9' }}>
+                      <WidgetLabelPill style={{ position: 'absolute', top: 10, left: 10 }}>Calendar</WidgetLabelPill>
+                    </WidgetPreview>
+                    <WidgetBottomBar>
+                      <WidgetCardName>Spring Planner</WidgetCardName>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <IconBtn><Pencil /></IconBtn>
+                        <IconBtn $danger><Trash2 /></IconBtn>
+                      </div>
+                    </WidgetBottomBar>
+                  </WidgetCardDemo>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('pricing card plan tier', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>PricingCard</ComponentFrameName>
+                    <ComponentFrameUsage>/widgets pricing section</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                    <PricingCardDemo data-ux="Demo PricingCard Free">
+                      <PlanTitle>Free</PlanTitle>
+                      <PlanPrice>$0</PlanPrice>
+                      <PlanSub>forever</PlanSub>
+                      <PlanLi>3 widgets</PlanLi>
+                      <PlanLi>Basic types</PlanLi>
+                    </PricingCardDemo>
+                    <PricingCardDemo $highlighted data-ux="Demo PricingCard Pro">
+                      <PopularPill>Popular</PopularPill>
+                      <PlanTitle>Pro</PlanTitle>
+                      <PlanPrice>$4<span>/mo</span></PlanPrice>
+                      <PlanSub>monthly</PlanSub>
+                      <PlanLi>Unlimited widgets</PlanLi>
+                      <PlanLi>All styles</PlanLi>
+                    </PricingCardDemo>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('testimonial review card', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>TestimonialCard</ComponentFrameName>
+                    <ComponentFrameUsage>Landing testimonials marquee</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <TestimonialCardDemo data-ux="Demo TestimonialCard">
+                    <EyebrowStars style={{ display: 'block', marginBottom: 10 }}>★★★★★</EyebrowStars>
+                    <TestimonialText>An absolute game changer in my daily life.</TestimonialText>
+                    <TestimonialDivider />
+                    <TestimonialAuthor>
+                      <MiniAvatar style={{ width: 28, height: 28 }} $bg="#D4E0EF" />
+                      <span>Alyssa</span>
+                    </TestimonialAuthor>
+                  </TestimonialCardDemo>
+                </ComponentFrame>
+              )}
+            </SectionCard>
+          </Section>
+
+          {/* ═══════ 20. FORM ELEMENTS ═══════ */}
+          <Section id="forms">
+            <SectionCard>
+              <SectionTitle>Form Elements</SectionTitle>
+
+              {matchesFilter('input text email password', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Text Input / Textarea</ComponentFrameName>
+                    <ComponentFrameUsage>Login, Checkout, Settings, Forms across site</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <FormStack>
+                    <FormRow>
+                      <FormLabel>Email</FormLabel>
+                      <FormInput data-ux="Demo FormInput Email" placeholder="you@example.com" defaultValue="ziyazovaa@gmail.com" />
+                    </FormRow>
+                    <FormRow>
+                      <FormLabel>Password</FormLabel>
+                      <FormInput data-ux="Demo FormInput Password" type="password" defaultValue="••••••••" />
+                    </FormRow>
+                    <FormRow>
+                      <FormLabel>Bio</FormLabel>
+                      <FormTextarea data-ux="Demo FormTextarea" placeholder="Tell us about yourself" rows={3} />
+                    </FormRow>
+                  </FormStack>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('select dropdown picker native', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Native Select</ComponentFrameName>
+                    <ComponentFrameUsage>Inside forms: Settings, Customization panel (for simple enum picks)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <FormSelect data-ux="Demo FormSelect" defaultValue="auto">
+                    <option value="auto">Auto (system)</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </FormSelect>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('dropdown menu floating popover profile cart', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Dropdown Menu</ComponentFrameName>
+                    <ComponentFrameUsage>Profile menu, cart preview, filter selectors, context actions</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <DropdownWrap data-ux="Demo Dropdown">
+                    <DropdownButton>
+                      <User />
+                      Aliya
+                      <ChevronDown style={{ marginLeft: 4 }} />
+                    </DropdownButton>
+                    <DropdownMenu data-ux="Demo Dropdown Menu Open">
+                      <DropdownLabel>Account</DropdownLabel>
+                      <DropdownItem><User /> Profile</DropdownItem>
+                      <DropdownItem><Settings /> Settings</DropdownItem>
+                      <DropdownSeparator />
+                      <DropdownLabel>Workspace</DropdownLabel>
+                      <DropdownItem><Home /> My widgets</DropdownItem>
+                      <DropdownItem><Star /> Templates</DropdownItem>
+                      <DropdownSeparator />
+                      <DropdownItem $danger><LogOut /> Sign out</DropdownItem>
+                    </DropdownMenu>
+                  </DropdownWrap>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('slider range', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Range Slider</ComponentFrameName>
+                    <ComponentFrameUsage>Customization panel (border radius, font size, embed size)</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <FormRow>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <FormLabel>Border Radius</FormLabel>
+                      <FormHint>12px</FormHint>
+                    </div>
+                    <FormRange data-ux="Demo FormRange" type="range" min={0} max={32} defaultValue={12} />
+                  </FormRow>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('checkbox check', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Checkbox</ComponentFrameName>
+                    <ComponentFrameUsage>Settings, Customization panel</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                    <CheckboxRow data-ux="Demo Checkbox Checked">
+                      <FormCheckbox type="checkbox" defaultChecked />
+                      <span>Show weekends</span>
+                    </CheckboxRow>
+                    <CheckboxRow data-ux="Demo Checkbox Unchecked">
+                      <FormCheckbox type="checkbox" />
+                      <span>Show day borders</span>
+                    </CheckboxRow>
+                  </div>
+                </ComponentFrame>
+              )}
+
+              {matchesFilter('color swatch picker palette', f) && (
+                <ComponentFrame>
+                  <ComponentFrameHeader>
+                    <ComponentFrameName>Color Picker Swatches</ComponentFrameName>
+                    <ComponentFrameUsage>Customization panel color selectors</ComponentFrameUsage>
+                  </ComponentFrameHeader>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {['#6E7FF2', '#7C63B8', '#E89A78', '#F4A672', '#7FA96B', '#3B82F6'].map((c, i) => (
+                      <ColorSwatchDemo key={c} $color={c} $active={i === 0} data-ux={`Demo ColorSwatch ${c}`} />
+                    ))}
+                  </div>
                 </ComponentFrame>
               )}
             </SectionCard>

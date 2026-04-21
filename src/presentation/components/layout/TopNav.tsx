@@ -36,7 +36,7 @@ const NavInner = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0 46px;
-  max-width: 1200px;
+  max-width: 1300px;
   height: 100%;
   margin: 0 auto;
 
@@ -442,7 +442,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
   const avatarRef = useRef<HTMLDivElement>(null);
   const cartRef = useRef<HTMLDivElement>(null);
   const { items, itemCount, removeItem } = useCart();
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user, logout, isPro, planLoading } = useAuth();
   const { open: openUpgrade } = useUpgradeModal();
   const isLanding = location.pathname === '/';
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
@@ -625,8 +625,29 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                       </div>
                     </div>
 
-                    {/* Upgrade to Pro — headline CTA in the menu */}
-                    <div style={{ padding: '8px 8px 4px' }}>
+                    {/* Pro users get a status badge instead of the upgrade CTA */}
+                    {!planLoading && isPro && (
+                      <div style={{ padding: '8px 8px 4px' }}>
+                        <div style={{
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px',
+                          borderRadius: 10,
+                          background: 'linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%)',
+                          border: '1px solid rgba(99, 102, 241, 0.18)',
+                        }}>
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', height: 22, padding: '0 10px',
+                            borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                            textTransform: 'uppercase' as const,
+                            color: '#fff', background: 'linear-gradient(135deg, #6366F1, #818CF8)',
+                            boxShadow: '0 1px 4px rgba(99,102,241,0.25)',
+                          }}>Pro</span>
+                          <span style={{ fontSize: 12.5, fontWeight: 600, color: '#4F46E5' }}>Unlimited widgets</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upgrade to Pro — headline CTA in the menu (hidden for Pro users and while plan loads) */}
+                    {!planLoading && !isPro && <div style={{ padding: '8px 8px 4px' }}>
                       <button
                         onClick={() => { setAvatarOpen(false); openUpgrade(); }}
                         style={{
@@ -654,7 +675,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                           padding: '2px 6px', borderRadius: 4,
                         }}>$4/mo</span>
                       </button>
-                    </div>
+                    </div>}
 
                     {/* Menu items */}
                     <div style={{ padding: '4px 8px 8px' }}>
@@ -683,7 +704,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
 
                     <div style={{ height: 1, margin: '0 12px', background: 'rgba(0,0,0,0.04)' }} />
 
-                    {/* Logout — peach hover, not red, per brand */}
+                    {/* Logout — soft red destructive hover. */}
                     <div style={{ padding: '8px 8px' }}>
                       <button
                         onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
@@ -696,8 +717,8 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                           letterSpacing: '-0.005em',
                         }}
                         onMouseEnter={e => {
-                          e.currentTarget.style.background = 'rgba(255, 160, 110, 0.12)';
-                          e.currentTarget.style.color = '#B4623A';
+                          e.currentTarget.style.background = 'rgba(220, 60, 60, 0.08)';
+                          e.currentTarget.style.color = '#C23B3B';
                         }}
                         onMouseLeave={e => {
                           e.currentTarget.style.background = 'transparent';

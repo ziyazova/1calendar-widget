@@ -5,16 +5,13 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const hasSupabaseEnv = Boolean(supabaseUrl && supabaseAnonKey);
 
+// Fail loudly instead of silently falling back to a placeholder URL —
+// a bogus client caused Google OAuth redirects to `example.supabase.co`
+// which Chrome blocked with "Unsafe attempt to load URL".
 if (!hasSupabaseEnv) {
-  console.warn('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Running in fallback mode — auth actions will fail.');
+  const msg = '[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Check Vercel env vars and redeploy.';
+  console.error(msg);
+  throw new Error(msg);
 }
 
-// Prevent runtime crash (white screen) when env vars are missing in production.
-// Fallback client keeps app bootable; auth/storage calls will simply fail gracefully.
-const fallbackUrl = 'https://example.supabase.co';
-const fallbackAnonKey = 'public-anon-key';
-
-export const supabase = createClient(
-  hasSupabaseEnv ? supabaseUrl! : fallbackUrl,
-  hasSupabaseEnv ? supabaseAnonKey! : fallbackAnonKey,
-);
+export const supabase = createClient(supabaseUrl!, supabaseAnonKey!);

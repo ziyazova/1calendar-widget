@@ -5,10 +5,10 @@ import { Search, CreditCard, Copy, Palette, SlidersHorizontal, Code } from 'luci
 const Section = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 100px 48px 80px;
+  padding: 0 48px;
 
   @media (max-width: 768px) {
-    padding: 48px 24px;
+    padding: 0 24px;
   }
 `;
 
@@ -38,17 +38,33 @@ const Grid = styled.div`
 `;
 
 const Card = styled.div<{ $bg: string }>`
+  position: relative;
   background: ${({ $bg }) => $bg};
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(200, 195, 230, 0.3);
+  background-size: 180% 180%;
+  background-position: 50% 50%;
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(150, 145, 175, 0.28);
   border-radius: 20px;
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 220px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.03),
+    0 12px 32px -12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 120% 80% at 20% 0%, rgba(255, 255, 255, 0.45) 0%, transparent 55%);
+    pointer-events: none;
+  }
 
   @media (max-width: 768px) {
     padding: 22px 18px;
@@ -57,6 +73,8 @@ const Card = styled.div<{ $bg: string }>`
 `;
 
 const IconWrap = styled.div<{ $bg: string; $color: string }>`
+  position: relative;
+  z-index: 1;
   width: 48px;
   height: 48px;
   border-radius: 14px;
@@ -90,16 +108,19 @@ const CardDesc = styled.p`
   max-width: 240px;
 `;
 
+const CTA_GRADIENT = 'linear-gradient(150deg, rgba(237, 228, 255, 0.7) 0%, rgba(232, 237, 255, 0.65) 25%, rgba(238, 234, 255, 0.6) 50%, rgba(245, 235, 250, 0.65) 75%, rgba(255, 240, 245, 0.7) 100%)';
+const GRADIENTS = [CTA_GRADIENT, CTA_GRADIENT, CTA_GRADIENT];
+
 const TEMPLATE_STEPS = [
-  { icon: Search, bg: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 50%, rgba(245,235,250,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Pick your template', desc: 'Browse the collection. Find the one that fits your life.' },
-  { icon: CreditCard, bg: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(237,228,255,0.4) 50%, rgba(252,228,236,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Buy & download', desc: 'One-time payment. Files arrive instantly.' },
-  { icon: Copy, bg: 'linear-gradient(135deg, rgba(252,228,236,0.45) 0%, rgba(232,237,255,0.4) 50%, rgba(237,228,255,0.5) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Duplicate to Notion', desc: 'One click. It\'s in your workspace. Ready to use.' },
+  { icon: Search, bg: GRADIENTS[0], iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Pick your template', desc: 'Browse the collection. Find the one that fits your life.' },
+  { icon: CreditCard, bg: GRADIENTS[1], iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Buy & download', desc: 'One-time payment. Files arrive instantly.' },
+  { icon: Copy, bg: GRADIENTS[2], iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Duplicate to Notion', desc: 'One click. It\'s in your workspace. Ready to use.' },
 ];
 
 const WIDGET_STEPS = [
-  { icon: Palette, bg: 'linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 50%, rgba(245,235,250,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Pick a widget', desc: 'Calendar, clock, or board. Choose your style.' },
-  { icon: SlidersHorizontal, bg: 'linear-gradient(135deg, rgba(232,237,255,0.5) 0%, rgba(237,228,255,0.4) 50%, rgba(252,228,236,0.45) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Customize it', desc: 'Colors, fonts, sizes. Make it match your workspace.' },
-  { icon: Code, bg: 'linear-gradient(135deg, rgba(252,228,236,0.45) 0%, rgba(232,237,255,0.4) 50%, rgba(237,228,255,0.5) 100%)', iconBg: 'rgba(255,255,255,0.8)', iconColor: '#1F1F1F', title: 'Embed in Notion', desc: 'Copy the link. Paste in Notion. Done.' },
+  { icon: Palette, bg: GRADIENTS[0], iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Pick a widget', desc: 'Calendar, clock, or board. Choose your style.' },
+  { icon: SlidersHorizontal, bg: GRADIENTS[1], iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Customize it', desc: 'Colors, fonts, sizes. Make it match your workspace.' },
+  { icon: Code, bg: GRADIENTS[2], iconBg: 'rgba(255,255,255,0.9)', iconColor: '#1F1F1F', title: 'Embed in Notion', desc: 'Copy the link. Paste in Notion. Done.' },
 ];
 
 interface HowItWorksProps {
@@ -121,7 +142,7 @@ export const HowItWorksSection: React.FC<HowItWorksProps> = ({ showTitle = true,
       {steps.map(s => (
         <Card key={s.title} $bg={s.bg}>
           <IconWrap $bg={s.iconBg} $color={s.iconColor}><s.icon /></IconWrap>
-          <div>
+          <div style={{ position: 'relative', zIndex: 1 }}>
             <CardTitle>{s.title}</CardTitle>
             <CardDesc>{s.desc}</CardDesc>
           </div>
