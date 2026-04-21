@@ -13,7 +13,7 @@ import { PurchaseService, type Purchase } from '@/infrastructure/services/Purcha
 import { TEMPLATES } from '@/presentation/data/templates';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
-import { PlanPill } from '@/presentation/components/shared';
+import { PlanPill, Button as SharedButton, Card as SharedCard } from '@/presentation/components/shared';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
 import { getContrastColor } from '@/presentation/themes/colors';
 
@@ -634,23 +634,6 @@ const Section = styled.section`
   margin-top: 40px;
 `;
 
-const ViewAllBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.15s;
-  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
-  svg { width: 12px; height: 12px; }
-`;
-
 const TopBar = styled.div`
   display: flex;
   align-items: center;
@@ -827,30 +810,6 @@ const BigCardActions = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-`;
-
-const ActionButton = styled.button<{ $primary?: boolean; $danger?: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1px solid ${({ $primary, $danger }) => $primary ? '#1F1F1F' : $danger ? 'rgba(220,40,40,0.2)' : 'rgba(0,0,0,0.1)'};
-  background: ${({ $primary }) => $primary ? '#1F1F1F' : 'transparent'};
-  color: ${({ $primary, $danger }) => $primary ? '#fff' : $danger ? '#DC2828' : '#666'};
-
-  &:hover {
-    opacity: 0.85;
-    ${({ $primary }) => !$primary && 'background: rgba(0,0,0,0.02);'}
-  }
-
-  svg { width: 14px; height: 14px; }
 `;
 
 const EmptyBox = styled.div`
@@ -1113,7 +1072,7 @@ const DashboardView: React.FC<{
       <Section>
         <SectionHeading>
           <SectionTitle>My Widgets <SectionCount>{widgets.length}</SectionCount></SectionTitle>
-          {widgets.length > 0 && <ViewAllBtn onClick={() => onNavigate('my-widgets')}>Browse all <ArrowRight /></ViewAllBtn>}
+          {widgets.length > 0 && <SharedButton $variant="link" $size="sm" onClick={() => onNavigate('my-widgets')}>Browse all <ArrowRight /></SharedButton>}
         </SectionHeading>
 
         {!loading && widgets.length === 0 ? (
@@ -1133,8 +1092,8 @@ const DashboardView: React.FC<{
                 <BigCardBottom>
                   <BigCardName>{w.name}</BigCardName>
                   <BigCardActions>
-                    <ActionButton $primary onClick={() => onEditWidget?.(w)}><Pencil /> Edit</ActionButton>
-                    <ActionButton $danger onClick={() => handleDelete(w.id)}><Trash2 /></ActionButton>
+                    <SharedButton $variant="primary" $size="sm" onClick={() => onEditWidget?.(w)}><Pencil /> Edit</SharedButton>
+                    <SharedButton $variant="dangerStrong" $size="sm" onClick={() => handleDelete(w.id)}><Trash2 /></SharedButton>
                   </BigCardActions>
                 </BigCardBottom>
               </BigCard>
@@ -1147,7 +1106,7 @@ const DashboardView: React.FC<{
       <Section>
         <SectionHeading>
           <SectionTitle>Recent Purchases <SectionCount>{PURCHASES.length}</SectionCount></SectionTitle>
-          {PURCHASES.length > 0 && <ViewAllBtn onClick={() => onNavigate('purchases')}>View all <ArrowRight /></ViewAllBtn>}
+          {PURCHASES.length > 0 && <SharedButton $variant="link" $size="sm" onClick={() => onNavigate('purchases')}>View all <ArrowRight /></SharedButton>}
         </SectionHeading>
         {PURCHASES.length === 0 ? (
           <EmptyBox onClick={() => onNavigate('templates')}>
@@ -1165,7 +1124,7 @@ const DashboardView: React.FC<{
                   <PurchaseMeta>{p.date}</PurchaseMeta>
                 </PurchaseDetails>
                 <PurchasePriceTag>{p.price}</PurchasePriceTag>
-                <ActionButton><Download /></ActionButton>
+                <SharedButton $variant="secondary" $size="sm"><Download /></SharedButton>
               </PurchaseCard>
             ))}
           </>
@@ -1230,7 +1189,7 @@ const WidgetsGalleryView: React.FC<{ onAddNew?: () => void }> = ({ onAddNew }) =
               </BigCardPreview>
               <BigCardBottom>
                 <BigCardName>{s.label}</BigCardName>
-                <ActionButton $primary onClick={() => onAddNew?.()}><Pencil /> Customize</ActionButton>
+                <SharedButton $variant="primary" $size="sm" onClick={() => onAddNew?.()}><Pencil /> Customize</SharedButton>
               </BigCardBottom>
             </BigCard>
           ))}
@@ -1338,14 +1297,14 @@ const PurchasesView: React.FC = () => {
                   <PurchaseMeta>#{p.polarOrderId.slice(-8)} · {formatDate(p.createdAt)}{p.status === 'refunded' ? ' · refunded' : ''}</PurchaseMeta>
                 </PurchaseDetails>
                 <PurchasePriceTag>{formatPrice(p.amountCents, p.currency)}</PurchasePriceTag>
-                <ActionButton onClick={(e) => {
+                <SharedButton $variant="secondary" $size="sm" onClick={(e) => {
                   e.stopPropagation();
                   // Download links live in the Polar email delivery. Open the
                   // Polar customer portal where the buyer can redownload.
                   void SubscriptionService.openCustomerPortal().then(ok => {
                     if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
                   });
-                }}><Download /> Download</ActionButton>
+                }}><Download /> Download</SharedButton>
               </PurchaseCard>
             );
           })}
@@ -1448,7 +1407,7 @@ const ProfileView: React.FC = () => {
             <SettingsInput defaultValue={user?.email || ''} readOnly />
           </SettingsRow>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-            <ActionButton $primary>Save changes</ActionButton>
+            <SharedButton $variant="primary" $size="sm">Save changes</SharedButton>
           </div>
         </SectionBlockBody>
       </SectionBlock>
@@ -1469,9 +1428,9 @@ const ProfileView: React.FC = () => {
                   : "You signed up with Google, so there's no password on this account yet. Set one to also sign in with email."}
               </div>
             </div>
-            <ActionButton onClick={() => { setShowPwModal(true); setNewPw(''); setConfirmPw(''); setPwError(null); setPwSuccess(false); }}>
+            <SharedButton $variant="secondary" $size="sm" onClick={() => { setShowPwModal(true); setNewPw(''); setConfirmPw(''); setPwError(null); setPwSuccess(false); }}>
               {hasPasswordLogin ? 'Change password' : 'Set a password'}
-            </ActionButton>
+            </SharedButton>
           </SettingsRowSplit>
         </SectionBlockBody>
       </SectionBlock>
@@ -1495,12 +1454,12 @@ const ProfileView: React.FC = () => {
               </div>
             </div>
             {isPro ? (
-              <ActionButton onClick={async () => {
+              <SharedButton $variant="secondary" $size="sm" onClick={async () => {
                 const ok = await SubscriptionService.openCustomerPortal();
                 if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
-              }}>Manage</ActionButton>
+              }}>Manage</SharedButton>
             ) : (
-              <ActionButton $primary onClick={openUpgrade}>Upgrade to Pro</ActionButton>
+              <SharedButton $variant="primary" $size="sm" onClick={openUpgrade}>Upgrade to Pro</SharedButton>
             )}
           </SettingsRowSplit>
         </SectionBlockBody>
@@ -1518,9 +1477,9 @@ const ProfileView: React.FC = () => {
               <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Download my data</div>
               <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Export your profile and saved widgets as a JSON file.</div>
             </div>
-            <ActionButton onClick={handleExport} disabled={exporting}>
+            <SharedButton $variant="secondary" $size="sm" onClick={handleExport} disabled={exporting}>
               {exporting ? 'Preparing…' : 'Download JSON'}
-            </ActionButton>
+            </SharedButton>
           </SettingsRowSplit>
           <SectionDivider />
           <SettingsRowSplit>
@@ -1528,9 +1487,9 @@ const ProfileView: React.FC = () => {
               <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Privacy policy</div>
               <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Read how we handle your data.</div>
             </div>
-            <ActionButton onClick={() => navigate('/privacy')}>
+            <SharedButton $variant="secondary" $size="sm" onClick={() => navigate('/privacy')}>
               Read policy
-            </ActionButton>
+            </SharedButton>
           </SettingsRowSplit>
         </SectionBlockBody>
       </SectionBlock>
@@ -1547,9 +1506,9 @@ const ProfileView: React.FC = () => {
               <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Log out</div>
               <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>End your session on this device.</div>
             </div>
-            <ActionButton $danger onClick={async () => { await logout(); navigate('/'); }}>
+            <SharedButton $variant="dangerStrong" $size="sm" onClick={async () => { await logout(); navigate('/'); }}>
               Log out
-            </ActionButton>
+            </SharedButton>
           </SettingsRowSplit>
           <SectionDivider />
           <SettingsRowSplit>
@@ -1557,9 +1516,9 @@ const ProfileView: React.FC = () => {
               <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Delete account</div>
               <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Permanently remove your profile and all widgets. This cannot be undone.</div>
             </div>
-            <ActionButton $danger onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(''); setDeleteError(null); }}>
+            <SharedButton $variant="dangerStrong" $size="sm" onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(''); setDeleteError(null); }}>
               Delete account
-            </ActionButton>
+            </SharedButton>
           </SettingsRowSplit>
         </SectionBlockBody>
       </SectionBlock>
@@ -1757,11 +1716,12 @@ const ProfileView: React.FC = () => {
               <div style={{ fontSize: 12, color: '#DC2828', marginBottom: 16 }}>{deleteError}</div>
             )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <ActionButton onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
+              <SharedButton $variant="secondary" $size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
                 Cancel
-              </ActionButton>
-              <ActionButton
-                $danger
+              </SharedButton>
+              <SharedButton
+                $variant="dangerStrong"
+                $size="sm"
                 onClick={handleDelete}
                 disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
                 style={{
@@ -1770,7 +1730,7 @@ const ProfileView: React.FC = () => {
                 }}
               >
                 <Trash2 /> {deleting ? 'Deleting…' : 'Delete forever'}
-              </ActionButton>
+              </SharedButton>
             </div>
           </div>
         </div>
