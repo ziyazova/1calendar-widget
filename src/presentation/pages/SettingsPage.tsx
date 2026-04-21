@@ -372,43 +372,9 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' | 'danger' | 'dang
   svg { width: 13px; height: 13px; stroke-width: 1.75; }
 `;
 
-/* ────────────────── Modals ────────────────── */
-
-const Overlay = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-`;
-
-const Backdrop = styled.div`
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-`;
-
-const Modal = styled.div`
-  position: relative;
-  background: #fff;
-  border-radius: 24px;
-  padding: 32px 28px 24px;
-  width: 440px;
-  max-width: 100%;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.14), 0 8px 24px rgba(0, 0, 0, 0.06);
-`;
-
-const ModalTitle = styled.h2<{ $danger?: boolean }>`
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: ${({ $danger }) => ($danger ? '#B91C1C' : '#1F1F1F')};
-  margin: 0 0 8px;
-`;
+/* ────────────────── Modal form internals ────────────────── */
+/* All three modals (password/email/delete) use the shared <Modal> shell;
+   these styled-components are just the form body bits inside them. */
 
 const ModalText = styled.p`
   font-size: 14px;
@@ -989,281 +955,319 @@ export const SettingsPage: React.FC = () => {
 
       <Footer />
 
-      {/* Password modal */}
-      {showPwModal && (
-        <Overlay>
-          <Backdrop onClick={() => !pwSubmitting && setShowPwModal(false)} />
-          <Modal>
-            {pwSuccess ? (
-              <>
-                <ModalTitle>Password updated</ModalTitle>
-                <ModalText>
-                  You can use your new password the next time you sign in with email.
-                  Other devices where you were signed in have been logged out.
-                </ModalText>
-                <Button
-                  $variant="primary"
-                  style={{ width: '100%', height: 44 }}
-                  onClick={() => setShowPwModal(false)}
-                >
-                  Done
-                </Button>
-              </>
-            ) : (
-              <>
-                <ModalTitle>{hasPasswordLogin ? 'Change password' : 'Set a password'}</ModalTitle>
-                <ModalText>Choose a strong password you haven't used before.</ModalText>
-                {pwError && <ErrorText>{pwError}</ErrorText>}
-                <form
-                  onSubmit={async e => {
-                    e.preventDefault();
-                    setPwError(null);
-                    if (!pwValid) {
-                      setPwError('Password does not meet the requirements or does not match.');
+      {/* Password modal — migrated to shared <Modal>. Form body stays page-local. */}
+      <SharedModal
+        open={showPwModal}
+        onClose={() => !pwSubmitting && setShowPwModal(false)}
+        title={pwSuccess ? 'Password updated' : (hasPasswordLogin ? 'Change password' : 'Set a password')}
+        size="sm"
+        hideClose={pwSubmitting}
+      >
+        {pwSuccess ? (
+          <>
+            <ModalText>
+              You can use your new password the next time you sign in with email.
+              Other devices where you were signed in have been logged out.
+            </ModalText>
+            <SharedButton
+              $variant="primary"
+              $size="lg"
+              $fullWidth
+              onClick={() => setShowPwModal(false)}
+            >
+              Done
+            </SharedButton>
+          </>
+        ) : (
+          <>
+            <ModalText>Choose a strong password you haven't used before.</ModalText>
+            {pwError && <ErrorText>{pwError}</ErrorText>}
+            <form
+              onSubmit={async e => {
+                e.preventDefault();
+                setPwError(null);
+                if (!pwValid) {
+                  setPwError('Password does not meet the requirements or does not match.');
+                  return;
+                }
+                setPwSubmitting(true);
+                try {
+                  // Re-auth with current password so a stolen session can't
+                  // change the password without knowing it. Only applies
+                  // when the user already has a password — Google-only
+                  // users are "setting" a password for the first time.
+                  if (hasPasswordLogin) {
+                    if (currentPw.length === 0) {
+                      setPwError('Enter your current password.');
                       return;
                     }
-                    setPwSubmitting(true);
-                    try {
-                      // Re-auth with current password so a stolen session can't
-                      // change the password without knowing it. Only applies
-                      // when the user already has a password — Google-only
-                      // users are "setting" a password for the first time.
-                      if (hasPasswordLogin) {
-                        if (currentPw.length === 0) {
-                          setPwError('Enter your current password.');
-                          return;
-                        }
-                        const verifyErr = await verifyPassword(currentPw);
-                        if (verifyErr) {
-                          setPwError(verifyErr.toLowerCase().includes('invalid')
-                            ? 'Current password is incorrect.'
-                            : humanisePasswordError(verifyErr, false));
-                          return;
-                        }
-                      }
-                      const err = await updatePassword(newPw);
-                      if (err) {
-                        setPwError(humanisePasswordError(err, !hasPasswordLogin));
-                        return;
-                      }
-                      // Invalidate sessions on other devices so a stolen token
-                      // can't survive the password change. Current device stays.
-                      await logoutOthers();
-                      setPwSuccess(true);
-                    } finally {
-                      setPwSubmitting(false);
-                    }
-                  }}
-                >
-                  {hasPasswordLogin && (
-                    <ModalInputWrap>
-                      <Lock className="lead" />
-                      <ModalInput
-                        type={showPw ? 'text' : 'password'}
-                        autoFocus
-                        placeholder="Current password"
-                        value={currentPw}
-                        onChange={e => setCurrentPw(e.target.value)}
-                        autoComplete="current-password"
-                      />
-                    </ModalInputWrap>
-                  )}
-                  <ModalInputWrap>
-                    <Lock className="lead" />
-                    <ModalInput
-                      type={showPw ? 'text' : 'password'}
-                      autoFocus={!hasPasswordLogin}
-                      placeholder="New password"
-                      value={newPw}
-                      onChange={e => setNewPw(e.target.value)}
-                      autoComplete="new-password"
-                      minLength={8}
-                    />
-                    <button
-                      type="button"
-                      className="toggle"
-                      onClick={() => setShowPw(v => !v)}
-                      aria-label={showPw ? 'Hide password' : 'Show password'}
-                    >
-                      {showPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
-                    </button>
-                  </ModalInputWrap>
-                  <ModalInputWrap style={{ marginBottom: 14 }}>
-                    <Lock className="lead" />
-                    <ModalInput
-                      type={showPw ? 'text' : 'password'}
-                      placeholder="Confirm new password"
-                      value={confirmPw}
-                      onChange={e => setConfirmPw(e.target.value)}
-                      autoComplete="new-password"
-                      minLength={8}
-                    />
-                  </ModalInputWrap>
-
-                  {newPw.length > 0 && (
-                    <PwChecks>
-                      {pwChecks.map(c => (
-                        <PwCheck key={c.label} $met={c.met}>
-                          {c.met ? <CheckCircle2 /> : <Check />}
-                          {c.label}
-                        </PwCheck>
-                      ))}
-                    </PwChecks>
-                  )}
-
-                  <ModalActions>
-                    <Button type="button" onClick={() => setShowPwModal(false)} disabled={pwSubmitting}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" $variant="primary" disabled={pwSubmitting || !pwValid}>
-                      {pwSubmitting ? 'Updating…' : 'Update password'}
-                    </Button>
-                  </ModalActions>
-                </form>
-              </>
-            )}
-          </Modal>
-        </Overlay>
-      )}
-
-      {/* Change-email modal */}
-      {showEmailModal && (
-        <Overlay>
-          <Backdrop onClick={() => !emailSubmitting && setShowEmailModal(false)} />
-          <Modal>
-            {emailStep === 'sent' ? (
-              <>
-                <ModalTitle>Confirm your new email</ModalTitle>
-                <ModalText>
-                  We sent a confirmation link to <strong>{emailNew}</strong>.
-                  Click the link in that email to finish the change — your address
-                  will stay <strong>{user.email}</strong> until you do.
-                </ModalText>
-                <Button
-                  $variant="primary"
-                  style={{ width: '100%', height: 44 }}
-                  onClick={() => setShowEmailModal(false)}
-                >
-                  Done
-                </Button>
-              </>
-            ) : emailStep === 'verify' ? (
-              <>
-                <ModalTitle>Verify your password</ModalTitle>
-                <ModalText>For your security, enter your current password before changing the email on your account.</ModalText>
-                {emailError && <ErrorText>{emailError}</ErrorText>}
-                <form onSubmit={async e => {
-                  e.preventDefault();
-                  setEmailError(null);
-                  if (emailCurrentPw.length === 0) {
-                    setEmailError('Enter your current password.');
-                    return;
-                  }
-                  setEmailSubmitting(true);
-                  try {
-                    const err = await verifyPassword(emailCurrentPw);
-                    if (err) {
-                      setEmailError(err.toLowerCase().includes('invalid')
+                    const verifyErr = await verifyPassword(currentPw);
+                    if (verifyErr) {
+                      setPwError(verifyErr.toLowerCase().includes('invalid')
                         ? 'Current password is incorrect.'
-                        : 'Could not verify your password. Please try again.');
+                        : humanisePasswordError(verifyErr, false));
                       return;
                     }
-                    setEmailStep('new');
-                  } finally {
-                    setEmailSubmitting(false);
                   }
-                }}>
-                  <ModalInputWrap style={{ marginBottom: 14 }}>
-                    <Lock className="lead" />
-                    <ModalInput
-                      type={emailShowPw ? 'text' : 'password'}
-                      autoFocus
-                      placeholder="Current password"
-                      value={emailCurrentPw}
-                      onChange={e => setEmailCurrentPw(e.target.value)}
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
-                      className="toggle"
-                      onClick={() => setEmailShowPw(v => !v)}
-                      aria-label={emailShowPw ? 'Hide password' : 'Show password'}
-                    >
-                      {emailShowPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
-                    </button>
-                  </ModalInputWrap>
-                  <ModalActions>
-                    <Button type="button" onClick={() => setShowEmailModal(false)} disabled={emailSubmitting}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" $variant="primary" disabled={emailSubmitting}>
-                      {emailSubmitting ? 'Verifying…' : 'Continue'}
-                    </Button>
-                  </ModalActions>
-                </form>
-              </>
-            ) : (
-              <>
-                <ModalTitle>New email address</ModalTitle>
-                <ModalText>
-                  We'll send a confirmation link to the new address. Your email stays{' '}
-                  <strong>{user.email}</strong> until you click it.
-                </ModalText>
-                {emailError && <ErrorText>{emailError}</ErrorText>}
-                <form onSubmit={async e => {
-                  e.preventDefault();
-                  setEmailError(null);
-                  const trimmed = emailNew.trim();
-                  if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
-                    setEmailError('Please enter a valid email address.');
+                  const err = await updatePassword(newPw);
+                  if (err) {
+                    setPwError(humanisePasswordError(err, !hasPasswordLogin));
                     return;
                   }
-                  if (trimmed.toLowerCase() === (user.email || '').toLowerCase()) {
-                    setEmailError('That is already your email.');
-                    return;
-                  }
-                  setEmailSubmitting(true);
-                  try {
-                    const err = await updateEmail(trimmed);
-                    if (err) {
-                      const m = err.toLowerCase();
-                      setEmailError(m.includes('already') || m.includes('taken') || m.includes('registered')
-                        ? 'This email is already in use by another account.'
-                        : m.includes('rate') || m.includes('only request')
-                          ? 'Please wait a minute before trying again.'
-                          : 'Could not update email. Please try again.');
-                      return;
-                    }
-                    setEmailStep('sent');
-                  } finally {
-                    setEmailSubmitting(false);
-                  }
-                }}>
-                  <ModalInputWrap style={{ marginBottom: 14 }}>
-                    <Mail className="lead" />
-                    <ModalInput
-                      type="email"
-                      autoFocus
-                      placeholder="new@example.com"
-                      value={emailNew}
-                      onChange={e => setEmailNew(e.target.value)}
-                      autoComplete="email"
-                    />
-                  </ModalInputWrap>
-                  <ModalActions>
-                    <Button type="button" onClick={() => setShowEmailModal(false)} disabled={emailSubmitting}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" $variant="primary" disabled={emailSubmitting}>
-                      {emailSubmitting ? 'Sending…' : 'Send confirmation'}
-                    </Button>
-                  </ModalActions>
-                </form>
-              </>
-            )}
-          </Modal>
-        </Overlay>
-      )}
+                  // Invalidate sessions on other devices so a stolen token
+                  // can't survive the password change. Current device stays.
+                  await logoutOthers();
+                  setPwSuccess(true);
+                } finally {
+                  setPwSubmitting(false);
+                }
+              }}
+            >
+              {hasPasswordLogin && (
+                <ModalInputWrap>
+                  <Lock className="lead" />
+                  <ModalInput
+                    type={showPw ? 'text' : 'password'}
+                    autoFocus
+                    placeholder="Current password"
+                    value={currentPw}
+                    onChange={e => setCurrentPw(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                </ModalInputWrap>
+              )}
+              <ModalInputWrap>
+                <Lock className="lead" />
+                <ModalInput
+                  type={showPw ? 'text' : 'password'}
+                  autoFocus={!hasPasswordLogin}
+                  placeholder="New password"
+                  value={newPw}
+                  onChange={e => setNewPw(e.target.value)}
+                  autoComplete="new-password"
+                  minLength={8}
+                />
+                <button
+                  type="button"
+                  className="toggle"
+                  onClick={() => setShowPw(v => !v)}
+                  aria-label={showPw ? 'Hide password' : 'Show password'}
+                >
+                  {showPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
+                </button>
+              </ModalInputWrap>
+              <ModalInputWrap style={{ marginBottom: 14 }}>
+                <Lock className="lead" />
+                <ModalInput
+                  type={showPw ? 'text' : 'password'}
+                  placeholder="Confirm new password"
+                  value={confirmPw}
+                  onChange={e => setConfirmPw(e.target.value)}
+                  autoComplete="new-password"
+                  minLength={8}
+                />
+              </ModalInputWrap>
+
+              {newPw.length > 0 && (
+                <PwChecks>
+                  {pwChecks.map(c => (
+                    <PwCheck key={c.label} $met={c.met}>
+                      {c.met ? <CheckCircle2 /> : <Check />}
+                      {c.label}
+                    </PwCheck>
+                  ))}
+                </PwChecks>
+              )}
+
+              <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -24, marginTop: 16 }}>
+                <SharedButton
+                  type="button"
+                  $variant="secondary"
+                  $size="lg"
+                  onClick={() => setShowPwModal(false)}
+                  disabled={pwSubmitting}
+                >
+                  Cancel
+                </SharedButton>
+                <SharedButton
+                  type="submit"
+                  $variant="primary"
+                  $size="lg"
+                  disabled={pwSubmitting || !pwValid}
+                >
+                  {pwSubmitting ? 'Updating…' : 'Update password'}
+                </SharedButton>
+              </ModalFooter>
+            </form>
+          </>
+        )}
+      </SharedModal>
+
+      {/* Change-email modal — migrated to shared <Modal>. Multi-step form stays page-local. */}
+      <SharedModal
+        open={showEmailModal}
+        onClose={() => !emailSubmitting && setShowEmailModal(false)}
+        title={
+          emailStep === 'sent'
+            ? 'Confirm your new email'
+            : emailStep === 'verify'
+              ? 'Verify your password'
+              : 'New email address'
+        }
+        size="sm"
+        hideClose={emailSubmitting}
+      >
+        {emailStep === 'sent' ? (
+          <>
+            <ModalText>
+              We sent a confirmation link to <strong>{emailNew}</strong>.
+              Click the link in that email to finish the change — your address
+              will stay <strong>{user.email}</strong> until you do.
+            </ModalText>
+            <SharedButton
+              $variant="primary"
+              $size="lg"
+              $fullWidth
+              onClick={() => setShowEmailModal(false)}
+            >
+              Done
+            </SharedButton>
+          </>
+        ) : emailStep === 'verify' ? (
+          <>
+            <ModalText>For your security, enter your current password before changing the email on your account.</ModalText>
+            {emailError && <ErrorText>{emailError}</ErrorText>}
+            <form onSubmit={async e => {
+              e.preventDefault();
+              setEmailError(null);
+              if (emailCurrentPw.length === 0) {
+                setEmailError('Enter your current password.');
+                return;
+              }
+              setEmailSubmitting(true);
+              try {
+                const err = await verifyPassword(emailCurrentPw);
+                if (err) {
+                  setEmailError(err.toLowerCase().includes('invalid')
+                    ? 'Current password is incorrect.'
+                    : 'Could not verify your password. Please try again.');
+                  return;
+                }
+                setEmailStep('new');
+              } finally {
+                setEmailSubmitting(false);
+              }
+            }}>
+              <ModalInputWrap style={{ marginBottom: 14 }}>
+                <Lock className="lead" />
+                <ModalInput
+                  type={emailShowPw ? 'text' : 'password'}
+                  autoFocus
+                  placeholder="Current password"
+                  value={emailCurrentPw}
+                  onChange={e => setEmailCurrentPw(e.target.value)}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="toggle"
+                  onClick={() => setEmailShowPw(v => !v)}
+                  aria-label={emailShowPw ? 'Hide password' : 'Show password'}
+                >
+                  {emailShowPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
+                </button>
+              </ModalInputWrap>
+              <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -24, marginTop: 16 }}>
+                <SharedButton
+                  type="button"
+                  $variant="secondary"
+                  $size="lg"
+                  onClick={() => setShowEmailModal(false)}
+                  disabled={emailSubmitting}
+                >
+                  Cancel
+                </SharedButton>
+                <SharedButton
+                  type="submit"
+                  $variant="primary"
+                  $size="lg"
+                  disabled={emailSubmitting}
+                >
+                  {emailSubmitting ? 'Verifying…' : 'Continue'}
+                </SharedButton>
+              </ModalFooter>
+            </form>
+          </>
+        ) : (
+          <>
+            <ModalText>
+              We'll send a confirmation link to the new address. Your email stays{' '}
+              <strong>{user.email}</strong> until you click it.
+            </ModalText>
+            {emailError && <ErrorText>{emailError}</ErrorText>}
+            <form onSubmit={async e => {
+              e.preventDefault();
+              setEmailError(null);
+              const trimmed = emailNew.trim();
+              if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
+                setEmailError('Please enter a valid email address.');
+                return;
+              }
+              if (trimmed.toLowerCase() === (user.email || '').toLowerCase()) {
+                setEmailError('That is already your email.');
+                return;
+              }
+              setEmailSubmitting(true);
+              try {
+                const err = await updateEmail(trimmed);
+                if (err) {
+                  const m = err.toLowerCase();
+                  setEmailError(m.includes('already') || m.includes('taken') || m.includes('registered')
+                    ? 'This email is already in use by another account.'
+                    : m.includes('rate') || m.includes('only request')
+                      ? 'Please wait a minute before trying again.'
+                      : 'Could not update email. Please try again.');
+                  return;
+                }
+                setEmailStep('sent');
+              } finally {
+                setEmailSubmitting(false);
+              }
+            }}>
+              <ModalInputWrap style={{ marginBottom: 14 }}>
+                <Mail className="lead" />
+                <ModalInput
+                  type="email"
+                  autoFocus
+                  placeholder="new@example.com"
+                  value={emailNew}
+                  onChange={e => setEmailNew(e.target.value)}
+                  autoComplete="email"
+                />
+              </ModalInputWrap>
+              <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -24, marginTop: 16 }}>
+                <SharedButton
+                  type="button"
+                  $variant="secondary"
+                  $size="lg"
+                  onClick={() => setShowEmailModal(false)}
+                  disabled={emailSubmitting}
+                >
+                  Cancel
+                </SharedButton>
+                <SharedButton
+                  type="submit"
+                  $variant="primary"
+                  $size="lg"
+                  disabled={emailSubmitting}
+                >
+                  {emailSubmitting ? 'Sending…' : 'Send confirmation'}
+                </SharedButton>
+              </ModalFooter>
+            </form>
+          </>
+        )}
+      </SharedModal>
 
       {/* Delete modal — migrated to shared <Modal>. Form input stays page-local. */}
       <SharedModal
