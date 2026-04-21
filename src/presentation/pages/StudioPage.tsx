@@ -10,6 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
+import { Button as SharedButton } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -114,21 +115,6 @@ const SectionCount = styled.span`
   font-size: 16px;
 `;
 
-const SectionLink = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  color: #999;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  &:hover { color: #1F1F1F; }
-  svg { width: 12px; height: 12px; }
-`;
-
 /* Widget cards */
 const WidgetGrid = styled.div`
   display: grid;
@@ -197,25 +183,6 @@ const WidgetActions = styled.div`
   gap: 6px;
 `;
 
-const Btn = styled.button<{ $primary?: boolean; $danger?: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1px solid ${({ $primary, $danger }) => $primary ? '#1F1F1F' : $danger ? 'rgba(220,40,40,0.2)' : 'rgba(0,0,0,0.1)'};
-  background: ${({ $primary }) => $primary ? '#1F1F1F' : 'transparent'};
-  color: ${({ $primary, $danger }) => $primary ? '#fff' : $danger ? '#F49B8B' : '#666'};
-  &:hover { opacity: 0.85; }
-  svg { width: 14px; height: 14px; }
-`;
-
 /* Empty state */
 const EmptyCard = styled.div`
   border: 1.5px solid rgba(0,0,0,0.06);
@@ -239,27 +206,6 @@ const EmptyCircle = styled.div`
   justify-content: center;
   margin: 0 auto 14px;
   svg { width: 24px; height: 24px; color: #6366F1; }
-`;
-
-const BrowseBtn = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  height: 56px;
-  background: linear-gradient(135deg, rgba(237,228,255,0.5) 0%, rgba(232,237,255,0.4) 40%, rgba(245,235,250,0.45) 100%);
-  color: #6366F1;
-  border: 1.5px solid rgba(200,195,230,0.3);
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 24px;
-  &:hover { border-color: rgba(99,102,241,0.3); background: linear-gradient(135deg, rgba(237,228,255,0.65) 0%, rgba(232,237,255,0.55) 40%, rgba(245,235,250,0.6) 100%); }
-  svg { width: 16px; height: 16px; }
 `;
 
 /* Purchase cards */
@@ -1257,8 +1203,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <WidgetBottom>
                       <WidgetName>{w.name}</WidgetName>
                       <WidgetActions>
-                        <Btn $primary onClick={() => handleEdit(w)}><Pencil /> Edit</Btn>
-                        <Btn $danger onClick={() => handleDelete(w.id)}><Trash2 /></Btn>
+                        <SharedButton $variant="primary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
+                        <SharedButton $variant="danger" $size="sm" onClick={() => handleDelete(w.id)}><Trash2 /></SharedButton>
                       </WidgetActions>
                     </WidgetBottom>
                   </WidgetCard>
@@ -1318,7 +1264,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       <div style={{ fontSize: 12, color: '#999', marginTop: 2 }}>{p.order} · {p.date}</div>
                     </div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', marginRight: 8 }}>{p.price}</div>
-                    <Btn onClick={(e) => { e.stopPropagation(); }}><Download /> Download</Btn>
+                    <SharedButton $variant="secondary" $size="sm" onClick={(e) => { e.stopPropagation(); }}><Download /> Download</SharedButton>
                   </PurchaseCard>
                 ))}
               </>
