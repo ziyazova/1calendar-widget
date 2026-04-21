@@ -136,15 +136,25 @@ const Bar = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 10px;
-  background: linear-gradient(180deg, #1F1F1F 0%, #2B2520 100%);
+  padding: 12px;
+  /* Frosted glass over live page content. Fallback = opaque darker
+     tone so it still reads cleanly when backdrop-filter is unsupported. */
+  background: rgba(22, 22, 24, 0.68);
+  @supports not (backdrop-filter: blur(0)) {
+    background: rgba(22, 22, 24, 0.96);
+  }
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
   color: #fff;
   font-family: ui-monospace, monospace;
   font-size: 12px;
   z-index: 2147483645;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   width: 220px;
   animation: ${slideIn} 0.25s ease-out;
 `;
@@ -153,13 +163,13 @@ const Brand = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 4px 6px;
+  padding: 2px 6px 8px;
   font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 `;
 
 const Tabs = styled.div`
@@ -172,21 +182,21 @@ const Tab = styled.button<{ $active: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.06)')};
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.14)' : 'transparent')};
   background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'transparent')};
   color: #fff;
   cursor: ${({ $active, disabled }) => ($active || disabled ? 'default' : 'pointer')};
   font-family: inherit;
-  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  transition: background 0.18s ease, border-color 0.18s ease, opacity 0.15s ease;
   flex: 1;
   min-width: 0;
   text-align: left;
 
   &:hover:not(:disabled) {
-    background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.04)')};
-    border-color: rgba(255, 255, 255, 0.14);
+    background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)')};
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
   &:disabled {

@@ -461,15 +461,25 @@ const DevPanel = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 10px;
-  background: linear-gradient(180deg, #1F1F1F 0%, #2B2520 100%);
+  padding: 12px;
+  /* Frosted glass — matches BranchSwitcher Bar. Opaque fallback for
+     browsers without backdrop-filter. */
+  background: rgba(22, 22, 24, 0.68);
+  @supports not (backdrop-filter: blur(0)) {
+    background: rgba(22, 22, 24, 0.96);
+  }
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
   color: #fff;
   font-family: ui-monospace, monospace;
   font-size: 12px;
   z-index: 2147483600;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   animation: ${slideInPanel} 0.28s ease-out;
 `;
 
@@ -477,27 +487,27 @@ const DevBrand = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 4px 6px;
+  padding: 2px 6px 8px;
   font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 `;
 
 const devRowBase = `
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
   background: transparent;
   color: #fff;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.18s ease, border-color 0.18s ease;
   text-align: left;
   text-decoration: none;
   width: 100%;
@@ -506,11 +516,11 @@ const devRowBase = `
 const DevRow = styled.button<{ $active: boolean }>`
   ${devRowBase}
   background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'transparent')};
-  border-color: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.06)')};
+  border-color: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.14)' : 'transparent')};
 
   &:hover {
-    background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.04)')};
-    border-color: rgba(255, 255, 255, 0.14);
+    background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)')};
+    border-color: rgba(255, 255, 255, 0.12);
   }
 `;
 
@@ -518,8 +528,8 @@ const DevRowLink = styled.a`
   ${devRowBase}
 
   &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 `;
 
@@ -584,14 +594,22 @@ const HintBar = styled.div`
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  background: #111;
+  background: rgba(17, 17, 19, 0.72);
+  @supports not (backdrop-filter: blur(0)) {
+    background: rgba(17, 17, 19, 0.96);
+  }
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
   color: #fff;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 999px;
   font-size: 13px;
   font-family: system-ui, sans-serif;
   z-index: 2147483600;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 12px 32px -8px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 `;
 
 const Backdrop = styled.div`
