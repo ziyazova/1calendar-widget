@@ -21,21 +21,21 @@ const Header = styled.div`
 
 
 const PageTitle = styled.h1`
-  font-size: 32px;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.03em;
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 10px;
 
   @media (max-width: 768px) {
-    font-size: 26px;
+    font-size: ${({ theme }) => theme.typography.sizes['3xl']};
   }
 `;
 
 const PageSubtitle = styled.p`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 36px;
+  margin: 0 0 ${({ theme }) => theme.spacing['9']};
   letter-spacing: -0.01em;
 `;
 
@@ -62,7 +62,7 @@ const SearchInput = styled.input`
   padding: 0 14px 0 40px;
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surface};
@@ -72,8 +72,8 @@ const SearchInput = styled.input`
 
   &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }
   &:focus {
-    border-color: rgba(0, 0, 0, 0.16);
-    background: #ffffff;
+    border-color: ${({ theme }) => theme.colors.border.medium};
+    background: ${({ theme }) => theme.colors.background.elevated};
   }
 `;
 
@@ -89,18 +89,18 @@ const SubChip = styled.button<{ $active: boolean }>`
   height: 28px;
   padding: 0 14px;
   border: none;
-  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'transparent'};
-  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.tertiary};
+  background: ${({ $active, theme }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'transparent'};
+  color: ${({ $active, theme }) => $active ? theme.colors.brand.blue : theme.colors.text.tertiary};
   border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: 12px;
-  font-weight: ${({ $active }) => $active ? '500' : '400'};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ $active, theme }) => $active ? theme.typography.weights.medium : theme.typography.weights.normal};
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
   transition: all 0.15s ease;
 
   &:hover {
-    color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+    color: ${({ $active, theme }) => $active ? theme.colors.brand.blue : theme.colors.text.primary};
     background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'rgba(0, 0, 0, 0.02)'};
   }
 `;
@@ -131,7 +131,7 @@ const Grid = styled.div`
   }
 `;
 
-const Card = styled.div`
+const TemplateCardWrap = styled.div`
   cursor: pointer;
   animation: ${fadeUp} 0.25s ease both;
 `;
@@ -178,8 +178,8 @@ const CardBadge = styled.span`
   backdrop-filter: blur(8px);
   color: ${({ theme }) => theme.colors.text.primary};
   border-radius: 6px;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
 `;
 
 const CardMeta = styled.div`
@@ -194,20 +194,20 @@ const CardMeta = styled.div`
 `;
 
 const CardTitle = styled.span`
-  font-size: 14px;
-  font-weight: 500;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
-    font-size: 13px;
+    font-size: ${({ theme }) => theme.typography.sizes.md};
   }
 `;
 
 const Price = styled.span<{ $free: boolean }>`
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ $free, theme }) => $free ? '#22C55E' : theme.colors.text.tertiary};
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ $free, theme }) => $free ? theme.colors.success : theme.colors.text.tertiary};
 `;
 
 const EmptyState = styled.div`
@@ -215,7 +215,7 @@ const EmptyState = styled.div`
   text-align: center;
   padding: 80px 0;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
 `;
 
 
@@ -292,7 +292,7 @@ export const TemplatesPage: React.FC = () => {
           <EmptyState>No templates in this category yet</EmptyState>
         ) : (
           filtered.map((template, i) => (
-            <Card key={template.id} style={{ animationDelay: `${i * 0.04}s` }} onClick={() => navigate(`/templates/${template.id}`)}>
+            <TemplateCardWrap key={template.id} style={{ animationDelay: `${i * 0.04}s` }} onClick={() => navigate(`/templates/${template.id}`)}>
               <CardImage className="card-preview" $gradient={template.gradient}>
                 <CardInner src={template.image} alt={template.title} />
               </CardImage>
@@ -300,7 +300,7 @@ export const TemplatesPage: React.FC = () => {
                 <CardTitle>{template.title}</CardTitle>
                 <Price $free={template.price === 'Free'}>{template.price}</Price>
               </CardMeta>
-            </Card>
+            </TemplateCardWrap>
           ))
         )}
       </Grid>
