@@ -37,6 +37,17 @@ export const theme = {
     destructiveBorder: 'rgba(220, 38, 38, 0.15)',
     destructiveText: '#DC2828',
 
+    // Unified danger palette — source of truth going forward.
+    // `soft` = reversible destructive (cancel subscription, remove from cart).
+    // `strong` = irreversible destructive (delete account, delete widget, logout).
+    // Existing `destructive*` keys are aliased to these — see SIMPLIFICATION_PLAN.md.
+    danger: {
+      soft: '#F49B8B',              // = destructiveSoft
+      strong: '#DC2828',            // = destructiveText (was hardcoded in DashboardViews ActionButton)
+      bg: 'rgba(220, 38, 38, 0.06)',
+      border: 'rgba(220, 38, 38, 0.15)',
+    },
+
     // Widget colors
     widgets: widgetColors,
 
