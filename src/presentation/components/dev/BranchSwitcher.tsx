@@ -39,19 +39,6 @@ export function BranchSwitcher() {
     load();
   }, []);
 
-  // Push any position:fixed top-nav below the branch bar without touching TopNav itself.
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.id = 'branch-switcher-offset';
-    style.textContent = `
-      /* dev-only: make room for BranchSwitcher above any fixed top bar */
-      nav { top: 56px !important; }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.getElementById('branch-switcher-offset')?.remove();
-    };
-  }, []);
 
   const switchTo = async (branch: string) => {
     setState({ kind: 'switching', to: branch });
@@ -82,10 +69,7 @@ export function BranchSwitcher() {
   }
 
   return (
-    <>
-      {/* Pushes page content below the fixed bar. */}
-      <Spacer />
-      <Bar data-branch-switcher>
+    <Bar data-branch-switcher>
       <Brand>
         <span style={{ fontSize: 14 }}>🎨</span>
         Branch
@@ -133,59 +117,55 @@ export function BranchSwitcher() {
         </ErrorChip>
       )}
     </Bar>
-    </>
   );
 }
 
-const slideDown = keyframes`
-  from { transform: translateY(-100%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+const slideIn = keyframes`
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 `;
 
 const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
 
-const Spacer = styled.div`
-  height: 56px;
-  width: 100%;
-`;
-
 const Bar = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 88px;
+  right: 16px;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 16px;
-  background: linear-gradient(90deg, #1F1F1F 0%, #2B2520 100%);
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: linear-gradient(180deg, #1F1F1F 0%, #2B2520 100%);
   color: #fff;
   font-family: ui-monospace, monospace;
   font-size: 12px;
   z-index: 2147483645;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-  animation: ${slideDown} 0.25s ease-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  width: 220px;
+  animation: ${slideIn} 0.25s ease-out;
 `;
 
 const Brand = styled.div`
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
+  gap: 6px;
+  padding: 2px 4px 6px;
+  font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 `;
 
 const Tabs = styled.div`
   display: flex;
-  gap: 6px;
-  flex: 1;
-  max-width: 720px;
+  flex-direction: column;
+  gap: 4px;
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
@@ -260,21 +240,21 @@ const Spinner = styled.span`
 `;
 
 const ErrorChip = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 8px;
+  margin-top: 4px;
   background: rgba(220, 60, 60, 0.18);
   border: 1px solid rgba(220, 60, 60, 0.3);
   color: #FFB3B3;
   border-radius: 6px;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 10.5px;
+  line-height: 1.3;
   cursor: pointer;
-  white-space: nowrap;
-  max-width: 420px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: left;
+  word-break: break-word;
 `;
 
 const ErrorDismiss = styled.span`

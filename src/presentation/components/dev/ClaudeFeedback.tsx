@@ -345,27 +345,49 @@ export function ClaudeFeedback() {
 
       {toast && <Toast>{toast}</Toast>}
 
-      <DevLinkFab href="/dev" title="Перейти в дизайн-систему (/dev)">🎨</DevLinkFab>
+      <DevPanel>
+        <DevBrand>
+          <span style={{ fontSize: 14 }}>💬</span>
+          Feedback
+        </DevBrand>
 
-      <ListFab
-        onClick={() => setMode(mode === 'list' ? 'idle' : 'list')}
-        title="Список комментов"
-      >
-        📋
-        {(pendingCount + fixedCount) > 0 && (
-          <FabBadge $green={fixedCount > 0 && pendingCount === 0}>
-            {fixedCount > 0 ? fixedCount : pendingCount}
-          </FabBadge>
-        )}
-      </ListFab>
+        <DevRow
+          $active={mode === 'picking'}
+          onClick={() => setMode(mode === 'picking' ? 'idle' : 'picking')}
+        >
+          <DevEmoji>{mode === 'picking' ? '✕' : '➕'}</DevEmoji>
+          <DevText>
+            <DevTitle>{mode === 'picking' ? 'Cancel picking' : 'New comment'}</DevTitle>
+            <DevSub>{mode === 'picking' ? 'esc to exit' : 'pick any element on page'}</DevSub>
+          </DevText>
+        </DevRow>
 
-      <Fab
-        $active={mode === 'picking'}
-        onClick={() => setMode(mode === 'picking' ? 'idle' : 'picking')}
-        title="Оставить коммент для Claude"
-      >
-        {mode === 'picking' ? '×' : '💬'}
-      </Fab>
+        <DevRow
+          $active={mode === 'list'}
+          onClick={() => setMode(mode === 'list' ? 'idle' : 'list')}
+        >
+          <DevEmoji>📋</DevEmoji>
+          <DevText>
+            <DevTitle>
+              View comments
+              {(pendingCount + fixedCount) > 0 && (
+                <DevBadge $green={fixedCount > 0 && pendingCount === 0}>
+                  {fixedCount > 0 ? fixedCount : pendingCount}
+                </DevBadge>
+              )}
+            </DevTitle>
+            <DevSub>{pendingCount} pending · {fixedCount} fixed</DevSub>
+          </DevText>
+        </DevRow>
+
+        <DevRowLink href="/dev">
+          <DevEmoji>🎨</DevEmoji>
+          <DevText>
+            <DevTitle>Design system</DevTitle>
+            <DevSub>open /dev</DevSub>
+          </DevText>
+        </DevRowLink>
+      </DevPanel>
     </div>
   );
 }
@@ -424,82 +446,123 @@ function getComponentChain(el: HTMLElement): string[] {
 
 const fadeIn = keyframes`from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }`;
 
-const Fab = styled.button<{ $active: boolean }>`
+/* ── Unified dev panel — matches BranchSwitcher visual language ── */
+
+const slideInPanel = keyframes`
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+`;
+
+const DevPanel = styled.div`
   position: fixed;
-  bottom: 96px;
-  right: 24px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: none;
-  background: ${({ $active }) => ($active ? '#ef4444' : '#111')};
+  top: 248px;
+  right: 16px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: linear-gradient(180deg, #1F1F1F 0%, #2B2520 100%);
   color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
   z-index: 2147483600;
-  transition: transform 0.15s ease, background 0.15s ease;
-  &:hover { transform: scale(1.06); }
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  animation: ${slideInPanel} 0.28s ease-out;
 `;
 
-const ListFab = styled.button`
-  position: fixed;
-  bottom: 96px;
-  right: 88px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
-  color: #111;
-  font-size: 22px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  z-index: 2147483600;
-  transition: transform 0.15s ease;
-  &:hover { transform: scale(1.06); }
+const DevBrand = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 6px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 `;
 
-const FabBadge = styled.span<{ $green: boolean }>`
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
+const devRowBase = `
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+`;
+
+const DevRow = styled.button<{ $active: boolean }>`
+  ${devRowBase}
+  background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'transparent')};
+  border-color: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.06)')};
+
+  &:hover {
+    background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.04)')};
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+`;
+
+const DevRowLink = styled.a`
+  ${devRowBase}
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+`;
+
+const DevEmoji = styled.span`
+  font-size: 16px;
+  flex-shrink: 0;
+`;
+
+const DevText = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+`;
+
+const DevTitle = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+`;
+
+const DevSub = styled.div`
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.02em;
+`;
+
+const DevBadge = styled.span<{ $green: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 8px;
   background: ${({ $green }) => ($green ? '#10b981' : '#f59e0b')};
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-`;
-
-const DevLinkFab = styled.a`
-  position: fixed;
-  bottom: 158px;
-  right: 24px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #111;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  z-index: 2147483600;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  &:hover {
-    transform: scale(1.06);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-  }
 `;
 
 const HoverBox = styled.div`
