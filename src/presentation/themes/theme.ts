@@ -58,6 +58,7 @@ export const theme = {
       surfaceAlt: '#FAFAFA',        // the lightest neutral used in Login/Studio
       surfaceMuted: '#F5F5F5',      // TabBar, pills, ConfirmEmail bg
       surfaceCool: '#F8F8F7',       // artboard bg
+      surfaceWarm: '#FBFAF7',       // warm cream — Settings page (intentional aesthetic)
       elevated: '#FFFFFF',
       glass: 'rgba(255, 255, 255, 0.72)',
       glassBright: 'rgba(255, 255, 255, 0.94)', // floating toolbar
@@ -215,6 +216,7 @@ export const theme = {
   shadows: {
     form: '0 0.5px 1px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(0, 0, 0, 0.03)',
     subtle: '0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(0, 0, 0, 0.02)',
+    cardFlat: '0 1px 2px rgba(0, 0, 0, 0.02)',  // near-invisible hairline — calm flat surfaces (Settings Section)
     card: '0 2px 12px rgba(0, 0, 0, 0.03)',
     cardHover: '0 4px 20px rgba(0, 0, 0, 0.05)',
     medium: '0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.02)',

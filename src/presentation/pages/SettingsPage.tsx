@@ -65,7 +65,7 @@ const humanisePasswordError = (raw: string, isFirstTimeSet: boolean): string => 
 
 const Page = styled.div`
   min-height: 100vh;
-  background: #FBFAF7;
+  background: ${({ theme }) => theme.colors.background.surfaceWarm};
   font-family: ${({ theme }) => theme.typography.fonts.primary};
   color: ${({ theme }) => theme.colors.text.primary};
 `;
@@ -168,12 +168,12 @@ const ProfileEmail = styled.div`
 /* ────────────────── Section cards ────────────────── */
 
 const Section = styled.section`
-  background: #fff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 16px;
   padding: 18px 20px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  box-shadow: ${({ theme }) => theme.shadows.cardFlat};
 `;
 
 const SectionHeader = styled.div`
