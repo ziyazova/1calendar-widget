@@ -282,7 +282,7 @@ const Section = styled.section<{
 }>`
   padding-top: ${({ $size = 'md', $bleedTop }) => ($bleedTop ? '0' : SECTION_Y[$size])};
   padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
-  ${({ $tint }) => $tint && 'background: #FAFAFA;'}
+  ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
   @media (max-width: 768px) {
     padding-top: ${({ $size = 'md', $bleedTop }) =>
@@ -292,9 +292,9 @@ const Section = styled.section<{
   }
 `;
 
-/* Заливка hero — тот же #FAFAFA что и на /?hero=v2 */
+/* Заливка hero — тот же surfaceAlt что и на /?hero=v2 */
 const Hero = styled.div`
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
 `;
 
 const HeroScene = styled.div`
@@ -303,7 +303,7 @@ const HeroScene = styled.div`
   min-height: 728px;
   margin: 0 auto;
   padding: 88px 48px 49px;
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
   @media (max-width: 768px) {
     min-height: 0;
@@ -704,15 +704,15 @@ const PricingBtn = styled.button<{ $primary?: boolean }>`
   cursor: pointer;
   transition: all 0.2s ease;
   border: ${({ $primary }) => $primary ? 'none' : '1px solid rgba(0,0,0,0.1)'};
-  background: ${({ $primary }) => $primary ? '#1F1F1F' : 'transparent'};
-  color: ${({ $primary }) => $primary ? '#fff' : 'inherit'};
+  background: ${({ $primary, theme }) => $primary ? theme.colors.text.primary : 'transparent'};
+  color: ${({ $primary, theme }) => $primary ? theme.colors.text.inverse : 'inherit'};
 
   &:hover { opacity: 0.85; }
 `;
 
 /* Kill FooterOuter's 120px margin-top for flush layout */
 const FooterFlush = styled.div`
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   & > div:first-child { margin-top: 0; }
 `;
 
