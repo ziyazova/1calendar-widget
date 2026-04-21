@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 import path from 'path'
 import fs from 'fs'
+import { execSync } from 'child_process'
 
 function claudeFeedbackPlugin(): Plugin {
   const dir = path.resolve(__dirname, '.claude-feedback')
@@ -108,9 +109,57 @@ function claudeFeedbackPlugin(): Plugin {
   }
 }
 
+// Dev-only endpoint: GET current git branch, POST to switch branches.
+// Used by <BranchSwitcher/> so the user can flip main ↔ design-experiment from the UI.
+function branchSwitchPlugin(): Plugin {
+  const BRANCHES = ['main', 'design-experiment'] as const
+  const sendJson = (res: any, status: number, payload: unknown) => {
+    res.statusCode = status
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(payload))
+  }
+  const readBody = (req: any): Promise<string> =>
+    new Promise((resolve) => {
+      let body = ''
+      req.on('data', (chunk: Buffer) => { body += chunk })
+      req.on('end', () => resolve(body))
+    })
+
+  return {
+    name: 'branch-switch',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__branch', async (req, res) => {
+        try {
+          if (req.method === 'GET') {
+            const current = execSync('git branch --show-current', { cwd: __dirname }).toString().trim()
+            return sendJson(res, 200, { current, branches: BRANCHES })
+          }
+          if (req.method === 'POST') {
+            const { branch } = JSON.parse(await readBody(req))
+            // Whitelist — never accept an arbitrary string, prevents command injection.
+            if (!BRANCHES.includes(branch)) return sendJson(res, 400, { error: 'unknown branch' })
+            try {
+              execSync(`git checkout ${branch}`, { cwd: __dirname, stdio: 'pipe' })
+              return sendJson(res, 200, { ok: true, current: branch })
+            } catch (err: any) {
+              // Common cause: uncommitted changes block the checkout.
+              return sendJson(res, 409, { error: (err.stderr?.toString() || err.message || String(err)).trim() })
+            }
+          }
+          res.statusCode = 405
+          res.end()
+        } catch (err) {
+          sendJson(res, 500, { error: String(err) })
+        }
+      })
+    },
+  }
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), claudeFeedbackPlugin()],
+  plugins: [react(), claudeFeedbackPlugin(), branchSwitchPlugin()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
