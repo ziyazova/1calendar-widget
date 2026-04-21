@@ -25,7 +25,12 @@ import { useAuth } from '../context/AuthContext';
 import { useUpgradeModal } from '../context/UpgradeModalContext';
 import { AccountService } from '@/infrastructure/services/AccountService';
 import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
-import { PlanBadge } from '@/presentation/components/shared';
+import {
+  PlanBadge,
+  Modal as SharedModal,
+  ModalFooter,
+  Button as SharedButton,
+} from '@/presentation/components/shared';
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return '';
@@ -1260,44 +1265,48 @@ export const SettingsPage: React.FC = () => {
         </Overlay>
       )}
 
-      {/* Delete modal */}
-      {showDeleteConfirm && (
-        <Overlay>
-          <Backdrop onClick={() => !deleting && setShowDeleteConfirm(false)} />
-          <Modal>
-            <ModalTitle $danger>Delete account?</ModalTitle>
-            <ModalText>
-              We'll permanently remove your profile and all saved widgets from our servers. You can always sign up again later with the same email. To confirm, please type <strong>delete</strong> below.
-            </ModalText>
-            <ModalInputWrap style={{ marginBottom: deleteError ? 8 : 20 }}>
-              <ModalInput
-                style={{ padding: '0 14px' }}
-                type="text"
-                autoFocus
-                value={deleteConfirmText}
-                onChange={e => setDeleteConfirmText(e.target.value)}
-                placeholder='Type "delete" to confirm'
-              />
-            </ModalInputWrap>
-            {deleteError && (
-              <div style={{ fontSize: 12, color: '#DC2828', marginBottom: 16 }}>{deleteError}</div>
-            )}
-            <ModalActions>
-              <Button type="button" onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                $variant="dangerSolid"
-                onClick={handleDelete}
-                disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
-              >
-                <Trash2 /> {deleting ? 'Deleting…' : 'Delete forever'}
-              </Button>
-            </ModalActions>
-          </Modal>
-        </Overlay>
-      )}
+      {/* Delete modal — migrated to shared <Modal>. Form input stays page-local. */}
+      <SharedModal
+        open={showDeleteConfirm}
+        onClose={() => !deleting && setShowDeleteConfirm(false)}
+        title="Delete account?"
+        size="sm"
+      >
+        <ModalText>
+          We'll permanently remove your profile and all saved widgets from our servers. You can always sign up again later with the same email. To confirm, please type <strong>delete</strong> below.
+        </ModalText>
+        <ModalInputWrap style={{ marginBottom: deleteError ? 8 : 20 }}>
+          <ModalInput
+            style={{ padding: '0 14px' }}
+            type="text"
+            autoFocus
+            value={deleteConfirmText}
+            onChange={e => setDeleteConfirmText(e.target.value)}
+            placeholder='Type "delete" to confirm'
+          />
+        </ModalInputWrap>
+        {deleteError && <ErrorText style={{ marginBottom: 16 }}>{deleteError}</ErrorText>}
+        <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -20, marginTop: 16 }}>
+          <SharedButton
+            type="button"
+            $variant="secondary"
+            $size="lg"
+            onClick={() => setShowDeleteConfirm(false)}
+            disabled={deleting}
+          >
+            Cancel
+          </SharedButton>
+          <SharedButton
+            type="button"
+            $variant="danger"
+            $size="lg"
+            onClick={handleDelete}
+            disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
+          >
+            <Trash2 /> {deleting ? 'Deleting…' : 'Delete forever'}
+          </SharedButton>
+        </ModalFooter>
+      </SharedModal>
     </Page>
   );
 };
