@@ -52,6 +52,7 @@
 export type ButtonVariant =
   | 'primary'
   | 'accent'
+  | 'upgrade'
   | 'blue'
   | 'secondary'
   | 'outline'
@@ -160,6 +161,31 @@ const accent: ButtonVariantTokens = {
     bg: 'linear-gradient(135deg, #4F46E5 0%, #5A5EE8 50%, #6B75ED 100%)',
     transform: 'translateY(0)',
     shadow: 'inset 0 1px 3px rgba(79, 70, 229, 0.3), 0 1px 2px rgba(99, 102, 241, 0.15)',
+  },
+};
+
+/** Upgrade — outlined with sparkle. Lighter-weight Pro CTA for inline
+ *  spots, toolbars, and cards. Use when `accent` filled would be too loud.
+ *  Pair with a <Sparkles /> icon. */
+const upgrade: ButtonVariantTokens = {
+  base: {
+    bg: 'rgba(99, 102, 241, 0.05)',
+    fg: '#4F46E5',
+    border: '1px solid #6366F1',
+    shadow: '0 1px 2px rgba(99, 102, 241, 0.08)',
+    fontWeight: 600,
+  },
+  hover: {
+    bg: 'rgba(99, 102, 241, 0.11)',
+    fg: '#4338CA',
+    border: '1px solid #4F46E5',
+    transform: 'translateY(-0.5px)',
+    shadow: '0 3px 12px rgba(99, 102, 241, 0.18)',
+  },
+  active: {
+    bg: 'rgba(99, 102, 241, 0.10)',
+    transform: 'translateY(0)',
+    shadow: '0 1px 2px rgba(99, 102, 241, 0.14)',
   },
 };
 
@@ -308,6 +334,7 @@ const link: ButtonVariantTokens = {
 export const buttonVariantTokens: Record<ButtonVariant, ButtonVariantTokens> = {
   primary,
   accent,
+  upgrade,
   blue,
   secondary,
   outline,

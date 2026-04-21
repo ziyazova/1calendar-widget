@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button, FilterChip, FilterRow } from '../components/shared';
-import { Plus, Trash2, Download, Check, ArrowRight, Settings, Sparkles } from 'lucide-react';
+import {
+  Plus, Trash2, Download, Check, ArrowRight, ArrowLeft,
+  Settings, Sparkles, X, Copy, Pencil,
+} from 'lucide-react';
 import {
   buttonVariantTokens,
   buttonSizeTokens,
@@ -119,6 +122,110 @@ export const DesignSystemV2Page: React.FC = () => {
         </SubSection>
       </Section>
 
+      {/* ─────── Patterns ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Patterns</SectionTitle>
+          <SectionMeta>
+            Real-world usage — how variants come together in the product.
+          </SectionMeta>
+        </SectionHeader>
+
+        {/* Upgrade */}
+        <SubSection>
+          <SubTitle>Upgrade — outlined with sparkle</SubTitle>
+          <PatternMeta>
+            Lighter-weight alternative to filled <code>accent</code>. For inline
+            spots, toolbars, and cards. Pair with <code>&lt;Sparkles /&gt;</code>.
+          </PatternMeta>
+          <Row>
+            <Button $variant="upgrade" $size="sm"><Sparkles /> Upgrade</Button>
+            <Button $variant="upgrade" $size="md"><Sparkles /> Upgrade to Pro</Button>
+            <Button $variant="upgrade" $size="lg"><Sparkles /> Upgrade to Pro — $9/mo</Button>
+          </Row>
+        </SubSection>
+
+        {/* Back */}
+        <SubSection>
+          <SubTitle>Back — navigation</SubTitle>
+          <PatternMeta>
+            Top-of-page back links. Default = <code>outline</code> with label.
+            Dense toolbars use icon-only.
+          </PatternMeta>
+          <Row>
+            <Button $variant="outline" $size="sm"><ArrowLeft /> Templates</Button>
+            <Button $variant="outline" $size="sm" $iconOnly aria-label="Back"><ArrowLeft /></Button>
+          </Row>
+        </SubSection>
+
+        {/* Close */}
+        <SubSection>
+          <SubTitle>Close (×) — modals & drawers</SubTitle>
+          <PatternMeta>
+            Icon-only <code>ghost</code> dismiss. Sits top-right of any overlay surface.
+          </PatternMeta>
+          <Row>
+            <Button $variant="ghost" $size="sm" $iconOnly aria-label="Close"><X /></Button>
+            <Button $variant="ghost" $size="md" $iconOnly aria-label="Close"><X /></Button>
+            <Button $variant="outline" $size="sm" $iconOnly aria-label="Close"><X /></Button>
+          </Row>
+        </SubSection>
+
+        {/* Ghost nav */}
+        <SubSection>
+          <SubTitle>Ghost — nav items</SubTitle>
+          <PatternMeta>
+            Sidebar / top-nav links. No bg at rest, subtle hover tint.
+          </PatternMeta>
+          <Row>
+            <Button $variant="ghost" $size="md">Dashboard</Button>
+            <Button $variant="ghost" $size="md">Templates</Button>
+            <Button $variant="ghost" $size="md">My Widgets</Button>
+          </Row>
+        </SubSection>
+
+        {/* Link */}
+        <SubSection>
+          <SubTitle>Link — refined underline</SubTitle>
+          <PatternMeta>
+            Inline text-style buttons. Underline appears on hover with 3px
+            offset / 1.5px thickness.
+          </PatternMeta>
+          <Row>
+            <Button $variant="link">Forgot password?</Button>
+            <Button $variant="link">Learn more</Button>
+            <Button $variant="link">Resend email</Button>
+          </Row>
+        </SubSection>
+
+        {/* Card actions */}
+        <SubSection>
+          <SubTitle>Card actions — Customize &amp; Copy</SubTitle>
+          <PatternMeta>
+            Dense action row on cards (e.g. widget / template thumbs).
+            Customize = <code>primary sm</code>. Copy = <code>ghost sm iconOnly</code> (with ✓ feedback on click).
+          </PatternMeta>
+          <Row>
+            <Button $variant="primary" $size="sm"><Pencil /> Customize</Button>
+            <CopyButtonDemo />
+            <Button $variant="danger" $size="sm" $iconOnly aria-label="Delete"><Trash2 /></Button>
+          </Row>
+        </SubSection>
+
+        {/* Real-world CTAs */}
+        <SubSection>
+          <SubTitle>Real-world CTAs</SubTitle>
+          <PatternMeta>
+            Straight-from-app examples — check that your edits read well in context.
+          </PatternMeta>
+          <Row>
+            <Button $variant="primary" $size="lg">Sign in</Button>
+            <Button $variant="upgrade" $size="lg"><Sparkles /> Upgrade to Pro — $9/mo</Button>
+            <Button $variant="secondary" $size="lg"><GoogleIcon /> Continue with Google</Button>
+          </Row>
+        </SubSection>
+      </Section>
+
       {/* ─────── Filter chips ─────── */}
       <Section>
         <SectionHeader>
@@ -211,6 +318,7 @@ function variantBlurb(v: ButtonVariant): string {
   const blurbs: Record<ButtonVariant, string> = {
     primary: 'Default dark CTA · carved depth',
     accent: 'Indigo gradient · Pro/Upgrade',
+    upgrade: 'Outlined indigo · inline upgrade',
     blue: 'Sky blue solid · copy/share',
     secondary: 'Notion paper · neutral CTA',
     outline: 'Transparent + border',
@@ -222,6 +330,35 @@ function variantBlurb(v: ButtonVariant): string {
   };
   return blurbs[v] || '';
 }
+
+/* ── Copy button with ✓ feedback ── */
+const CopyButtonDemo: React.FC = () => {
+  const [copied, setCopied] = useState(false);
+  return (
+    <Button
+      $variant="ghost"
+      $size="sm"
+      $iconOnly
+      aria-label={copied ? 'Copied' : 'Copy embed URL'}
+      onClick={() => {
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1500);
+      }}
+    >
+      {copied ? <Check /> : <Copy />}
+    </Button>
+  );
+};
+
+/* ── Google G logo (for "Continue with Google") ── */
+const GoogleIcon: React.FC = () => (
+  <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" />
+    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
+    <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" />
+    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" />
+  </svg>
+);
 
 /* ─────── Layout ─────── */
 
@@ -353,6 +490,24 @@ const Row = styled.div`
   gap: 12px;
   flex-wrap: wrap;
   align-items: center;
+`;
+
+const PatternMeta = styled.p`
+  font-size: 13px;
+  line-height: 1.55;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: -4px 0 14px;
+  max-width: 640px;
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 12px;
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    border: 1px solid ${({ theme }) => theme.colors.border.light};
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
 `;
 
 const Spacer = styled.div`
