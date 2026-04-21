@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { Plus, X, List, Palette } from 'lucide-react';
+import { useDevPanelsHidden } from './useDevPanelsHidden';
 
 type Mode = 'idle' | 'picking' | 'composing' | 'list';
 type Category = 'copy' | 'spacing' | 'color' | 'layout' | 'bug' | 'other';
@@ -37,6 +39,7 @@ interface Comment {
 }
 
 export function ClaudeFeedback() {
+  const hidden = useDevPanelsHidden();
   const [mode, setMode] = useState<Mode>('idle');
   const [target, setTarget] = useState<PickedTarget | null>(null);
   const [comment, setComment] = useState('');
@@ -345,49 +348,48 @@ export function ClaudeFeedback() {
 
       {toast && <Toast>{toast}</Toast>}
 
-      <DevPanel>
-        <DevBrand>
-          <span style={{ fontSize: 14 }}>💬</span>
-          Feedback
-        </DevBrand>
+      {!hidden && (
+        <DevPanel>
+          <DevBrand>Feedback</DevBrand>
 
-        <DevRow
-          $active={mode === 'picking'}
-          onClick={() => setMode(mode === 'picking' ? 'idle' : 'picking')}
-        >
-          <DevEmoji>{mode === 'picking' ? '✕' : '➕'}</DevEmoji>
-          <DevText>
-            <DevTitle>{mode === 'picking' ? 'Cancel picking' : 'New comment'}</DevTitle>
-            <DevSub>{mode === 'picking' ? 'esc to exit' : 'pick any element on page'}</DevSub>
-          </DevText>
-        </DevRow>
+          <DevRow
+            $active={mode === 'picking'}
+            onClick={() => setMode(mode === 'picking' ? 'idle' : 'picking')}
+          >
+            <DevIcon>{mode === 'picking' ? <X /> : <Plus />}</DevIcon>
+            <DevText>
+              <DevTitle>{mode === 'picking' ? 'Cancel picking' : 'New comment'}</DevTitle>
+              <DevSub>{mode === 'picking' ? 'esc to exit' : 'pick any element on page'}</DevSub>
+            </DevText>
+          </DevRow>
 
-        <DevRow
-          $active={mode === 'list'}
-          onClick={() => setMode(mode === 'list' ? 'idle' : 'list')}
-        >
-          <DevEmoji>📋</DevEmoji>
-          <DevText>
-            <DevTitle>
-              View comments
-              {(pendingCount + fixedCount) > 0 && (
-                <DevBadge $green={fixedCount > 0 && pendingCount === 0}>
-                  {fixedCount > 0 ? fixedCount : pendingCount}
-                </DevBadge>
-              )}
-            </DevTitle>
-            <DevSub>{pendingCount} pending · {fixedCount} fixed</DevSub>
-          </DevText>
-        </DevRow>
+          <DevRow
+            $active={mode === 'list'}
+            onClick={() => setMode(mode === 'list' ? 'idle' : 'list')}
+          >
+            <DevIcon><List /></DevIcon>
+            <DevText>
+              <DevTitle>
+                View comments
+                {(pendingCount + fixedCount) > 0 && (
+                  <DevBadge $green={fixedCount > 0 && pendingCount === 0}>
+                    {fixedCount > 0 ? fixedCount : pendingCount}
+                  </DevBadge>
+                )}
+              </DevTitle>
+              <DevSub>{pendingCount} pending · {fixedCount} fixed</DevSub>
+            </DevText>
+          </DevRow>
 
-        <DevRowLink href="/dev">
-          <DevEmoji>🎨</DevEmoji>
-          <DevText>
-            <DevTitle>Design system</DevTitle>
-            <DevSub>open /dev</DevSub>
-          </DevText>
-        </DevRowLink>
-      </DevPanel>
+          <DevRowLink href="/dev">
+            <DevIcon><Palette /></DevIcon>
+            <DevText>
+              <DevTitle>Design system</DevTitle>
+              <DevSub>open /dev</DevSub>
+            </DevText>
+          </DevRowLink>
+        </DevPanel>
+      )}
     </div>
   );
 }
@@ -533,9 +535,19 @@ const DevRowLink = styled.a`
   }
 `;
 
-const DevEmoji = styled.span`
-  font-size: 16px;
+const DevIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.7);
+  svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+  }
 `;
 
 const DevText = styled.div`

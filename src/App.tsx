@@ -17,6 +17,7 @@ import { ErrorBoundary } from './presentation/components/ErrorBoundary';
 import { DebugOverlay } from './presentation/components/debug/DebugOverlay';
 import { ClaudeFeedback } from './presentation/components/dev/ClaudeFeedback';
 import { BranchSwitcher } from './presentation/components/dev/BranchSwitcher';
+import { DevPanelsToggle } from './presentation/components/dev/DevPanelsToggle';
 import { DesignSystemPage } from './presentation/pages/DesignSystemPage';
 import { PrivacyPage } from './presentation/pages/PrivacyPage';
 import { TermsPage } from './presentation/pages/TermsPage';
@@ -81,6 +82,7 @@ function App() {
             <UpgradeModalProvider>
               <ScrollToTop />
               <DebugOverlay />
+              {import.meta.env.DEV && <DevPanelsToggle />}
               {import.meta.env.DEV && <BranchSwitcher />}
               {import.meta.env.DEV && <ClaudeFeedback />}
               <PageTransition>

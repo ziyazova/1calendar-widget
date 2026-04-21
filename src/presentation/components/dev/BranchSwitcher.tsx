@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { useDevPanelsHidden } from './useDevPanelsHidden';
 
 type State =
   | { kind: 'loading' }
@@ -7,20 +8,19 @@ type State =
   | { kind: 'switching'; to: string }
   | { kind: 'error'; message: string };
 
-const BRANCH_LABEL: Record<string, { emoji: string; title: string; subtitle: string }> = {
+const BRANCH_LABEL: Record<string, { title: string; subtitle: string }> = {
   main: {
-    emoji: '🌿',
     title: 'main',
     subtitle: 'stable / prod',
   },
   'design-experiment': {
-    emoji: '🧪',
     title: 'design-experiment',
-    subtitle: 'Claude-design sandbox',
+    subtitle: 'design sandbox',
   },
 };
 
 export function BranchSwitcher() {
+  const hidden = useDevPanelsHidden();
   const [state, setState] = useState<State>({ kind: 'loading' });
 
   const load = async () => {
@@ -68,12 +68,11 @@ export function BranchSwitcher() {
     return null;
   }
 
+  if (hidden) return null;
+
   return (
-    <Bar data-branch-switcher>
-      <Brand>
-        <span style={{ fontSize: 14 }}>🎨</span>
-        Branch
-      </Brand>
+    <Bar data-branch-switcher data-dev-ui>
+      <Brand>Branch</Brand>
 
       <Tabs>
         {(['main', 'design-experiment'] as const).map((b) => {
@@ -91,7 +90,6 @@ export function BranchSwitcher() {
                 if (!isActive) switchTo(b);
               }}
             >
-              <TabEmoji>{info.emoji}</TabEmoji>
               <TabText>
                 <TabTitle>
                   {info.title}
@@ -112,8 +110,7 @@ export function BranchSwitcher() {
           }}
           title={state.message}
         >
-          ⚠ {state.message.length > 80 ? state.message.slice(0, 77) + '…' : state.message}
-          <ErrorDismiss>✕</ErrorDismiss>
+          {state.message.length > 80 ? state.message.slice(0, 77) + '…' : state.message}
         </ErrorChip>
       )}
     </Bar>
@@ -204,11 +201,6 @@ const Tab = styled.button<{ $active: boolean }>`
   }
 `;
 
-const TabEmoji = styled.span`
-  font-size: 16px;
-  flex-shrink: 0;
-`;
-
 const TabText = styled.div`
   display: flex;
   flex-direction: column;
@@ -265,8 +257,4 @@ const ErrorChip = styled.button`
   cursor: pointer;
   text-align: left;
   word-break: break-word;
-`;
-
-const ErrorDismiss = styled.span`
-  opacity: 0.6;
 `;
