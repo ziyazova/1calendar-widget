@@ -46,6 +46,7 @@
  * - Soften danger red:                        `danger.base.fg` / `dangerStrong.base.fg`
  * - Add a tiny lift on ghost:                 `ghost.hover.transform`
  *
+ * Scope: 10 variants × 4 sizes. Live preview at `/dev/v2`.
  * See original spec: `01-buttons.standalone.html` (Before/After) + HANDOFF-buttons.md.
  */
 
@@ -53,7 +54,6 @@ export type ButtonVariant =
   | 'primary'
   | 'accent'
   | 'upgrade'
-  | 'blue'
   | 'secondary'
   | 'outline'
   | 'ghost'
@@ -62,7 +62,7 @@ export type ButtonVariant =
   | 'success'
   | 'link';
 
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ButtonStateTokens {
   bg?: string;
@@ -93,7 +93,6 @@ export interface ButtonSizeTokens {
    ──────────────────────────────────────────────────────────────── */
 
 export const buttonSizeTokens: Record<ButtonSize, ButtonSizeTokens> = {
-  xs: { height: '28px', padding: '0 12px', radius: '8px',  fontSize: '12px', iconSize: '12px' },
   sm: { height: '32px', padding: '0 14px', radius: '10px', fontSize: '12px', iconSize: '14px' },
   md: { height: '36px', padding: '0 16px', radius: '10px', fontSize: '13px', iconSize: '14px' },
   lg: { height: '44px', padding: '0 20px', radius: '12px', fontSize: '14px', iconSize: '16px' },
@@ -101,7 +100,7 @@ export const buttonSizeTokens: Record<ButtonSize, ButtonSizeTokens> = {
 };
 
 export const sizePxMap: Record<ButtonSize, number> = {
-  xs: 28, sm: 32, md: 36, lg: 44, xl: 48,
+  sm: 32, md: 36, lg: 44, xl: 48,
 };
 
 /* ────────────────────────────────────────────────────────────────
@@ -186,26 +185,6 @@ const upgrade: ButtonVariantTokens = {
     bg: 'rgba(99, 102, 241, 0.10)',
     transform: 'translateY(0)',
     shadow: '0 1px 2px rgba(99, 102, 241, 0.14)',
-  },
-};
-
-/** Blue — solid sky blue with colored shadow. Copy/share CTA. */
-const blue: ButtonVariantTokens = {
-  base: {
-    bg: '#60A5FA',
-    fg: '#ffffff',
-    shadow: '0 1px 2px rgba(96, 165, 250, 0.24), 0 4px 14px rgba(96, 165, 250, 0.32)',
-    fontWeight: 600,
-  },
-  hover: {
-    bg: '#4F97F5',
-    transform: 'translateY(-0.5px)',
-    shadow: '0 2px 4px rgba(96, 165, 250, 0.28), 0 8px 22px rgba(96, 165, 250, 0.42)',
-  },
-  active: {
-    bg: '#3B86EA',
-    transform: 'translateY(0)',
-    shadow: '0 1px 2px rgba(96, 165, 250, 0.28)',
   },
 };
 
@@ -335,7 +314,6 @@ export const buttonVariantTokens: Record<ButtonVariant, ButtonVariantTokens> = {
   primary,
   accent,
   upgrade,
-  blue,
   secondary,
   outline,
   ghost,
@@ -346,8 +324,8 @@ export const buttonVariantTokens: Record<ButtonVariant, ButtonVariantTokens> = {
 };
 
 /** Variants that deserve font-weight: 600 even if not set per-variant. */
-export const emphasisVariants: ReadonlySet<ButtonVariant> = new Set([
-  'primary', 'accent', 'blue', 'success',
+export const emphasisVariants: ReadonlySet<ButtonVariant> = new Set<ButtonVariant>([
+  'primary', 'accent', 'success',
 ]);
 
 /* ────────────────────────────────────────────────────────────────

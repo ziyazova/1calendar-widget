@@ -1127,7 +1127,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <WidgetBottom>
                       <WidgetName>{w.name}</WidgetName>
                       <WidgetActions>
-                        <SharedButton $variant="primary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
+                        <SharedButton $variant="outline" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
                         <SharedButton $variant="danger" $size="sm" onClick={() => handleDelete(w.id)}><Trash2 /></SharedButton>
                       </WidgetActions>
                     </WidgetBottom>

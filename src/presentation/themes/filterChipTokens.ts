@@ -1,14 +1,12 @@
 /**
  * FilterChip tokens — companion to buttonTokens.
  *
- * Same philosophy: edit here, every filter chip / tab toggle / pill-button
- * across the site updates at once.
+ * Same philosophy: edit here, every filter chip across the site updates at once.
  *
  * Used by:
  *   - <FilterChip> in shared
- *   - TemplatesPage / TemplatesGallery filters ("All · Life · Student · …")
- *   - DashboardViews widget-category filter
- *   - future dashboard sort/category pills
+ *   - TemplatesPage / TemplatesGallery filters
+ *   - WidgetStudioPage category filters
  *
  * ## Anatomy
  *
@@ -16,13 +14,8 @@
  *   inactive  — resting (white bg, muted fg)
  *   active    — selected (dark bg, white fg)
  *
- * Plus hover per state.
- *
- * Sizes — match buttonTokens scale so chips align in rows with buttons:
- *   sm (32) / md (36)  — default is `md`
+ * Plus a hover for each state. One single size — 32px tall.
  */
-
-export type FilterChipSize = 'sm' | 'md';
 
 export interface ChipStateTokens {
   bg: string;
@@ -35,13 +28,6 @@ export interface FilterChipTokens {
   inactiveHover: ChipStateTokens;
   active: ChipStateTokens;
   activeHover: ChipStateTokens;
-}
-
-export interface FilterChipSizeTokens {
-  height: string;
-  padding: string;
-  fontSize: string;
-  radius: string;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -72,13 +58,15 @@ export const filterChipTokens: FilterChipTokens = {
 };
 
 /* ────────────────────────────────────────────────────────────────
-   SIZES
+   SIZE — single 32px chip to align with Button $size="sm".
    ──────────────────────────────────────────────────────────────── */
 
-export const filterChipSizeTokens: Record<FilterChipSize, FilterChipSizeTokens> = {
-  sm: { height: '32px', padding: '0 12px', fontSize: '12px', radius: '10px' },
-  md: { height: '34px', padding: '0 16px', fontSize: '13px', radius: '12px' },
-};
+export const filterChipSize = {
+  height: '32px',
+  padding: '0 14px',
+  fontSize: '12px',
+  radius: '10px',
+} as const;
 
 /* ────────────────────────────────────────────────────────────────
    MOTION

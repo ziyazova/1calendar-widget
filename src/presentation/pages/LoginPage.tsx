@@ -754,7 +754,7 @@ export const LoginPage: React.FC = () => {
                   <Button
                     type="button"
                     $variant="link"
-                    $size="xs"
+                    $size="sm"
                     onClick={() => { setForgotOpen(false); auth.loginWithGoogle(); }}
                   >
                     Continue with Google

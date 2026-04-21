@@ -1,12 +1,9 @@
 import styled from 'styled-components';
 import {
-  FilterChipSize,
   filterChipTokens,
-  filterChipSizeTokens,
+  filterChipSize,
   filterChipTransition,
 } from '../../themes/filterChipTokens';
-
-export type { FilterChipSize };
 
 export const FilterRow = styled.div`
   display: flex;
@@ -16,7 +13,6 @@ export const FilterRow = styled.div`
 
 interface FilterChipProps {
   $active: boolean;
-  $size?: FilterChipSize;
 }
 
 export const FilterChip = styled.button<FilterChipProps>`
@@ -27,16 +23,10 @@ export const FilterChip = styled.button<FilterChipProps>`
   font-weight: 500;
   letter-spacing: -0.01em;
   transition: ${filterChipTransition};
-
-  ${({ $size = 'md' }) => {
-    const s = filterChipSizeTokens[$size];
-    return `
-      height: ${s.height};
-      padding: ${s.padding};
-      font-size: ${s.fontSize};
-      border-radius: ${s.radius};
-    `;
-  }}
+  height: ${filterChipSize.height};
+  padding: ${filterChipSize.padding};
+  font-size: ${filterChipSize.fontSize};
+  border-radius: ${filterChipSize.radius};
 
   ${({ $active }) => {
     const state = $active ? filterChipTokens.active : filterChipTokens.inactive;
@@ -53,12 +43,4 @@ export const FilterChip = styled.button<FilterChipProps>`
       }
     `;
   }}
-
-  @media (max-width: 768px) {
-    ${({ $size = 'md' }) => {
-      if ($size !== 'md') return '';
-      const sm = filterChipSizeTokens.sm;
-      return `height: ${sm.height}; padding: ${sm.padding}; font-size: ${sm.fontSize};`;
-    }}
-  }
 `;

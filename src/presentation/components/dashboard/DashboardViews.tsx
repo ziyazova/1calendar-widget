@@ -788,7 +788,7 @@ const DashboardView: React.FC<{
                 <BigCardBottom>
                   <BigCardName>{w.name}</BigCardName>
                   <BigCardActions>
-                    <SharedButton $variant="primary" $size="sm" onClick={() => onEditWidget?.(w)}><Pencil /> Edit</SharedButton>
+                    <SharedButton $variant="outline" $size="sm" onClick={() => onEditWidget?.(w)}><Pencil /> Edit</SharedButton>
                     <SharedButton $variant="dangerStrong" $size="sm" onClick={() => handleDelete(w.id)}><Trash2 /></SharedButton>
                   </BigCardActions>
                 </BigCardBottom>

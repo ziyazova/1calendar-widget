@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button, FilterChip, FilterRow } from '../components/shared';
 import {
-  Plus, Trash2, Download, Check, ArrowRight, ArrowLeft,
-  Settings, Sparkles, X, Copy, Pencil,
+  Plus, Trash2, Check, ArrowRight, ArrowLeft,
+  Settings, Sparkle, X, Copy, Pencil,
+  LogOut, Home, ArrowUpRight, ChevronDown,
 } from 'lucide-react';
 import {
   buttonVariantTokens,
@@ -11,7 +12,7 @@ import {
   ButtonVariant,
   ButtonSize,
 } from '../themes/buttonTokens';
-import { filterChipSizeTokens } from '../themes/filterChipTokens';
+import { filterChipSize } from '../themes/filterChipTokens';
 
 /**
  * DesignSystemV2Page — live showcase rendered straight from tokens.
@@ -28,7 +29,6 @@ const ALL_SIZES: ButtonSize[] = Object.keys(buttonSizeTokens) as ButtonSize[];
 
 export const DesignSystemV2Page: React.FC = () => {
   const [filter, setFilter] = useState<string>('all');
-  const [filterSm, setFilterSm] = useState<string>('all');
 
   return (
     <Page>
@@ -60,7 +60,7 @@ export const DesignSystemV2Page: React.FC = () => {
               <MatrixCell key={s}>
                 <SizeLabel>{s}</SizeLabel>
                 <SizeMeta>
-                  {buttonSizeTokens[s].height} · {buttonSizeTokens[s].radius}r
+                  {buttonSizeTokens[s].height} · {sizeUsage(s)}
                 </SizeMeta>
               </MatrixCell>
             ))}
@@ -84,40 +84,16 @@ export const DesignSystemV2Page: React.FC = () => {
         </Matrix>
 
         <SubSection>
-          <SubTitle>With icons</SubTitle>
+          <SubTitle>Options — icons · pill · icon-only · disabled</SubTitle>
           <Row>
             <Button $variant="primary" $size="md"><Plus /> Create</Button>
-            <Button $variant="accent" $size="md"><Sparkles /> Upgrade</Button>
-            <Button $variant="secondary" $size="md"><Settings /> Settings</Button>
-            <Button $variant="blue" $size="md"><Download /> Export</Button>
-            <Button $variant="success" $size="md"><Check /> Saved</Button>
-            <Button $variant="danger" $size="md"><Trash2 /> Remove</Button>
-            <Button $variant="dangerStrong" $size="md"><Trash2 /> Delete forever</Button>
+            <Button $variant="upgrade" $size="md"><Sparkle /> Upgrade</Button>
             <Button $variant="outline" $size="md">Continue <ArrowRight /></Button>
-          </Row>
-        </SubSection>
-
-        <SubSection>
-          <SubTitle>Modifiers</SubTitle>
-          <Row>
-            <Button $variant="primary" $size="md" $fullWidth>fullWidth</Button>
-          </Row>
-          <Spacer />
-          <Row>
             <Button $variant="accent" $size="md" $pill>pill</Button>
-            <Button $variant="secondary" $size="md" $pill>pill secondary</Button>
-          </Row>
-          <Spacer />
-          <Row>
-            <Button $variant="primary" $size="sm" $iconOnly aria-label="Edit"><Settings /></Button>
-            <Button $variant="secondary" $size="md" $iconOnly aria-label="Edit"><Settings /></Button>
-            <Button $variant="danger" $size="lg" $iconOnly aria-label="Delete"><Trash2 /></Button>
-          </Row>
-          <Spacer />
-          <Row>
+            <Button $variant="outline" $size="md" $iconOnly aria-label="Copy"><Copy /></Button>
+            <Button $variant="secondary" $size="md" $iconOnly aria-label="Settings"><Settings /></Button>
+            <Button $variant="danger" $size="md" $iconOnly aria-label="Delete"><Trash2 /></Button>
             <Button $variant="primary" $size="md" disabled>disabled</Button>
-            <Button $variant="accent" $size="md" disabled>disabled</Button>
-            <Button $variant="outline" $size="md" disabled>disabled</Button>
           </Row>
         </SubSection>
       </Section>
@@ -133,94 +109,124 @@ export const DesignSystemV2Page: React.FC = () => {
 
         {/* Upgrade */}
         <SubSection>
-          <SubTitle>Upgrade — outlined with sparkle</SubTitle>
+          <SubTitle>Upgrade CTA · three sizes</SubTitle>
           <PatternMeta>
-            Lighter-weight alternative to filled <code>accent</code>. For inline
-            spots, toolbars, and cards. Pair with <code>&lt;Sparkles /&gt;</code>.
+            Outlined indigo — lighter than filled <code>accent</code>. Pair with{' '}
+            <code>&lt;Sparkle /&gt;</code>.
           </PatternMeta>
           <Row>
-            <Button $variant="upgrade" $size="sm"><Sparkles /> Upgrade</Button>
-            <Button $variant="upgrade" $size="md"><Sparkles /> Upgrade to Pro</Button>
-            <Button $variant="upgrade" $size="lg"><Sparkles /> Upgrade to Pro — $9/mo</Button>
+            <Button $variant="upgrade" $size="sm"><Sparkle /> Upgrade</Button>
+            <Button $variant="upgrade" $size="md"><Sparkle /> Upgrade to Pro</Button>
+            <Button $variant="upgrade" $size="lg"><Sparkle /> Upgrade to Pro · $9/mo</Button>
           </Row>
         </SubSection>
 
-        {/* Back */}
+        {/* Navigation toolkit — back, close, nav items */}
         <SubSection>
-          <SubTitle>Back — navigation</SubTitle>
+          <SubTitle>Navigation — back / close / nav items</SubTitle>
           <PatternMeta>
-            Top-of-page back links. Default = <code>outline</code> with label.
-            Dense toolbars use icon-only.
+            Back link = <code>outline + ArrowLeft</code>. Close × =
+            <code> ghost iconOnly</code>. Top-nav links = <code>ghost md</code>.
           </PatternMeta>
           <Row>
             <Button $variant="outline" $size="sm"><ArrowLeft /> Templates</Button>
-            <Button $variant="outline" $size="sm" $iconOnly aria-label="Back"><ArrowLeft /></Button>
-          </Row>
-        </SubSection>
-
-        {/* Close */}
-        <SubSection>
-          <SubTitle>Close (×) — modals & drawers</SubTitle>
-          <PatternMeta>
-            Icon-only <code>ghost</code> dismiss. Sits top-right of any overlay surface.
-          </PatternMeta>
-          <Row>
             <Button $variant="ghost" $size="sm" $iconOnly aria-label="Close"><X /></Button>
-            <Button $variant="ghost" $size="md" $iconOnly aria-label="Close"><X /></Button>
-            <Button $variant="outline" $size="sm" $iconOnly aria-label="Close"><X /></Button>
-          </Row>
-        </SubSection>
-
-        {/* Ghost nav */}
-        <SubSection>
-          <SubTitle>Ghost — nav items</SubTitle>
-          <PatternMeta>
-            Sidebar / top-nav links. No bg at rest, subtle hover tint.
-          </PatternMeta>
-          <Row>
             <Button $variant="ghost" $size="md">Dashboard</Button>
             <Button $variant="ghost" $size="md">Templates</Button>
-            <Button $variant="ghost" $size="md">My Widgets</Button>
           </Row>
         </SubSection>
 
-        {/* Link */}
+        {/* Card actions + links */}
         <SubSection>
-          <SubTitle>Link — refined underline</SubTitle>
+          <SubTitle>Card actions &amp; inline links</SubTitle>
           <PatternMeta>
-            Inline text-style buttons. Underline appears on hover with 3px
-            offset / 1.5px thickness.
-          </PatternMeta>
-          <Row>
-            <Button $variant="link">Forgot password?</Button>
-            <Button $variant="link">Learn more</Button>
-            <Button $variant="link">Resend email</Button>
-          </Row>
-        </SubSection>
-
-        {/* Card actions */}
-        <SubSection>
-          <SubTitle>Card actions — Customize &amp; Copy</SubTitle>
-          <PatternMeta>
-            Dense action row on cards (e.g. widget / template thumbs).
-            Customize = <code>primary sm</code>. Copy = <code>ghost sm iconOnly</code> (with ✓ feedback on click).
+            Customize = <code>primary sm</code>. Copy = <code>ghost sm iconOnly</code>
+            {' '}(✓ feedback on click). Inline link = underline on hover.
           </PatternMeta>
           <Row>
             <Button $variant="primary" $size="sm"><Pencil /> Customize</Button>
             <CopyButtonDemo />
             <Button $variant="danger" $size="sm" $iconOnly aria-label="Delete"><Trash2 /></Button>
+            <Button $variant="link">Forgot password?</Button>
           </Row>
+        </SubSection>
+
+        {/* Dropdown menu */}
+        <SubSection>
+          <SubTitle>Dropdown menu — avatar in TopNav</SubTitle>
+          <PatternMeta>
+            Trigger = avatar + "Dashboard" + chevron. Opens a 260px card with:
+            soft-indigo Upgrade banner (Free users only) OR Pro banner
+            (Pro users), Dashboard, Settings, divider, Log out. Menu items are
+            <code> ghost sm fullWidth</code>.
+          </PatternMeta>
+          <Row>
+            <DashTrigger>
+              <Avatar>GU</Avatar>
+              <span className="label">Dashboard</span>
+              <ChevronDown className="chev" />
+            </DashTrigger>
+          </Row>
+          <Spacer16 />
+          <Row>
+            {/* Free-user menu */}
+            <MenuShell>
+              <UpgradeRow>
+                <ArrowUpRight size={14} />
+                <span style={{ flex: 1, textAlign: 'left' }}>Upgrade to Pro</span>
+                <UpgradeBadge>$4/mo</UpgradeBadge>
+              </UpgradeRow>
+              <MenuItem>
+                <Button $variant="ghost" $size="sm" $fullWidth><Home /> Dashboard</Button>
+              </MenuItem>
+              <MenuItem>
+                <Button $variant="ghost" $size="sm" $fullWidth><Settings /> Settings</Button>
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem>
+                <Button $variant="ghost" $size="sm" $fullWidth><LogOut /> Log out</Button>
+              </MenuItem>
+            </MenuShell>
+
+            {/* Pro-user menu */}
+            <MenuShell>
+              <ProRow>
+                <ProPillBadge>Pro</ProPillBadge>
+                <span>Unlimited widgets</span>
+              </ProRow>
+              <MenuItem>
+                <Button $variant="ghost" $size="sm" $fullWidth><Home /> Dashboard</Button>
+              </MenuItem>
+              <MenuItem>
+                <Button $variant="ghost" $size="sm" $fullWidth><Settings /> Settings</Button>
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem>
+                <Button $variant="ghost" $size="sm" $fullWidth><LogOut /> Log out</Button>
+              </MenuItem>
+            </MenuShell>
+          </Row>
+        </SubSection>
+
+        {/* Segmented toggle */}
+        <SubSection>
+          <SubTitle>Segmented toggle — Widgets / Templates</SubTitle>
+          <PatternMeta>
+            Two-choice switch used at the top of <code>/studio</code>. Active pill
+            is dark; inactive is transparent. Container has a subtle grey bg.
+          </PatternMeta>
+          <Segment>
+            <SegmentItem $active>Widgets</SegmentItem>
+            <SegmentItem>Templates</SegmentItem>
+          </Segment>
         </SubSection>
 
         {/* Real-world CTAs */}
         <SubSection>
           <SubTitle>Real-world CTAs</SubTitle>
-          <PatternMeta>
-            Straight-from-app examples — check that your edits read well in context.
-          </PatternMeta>
           <Row>
             <Button $variant="primary" $size="lg">Sign in</Button>
-            <Button $variant="upgrade" $size="lg"><Sparkles /> Upgrade to Pro — $9/mo</Button>
+            <Button $variant="upgrade" $size="lg"><Sparkle /> Upgrade to Pro · $9/mo</Button>
             <Button $variant="secondary" $size="lg"><GoogleIcon /> Continue with Google</Button>
           </Row>
         </SubSection>
@@ -231,38 +237,19 @@ export const DesignSystemV2Page: React.FC = () => {
         <SectionHeader>
           <SectionTitle>Filter chips</SectionTitle>
           <SectionMeta>
-            Tab-like selectable pills — from <code>filterChipTokens.ts</code>
+            Tab-like selectable pills — from <code>filterChipTokens.ts</code>.
+            Single size ({filterChipSize.height}) — aligns with{' '}
+            <code>Button $size="sm"</code>.
           </SectionMeta>
         </SectionHeader>
 
         <SubSection>
-          <SubTitle>
-            Size <code>md</code> ({filterChipSizeTokens.md.height})
-          </SubTitle>
           <FilterRow>
             {['all', 'planners', 'student', 'wellness', 'finance', 'focus'].map((c) => (
               <FilterChip
                 key={c}
                 $active={filter === c}
                 onClick={() => setFilter(c)}
-              >
-                {c}
-              </FilterChip>
-            ))}
-          </FilterRow>
-        </SubSection>
-
-        <SubSection>
-          <SubTitle>
-            Size <code>sm</code> ({filterChipSizeTokens.sm.height})
-          </SubTitle>
-          <FilterRow>
-            {['all', 'calendar', 'clocks', 'boards', 'buttons'].map((c) => (
-              <FilterChip
-                key={c}
-                $active={filterSm === c}
-                $size="sm"
-                onClick={() => setFilterSm(c)}
               >
                 {c}
               </FilterChip>
@@ -313,16 +300,26 @@ export const DesignSystemV2Page: React.FC = () => {
   );
 };
 
+/* ── size-usage legend — where each size actually lives in the app ── */
+function sizeUsage(s: ButtonSize): string {
+  const m: Record<ButtonSize, string> = {
+    sm: 'cards · filters · inline',
+    md: 'toolbars · modals',
+    lg: 'primary forms · cards',
+    xl: 'hero · auth · full-width',
+  };
+  return m[s];
+}
+
 /* ── variant blurbs ── */
 function variantBlurb(v: ButtonVariant): string {
   const blurbs: Record<ButtonVariant, string> = {
     primary: 'Default dark CTA · carved depth',
     accent: 'Indigo gradient · Pro/Upgrade',
     upgrade: 'Outlined indigo · inline upgrade',
-    blue: 'Sky blue solid · copy/share',
     secondary: 'Notion paper · neutral CTA',
     outline: 'Transparent + border',
-    ghost: 'Minimal · nav / inline actions',
+    ghost: 'Minimal · nav / menu / inline',
     danger: 'Muted wine · reversible destructive',
     dangerStrong: 'Saturated red · irreversible',
     success: 'Emerald · confirm / saved',
@@ -331,12 +328,12 @@ function variantBlurb(v: ButtonVariant): string {
   return blurbs[v] || '';
 }
 
-/* ── Copy button with ✓ feedback ── */
+/* ── Copy button with ✓ feedback — outlined 32×32 ── */
 const CopyButtonDemo: React.FC = () => {
   const [copied, setCopied] = useState(false);
   return (
     <Button
-      $variant="ghost"
+      $variant="outline"
       $size="sm"
       $iconOnly
       aria-label={copied ? 'Copied' : 'Copy embed URL'}
@@ -510,8 +507,182 @@ const PatternMeta = styled.p`
   }
 `;
 
-const Spacer = styled.div`
+/* ── Dropdown-menu preview shell ── */
+
+const MenuShell = styled.div`
+  width: 260px;
+  padding: 6px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.08);
+`;
+
+const MenuItem = styled.div`
+  /* Button already handles its own hover/bg — this just ensures alignment. */
+  & > button {
+    justify-content: flex-start;
+  }
+`;
+
+const MenuDivider = styled.div`
+  height: 1px;
+  margin: 4px 2px;
+  background: ${({ theme }) => theme.colors.border.light};
+`;
+
+/** Upgrade banner row — soft indigo gradient, price badge right-aligned.
+ *  Matches TopNav real dropdown exactly. */
+const UpgradeRow = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  color: #4F46E5;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+  svg { color: #6366F1; flex-shrink: 0; }
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.36);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.16);
+  }
+`;
+
+const UpgradeBadge = styled.span`
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6366F1;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 2px 6px;
+  border-radius: 4px;
+`;
+
+/* Pro banner row — shown instead of UpgradeRow when user is Pro */
+const ProRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 10px;
+  color: #4F46E5;
+  font-size: 12.5px;
+  font-weight: 600;
+`;
+
+const ProPillBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #6366F1, #818CF8);
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.25);
+`;
+
+/* Dashboard trigger — matches real TopNav exactly: peach avatar + grey
+ * "Dashboard" label + ChevronDown. Soft grey pill bg, darker when open. */
+const DashTrigger = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 5px 5px;
+  background: rgba(0, 0, 0, 0.02);
+  border: none;
+  border-radius: 24px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  span.label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    transition: color 0.2s;
+  }
+
+  &:hover span.label { color: #1F1F1F; }
+
+  svg.chev {
+    width: 14px;
+    height: 14px;
+    color: #bbb;
+  }
+`;
+
+/* Peach-gradient initials avatar, exactly like TopNav. */
+const Avatar = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(255, 160, 140, 0.28);
+`;
+
+const Spacer16 = styled.div`
   height: 16px;
+`;
+
+/* Segmented toggle — Studio Widgets/Templates */
+const Segment = styled.div`
+  display: inline-flex;
+  padding: 4px;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 12px;
+`;
+
+const SegmentItem = styled.button<{ $active?: boolean }>`
+  height: 36px;
+  padding: 0 18px;
+  background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : 'transparent')};
+  color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.text.body)};
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: ${({ $active, theme }) =>
+      $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.04)'};
+  }
 `;
 
 /* ── Variant × size matrix ── */

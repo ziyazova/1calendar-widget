@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Star } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Star, Sparkle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill, Button as SharedButton } from '@/presentation/components/shared';
@@ -731,7 +731,7 @@ export const WidgetStudioPage: React.FC = () => {
               <WidgetGalleryMeta>
                 <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
-                  <SharedButton $variant="outline" $size="sm" onClick={openUpgrade}><span>✦</span>Upgrade</SharedButton>
+                  <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
                 ) : (
                   <SharedButton $variant="primary" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
                 )}
@@ -782,12 +782,12 @@ export const WidgetStudioPage: React.FC = () => {
                 }}
               />
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button onClick={() => setNameModal(null)} style={{
-                  height: 44, padding: '0 22px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
-                  background: 'transparent', fontSize: 14, fontWeight: 500, fontFamily: 'inherit',
-                  color: '#666', cursor: 'pointer', transition: 'all 0.15s',
-                }}>Cancel</button>
-                <button
+                <SharedButton $variant="outline" $size="lg" onClick={() => setNameModal(null)}>
+                  Cancel
+                </SharedButton>
+                <SharedButton
+                  $variant="primary"
+                  $size="lg"
                   onClick={() => {
                     if (widgetName.trim() && nameModal) {
                       const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
@@ -795,13 +795,9 @@ export const WidgetStudioPage: React.FC = () => {
                       navigate('/studio', { state: { newWidget: data } });
                     }
                   }}
-                  style={{
-                    height: 44, padding: '0 28px', border: 'none', borderRadius: 12,
-                    background: '#1F1F1F', fontSize: 14, fontWeight: 600, fontFamily: 'inherit',
-                    color: '#fff', cursor: 'pointer', transition: 'all 0.15s',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  }}
-                >Create & Edit</button>
+                >
+                  Create &amp; Edit
+                </SharedButton>
               </div>
             </div>
           </div>
