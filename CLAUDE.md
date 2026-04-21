@@ -190,10 +190,24 @@ Single source of truth for every CTA, surface, overlay, and upsell pattern. Impo
 | `PlanRing` | Circular usage indicator | `percent`, `size` (sm/md/lg/xl), `color`, `track` |
 | `GradientBanner` (+`BannerIcon/Body/Title/Text/Actions`) | Soft upsell/info strips | `$tone`: indigo/blue/soft/sage · `$emphasis`: subtle/strong · `$inline` |
 | `PlanUpgradeBar` | Sidebar plan+upgrade row | `mode`: free/pro/guest, `used`, `limit`, callbacks |
+| `BottomSheet` | Mobile-anchored drawer | `open`, `onClose`, `title`, `capitalizeTitle`, `maxHeight`. Separate from `Modal` — drag-handle affordance, no focus lock, bottom-anchored |
 | `Badges` (existing) | Tier/state pills | `ProPill`, `NewPill`, `FreePill`, `PopularPill`, `PlanPill`, `PlanBadge` |
 | `PrimaryButton` / `SecondaryButton` | Legacy aliases | Kept for back-compat; prefer `<Button $variant>` |
 
 **Policy:** when adding a surface/CTA/overlay, use a shared component. If a new variant is needed, add it to the shared component via a new `$variant` value — don't create a parallel local styled component.
+
+### Design-system rules (SIMPLIFICATION_PLAN.md)
+
+The ongoing "one source of truth" refactor (see `SIMPLIFICATION_PLAN.md` at repo root) codifies how new code should look. Apply these to every PR that touches UI:
+
+1. **Colors** — only `theme.colors.*`. No raw `#hex` in styled-components or inline `style={{}}`. `theme.colors.danger.{soft,strong,bg,border}` is the canonical destructive palette (`soft` = reversible, `strong` = irreversible like Delete account / Log out).
+2. **Buttons** — every CTA / inline action uses shared `<Button $variant $size>`. Variants: `primary` / `accent` / `blue` / `secondary` / `outline` / `ghost` / `danger` / `dangerStrong` / `success` / `link`. Don't invent `dangerStronger` etc; extend only if truly missing.
+3. **Overlays** — centered dialogs use shared `<Modal>`. Mobile bottom-anchored drawers use shared `<BottomSheet>`. Don't roll a local overlay+backdrop pair.
+4. **Card surfaces** — use shared `<Card $variant>` (`flat` / `outlined` / `elevated` / `subtle` / `interactive`) where feasible.
+5. **Pills / plan indicators** — use `Badges.tsx` exports (`ProPill`, `PlanPill $pro`, etc). Never re-declare.
+6. **Widget internals are frozen** — `src/presentation/components/widgets/**` is user-customizable content and must NOT be touched by DS migrations. Widget *preview scale wrappers* in pages are chrome and follow the DS.
+7. **Pages compose from shared** — `pages/**` should compose from `components/shared` and not stylize directly. Local `styled.*` in pages is allowed only for genuinely unique patterns (plan §1 rule 3), and even then **all colors / radii / shadows must come from theme tokens** — no raw hex.
+8. **Run `npm run audit:design`** — grep-based drift report (raw hex count + styled declarations per page). Advisory, not a hard gate. Watch the trend, not zero — some locally-unique patterns are correct.
 
 ### Migration
 

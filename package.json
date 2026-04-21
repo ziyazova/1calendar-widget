@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run test",
-    "test:smoke": "vitest run src/test/embed-size-smoke.test.ts"
+    "test:smoke": "vitest run src/test/embed-size-smoke.test.ts",
+    "audit:design": "bash scripts/design-audit.sh"
   },
   "dependencies": {
     "@rive-app/react-canvas": "^4.27.1",
