@@ -4,7 +4,7 @@
 
 **Repo:** `https://github.com/ziyazova/1calendar-widget`
 **Working branch:** `design-experiment` (never push to `main`)
-**Updated:** 2026-04-21
+**Updated:** 2026-04-21 (after Phase 3.2 — auth pages merged)
 
 ---
 
@@ -17,17 +17,17 @@
 | **2. Radii + Brand color** | `radii-colors-cleanup` | ✅ merged | `4113d4b` |
 | **2.5 Safe spacing snaps** | `spacing-safe-cleanup` | ✅ merged | `ca38cb5` |
 | **3.1 LoginPage** | `migrate-login` (inline) | ✅ merged | `9e8162c` |
-| **3.2 Reset / Signup / Verify** | `migrate-auth-pages` | ⏳ **next** | — |
+| **3.2 Verify + Reset** (no SignupPage — signup lives inside LoginPage) | `migrate-auth-pages` | ✅ merged | `70327ee` + dedupe `382f465` |
 | **3.3 TemplatesPage** | `migrate-templates` | ✅ merged | `5fab668` |
 | **3.4 TemplateDetailPage** | `migrate-template-detail` | ✅ merged | `77b802a` + fix `a3c548e` |
-| **3.5 SettingsPage** | `migrate-settings` | ⏳ | — |
+| **3.5 SettingsPage** | `migrate-settings` | ⏳ **next** | — |
 | **3.6 CheckoutPage** | `migrate-checkout` | ⏳ | — |
 | **3.7 DesignSystemPage** | `migrate-design-system` | ⏸ **deferred** by owner — not touching `/dev` for now | — |
 | **3.8 LandingPage** | `migrate-landing` | ⏳ | — |
 | **3.9 StudioPage + WidgetStudioPage** | `migrate-studio` | ⏳ **MOST RISKY — design review first** | — |
 | **4. Final polish** | — | ⏳ after all pages | — |
 
-`origin/design-experiment` HEAD is `ca38cb5` as of this report.
+`origin/design-experiment` HEAD is `382f465` as of this report.
 
 ---
 
