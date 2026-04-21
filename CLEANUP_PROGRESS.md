@@ -20,14 +20,14 @@
 | **3.2 Verify + Reset** (no SignupPage — signup lives inside LoginPage) | `migrate-auth-pages` | ✅ merged | `70327ee` + dedupe `382f465` |
 | **3.3 TemplatesPage** | `migrate-templates` | ✅ merged | `5fab668` |
 | **3.4 TemplateDetailPage** | `migrate-template-detail` | ✅ merged | `77b802a` + fix `a3c548e` |
-| **3.5 SettingsPage** | `migrate-settings` | ✅ merged (partial — colors only; structural Accordion/Card/Button conversion TBD) | `ca81005` |
+| **3.5 SettingsPage** | `migrate-settings` + `migrate-settings-structural` | 🟡 partial — colors done, delete-account modal swapped; password/email modals + local `Button` + Section → Accordion TBD | `ca81005` + `734b57d` |
 | **3.6 CheckoutPage** | `migrate-checkout` | ✅ merged | `a22b7ca` |
 | **3.7 DesignSystemPage** | `migrate-design-system` | ⏸ **deferred** by owner — not touching `/dev` for now | — |
 | **3.8 LandingPage** | `migrate-landing` | ✅ merged | `e68c5e5` |
 | **3.9 StudioPage + WidgetStudioPage** | `migrate-studio` | ⏸ **PAUSED — roadmap requires design review before touching live editor** | — |
 | **4. Final polish** | — | ⏳ after all pages | — |
 
-`origin/design-experiment` HEAD is `e68c5e5` as of this report. Seven pages migrated (Login, Verify, Reset, Templates, TemplateDetail, Settings-colors, Checkout, Landing). Only `/dev` (deferred) and `/studio` + `/widgets` (paused) remain.
+`origin/design-experiment` HEAD is `734b57d` as of this report. Seven pages migrated (Login, Verify, Reset, Templates, TemplateDetail, Settings-colors+delete-modal, Checkout, Landing). Only `/dev` (deferred) and `/studio` + `/widgets` (paused) remain, plus the structural Settings leftovers listed below.
 
 ---
 
@@ -66,6 +66,16 @@ All commits live on `origin/design-experiment`. Each was first pushed on its own
   - Only single-value `padding` / `margin` / `gap` (and per-side variants). Compound values like `padding: 18px 20px` and all files under `components/widgets/**` are intentionally untouched.
   - Values: 3→4, 7→8, 13→12, 18→16, 22→24.
 
+### Settings structural (Phase 3.5 continued)
+- **`ca81005`** `refactor(settings): migrate SettingsPage hex colors to theme tokens` — 21 raw hexes in styled-components swapped to `theme.colors.*` (kept per-context to avoid breaking variant-switch plain-string returns).
+- **`734b57d`** `refactor(settings): swap delete-account modal to shared <Modal>` — replaced the local `Overlay`/`Backdrop`/`Modal`/`ModalTitle`/`ModalActions` wrappers with `<Modal open onClose title="Delete account?" size="sm">` + `<ModalFooter>`. Confirm is `<Button $variant="danger" $size="lg">`, cancel is `<Button $variant="secondary" $size="lg">`. Kept `ModalText`/`ModalInputWrap`/`ModalInput`/`ErrorText` as page-locals (form-state-specific shells).
+
+**Still TBD for Phase 3.5** (not yet scheduled — await owner go-ahead):
+- Password-change modal → shared `<Modal>` + `<Button>` (form has current/new/confirm password fields with live validation).
+- Email-change modal → shared `<Modal>` + `<Button>` (form has new email + confirmation flow).
+- Local `Button` (5 variants: `primary`/`ghost`/`danger`/`dangerSolid`/`upgrade`, ~23 usages) — pixel-level differences from shared `Button $size="sm"` (local is 32/12/8, shared sm is 32/14/10), needs visual diff before swap.
+- `Section` wrappers → `<Accordion>` / `<Card>` per `migrations/SETTINGS_MIGRATION.md` (biggest structural win; deferred because each section has custom heading/subtitle/icon layout that must be audited).
+
 ### Infra / dev tooling commits (unrelated to cleanup but on `design-experiment`)
 - `aa1498c` — original foundation dump (Polar billing, landing polish, initial dev feedback tool)
 - `715cbf1`, `7c78311`, `cab5517` — `BranchSwitcher` dev panel + unified dev overlays + initial `TemplateDetailPage` pass (later redone as `77b802a`)
@@ -80,6 +90,7 @@ All pushed to `origin`. `design-experiment` is the integration branch; each phas
 - `typography-cleanup` ← merged
 - `radii-colors-cleanup` ← merged
 - `spacing-safe-cleanup` ← merged
+- `migrate-settings-structural` ← merged (delete-modal swap, `734b57d`)
 - (pre-roadmap branches implied by commits above were merged inline, no standalone branches)
 
 Main is stable at `aa1498c` (nothing from this cleanup campaign has been promoted to `main` yet — per roadmap guardrail).
@@ -100,11 +111,15 @@ Main is stable at `aa1498c` (nothing from this cleanup campaign has been promote
 
 ## 🧭 What's next
 
-Per roadmap, **Phase 3.2** (`migrate-auth-pages`):
-- `ResetPasswordPage.tsx`, `SignupPage.tsx`, `VerifyEmailPage.tsx`
-- They share the auth-cluster patterns already proven in `LoginPage`: shared `<Button>`, `<Card>`, error banner using `theme.colors.destructive*`, `GradientBanner` for Google hint.
+Two tracks open, both waiting on owner input:
 
-After 3.2: 3.5 Settings → 3.6 Checkout → 3.8 Landing → **pause** → 3.9 Studio (with design review) → 4. Final polish.
+**Track A — Finish Phase 3.5 Settings (optional, medium risk):**
+Pick any of the leftovers listed in the "Settings structural" section above. Recommended order: password modal → email modal (both are pure modal swaps like the delete one) → Section → Accordion conversion (bigger, needs `migrations/SETTINGS_MIGRATION.md` re-read) → local Button swap (pixel diff last).
+
+**Track B — Phase 3.9 Studio (blocked):**
+Owner needs to (1) ask design-claude for `STUDIO_MIGRATION.md` (the per-component spec for `StudioPage.tsx` + `WidgetStudioPage.tsx`, analogous to the other `migrations/*.md` files), (2) do visual QA of `/studio` and `/widgets` on preview, (3) confirm the widget-vs-chrome scope rule still stands (chrome follows DS, `components/widgets/**` stays frozen). Only then unpause.
+
+After 3.9 lands → Phase 4 final polish: audit remaining raw shadows, bare grays (`#999`/`#333`/`#666` outside theme), and add an ESLint rule banning raw hex literals in `.tsx` outside `components/widgets/**` + `themes/`.
 
 ---
 
