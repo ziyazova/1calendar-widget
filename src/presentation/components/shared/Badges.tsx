@@ -40,7 +40,7 @@ export const badgeBase = `
   border-radius: 999px;
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   line-height: 1;
   text-transform: uppercase;
   border: 1px solid transparent;
@@ -125,7 +125,7 @@ export const PlanBadge = styled.span<{ $pro?: boolean }>`
   height: 22px;
   padding: 0 10px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;

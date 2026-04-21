@@ -39,7 +39,7 @@ const FooterBrand = styled.div`
 `;
 
 const BrandName = styled.span`
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
@@ -67,7 +67,7 @@ const NavTitle = styled.span`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   margin-bottom: 2px;
 `;
 

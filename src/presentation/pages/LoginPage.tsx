@@ -124,7 +124,7 @@ const LegalNotice = styled.p`
   text-align: center;
   margin: ${({ theme }) => theme.spacing['4']} 0 0;
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  line-height: 1.55;
+  line-height: 1.5;
   color: ${({ theme }) => theme.colors.text.hint};
   letter-spacing: -0.005em;
 
@@ -589,7 +589,7 @@ export const LoginPage: React.FC = () => {
             fontSize: 12, color: '#555',
             background: 'rgba(99,102,241,0.06)',
             border: '1px solid rgba(99,102,241,0.15)',
-            padding: '10px 12px', borderRadius: 10, marginBottom: 8, lineHeight: 1.45,
+            padding: '10px 12px', borderRadius: 10, marginBottom: 8, lineHeight: 1.5,
           }}>
             Did you sign up with Google? This email may not have a password set. Try{' '}
             <button

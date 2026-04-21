@@ -173,7 +173,7 @@ const MobileLink = styled.button<{ $active?: boolean }>`
   width: 100%;
   text-align: left;
   padding: 14px 16px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: ${({ $active }) => $active ? '600' : '400'};
   color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
   background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.03)' : 'none'};
@@ -198,7 +198,7 @@ const MobileCTA = styled.button`
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -237,7 +237,7 @@ const CartBadge = styled.span`
   padding: 0 4px;
   background: ${({ theme }) => theme.colors.accent};
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   border-radius: ${({ theme }) => theme.radii.full};
   display: flex;
@@ -670,7 +670,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                         <ArrowUpRight style={{ width: 14, height: 14, strokeWidth: 2, color: '#6366F1', flexShrink: 0 }} />
                         <span style={{ flex: 1, textAlign: 'left' }}>Upgrade to Pro</span>
                         <span style={{
-                          fontSize: 10, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const,
+                          fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const,
                           color: '#6366F1', background: 'rgba(255,255,255,0.65)',
                           padding: '2px 6px', borderRadius: 4,
                         }}>$4/mo</span>

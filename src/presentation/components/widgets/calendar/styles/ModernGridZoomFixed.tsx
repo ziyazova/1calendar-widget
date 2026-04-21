@@ -62,7 +62,7 @@ const CalendarHeader = styled.div`
 `;
 
 const MonthTitle = styled.h2<{ $textColor: string; $primaryColor: string }>`
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   margin: 0;
   background: linear-gradient(
@@ -138,7 +138,7 @@ const WeekDay = styled.div<{
 }>`
   padding: 2px 2px;
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};

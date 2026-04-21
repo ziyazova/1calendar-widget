@@ -80,7 +80,7 @@ const Grid = styled.div`
 const WeekDayCell = styled.div<{ $textColor: string }>`
   padding: 4px 0;
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}70`};
   text-transform: uppercase;
@@ -118,7 +118,7 @@ const DayCell = styled.button<{
 `;
 
 const ApproachLabel = styled.div`
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
   margin-top: 8px;
   text-align: left;

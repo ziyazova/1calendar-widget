@@ -79,7 +79,7 @@ const PanelLabel = styled.span<{ $color: string; $align: 'left' | 'right' }>`
   position: absolute;
   bottom: 10px;
   ${({ $align }) => $align === 'left' ? 'left: 12px;' : 'right: 12px;'}
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   color: ${({ $color }) => $color};
   letter-spacing: 0.06em;

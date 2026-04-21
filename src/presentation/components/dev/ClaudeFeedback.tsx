@@ -546,7 +546,7 @@ const DevTitle = styled.div`
 `;
 
 const DevSub = styled.div`
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.02em;
 `;
@@ -561,7 +561,7 @@ const DevBadge = styled.span<{ $green: boolean }>`
   border-radius: 8px;
   background: ${({ $green }) => ($green ? '#10b981' : '#f59e0b')};
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 `;
 
@@ -675,7 +675,7 @@ const DataUxSmall = styled.span`
   background: #111;
   color: #fff;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-family: ui-monospace, monospace;
 `;
 
@@ -809,7 +809,7 @@ const RowTarget = styled.div`
 
 const RowText = styled.div`
   color: #333;
-  line-height: 1.45;
+  line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
   margin-bottom: 8px;

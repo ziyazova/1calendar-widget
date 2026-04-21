@@ -169,7 +169,7 @@ const BadgeStars = styled.span`
 `;
 
 const BadgeText = styled.span`
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.005em;
@@ -182,32 +182,32 @@ const BadgeText = styled.span`
 `;
 
 const Title = styled.h1`
-  font-size: 68px;
+  font-size: 56px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   line-height: 1.2;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   margin: 0 auto 24px;
   max-width: 760px;
 
   @media (max-width: 1024px) {
-    font-size: 54px;
+    font-size: 56px;
   }
 
   @media (max-width: 768px) {
-    font-size: 38px;
-    line-height: 1.12;
+    font-size: 40px;
+    line-height: 1.2;
   }
 `;
 
 const HeroSubtitle = styled.p`
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 400;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0 auto 32px;
   max-width: 540px;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
     font-size: 16px;
@@ -220,7 +220,7 @@ const HeroPrimary = styled(PrimaryButton)`
   border-radius: 14px;
   background: #1A1A1E;
   padding: 0 26px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.12) inset,
@@ -251,7 +251,7 @@ const TrustRow = styled.div`
   @media (max-width: 540px) {
     flex-wrap: wrap;
     gap: 10px 16px;
-    font-size: 12.5px;
+    font-size: 12px;
   }
 `;
 
@@ -280,7 +280,7 @@ const GhostButton = styled.button`
   color: ${({ theme }) => theme.colors.text.primary};
   border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: 14px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   font-family: inherit;
   line-height: 1;

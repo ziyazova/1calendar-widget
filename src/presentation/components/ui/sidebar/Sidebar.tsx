@@ -471,7 +471,7 @@ const PopoverTitle = styled.div`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   padding: 4px 8px 8px;
 `;
 

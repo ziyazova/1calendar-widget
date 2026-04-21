@@ -382,7 +382,7 @@ const AddedBtn = styled(Button).attrs({ $variant: 'success' as const, $size: 'lg
 const EtsyDisclosure = styled.p`
   margin: 10px 0 0;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  line-height: 1.4;
+  line-height: 1.5;
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-align: center;
 `;
@@ -390,7 +390,7 @@ const EtsyDisclosure = styled.p`
 const ErrorDisclosure = styled.p`
   margin: 10px 0 0;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  line-height: 1.4;
+  line-height: 1.5;
   color: ${({ theme }) => theme.colors.destructiveText};
   text-align: center;
 `;
@@ -844,7 +844,7 @@ export const TemplateDetailPage: React.FC = () => {
             </Card>
 
             <Card $variant="outlined" $padding="lg" $radius="lg" style={{ marginBottom: 16 }}>
-              <SectionTitle style={{ fontSize: '15px', marginBottom: '12px' }}>Pages Included</SectionTitle>
+              <SectionTitle style={{ fontSize: '14px', marginBottom: '12px' }}>Pages Included</SectionTitle>
               <PagesList>
                 {(showAllPages ? template.pagesIncluded : template.pagesIncluded.slice(0, 3)).map((p, i) => (
                   <PagesItem key={i}>{p}</PagesItem>

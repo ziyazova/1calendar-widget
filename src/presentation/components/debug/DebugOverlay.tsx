@@ -30,7 +30,7 @@ const DebugTooltip = styled.div<{ $locked?: boolean }>`
   max-width: 600px;
   max-height: 200px;
   overflow-y: auto;
-  line-height: 1.7;
+  line-height: 1.65;
   backdrop-filter: blur(12px);
   user-select: text;
   cursor: ${({ $locked }) => $locked ? 'text' : 'default'};

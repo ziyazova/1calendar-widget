@@ -48,7 +48,7 @@ const Header = styled.div`
 `;
 
 const MonthTitle = styled.h2<{ $primaryColor: string }>`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   margin: 0;
   color: ${({ $primaryColor }) => $primaryColor};
@@ -124,7 +124,7 @@ const DayCell = styled.button<{
 `;
 
 const ApproachLabel = styled.div`
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
   margin-top: 8px;
   text-align: left;

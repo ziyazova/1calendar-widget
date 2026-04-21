@@ -200,7 +200,7 @@ const FeatureCardTitle = styled.h3`
 const FeatureCardDesc = styled.p`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
   letter-spacing: -0.01em;
 `;
@@ -230,7 +230,7 @@ const FeatureCardImage = styled.div`
 `;
 
 const WhyTitle = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;

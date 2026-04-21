@@ -84,7 +84,7 @@ const WeekRow = styled.div`
 
 const WeekDayCell = styled.div<{ $textColor: string }>`
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}70`};
   padding: 4px 0;
@@ -130,7 +130,7 @@ const DayCell = styled.button<{
 
 const Label = styled.div`
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
   margin-top: 8px;
 `;

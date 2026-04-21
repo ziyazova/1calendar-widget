@@ -128,7 +128,7 @@ const FilterChip = styled.button<{ $active: boolean }>`
 `;
 
 const ChipCount = styled.span`
-  font-size: 10px;
+  font-size: 11px;
   opacity: 0.5;
 `;
 
@@ -377,7 +377,7 @@ const Avatar = styled.div`
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
 `;
 
@@ -682,7 +682,7 @@ const WelcomeTitle = styled.h1`
 `;
 
 const WelcomeSub = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 32px;
 `;
@@ -882,7 +882,7 @@ const EmptyCircle = styled.div`
 `;
 
 const EmptyTitle = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 4px;
@@ -981,7 +981,7 @@ const SectionBlockHead = styled.div`
 `;
 
 const SectionBlockTitle = styled.h3`
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: #1F1F1F;
   letter-spacing: -0.02em;
@@ -1252,7 +1252,7 @@ const BrowseShopBtn = styled.button`
   color: #fff;
   border: none;
   border-radius: 16px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   letter-spacing: -0.01em;
@@ -1735,7 +1735,7 @@ const ProfileView: React.FC = () => {
             <div style={{ fontSize: 20, fontWeight: 600, color: '#B91C1C', letterSpacing: '-0.02em', marginBottom: 10 }}>
               Delete account?
             </div>
-            <div style={{ fontSize: 14, color: '#555', lineHeight: 1.55, marginBottom: 20 }}>
+            <div style={{ fontSize: 14, color: '#555', lineHeight: 1.5, marginBottom: 20 }}>
               We'll permanently remove your profile and all saved widgets from our servers. You can always sign up again later with the same email.
               To confirm, please type <strong>delete</strong> below.
             </div>

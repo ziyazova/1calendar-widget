@@ -47,7 +47,7 @@ const Title = styled.h1`
   margin: 0 0 ${({ theme }) => theme.spacing['8']};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: 24px;
+    font-size: 22px;
   }
 `;
 

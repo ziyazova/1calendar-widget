@@ -24,14 +24,14 @@ const CTACard = styled.div`
 `;
 
 const CTATitle = styled.h2`
-  font-size: 42px;
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 16px;
 
   @media (max-width: 768px) {
-    font-size: 32px;
+    font-size: 28px;
   }
 `;
 

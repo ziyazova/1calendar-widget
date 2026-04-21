@@ -36,7 +36,7 @@ const IconWrap = styled.div<{ $ok: boolean }>`
 `;
 
 const Title = styled.h1`
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   text-align: center;
   color: #1F1F1F;
@@ -49,7 +49,7 @@ const Subtitle = styled.p`
   color: #777;
   text-align: center;
   margin: 0 0 24px;
-  line-height: 1.55;
+  line-height: 1.5;
 `;
 
 const SubmitBtn = styled.button`
@@ -60,7 +60,7 @@ const SubmitBtn = styled.button`
   color: #fff;
   border: none;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;

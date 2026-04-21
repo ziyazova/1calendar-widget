@@ -81,7 +81,7 @@ const TimeDisplay = styled.div<{
   }};
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: ${({ $textColor }) => $textColor};
   user-select: none;
   line-height: 1;
@@ -98,7 +98,7 @@ const ColonSpan = styled.span`
 const PeriodSpan = styled.span`
   font-size: 0.3em;
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   margin-left: 3px;
   opacity: 0.4;
   vertical-align: baseline;

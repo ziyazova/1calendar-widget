@@ -94,9 +94,9 @@ const HeroTitle = styled.h1`
   font-size: clamp(42px, 5.6vw, 74px);
   font-weight: 600;
   color: #2B2320;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   margin: 0;
-  line-height: 1.16;
+  line-height: 1.2;
 
   em {
     font-style: normal;
@@ -110,7 +110,7 @@ const HeroDesc = styled.p`
   font-size: 16px;
   font-weight: 400;
   color: #9B9790;
-  line-height: 1.6;
+  line-height: 1.65;
   max-width: 440px;
   letter-spacing: -0.005em;
 `;
@@ -126,7 +126,7 @@ const HeroButton = styled.button`
   color: #ffffff;
   border: 0;
   border-radius: 14px;
-  font-size: 15.5px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
@@ -159,7 +159,7 @@ const EmailInput = styled.input`
   padding: 0 18px;
   border: 1px solid rgba(26, 22, 19, 0.14);
   border-radius: 14px;
-  font-size: 15px;
+  font-size: 14px;
   font-family: inherit;
   color: #2B2320;
   background: #fff;
@@ -384,7 +384,7 @@ const WidgetGalleryTitleRow = styled.div`
 `;
 
 const WidgetGalleryTitle = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -624,7 +624,7 @@ const PricingSection = styled.section`
 `;
 
 const PricingTitle = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -666,7 +666,7 @@ const PricingPlan = styled.div`
 `;
 
 const PricingPrice = styled.div`
-  font-size: 42px;
+  font-size: 40px;
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -737,7 +737,7 @@ const BottomCTA = styled.section`
 `;
 
 const CTATitle = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -870,7 +870,7 @@ export const WidgetStudioPage: React.FC = () => {
                 background: 'rgba(0,0,0,0.04)', borderRadius: 10, cursor: 'pointer', fontSize: 18, color: '#999',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>×</button>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: 8 }}>
                 New {nameModal.category === 'calendar' ? 'Calendar' : nameModal.category === 'clock' ? 'Clock' : 'Board'}
               </div>
               <div style={{ fontSize: 22, fontWeight: 700, color: '#1F1F1F', marginBottom: 24, letterSpacing: '-0.03em' }}>

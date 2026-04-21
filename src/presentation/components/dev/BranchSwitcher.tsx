@@ -217,9 +217,9 @@ const TabTitle = styled.div`
 `;
 
 const TabSub = styled.div`
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 `;
 
 const ActiveDot = styled.span`

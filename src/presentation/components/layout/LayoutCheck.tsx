@@ -377,7 +377,7 @@ const SizeLabel = styled.span<{ $dark?: boolean }>`
   position: absolute;
   bottom: 6px;
   right: 10px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: ${({ $dark }) => $dark ? '#666' : '#6B6B6B'};
   pointer-events: none;

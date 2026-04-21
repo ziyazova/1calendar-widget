@@ -350,7 +350,7 @@ const ModalCard = styled.div`
 `;
 
 const ModalTitle = styled.h3`
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: #1F1F1F;
   letter-spacing: -0.02em;

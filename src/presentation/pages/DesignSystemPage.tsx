@@ -235,7 +235,7 @@ const SubsectionTitle = styled.h3`
   margin: 0 0 ${({ theme }) => theme.spacing['4']};
   text-transform: uppercase;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 `;
 
 const SubsectionDivider = styled.div`
@@ -508,7 +508,7 @@ const ButtonCellLabel = styled.div`
   font-weight: ${({ theme }) => theme.typography.weights.medium};
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 `;
 
 const ButtonCellRow = styled.div`
@@ -595,7 +595,7 @@ const ComponentLabel = styled.div`
   font-weight: ${({ theme }) => theme.typography.weights.medium};
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   margin-bottom: ${({ theme }) => theme.spacing['4']};
 `;
 
@@ -780,7 +780,7 @@ const SpecTable = styled.table`
     color: ${({ theme }) => theme.colors.text.secondary};
     text-transform: uppercase;
     font-size: ${({ theme }) => theme.typography.sizes.xs};
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
   }
 
   td {
@@ -1085,7 +1085,7 @@ const MobileTabItem = styled.div<{ $active?: boolean }>`
   svg { width: 20px; height: 20px; }
 
   span {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: ${({ theme }) => theme.typography.weights.medium};
   }
 `;
@@ -1145,7 +1145,7 @@ const UpgradeStateLabel = styled.div`
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
@@ -1176,7 +1176,7 @@ const DropdownRowUpgrade = styled.button`
   color: #4F46E5;
   font-family: inherit;
   border-radius: 10px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.005em;
   transition: transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
@@ -1188,9 +1188,9 @@ const DropdownRowUpgrade = styled.button`
 `;
 
 const DropdownUpgradeBadge = styled.span`
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #6366F1;
   background: rgba(255, 255, 255, 0.65);
@@ -1209,7 +1209,7 @@ const DropdownRowPlain = styled.button`
   cursor: pointer;
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
   border-radius: 8px;
   transition: background 0.12s ease;
@@ -1266,7 +1266,7 @@ const DropdownUserName = styled.div`
 `;
 
 const DropdownUserEmail = styled.div`
-  font-size: 11.5px;
+  font-size: 12px;
   color: #8E8E93;
   margin-top: 1px;
   overflow: hidden;
@@ -1385,7 +1385,7 @@ const CardBadgeDemo = styled.span`
   backdrop-filter: blur(8px);
   color: ${({ theme }) => theme.colors.text.primary};
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
 `;
 
@@ -1471,7 +1471,7 @@ const SocialBadgeStars = styled.span`
 `;
 
 const SocialBadgeText = styled.span`
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.secondary};
   letter-spacing: -0.005em;
@@ -1526,7 +1526,7 @@ const MobileCTADemo = styled.button`
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -1808,7 +1808,7 @@ const PlanTitle = styled.div`
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin-bottom: 6px;
 `;
@@ -2133,7 +2133,7 @@ const TestimonialCardDemo = styled.div`
 
 const TestimonialTextDemo = styled.p`
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.5;
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 16px;
 `;
@@ -2325,7 +2325,7 @@ const DropdownLabel = styled.div`
   font-size: 11px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 `;
 

@@ -147,7 +147,7 @@ const WeekDay = styled.div<{
 }>`
   padding: 4px 2px;
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: ${({ $textColor }) => `${$textColor}85`};
   background: ${({ $accentColor }) => `${$accentColor}20`};

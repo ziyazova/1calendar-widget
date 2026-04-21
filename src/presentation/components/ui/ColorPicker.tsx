@@ -134,7 +134,7 @@ const HexInput = styled.input`
   outline: none;
   flex-shrink: 0;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   line-height: 20px;
   transition: color 0.15s ease;
 

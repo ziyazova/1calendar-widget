@@ -121,8 +121,8 @@ const Headline = styled.h1`
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: clamp(44px, 6vw, 84px);
-  line-height: 1.12;
-  letter-spacing: -0.04em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   margin: 22px 0 0;
   color: ${COLORS.ink};
   max-width: 920px;
@@ -161,7 +161,7 @@ const Headline = styled.h1`
 const Sub = styled.p`
   margin: 22px auto 0;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: #9B9790;
   max-width: 440px;
   font-weight: 400;
@@ -183,7 +183,7 @@ const BtnBase = styled.button`
   gap: 10px;
   padding: 17px 26px;
   border-radius: 14px;
-  font-size: 15.5px;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -396,12 +396,12 @@ const CardBody = styled.div`
 `;
 
 const CardTitle = styled.div`
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.03em;
   color: #37352F;
   margin-top: 2px;
-  line-height: 1.15;
+  line-height: 1.2;
 `;
 
 const CardDesc = styled.div`
@@ -589,7 +589,7 @@ const DayHeader = styled.div`
     gap: 4px;
     font-size: 9px;
     color: #C7C3BA;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
   }
   & > span:last-child span {
     width: 14px;

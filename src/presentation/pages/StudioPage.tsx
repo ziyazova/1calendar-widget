@@ -100,7 +100,7 @@ const SectionRow = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #1F1F1F;
   letter-spacing: -0.02em;
@@ -252,7 +252,7 @@ const BrowseBtn = styled.button`
   color: #6366F1;
   border: 1.5px solid rgba(200,195,230,0.3);
   border-radius: 16px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -397,7 +397,7 @@ const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }
     $disabled ? '#C8C8C8' : $active ? '#3384F4' : '#777'};
   opacity: ${({ $disabled }) => $disabled ? 0.55 : 1};
   border-radius: 10px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   font-family: inherit;
   letter-spacing: -0.01em;
@@ -453,7 +453,7 @@ const MobileSheetHeader = styled.div`
 
 const MobileSheetTitle = styled.h3`
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #1F1F1F;
   letter-spacing: -0.02em;

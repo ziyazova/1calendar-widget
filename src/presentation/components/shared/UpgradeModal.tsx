@@ -81,8 +81,8 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '5fr 6fr', gap: 16, alignItems: 'stretch' }}>
           <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#bbb', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', minHeight: 27, display: 'flex', alignItems: 'center' }}>Free</div>
-            <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#bbb', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', minHeight: 27, display: 'flex', alignItems: 'center' }}>Free</div>
+            <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em', lineHeight: 1 }}>$0</div>
             <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>forever</div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#ccc', fontSize: 15 }}>✓</span> 3 widgets</li>
@@ -103,10 +103,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
             display: 'flex', flexDirection: 'column',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pro</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Pro</div>
               <div style={{ background: 'linear-gradient(135deg, #6366F1, #818CF8)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 20 }}>Popular</div>
             </div>
-            <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.04em', lineHeight: 1 }}>$4</div>
+            <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em', lineHeight: 1 }}>$4</div>
             <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>/month</div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#444', display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ color: '#6366F1', fontSize: 15 }}>✓</span> <strong>Unlimited widgets</strong></li>

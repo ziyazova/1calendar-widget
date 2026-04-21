@@ -128,7 +128,7 @@ const WeekDayLabel = styled.div<{ $isSunday: boolean; $primaryColor: string; $te
   font-size: 7px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   padding: 3px 0;
   font-family: 'Courier New', Courier, monospace;
   color: ${({ $isSunday, $primaryColor, $textColor }) =>

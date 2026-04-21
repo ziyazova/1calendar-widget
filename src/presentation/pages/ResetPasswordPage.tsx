@@ -73,7 +73,7 @@ const Input = styled.input`
   padding: 0 44px;
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 14px;
   font-family: inherit;
   color: #1F1F1F;
   background: #fff;
@@ -106,7 +106,7 @@ const SubmitBtn = styled.button`
   color: #fff;
   border: none;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;

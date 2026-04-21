@@ -121,7 +121,7 @@ const DayCell = styled.button<{
 `;
 
 const ApproachLabel = styled.div`
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
   margin-top: 2cqi;
   text-align: left;

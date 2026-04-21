@@ -89,7 +89,7 @@ const Shell = styled.main`
 `;
 
 const PageTitle = styled.h1`
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   letter-spacing: -0.03em;
   margin: 0 0 4px;
@@ -146,7 +146,7 @@ const ProfileMeta = styled.div`
 `;
 
 const ProfileName = styled.div`
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: #1F1F1F;
@@ -198,7 +198,7 @@ const SectionIcon = styled.div`
 const SectionTitle = styled.h3`
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   color: #1F1F1F;
   margin: 0;
 `;
@@ -208,7 +208,7 @@ const SectionSub = styled.p`
   color: #8E8E93;
   letter-spacing: -0.005em;
   margin: 2px 0 0;
-  line-height: 1.45;
+  line-height: 1.5;
 `;
 
 const Field = styled.div`
@@ -294,7 +294,7 @@ const RowDesc = styled.div`
   font-size: 12px;
   color: #8E8E93;
   margin-top: 2px;
-  line-height: 1.45;
+  line-height: 1.5;
   letter-spacing: 0;
 `;
 
@@ -308,7 +308,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'ghost' | 'danger' | 'dang
   height: 32px;
   padding: 0 12px;
   border-radius: 9px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
   font-family: inherit;
   letter-spacing: -0.005em;
@@ -398,7 +398,7 @@ const Modal = styled.div`
 `;
 
 const ModalTitle = styled.h2<{ $danger?: boolean }>`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: ${({ $danger }) => ($danger ? '#B91C1C' : '#1F1F1F')};
@@ -408,7 +408,7 @@ const ModalTitle = styled.h2<{ $danger?: boolean }>`
 const ModalText = styled.p`
   font-size: 14px;
   color: #666;
-  line-height: 1.55;
+  line-height: 1.5;
   margin: 0 0 20px;
 `;
 

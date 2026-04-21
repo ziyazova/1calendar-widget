@@ -72,7 +72,7 @@ const GalleryTitleGroup = styled.div`
 `;
 
 const GalleryTitle = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -84,7 +84,7 @@ const GalleryTitle = styled.h2`
 `;
 
 const GallerySubtitle = styled.p`
-  font-size: 15px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0;
 `;

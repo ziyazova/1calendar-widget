@@ -41,7 +41,7 @@ const Kicker = styled.div`
   gap: 8px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #6366F1;
   padding: 6px 12px;
@@ -55,16 +55,16 @@ const Kicker = styled.div`
 const Title = styled.h1`
   font-size: 56px;
   font-weight: 600;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
   color: #1F1F1F;
   margin: 0 0 16px;
-  line-height: 1.05;
+  line-height: 1;
 
   @media (max-width: 768px) { font-size: 40px; }
 `;
 
 const Lead = styled.p`
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.65;
   color: #444;
   margin: 0 0 24px;
@@ -134,8 +134,8 @@ const H2 = styled.h2`
 `;
 
 const P = styled.p`
-  font-size: 15px;
-  line-height: 1.72;
+  font-size: 14px;
+  line-height: 1.65;
   color: #444;
   margin: 0 0 14px;
 
@@ -169,8 +169,8 @@ const RowLabel = styled.div`
 `;
 
 const RowValue = styled.div`
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.5;
   color: #1F1F1F;
 
   em {

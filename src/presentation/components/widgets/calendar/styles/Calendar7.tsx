@@ -122,7 +122,7 @@ const DayCell = styled.button<{
 
 const Label = styled.div`
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
   margin-top: clamp(4px, 1vw, 10px);
 `;
