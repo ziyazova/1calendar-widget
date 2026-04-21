@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ChevronDown, Eye, ShoppingCart, Check } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, BackButton } from '@/presentation/components/shared';
+import { PageWrapper, BackButton, Button, Card, Accordion } from '@/presentation/components/shared';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, FAQ_ITEMS } from '@/presentation/data/templates';
@@ -127,14 +127,14 @@ const BreadcrumbCurrent = styled.span`
 /* ── Title area ── */
 
 const Title = styled.h1`
-  font-size: 32px;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.03em;
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 6px;
 
   @media (max-width: 768px) {
-    font-size: 26px;
+    font-size: ${({ theme }) => theme.typography.sizes['3xl']};
   }
 `;
 
@@ -332,20 +332,6 @@ const FeatureItem = styled.li`
 
 /* ── Sidebar cards ── */
 
-const SidebarCard = styled.div`
-  background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  padding: 24px;
-  margin-bottom: 16px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    padding: 20px;
-    margin-bottom: 12px;
-    border-radius: ${({ theme }) => theme.radii.md};
-  }
-`;
-
 const BenefitRow = styled.div`
   display: flex;
   align-items: center;
@@ -381,60 +367,13 @@ const BtnGroup = styled.div`
 
 `;
 
-const ActionBtn = styled.button<{ $variant: 'outline' | 'primary' | 'ghost' }>`
-  width: 100%;
-  height: 44px;
-  border-radius: ${({ theme }) => theme.radii.button};
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  letter-spacing: -0.01em;
-  transition: all ${({ theme }) => theme.transitions.base};
-  white-space: nowrap;
-  text-decoration: none;
-
-  svg { width: 16px; height: 16px; }
-
-  ${({ $variant, theme }) => {
-    if ($variant === 'primary') return `
-      background: ${theme.colors.text.primary};
-      color: ${theme.colors.text.inverse};
-      border: none;
-      &:hover { background: #333; transform: translateY(-1px); }
-    `;
-    if ($variant === 'outline') return `
-      background: ${theme.colors.background.elevated};
-      color: ${theme.colors.text.primary};
-      border: 1px solid ${theme.colors.border.light};
-      &:hover { background: ${theme.colors.background.surface}; }
-    `;
-    return `
-      background: transparent;
-      color: ${theme.colors.text.accent};
-      border: 1px solid ${theme.colors.border.light};
-      &:hover { background: ${theme.colors.interactive.accentHover}; }
-    `;
-  }}
-`;
-
-const AddedBtn = styled(ActionBtn)`
-  background: ${({ theme }) => theme.colors.success} !important;
-  color: #fff !important;
-  border: none !important;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
+const AddedBtn = styled(Button).attrs({ $variant: 'success' as const, $size: 'lg' as const, $fullWidth: true })`
   .added-label { display: inline-flex; align-items: center; gap: 8px; }
   .remove-label { display: none; align-items: center; gap: 8px; }
 
-  &:hover {
-    background: ${({ theme }) => theme.colors.destructive} !important;
-    transform: none;
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.destructive};
+    filter: none;
     .added-label { display: none; }
     .remove-label { display: inline-flex; }
   }
@@ -445,6 +384,14 @@ const EtsyDisclosure = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   line-height: 1.4;
   color: ${({ theme }) => theme.colors.text.tertiary};
+  text-align: center;
+`;
+
+const ErrorDisclosure = styled.p`
+  margin: 10px 0 0;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  line-height: 1.4;
+  color: ${({ theme }) => theme.colors.destructiveText};
   text-align: center;
 `;
 
@@ -626,64 +573,12 @@ const RelatedPrice = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-/* ── FAQ ── */
+/* ── FAQ (uses shared <Accordion>; just a vertical stack) ── */
 
-const FaqItem = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.md};
-  margin-bottom: ${({ theme }) => theme.spacing['2']};
-  background: ${({ theme }) => theme.colors.background.elevated};
-  overflow: hidden;
-`;
-
-const FaqQuestion = styled.button`
-  width: 100%;
+const FaqList = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing['3']};
-  padding: ${({ theme }) => theme.spacing['4']} ${({ theme }) => theme.spacing['5']};
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.01em;
-  text-align: left;
-  svg {
-    width: 16px;
-    height: 16px;
-    color: ${({ theme }) => theme.colors.text.tertiary};
-    transition: transform 0.2s ease;
-    flex-shrink: 0;
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
-    padding: 14px 0;
-  }
-`;
-
-const FaqAnswer = styled.div<{ $open: boolean }>`
-  max-height: ${({ $open }) => $open ? '200px' : '0'};
-  opacity: ${({ $open }) => $open ? 1 : 0};
-  overflow: hidden;
-  transition: max-height 0.35s ease, opacity 0.35s ease;
-`;
-
-const FaqAnswerInner = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
-  margin: 0;
-  padding: 0 ${({ theme }) => theme.spacing['5']} ${({ theme }) => theme.spacing['4']};
-  word-break: break-word;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
-  }
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing['2']};
 `;
 
 /* ── Mobile sticky buy bar ── */
@@ -862,22 +757,23 @@ export const TemplateDetailPage: React.FC = () => {
 
             {/* FAQ */}
             <SectionTitle style={{ marginTop: '32px' }}>FAQ</SectionTitle>
-            {FAQ_ITEMS.map((faq, i) => (
-              <FaqItem key={i}>
-                <FaqQuestion onClick={() => setOpenFaq(openFaq === i ? null : i)}>
-                  {faq.q}
-                  <ChevronDown style={{ transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0)' }} />
-                </FaqQuestion>
-                <FaqAnswer $open={openFaq === i}>
-                  <FaqAnswerInner>{faq.a}</FaqAnswerInner>
-                </FaqAnswer>
-              </FaqItem>
-            ))}
+            <FaqList>
+              {FAQ_ITEMS.map((faq, i) => (
+                <Accordion
+                  key={i}
+                  title={faq.q}
+                  open={openFaq === i}
+                  onToggle={(open) => setOpenFaq(open ? i : null)}
+                >
+                  {faq.a}
+                </Accordion>
+              ))}
+            </FaqList>
           </BottomSection>
 
           {/* ── Right sidebar ── */}
           <RightCol>
-            <SidebarCard>
+            <Card $variant="outlined" $padding="lg" $radius="lg" style={{ marginBottom: 16 }}>
               <BenefitRow><Check /> One-time Payment</BenefitRow>
               <BenefitRow><Check /> Instant Download</BenefitRow>
               <BenefitRow><Check /> Video Setup Guides</BenefitRow>
@@ -886,50 +782,54 @@ export const TemplateDetailPage: React.FC = () => {
 
               <BtnGroup>
                 {template.polarProductId && !isFree && (
-                  <ActionBtn
+                  <Button
                     $variant="primary"
+                    $size="lg"
+                    $fullWidth
                     onClick={handleBuyNow}
                     disabled={buying}
                   >
                     {buying ? 'Opening checkout…' : `Buy Now · ${template.price}`}
-                  </ActionBtn>
+                  </Button>
                 )}
                 {/* Free download still uses the cart/Add-to-Cart path */}
                 {isFree && FEATURES.ENABLE_LOCAL_CHECKOUT && (
                   inCart ? (
-                    <AddedBtn $variant="primary" onClick={() => removeItem(template.id)}>
+                    <AddedBtn onClick={() => removeItem(template.id)}>
                       <span className="added-label"><Check /> Added</span>
                       <span className="remove-label">Remove</span>
                     </AddedBtn>
                   ) : (
-                    <ActionBtn $variant="primary" onClick={handleAddToCart}>
+                    <Button $variant="primary" $size="lg" $fullWidth onClick={handleAddToCart}>
                       <ShoppingCart /> Get for Free
-                    </ActionBtn>
+                    </Button>
                   )
                 )}
                 {buyError && (
-                  <EtsyDisclosure style={{ color: '#DC2626' }}>{buyError}</EtsyDisclosure>
+                  <ErrorDisclosure>{buyError}</ErrorDisclosure>
                 )}
                 {template.etsyUrl && (
                   <>
-                    <ActionBtn
+                    <Button
                       as="a"
                       href={template.etsyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       $variant="outline"
+                      $size="lg"
+                      $fullWidth
                     >
                       Buy on Etsy
-                    </ActionBtn>
+                    </Button>
                     <EtsyDisclosure>
                       Etsy is an alternative if you prefer — prices may vary by location and their terms apply.
                     </EtsyDisclosure>
                   </>
                 )}
               </BtnGroup>
-            </SidebarCard>
+            </Card>
 
-            <SidebarCard>
+            <Card $variant="outlined" $padding="lg" $radius="lg" style={{ marginBottom: 16 }}>
               <SectionTitle style={{ fontSize: '15px', marginBottom: '12px' }}>Pages Included</SectionTitle>
               <PagesList>
                 {(showAllPages ? template.pagesIncluded : template.pagesIncluded.slice(0, 3)).map((p, i) => (
@@ -941,7 +841,7 @@ export const TemplateDetailPage: React.FC = () => {
                   +{template.pagesIncluded.length - 3} more pages
                 </ShowMoreLink>
               )}
-            </SidebarCard>
+            </Card>
 
             <SectionTitle style={{ fontSize: '16px', marginTop: '24px', marginBottom: '16px' }}>Related Templates</SectionTitle>
             <RelatedGrid>
