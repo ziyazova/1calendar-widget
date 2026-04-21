@@ -172,10 +172,45 @@ PR review grep: `import { supabase }` under `src/presentation/` = flag.
 
 ## Styling System
 
-- **Theme** (`theme.ts`): Apple-inspired tokens — 8px spacing grid, SF Pro font, cubic-bezier transitions, z-index layers, shadow presets
-- **Widget Tokens** (`widgetTokens.ts`): Responsive clamp() values for container sizing, typography, spacing — ensures widgets adapt from 200px to full width
-- **Colors** (`colors.ts`): Unified premium palette — Primary (#6E7FF2, #7C63B8, #E89A78), Background (#FFFFFF, #F7F7F5, #EEF1F5), Accent (#E8EDFF, #EEE8FA, #FBE9E1). 3 presets per category. `getContrastColor()` for accessibility
-- **Convention:** Styled-components with `$transientProps` to avoid DOM warnings
+- **Theme** (`theme.ts`): Apple-inspired tokens — 8px spacing grid, Inter font, cubic-bezier transitions, z-index layers, shadow presets. **Brand accent is `#6366F1` (indigo)**, not iOS blue. Includes: `colors.brand.*` (indigo/indigoLight/indigoDark/blue/blueLight), `colors.gradients.*` (indigo/blue/softBanner/templateCard/avatar), `colors.accentShadow/blueShadow/successShadow` (colored shadow presets), extended `text.*` (primary/inverse/body/subtle/hint/dim/muted), `background.*` (elevated/surfaceAlt/surfaceMuted/surfaceCool), full `typography.sizes.2xs..8xl`, `shadows.card/cardHover/tab/floating/modal/sheet`.
+- **Widget Tokens** (`widgetTokens.ts`): Responsive clamp() values for container sizing, typography, spacing — ensures widgets adapt from 200px to full width.
+- **Colors** (`colors.ts`): Widget-customization palette (user picks these in Studio) — Primary (#6E7FF2, #7C63B8, #E89A78), Background (#FFFFFF, #F7F7F5, #EEF1F5), Accent (#E8EDFF, #EEE8FA, #FBE9E1). Separate from the app's UI theme (which lives in `theme.ts`).
+- **Convention:** Styled-components with `$transientProps` to avoid DOM warnings. **Never hardcode hex/shadows/spacing in page files** — use theme tokens.
+
+### Shared Components Library (`src/presentation/components/shared/`)
+
+Single source of truth for every CTA, surface, overlay, and upsell pattern. Import from `@/presentation/components/shared`.
+
+| Component | Purpose | Key Props |
+|---|---|---|
+| `Button` | Every CTA site-wide | `$variant`: primary/accent/blue/secondary/outline/ghost/danger/success/link · `$size`: xs/sm/md/lg/xl · `$fullWidth`, `$pill`, `$iconOnly` |
+| `Card` (+`CardHeader/Title/Subtitle/Section`) | Unified surfaces | `$variant`: flat/outlined/elevated/subtle/interactive · `$padding`, `$radius` |
+| `Modal` (+`ModalFooter`) | Overlay dialogs | `open`, `onClose`, `title`, `size` (sm/md/lg/xl), `hideClose`, `lockOutside`. Handles ESC, scroll-lock, click-outside |
+| `Accordion` (+`AccordionGroup`) | Collapsible settings sections | `title`, `defaultOpen` or controlled `open`/`onToggle`, `right`, `variant` |
+| `PlanRing` | Circular usage indicator | `percent`, `size` (sm/md/lg/xl), `color`, `track` |
+| `GradientBanner` (+`BannerIcon/Body/Title/Text/Actions`) | Soft upsell/info strips | `$tone`: indigo/blue/soft/sage · `$emphasis`: subtle/strong · `$inline` |
+| `PlanUpgradeBar` | Sidebar plan+upgrade row | `mode`: free/pro/guest, `used`, `limit`, callbacks |
+| `Badges` (existing) | Tier/state pills | `ProPill`, `NewPill`, `FreePill`, `PopularPill`, `PlanPill`, `PlanBadge` |
+| `PrimaryButton` / `SecondaryButton` | Legacy aliases | Kept for back-compat; prefer `<Button $variant>` |
+
+**Policy:** when adding a surface/CTA/overlay, use a shared component. If a new variant is needed, add it to the shared component via a new `$variant` value — don't create a parallel local styled component.
+
+### Migration
+
+Ongoing effort to remove hardcoded colors/shadows/spacing from page files and adopt shared components. See **`MIGRATION_GUIDE.md`** at repo root for:
+- Token mapping cheatsheet (old hex → new token)
+- Per-page migration steps (LoginPage → TemplatesPage → TemplateDetailPage → DesignSystemPage → StudioPage → LandingPage)
+- Commit convention + red flags
+
+⚠️ After pulling a migration PR, ensure `src/presentation/components/shared/index.ts` exports the new components:
+```ts
+export { Card, CardHeader, CardTitle, CardSubtitle, CardSection } from './Card';
+export { Modal, ModalFooter } from './Modal';
+export { Accordion, AccordionGroup } from './Accordion';
+export { PlanRing } from './PlanRing';
+export { GradientBanner, BannerIcon, BannerBody, BannerTitle, BannerText, BannerActions } from './GradientBanner';
+export { PlanUpgradeBar } from './PlanUpgradeBar';
+```
 
 ## Testing
 

@@ -17,9 +17,9 @@
 // Subscribe to at minimum: subscription.created, subscription.updated,
 // subscription.canceled, subscription.revoked.
 
-// @ts-expect-error
+// @ts-expect-error — Deno edge function: esm.sh URL imports have no TS types
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-// @ts-expect-error
+// @ts-expect-error — Deno edge function: esm.sh URL imports have no TS types
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
