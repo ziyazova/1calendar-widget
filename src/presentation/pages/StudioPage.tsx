@@ -61,7 +61,7 @@ const cardAppear = keyframes`
 const TabBar = styled.div`
   display: inline-flex;
   gap: 4px;
-  background: #F5F5F5;
+  background: ${({ theme }) => theme.colors.background.surfaceMuted};
   border-radius: 12px;
   padding: 4px;
   margin-bottom: 32px;
@@ -85,11 +85,11 @@ const Tab = styled.button<{ $active: boolean }>`
     background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
     color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  background: ${({ $active }) => $active ? '#fff' : 'transparent'};
-  color: ${({ $active }) => $active ? '#1F1F1F' : '#888'};
-  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)' : '0 0 0 rgba(0,0,0,0)'};
+  background: ${({ $active, theme }) => $active ? theme.colors.background.elevated : 'transparent'};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : '#888'};
+  box-shadow: ${({ $active, theme }) => $active ? theme.shadows.tab : '0 0 0 rgba(0,0,0,0)'};
 
-  &:hover { color: #1F1F1F; }
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 /* Section headers */
@@ -103,7 +103,7 @@ const SectionRow = styled.div`
 const SectionTitle = styled.h2`
   font-size: 18px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   margin: 0;
 `;
@@ -145,7 +145,7 @@ const WidgetPreviewWrap = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #FAFAF9;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   cursor: pointer;
   position: relative;
 `;
@@ -156,7 +156,7 @@ const WidgetLabel = styled.span`
   left: 10px;
   font-size: 11px;
   font-weight: 600;
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   background: rgba(255,255,255,0.88);
   backdrop-filter: blur(8px);
   padding: 3px 10px;
@@ -175,7 +175,7 @@ const WidgetBottom = styled.div`
 const WidgetName = styled.div`
   font-size: 13px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const WidgetActions = styled.div`
@@ -200,12 +200,12 @@ const EmptyCircle = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #EDE4FF, #E0E8FF);
+  background: ${({ theme }) => theme.colors.gradients.avatar};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 14px;
-  svg { width: 24px; height: 24px; color: #6366F1; }
+  svg { width: 24px; height: 24px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 /* Purchase cards */
@@ -224,7 +224,7 @@ const PurchaseCard = styled.div`
 `;
 
 const PurchaseImg = styled.div`
-  width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: #F5F5F5; flex-shrink: 0;
+  width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: ${({ theme }) => theme.colors.background.surfaceMuted}; flex-shrink: 0;
   img { width: 100%; height: 100%; object-fit: cover; }
 `;
 
@@ -252,8 +252,8 @@ const MobileBackBtn = styled.button`
   width: 36px; height: 36px;
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 12px;
-  background: #fff;
-  color: #555;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  color: ${({ theme }) => theme.colors.text.body};
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
@@ -265,7 +265,7 @@ const MobileWidgetName = styled.div`
   min-width: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
@@ -279,8 +279,8 @@ const MobileCopyBtn = styled.button<{ $copied: boolean }>`
   padding: 0 14px;
   border: none;
   border-radius: 12px;
-  background: ${({ $copied }) => $copied ? '#22C55E' : 'linear-gradient(135deg, #3384F4, #5BA0F7)'};
-  color: #fff;
+  background: ${({ $copied, theme }) => $copied ? theme.colors.success : theme.colors.gradients.blue};
+  color: ${({ theme }) => theme.colors.text.inverse};
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
@@ -301,7 +301,7 @@ const MobileArtboard = styled.div`
     radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
-    #F8F8F7;
+    ${({ theme }) => theme.colors.background.surfaceCool};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -325,7 +325,7 @@ const MobileSectionTabs = styled.div`
   display: flex;
   gap: 4px;
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-  background: #fff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border-top: 1px solid rgba(0,0,0,0.06);
   flex-shrink: 0;
 `;
@@ -339,8 +339,8 @@ const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }
   border: none;
   background: ${({ $active, $disabled }) =>
     $disabled ? 'transparent' : $active ? 'rgba(51,132,244,0.08)' : 'transparent'};
-  color: ${({ $active, $disabled }) =>
-    $disabled ? '#C8C8C8' : $active ? '#3384F4' : '#777'};
+  color: ${({ $active, $disabled, theme }) =>
+    $disabled ? theme.colors.text.muted : $active ? theme.colors.brand.blue : theme.colors.text.hint};
   opacity: ${({ $disabled }) => $disabled ? 0.55 : 1};
   border-radius: 12px;
   font-size: 11px;
@@ -414,11 +414,11 @@ const DowngradeBannerInner = styled.div`
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: ${({ theme }) => theme.colors.warningBg};
+  border: 1px solid ${({ theme }) => theme.colors.warningBorder};
   border-radius: 12px;
   font-size: 13px;
-  color: #92400E;
+  color: ${({ theme }) => theme.colors.warningText};
   letter-spacing: -0.005em;
   flex-wrap: wrap;
 `;
