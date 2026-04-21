@@ -53,28 +53,6 @@ const FilterRow = styled.div`
   flex-wrap: wrap;
 `;
 
-const AccessBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  background: ${({ theme }) => theme.colors.text.primary};
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  margin-left: auto;
-  transition: all 0.2s;
-
-  &:hover { background: #333; }
-  svg { width: 14px; height: 14px; }
-`;
-
 const WIDGET_CATS = ['Featured', 'Calendar', 'Clocks', 'Boards', 'Buttons'];
 
 interface WidgetStudioSectionProps {

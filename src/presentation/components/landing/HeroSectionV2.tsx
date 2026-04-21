@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { Button as SharedButton } from '../shared';
 
 /* ── Design tokens (local to V2) ── */
 const COLORS = {
@@ -177,57 +178,7 @@ const CTAs = styled.div`
   justify-content: center;
 `;
 
-const BtnBase = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 17px 26px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  border: 0;
-  letter-spacing: -0.01em;
-  font-family: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-
-  .arrow {
-    transition: transform 0.2s ease;
-    display: inline-block;
-  }
-  &:hover .arrow {
-    transform: translateX(3px);
-  }
-`;
-
-const PrimaryBtn = styled(BtnBase)`
-  background: ${COLORS.ink};
-  color: #fff;
-  box-shadow: 0 8px 22px -8px rgba(26, 22, 19, 0.55);
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 28px -10px rgba(26, 22, 19, 0.6);
-  }
-`;
-
-const SecondaryBtn = styled(BtnBase)`
-  background: #fff;
-  color: ${COLORS.ink};
-  border: 1px solid rgba(43, 35, 32, 0.12);
-  box-shadow: 0 1px 2px rgba(43, 35, 32, 0.04);
-
-  &:hover {
-    background: #F4F2EF;
-    color: ${COLORS.ink};
-    border-color: rgba(43, 35, 32, 0.2);
-  }
-
-  &:active {
-    background: #EDEAE6;
-  }
-`;
+/* Hero CTAs now use shared <Button $size="xl"> — see buttons-polish PR. */
 
 /* ── Meta row ── */
 const Meta = styled.div`
@@ -737,10 +688,12 @@ export const HeroSectionV2: React.FC<HeroSectionV2Props> = ({ onBrowseTemplates,
           </Sub>
 
           <CTAs>
-            <PrimaryBtn onClick={onBrowseTemplates}>
+            <SharedButton $variant="primary" $size="xl" onClick={onBrowseTemplates}>
               Browse templates
-            </PrimaryBtn>
-            <SecondaryBtn onClick={onExploreWidgets}>Explore widgets</SecondaryBtn>
+            </SharedButton>
+            <SharedButton $variant="secondary" $size="xl" onClick={onExploreWidgets}>
+              Explore widgets
+            </SharedButton>
           </CTAs>
 
           <Meta data-ux="Hero V2 Meta">

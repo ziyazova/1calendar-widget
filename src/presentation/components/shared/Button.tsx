@@ -395,6 +395,7 @@ export const Button = styled.button<ButtonTransientProps>`
     opacity: 0.5;
     cursor: not-allowed;
     transform: none !important;
+    box-shadow: none;
   }
 `;
 

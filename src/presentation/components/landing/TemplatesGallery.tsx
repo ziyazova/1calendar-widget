@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
-import { FilterChip } from '../shared';
+import { FilterChip, Button as SharedButton } from '../shared';
 import { TEMPLATES, type Category } from '@/presentation/data/templates';
 
 const fadeUp = keyframes`
@@ -89,26 +89,7 @@ const GallerySubtitle = styled.p`
   margin: 0;
 `;
 
-const ExploreBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  background: ${({ theme }) => theme.colors.text.primary};
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: all 0.2s;
-
-  &:hover { background: #333; }
-  svg { width: 14px; height: 14px; }
-`;
+/* ExploreBtn replaced by shared <Button $variant="primary" $size="md"> */
 
 const FilterRow = styled.div`
   display: flex;
@@ -334,9 +315,9 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
               {c.label}
             </FilterChip>
           ))}
-          <ExploreBtn onClick={() => onNavigate('/templates')} style={{ marginLeft: 'auto' }}>
+          <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')} style={{ marginLeft: 'auto' }}>
             Explore all <ArrowRight />
-          </ExploreBtn>
+          </SharedButton>
         </FilterRow>
       </GalleryHeader>
       <TemplatesMarqueeWrap
