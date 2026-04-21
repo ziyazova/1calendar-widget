@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Plus, X, List, Palette } from 'lucide-react';
+import { Plus, X, List, Palette, Sparkles } from 'lucide-react';
 import { useDevPanelsHidden } from './useDevPanelsHidden';
 
 type Mode = 'idle' | 'picking' | 'composing' | 'list';
@@ -381,11 +381,19 @@ export function ClaudeFeedback() {
             </DevText>
           </DevRow>
 
+          <DevRowLink href="/dev/v2">
+            <DevIcon><Sparkles /></DevIcon>
+            <DevText>
+              <DevTitle>Design system v2</DevTitle>
+              <DevSub>token-driven · /dev/v2</DevSub>
+            </DevText>
+          </DevRowLink>
+
           <DevRowLink href="/dev">
             <DevIcon><Palette /></DevIcon>
             <DevText>
-              <DevTitle>Design system</DevTitle>
-              <DevSub>open /dev</DevSub>
+              <DevTitle>Design system (legacy)</DevTitle>
+              <DevSub>old showcase · /dev</DevSub>
             </DevText>
           </DevRowLink>
         </DevPanel>

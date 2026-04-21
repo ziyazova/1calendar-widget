@@ -14,7 +14,7 @@
  *   bg         — background (solid color, gradient, or rgba)
  *   fg         — text color
  *   border     — full border shorthand (e.g. `1px solid rgba(0,0,0,0.08)`)
- *   shadow     — full box-shadow value (multi-line OK)
+ *   shadow     — full box-shadow value (multi-liehffne OK)
  *   transform  — hover lift etc (e.g. `translateY(-0.5px)`)
  *   fontWeight — only on `base` — 500 for neutral, 600 for emphasis CTAs
  *

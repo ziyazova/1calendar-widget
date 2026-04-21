@@ -21,14 +21,14 @@ const Header = styled.div`
 
 
 const PageTitle = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 10px;
 
   @media (max-width: 768px) {
-    font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+    font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   }
 `;
 
