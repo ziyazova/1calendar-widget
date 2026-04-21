@@ -305,72 +305,10 @@ const RowDesc = styled.div`
 
 /* ────────────────── Buttons ────────────────── */
 
-const Button = styled.button<{ $variant?: 'primary' | 'ghost' | 'danger' | 'dangerSolid' | 'upgrade' }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  letter-spacing: -0.005em;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
-
-  ${({ $variant }) => {
-    switch ($variant) {
-      case 'primary':
-        return `
-          background: #1F1F1F;
-          color: #fff;
-          border: 1px solid #1F1F1F;
-          &:hover:not(:disabled) { background: #000; border-color: #000; }
-        `;
-      case 'danger':
-        return `
-          background: #fff;
-          color: #DC2828;
-          border: 1px solid rgba(220, 40, 40, 0.22);
-          &:hover:not(:disabled) { background: rgba(220, 40, 40, 0.04); border-color: rgba(220, 40, 40, 0.35); }
-        `;
-      case 'dangerSolid':
-        return `
-          background: #DC2828;
-          color: #fff;
-          border: 1px solid #DC2828;
-          &:hover:not(:disabled) { background: #B91C1C; border-color: #B91C1C; }
-        `;
-      case 'upgrade':
-        return `
-          background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
-          color: #4F46E5;
-          border: 1px solid rgba(99, 102, 241, 0.22);
-          font-weight: 600;
-          &:hover:not(:disabled) {
-            border-color: rgba(99, 102, 241, 0.38);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.16);
-            transform: translateY(-0.5px);
-          }
-          svg { color: #6366F1; }
-        `;
-      case 'ghost':
-      default:
-        return `
-          background: #fff;
-          color: #1F1F1F;
-          border: 1px solid rgba(0, 0, 0, 0.1);
-          &:hover:not(:disabled) { background: rgba(0, 0, 0, 0.03); border-color: rgba(0, 0, 0, 0.14); }
-        `;
-    }
-  }}
-
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
-  svg { width: 13px; height: 13px; stroke-width: 1.75; }
-`;
+/* Local Button removed — migrated to shared <Button> via SharedButton
+   import. Variant map: primary → primary, ghost/default → secondary,
+   danger → dangerStrong, upgrade → accent. All at $size="sm".
+   See SIMPLIFICATION_PLAN.md §2.3 — accepted 2-4px diff vs shared. */
 
 /* ────────────────── Modal form internals ────────────────── */
 /* All three modals (password/email/delete) use the shared <Modal> shell;
@@ -693,9 +631,9 @@ export const SettingsPage: React.FC = () => {
             <PlanBadge $pro={isPro}>{isPro ? 'Pro' : 'Free'}</PlanBadge>
           </ProfileMeta>
           {!isPro && (
-            <Button $variant="upgrade" onClick={openUpgrade}>
+            <SharedButton $variant="accent" $size="sm" onClick={openUpgrade}>
               <ArrowUpRight /> Upgrade
-            </Button>
+            </SharedButton>
           )}
         </ProfileCard>
 
@@ -733,13 +671,14 @@ export const SettingsPage: React.FC = () => {
                 Saved
               </span>
             )}
-            <Button
+            <SharedButton
               $variant="primary"
+              $size="sm"
               onClick={handleSaveProfile}
               disabled={!nameDirty || savingProfile}
             >
               {savingProfile ? 'Saving…' : 'Save changes'}
-            </Button>
+            </SharedButton>
           </SectionActions>
         </Section>
 
@@ -761,14 +700,16 @@ export const SettingsPage: React.FC = () => {
                   : "You signed up with Google. Set a password to also sign in with email."}
               </RowDesc>
             </RowLabel>
-            <Button
+            <SharedButton
+              $variant="secondary"
+              $size="sm"
               onClick={() => {
                 setShowPwModal(true);
                 setCurrentPw(''); setNewPw(''); setConfirmPw(''); setPwError(null); setPwSuccess(false);
               }}
             >
               <Lock /> {hasPasswordLogin ? 'Change password' : 'Set password'}
-            </Button>
+            </SharedButton>
           </Row>
           <Row>
             <RowLabel>
@@ -783,18 +724,18 @@ export const SettingsPage: React.FC = () => {
               </RowDesc>
             </RowLabel>
             {hasGoogleLogin ? (
-              <Button
+              <SharedButton $variant="secondary" $size="sm"
                 onClick={handleUnlinkGoogle}
                 disabled={googleBusy || !hasPasswordLogin}
                 title={!hasPasswordLogin ? 'Set a password first so you don\'t lose access.' : undefined}
               >
                 {googleBusy ? 'Working…' : 'Disconnect Google'}
-              </Button>
+              </SharedButton>
             ) : (
-              <Button onClick={handleLinkGoogle} disabled={googleBusy}>
+              <SharedButton $variant="secondary" $size="sm" onClick={handleLinkGoogle} disabled={googleBusy}>
                 <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 {googleBusy ? 'Redirecting…' : 'Connect Google'}
-              </Button>
+              </SharedButton>
             )}
           </Row>
           <Row>
@@ -813,9 +754,9 @@ export const SettingsPage: React.FC = () => {
                 )}
               </RowDesc>
             </RowLabel>
-            <Button onClick={handleSignOutOthers} disabled={otherSignOutState === 'loading'}>
+            <SharedButton $variant="secondary" $size="sm" onClick={handleSignOutOthers} disabled={otherSignOutState === 'loading'}>
               <LogOut /> {otherSignOutState === 'loading' ? 'Signing out…' : 'Sign out other devices'}
-            </Button>
+            </SharedButton>
           </Row>
           <Row>
             <RowLabel>
@@ -827,7 +768,7 @@ export const SettingsPage: React.FC = () => {
                 )}
               </RowDesc>
             </RowLabel>
-            <Button
+            <SharedButton $variant="secondary" $size="sm"
               disabled={!hasPasswordLogin}
               onClick={() => {
                 setShowEmailModal(true);
@@ -839,7 +780,7 @@ export const SettingsPage: React.FC = () => {
               title={!hasPasswordLogin ? 'Set a password first so we can verify email changes.' : undefined}
             >
               <Mail /> Change email
-            </Button>
+            </SharedButton>
           </Row>
         </Section>
 
@@ -865,7 +806,7 @@ export const SettingsPage: React.FC = () => {
                   }
                 </RowDesc>
               </RowLabel>
-              <Button onClick={async () => {
+              <SharedButton $variant="secondary" $size="sm" onClick={async () => {
                 // Billing + cancellation live in Polar's customer portal. The
                 // Edge Function mints a signed portal URL for this specific
                 // user; fall back to polar.sh if the call fails so the button
@@ -874,7 +815,7 @@ export const SettingsPage: React.FC = () => {
                 if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
               }}>
                 Cancel or manage subscription
-              </Button>
+              </SharedButton>
             </Row>
           ) : (
             <Row>
@@ -882,9 +823,9 @@ export const SettingsPage: React.FC = () => {
                 <RowTitle>Free plan</RowTitle>
                 <RowDesc>3 widgets, basic customization. Upgrade for unlimited widgets and premium styles.</RowDesc>
               </RowLabel>
-              <Button $variant="upgrade" onClick={openUpgrade}>
+              <SharedButton $variant="accent" $size="sm" onClick={openUpgrade}>
                 <ArrowUpRight /> Upgrade to Pro
-              </Button>
+              </SharedButton>
             </Row>
           )}
         </Section>
@@ -903,18 +844,18 @@ export const SettingsPage: React.FC = () => {
               <RowTitle>Download my data</RowTitle>
               <RowDesc>Export your profile and saved widgets as a JSON file.</RowDesc>
             </RowLabel>
-            <Button onClick={handleExport} disabled={exporting}>
+            <SharedButton $variant="secondary" $size="sm" onClick={handleExport} disabled={exporting}>
               <Download /> {exporting ? 'Preparing…' : 'Download JSON'}
-            </Button>
+            </SharedButton>
           </Row>
           <Row>
             <RowLabel>
               <RowTitle>Privacy policy</RowTitle>
               <RowDesc>Read how we collect, store and process your data.</RowDesc>
             </RowLabel>
-            <Button onClick={() => navigate('/privacy')}>
+            <SharedButton $variant="secondary" $size="sm" onClick={() => navigate('/privacy')}>
               Read policy
-            </Button>
+            </SharedButton>
           </Row>
         </Section>
 
@@ -934,21 +875,22 @@ export const SettingsPage: React.FC = () => {
               <RowTitle>Log out</RowTitle>
               <RowDesc>End your session on this device.</RowDesc>
             </RowLabel>
-            <Button $variant="danger" onClick={async () => { await logout(); navigate('/'); }}>
+            <SharedButton $variant="dangerStrong" $size="sm" onClick={async () => { await logout(); navigate('/'); }}>
               <LogOut /> Log out
-            </Button>
+            </SharedButton>
           </Row>
           <Row>
             <RowLabel>
               <RowTitle>Delete account</RowTitle>
               <RowDesc>Permanently remove your profile and all widgets. This cannot be undone.</RowDesc>
             </RowLabel>
-            <Button
-              $variant="danger"
+            <SharedButton
+              $variant="dangerStrong"
+              $size="sm"
               onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(''); setDeleteError(null); }}
             >
               <Trash2 /> Delete account
-            </Button>
+            </SharedButton>
           </Row>
         </Section>
       </Shell>
