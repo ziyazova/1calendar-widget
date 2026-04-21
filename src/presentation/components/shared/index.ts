@@ -28,6 +28,7 @@ export {
 } from './Badges';
 export { Card, CardHeader, CardTitle, CardSubtitle, CardSection } from './Card';
 export { Modal, ModalFooter } from './Modal';
+export { BottomSheet } from './BottomSheet';
 export { Accordion, AccordionGroup } from './Accordion';
 export { PlanRing } from './PlanRing';
 export {

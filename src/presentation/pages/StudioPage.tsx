@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -351,77 +351,6 @@ const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }
   transition: background 0.15s, color 0.15s, opacity 0.15s;
   padding: 0;
   svg { width: 18px; height: 18px; }
-`;
-
-const MobileSheetBackdrop = styled.div<{ $open: boolean }>`
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 39;
-  opacity: ${({ $open }) => $open ? 1 : 0};
-  pointer-events: ${({ $open }) => $open ? 'auto' : 'none'};
-  transition: opacity 0.25s ease;
-`;
-
-const MobileSheet = styled.div<{ $open: boolean }>`
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  max-height: 70vh;
-  background: #fff;
-  border-top: 1px solid rgba(0,0,0,0.06);
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -8px 40px rgba(0,0,0,0.1);
-  transform: ${({ $open }) => $open ? 'translateY(0)' : 'translateY(100%)'};
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding-bottom: env(safe-area-inset-bottom);
-`;
-
-const MobileSheetHandle = styled.div`
-  display: flex; justify-content: center;
-  padding: 10px 0 6px;
-  flex-shrink: 0;
-  &::after {
-    content: '';
-    width: 40px; height: 5px;
-    border-radius: 4px;
-    background: rgba(0,0,0,0.15);
-  }
-`;
-
-const MobileSheetHeader = styled.div`
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 20px 12px;
-  flex-shrink: 0;
-`;
-
-const MobileSheetTitle = styled.h3`
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1F1F1F;
-  letter-spacing: -0.02em;
-  text-transform: capitalize;
-`;
-
-const MobileSheetClose = styled.button`
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.04);
-  color: #777;
-  cursor: pointer;
-  padding: 0;
-  svg { width: 14px; height: 14px; }
-`;
-
-const MobileSheetBody = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
 `;
 
 /* Preview helpers */
@@ -835,32 +764,27 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             ))}
           </MobileSectionTabs>
 
-          <MobileSheetBackdrop $open={sheetOpen} onClick={closeSheet} />
-          <MobileSheet $open={sheetOpen} aria-hidden={!sheetOpen}>
-            <MobileSheetHandle />
-            <MobileSheetHeader>
-              <MobileSheetTitle>{mobileSection ?? ''}</MobileSheetTitle>
-              <MobileSheetClose onClick={closeSheet} aria-label="Close">
-                <ArrowRight style={{ transform: 'rotate(90deg)' }} />
-              </MobileSheetClose>
-            </MobileSheetHeader>
-            <MobileSheetBody>
-              {mobileSection && (
-                <CustomizationPanel
-                  widget={editingWidget}
-                  onSettingsChange={(settings) => {
-                    if (!editingWidget) return;
-                    const updated = editingWidget.updateSettings(settings as CalendarSettings | ClockSettings | BoardSettings);
-                    setEditingWidget(updated);
-                  }}
-                  visibleSection={mobileSection}
-                  widgetCount={widgets.length}
-                  widgetLimit={3}
-                  onUpgrade={() => openUpgrade()}
-                />
-              )}
-            </MobileSheetBody>
-          </MobileSheet>
+          <BottomSheet
+            open={sheetOpen}
+            onClose={closeSheet}
+            title={mobileSection ?? ''}
+            capitalizeTitle
+          >
+            {mobileSection && (
+              <CustomizationPanel
+                widget={editingWidget}
+                onSettingsChange={(settings) => {
+                  if (!editingWidget) return;
+                  const updated = editingWidget.updateSettings(settings as CalendarSettings | ClockSettings | BoardSettings);
+                  setEditingWidget(updated);
+                }}
+                visibleSection={mobileSection}
+                widgetCount={widgets.length}
+                widgetLimit={3}
+                onUpgrade={() => openUpgrade()}
+              />
+            )}
+          </BottomSheet>
         </MobileEditorWrap>
       );
     }
