@@ -106,9 +106,9 @@ const SortSelect = styled.select`
 const FilterChip = styled.button<{ $active: boolean }>`
   height: 32px;
   padding: 0 14px;
-  background: ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.03)'};
-  color: ${({ $active }) => $active ? '#fff' : '#999'};
-  border: 1px solid ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.06)'};
+  background: ${({ $active, theme }) => $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.03)'};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.inverse : theme.colors.text.subtle};
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.06)'};
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
@@ -122,8 +122,8 @@ const FilterChip = styled.button<{ $active: boolean }>`
   letter-spacing: -0.01em;
 
   &:hover {
-    background: ${({ $active }) => $active ? '#1F1F1F' : 'rgba(0, 0, 0, 0.06)'};
-    color: ${({ $active }) => $active ? '#fff' : '#666'};
+    background: ${({ $active, theme }) => $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.06)'};
+    color: ${({ $active, theme }) => $active ? theme.colors.text.inverse : theme.colors.text.dim};
   }
 `;
 
@@ -225,10 +225,10 @@ const SearchInput = styled.input`
   padding: 0 16px 0 42px;
   border: 1.5px solid rgba(0, 0, 0, 0.06);
   border-radius: 12px;
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   font-size: 14px;
   font-family: inherit;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   outline: none;
   transition: all 0.2s ease;
   letter-spacing: -0.01em;
@@ -260,7 +260,7 @@ const SectionHeading = styled.div`
 const SectionTitle = styled.h2`
   font-size: 18px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   margin: 0;
 `;
@@ -342,13 +342,13 @@ const AvatarCircle = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%);
+  background: ${({ theme }) => theme.colors.gradients.avatar};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 600;
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   flex-shrink: 0;
 `;
 
@@ -419,13 +419,13 @@ const CreateCardText = styled.div``;
 const CreateCardTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
 const CreateCardHint = styled.div`
   font-size: 12px;
-  color: #999;
+  color: ${({ theme }) => theme.colors.text.subtle};
   margin-top: 1px;
   @media (max-width: 768px) { display: none; }
 `;
@@ -461,7 +461,7 @@ const BigCardPreview = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #FAFAF9;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   cursor: pointer;
   position: relative;
 `;
@@ -472,7 +472,7 @@ const BigCardLabel = styled.span`
   left: 10px;
   font-size: 11px;
   font-weight: 500;
-  color: #555;
+  color: ${({ theme }) => theme.colors.text.body};
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(8px);
   padding: 3px 10px;
@@ -528,12 +528,12 @@ const EmptyCircle = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #EDE4FF 0%, #E0E8FF 100%);
+  background: ${({ theme }) => theme.colors.gradients.avatar};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 14px;
-  svg { width: 24px; height: 24px; color: #6366F1; }
+  svg { width: 24px; height: 24px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const EmptyTitle = styled.p`
@@ -574,7 +574,7 @@ const PurchaseImg = styled.div`
   height: 56px;
   border-radius: 12px;
   overflow: hidden;
-  background: #F5F5F5;
+  background: ${({ theme }) => theme.colors.background.surfaceMuted};
   flex-shrink: 0;
   img { width: 100%; height: 100%; object-fit: cover; }
 `;
@@ -638,14 +638,14 @@ const SectionBlockHead = styled.div`
 const SectionBlockTitle = styled.h3`
   font-size: 16px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   margin: 0 0 4px;
 `;
 
 const SectionBlockSub = styled.p`
   font-size: 13px;
-  color: #999;
+  color: ${({ theme }) => theme.colors.text.subtle};
   margin: 0;
   letter-spacing: -0.005em;
   line-height: 1.5;
@@ -692,12 +692,12 @@ const SettingsInput = styled.input`
   border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
-  color: #1F1F1F;
-  background: #FAFAFA;
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   outline: none;
   transition: border-color 0.2s;
 
-  &:focus { border-color: rgba(0,0,0,0.2); background: #fff; }
+  &:focus { border-color: rgba(0,0,0,0.2); background: ${({ theme }) => theme.colors.background.elevated}; }
   &:read-only { opacity: 0.5; cursor: not-allowed; }
 `;
 
@@ -903,8 +903,8 @@ const BrowseShopBtn = styled.button`
   gap: 10px;
   width: 100%;
   height: 56px;
-  background: linear-gradient(135deg, #1F1F1F 0%, #333 100%);
-  color: #fff;
+  background: ${({ theme }) => `linear-gradient(135deg, ${theme.colors.text.primary} 0%, #333 100%)`};
+  color: ${({ theme }) => theme.colors.text.inverse};
   border: none;
   border-radius: 16px;
   font-size: 14px;
