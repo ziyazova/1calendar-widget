@@ -581,6 +581,20 @@ const FaqList = styled.div`
   gap: ${({ theme }) => theme.spacing['2']};
 `;
 
+// Shared <Accordion> renders its children raw — style the FAQ answer here so
+// it matches the old size/color instead of inheriting body defaults.
+const FaqAnswerText = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
+  margin: 0;
+  word-break: break-word;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    font-size: ${({ theme }) => theme.typography.sizes.md};
+  }
+`;
+
 /* ── Mobile sticky buy bar ── */
 
 const MobileBuyBar = styled.div`
@@ -765,7 +779,7 @@ export const TemplateDetailPage: React.FC = () => {
                   open={openFaq === i}
                   onToggle={(open) => setOpenFaq(open ? i : null)}
                 >
-                  {faq.a}
+                  <FaqAnswerText>{faq.a}</FaqAnswerText>
                 </Accordion>
               ))}
             </FaqList>
