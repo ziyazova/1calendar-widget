@@ -41,7 +41,7 @@ const Section = styled.section<{
   padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
   padding-left: 0;
   padding-right: 0;
-  ${({ $tint }) => $tint && 'background: #FAFAFA;'}
+  ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
   @media (max-width: 768px) {
     padding-top: ${({ $size = 'md', $bleedTop }) =>
@@ -60,7 +60,7 @@ const Hero = styled.section<{ $v2?: boolean }>`
   padding: 100px 0 80px;
   gap: 64px;
   overflow: hidden;
-  ${({ $v2 }) => $v2 && `background: #FAFAFA;`}
+  ${({ $v2, theme }) => $v2 && `background: ${theme.colors.background.surfaceAlt};`}
 
   &::before {
     content: '';
