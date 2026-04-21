@@ -62,7 +62,7 @@ const Page = styled.div`
   min-height: 100vh;
   background: #FBFAF7;
   font-family: ${({ theme }) => theme.typography.fonts.primary};
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const HeroBg = styled.div`
@@ -93,12 +93,12 @@ const PageTitle = styled.h1`
   font-weight: 600;
   letter-spacing: -0.03em;
   margin: 0 0 4px;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const PageSubtitle = styled.p`
   font-size: 13px;
-  color: #8E8E93;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 24px;
   letter-spacing: -0.01em;
 `;
@@ -149,13 +149,13 @@ const ProfileName = styled.div`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 2px;
 `;
 
 const ProfileEmail = styled.div`
   font-size: 13px;
-  color: #8E8E93;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.005em;
   margin: 0 0 8px;
 `;
@@ -182,7 +182,7 @@ const SectionIcon = styled.div`
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: #F5F5F2;
+  background: ${({ theme }) => theme.colors.background.surfaceMuted};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,7 +190,7 @@ const SectionIcon = styled.div`
   svg {
     width: 16px;
     height: 16px;
-    color: #9A9AA0;
+    color: ${({ theme }) => theme.colors.text.tertiary};
     stroke-width: 1.75;
   }
 `;
@@ -199,13 +199,13 @@ const SectionTitle = styled.h3`
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
 `;
 
 const SectionSub = styled.p`
   font-size: 12px;
-  color: #8E8E93;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.005em;
   margin: 2px 0 0;
   line-height: 1.5;
@@ -223,7 +223,7 @@ const Field = styled.div`
 const Label = styled.label`
   font-size: 11px;
   font-weight: 500;
-  color: #8E8E93;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: 0;
 `;
 
@@ -232,10 +232,10 @@ const Input = styled.input`
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 12px;
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   font-size: 13px;
   font-family: inherit;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   outline: none;
   transition: border-color 0.15s ease, background 0.15s ease;
 
@@ -245,8 +245,8 @@ const Input = styled.input`
   }
 
   &[readonly] {
-    color: #8E8E93;
-    background: #F5F5F3;
+    color: ${({ theme }) => theme.colors.text.tertiary};
+    background: ${({ theme }) => theme.colors.background.surfaceMuted};
     cursor: default;
   }
 `;
@@ -286,13 +286,13 @@ const RowLabel = styled.div`
 const RowTitle = styled.div`
   font-size: 13px;
   font-weight: 500;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.005em;
 `;
 
 const RowDesc = styled.div`
   font-size: 12px;
-  color: #8E8E93;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin-top: 2px;
   line-height: 1.5;
   letter-spacing: 0;
@@ -423,7 +423,7 @@ const ModalInputWrap = styled.div`
     transform: translateY(-50%);
     width: 16px;
     height: 16px;
-    color: #8E8E93;
+    color: ${({ theme }) => theme.colors.text.tertiary};
   }
   button.toggle {
     position: absolute;
@@ -433,7 +433,7 @@ const ModalInputWrap = styled.div`
     background: none;
     border: none;
     cursor: pointer;
-    color: #8E8E93;
+    color: ${({ theme }) => theme.colors.text.tertiary};
     padding: 4px;
     display: flex;
     align-items: center;
@@ -448,8 +448,8 @@ const ModalInput = styled.input`
   border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
-  color: #1F1F1F;
-  background: #FAFAFA;
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.15s ease, background 0.15s ease;
@@ -479,7 +479,7 @@ const PwCheck = styled.div<{ $met: boolean }>`
 
 const ErrorText = styled.div`
   font-size: 13px;
-  color: #DC2828;
+  color: ${({ theme }) => theme.colors.destructiveText};
   background: rgba(220, 40, 40, 0.06);
   border: 1px solid rgba(220, 40, 40, 0.15);
   padding: 10px 12px;
