@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff, CheckCircle2, Check, ArrowRight, ShieldCheck } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, Footer } from '../components/shared';
+import { PageWrapper, Footer, Button } from '../components/shared';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '@/infrastructure/services/supabase';
 
@@ -20,31 +20,31 @@ const Container = styled.div`
 const IconWrap = styled.div`
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08));
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
 
-  svg { width: 26px; height: 26px; color: #6366F1; }
+  svg { width: 26px; height: 26px; color: ${({ theme }) => theme.colors.brand.indigo}; }
 `;
 
 const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
   text-align: center;
-  color: #1F1F1F;
-  letter-spacing: -0.03em;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 8px;
 `;
 
 const Subtitle = styled.p`
-  font-size: 14px;
-  color: #888;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.hint};
   text-align: center;
-  margin: 0 0 32px;
-  line-height: 1.5;
+  margin: 0 0 ${({ theme }) => theme.spacing['8']};
+  line-height: ${({ theme }) => theme.typography.lineHeights.normal};
 `;
 
 const Form = styled.form`
@@ -62,7 +62,7 @@ const InputIcon = styled.div`
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #999;
+  color: ${({ theme }) => theme.colors.text.hint};
   display: flex;
   svg { width: 16px; height: 16px; }
 `;
@@ -71,16 +71,16 @@ const Input = styled.input`
   width: 100%;
   height: 48px;
   padding: 0 44px;
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 12px;
-  font-size: 14px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-family: inherit;
-  color: #1F1F1F;
-  background: #fff;
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.elevated};
   outline: none;
   transition: border-color 0.15s;
 
-  &:focus { border-color: rgba(51,132,244,0.5); }
+  &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const PasswordToggle = styled.button`
@@ -91,35 +91,11 @@ const PasswordToggle = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #999;
+  color: ${({ theme }) => theme.colors.text.hint};
   display: flex;
   padding: 0;
   svg { width: 16px; height: 16px; }
-  &:hover { color: #555; }
-`;
-
-const SubmitBtn = styled.button`
-  width: 100%;
-  height: 48px;
-  margin-top: 8px;
-  background: #1F1F1F;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.15s;
-
-  &:hover:not(:disabled) { background: #333; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  svg { width: 16px; height: 16px; }
+  &:hover { color: ${({ theme }) => theme.colors.text.body}; }
 `;
 
 const RequirementsList = styled.div`
@@ -128,46 +104,46 @@ const RequirementsList = styled.div`
   gap: 4px;
   padding: 10px 12px;
   background: rgba(0,0,0,0.02);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
 `;
 
 const Requirement = styled.div<{ $met: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  color: ${({ $met }) => $met ? '#16A34A' : '#999'};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ $met, theme }) => ($met ? theme.colors.successFg : theme.colors.text.hint)};
   transition: color 0.15s;
   svg { width: 12px; height: 12px; flex-shrink: 0; }
 `;
 
 const ErrorText = styled.div`
-  font-size: 13px;
-  color: #DC2828;
-  background: rgba(220,40,40,0.06);
-  border: 1px solid rgba(220,40,40,0.15);
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.destructiveText};
+  background: ${({ theme }) => theme.colors.destructiveBg};
+  border: 1px solid ${({ theme }) => theme.colors.destructiveBorder};
   padding: 10px 12px;
-  border-radius: 12px;
-  margin-bottom: 8px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  margin-bottom: ${({ theme }) => theme.spacing['2']};
 `;
 
 const SuccessCard = styled.div`
   text-align: center;
   padding: 8px 0;
 
-  svg { color: #16A34A; }
+  svg { color: ${({ theme }) => theme.colors.successFg}; }
 `;
 
 const SuccessIcon = styled.div`
   width: 56px;
   height: 56px;
-  border-radius: 16px;
-  background: rgba(34,197,94,0.12);
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.successBg};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  svg { width: 28px; height: 28px; color: #16A34A; }
+  svg { width: 28px; height: 28px; color: ${({ theme }) => theme.colors.successFg}; }
 `;
 
 const getChecks = (pw: string) => [
@@ -257,9 +233,9 @@ export const ResetPasswordPage: React.FC = () => {
           <IconWrap><Lock /></IconWrap>
           <Title>Link expired</Title>
           <Subtitle>This password reset link is invalid or has expired. Please request a new one from the login page.</Subtitle>
-          <SubmitBtn onClick={() => navigate('/login')}>
+          <Button $variant="primary" $size="xl" $fullWidth onClick={() => navigate('/login')}>
             Back to login <ArrowRight />
-          </SubmitBtn>
+          </Button>
         </Container>
       </PageWrapper>
     );
@@ -274,9 +250,9 @@ export const ResetPasswordPage: React.FC = () => {
             <SuccessIcon><CheckCircle2 /></SuccessIcon>
             <Title>Password updated</Title>
             <Subtitle>You can now log in with your new password.</Subtitle>
-            <SubmitBtn onClick={() => navigate('/login')}>
+            <Button $variant="primary" $size="xl" $fullWidth onClick={() => navigate('/login')}>
               Go to login <ArrowRight />
-            </SubmitBtn>
+            </Button>
           </SuccessCard>
         </Container>
       </PageWrapper>
@@ -337,9 +313,16 @@ export const ResetPasswordPage: React.FC = () => {
               </RequirementsList>
             )}
 
-            <SubmitBtn type="submit" disabled={submitting || !valid}>
+            <Button
+              type="submit"
+              $variant="primary"
+              $size="xl"
+              $fullWidth
+              disabled={submitting || !valid}
+              style={{ marginTop: 8 }}
+            >
               {submitting ? 'Updating…' : 'Update password'}
-            </SubmitBtn>
+            </Button>
           </Form>
         )}
       </Container>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { MailCheck, MailX, ArrowRight } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, Footer } from '../components/shared';
+import { PageWrapper, Footer, Button } from '../components/shared';
 import { useAuth } from '../context/AuthContext';
 
 const Container = styled.div`
@@ -19,7 +19,7 @@ const Container = styled.div`
 const IconWrap = styled.div<{ $ok: boolean }>`
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   background: ${({ $ok }) => ($ok
     ? 'linear-gradient(135deg, rgba(34,197,94,0.14), rgba(16,185,129,0.10))'
     : 'linear-gradient(135deg, rgba(220,40,40,0.14), rgba(253,186,116,0.10))')};
@@ -31,47 +31,25 @@ const IconWrap = styled.div<{ $ok: boolean }>`
   svg {
     width: 28px;
     height: 28px;
-    color: ${({ $ok }) => ($ok ? '#16A34A' : '#DC2828')};
+    color: ${({ $ok, theme }) => ($ok ? theme.colors.success : theme.colors.destructive)};
   }
 `;
 
 const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 600;
+  font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
   text-align: center;
-  color: #1F1F1F;
-  letter-spacing: -0.03em;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 10px;
 `;
 
 const Subtitle = styled.p`
-  font-size: 14px;
-  color: #777;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.subtle};
   text-align: center;
-  margin: 0 0 24px;
-  line-height: 1.5;
-`;
-
-const SubmitBtn = styled.button`
-  width: 100%;
-  height: 48px;
-  margin-top: 8px;
-  background: #1F1F1F;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.15s;
-
-  &:hover { background: #333; }
-  svg { width: 16px; height: 16px; }
+  margin: 0 0 ${({ theme }) => theme.spacing['6']};
+  line-height: ${({ theme }) => theme.typography.lineHeights.normal};
 `;
 
 type State = 'pending' | 'success' | 'expired';
@@ -128,9 +106,9 @@ export const VerifyEmailPage: React.FC = () => {
             Head back to sign-in — if your account still needs confirmation,
             we can send a fresh link.
           </Subtitle>
-          <SubmitBtn onClick={() => navigate('/login')}>
+          <Button $variant="primary" $size="xl" $fullWidth onClick={() => navigate('/login')}>
             Back to sign-in <ArrowRight />
-          </SubmitBtn>
+          </Button>
         </Container>
         <Footer />
       </PageWrapper>
@@ -145,9 +123,9 @@ export const VerifyEmailPage: React.FC = () => {
           <IconWrap $ok><MailCheck /></IconWrap>
           <Title>Email confirmed</Title>
           <Subtitle>Your account is ready to use. Jump into the Studio to build your first widget.</Subtitle>
-          <SubmitBtn onClick={() => navigate('/studio', { replace: true })}>
+          <Button $variant="primary" $size="xl" $fullWidth onClick={() => navigate('/studio', { replace: true })}>
             Go to Studio <ArrowRight />
-          </SubmitBtn>
+          </Button>
         </Container>
         <Footer />
       </PageWrapper>
