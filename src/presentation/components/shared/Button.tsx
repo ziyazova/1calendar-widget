@@ -32,6 +32,7 @@ type ButtonVariant =
   | 'outline'
   | 'ghost'
   | 'danger'
+  | 'dangerStrong'
   | 'success'
   | 'link';
 
@@ -123,11 +124,23 @@ const ghostStyles = css`
 
 const dangerStyles = css`
   background: transparent;
-  color: ${({ theme }) => theme.colors.destructiveSoft};
-  border: 1px solid ${({ theme }) => theme.colors.destructiveBorder};
+  color: ${({ theme }) => theme.colors.danger.soft};
+  border: 1px solid ${({ theme }) => theme.colors.danger.border};
 
   &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.destructiveBg};
+    background: ${({ theme }) => theme.colors.danger.bg};
+  }
+`;
+
+/* dangerStrong — saturated red for irreversible actions
+   (Delete account, Delete widget, Log out). See SIMPLIFICATION_PLAN.md §2.1. */
+const dangerStrongStyles = css`
+  background: transparent;
+  color: ${({ theme }) => theme.colors.danger.strong};
+  border: 1px solid ${({ theme }) => theme.colors.danger.border};
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.danger.bg};
   }
 `;
 
@@ -163,6 +176,7 @@ const variantMap: Record<ButtonVariant, ReturnType<typeof css>> = {
   outline: outlineStyles,
   ghost: ghostStyles,
   danger: dangerStyles,
+  dangerStrong: dangerStrongStyles,
   success: successStyles,
   link: linkStyles,
 };
