@@ -20,14 +20,14 @@
 | **3.2 Verify + Reset** (no SignupPage — signup lives inside LoginPage) | `migrate-auth-pages` | ✅ merged | `70327ee` + dedupe `382f465` |
 | **3.3 TemplatesPage** | `migrate-templates` | ✅ merged | `5fab668` |
 | **3.4 TemplateDetailPage** | `migrate-template-detail` | ✅ merged | `77b802a` + fix `a3c548e` |
-| **3.5 SettingsPage** | `migrate-settings` + `migrate-settings-structural` | 🟡 partial — colors done, delete-account modal swapped; password/email modals + local `Button` + Section → Accordion TBD | `ca81005` + `734b57d` |
+| **3.5 SettingsPage** | `migrate-settings` + `migrate-settings-structural` + `migrate-settings-modals` | 🟡 partial — colors + all 3 modals (delete / password / email) on shared `<Modal>`; local `Button` + Section → Accordion still TBD | `ca81005` + `734b57d` + `69639df` |
 | **3.6 CheckoutPage** | `migrate-checkout` | ✅ merged | `a22b7ca` |
 | **3.7 DesignSystemPage** | `migrate-design-system` | ⏸ **deferred** by owner — not touching `/dev` for now | — |
 | **3.8 LandingPage** | `migrate-landing` | ✅ merged | `e68c5e5` |
 | **3.9 StudioPage + WidgetStudioPage** | `migrate-studio` | ⏸ **PAUSED — roadmap requires design review before touching live editor** | — |
 | **4. Final polish** | — | ⏳ after all pages | — |
 
-`origin/design-experiment` HEAD is `734b57d` as of this report. Seven pages migrated (Login, Verify, Reset, Templates, TemplateDetail, Settings-colors+delete-modal, Checkout, Landing). Only `/dev` (deferred) and `/studio` + `/widgets` (paused) remain, plus the structural Settings leftovers listed below.
+`origin/design-experiment` HEAD is `69639df` as of this report. Seven pages migrated (Login, Verify, Reset, Templates, TemplateDetail, Settings-colors+all-3-modals, Checkout, Landing). Only `/dev` (deferred) and `/studio` + `/widgets` (paused) remain, plus the structural Settings leftovers listed below.
 
 ---
 
@@ -69,12 +69,11 @@ All commits live on `origin/design-experiment`. Each was first pushed on its own
 ### Settings structural (Phase 3.5 continued)
 - **`ca81005`** `refactor(settings): migrate SettingsPage hex colors to theme tokens` — 21 raw hexes in styled-components swapped to `theme.colors.*` (kept per-context to avoid breaking variant-switch plain-string returns).
 - **`734b57d`** `refactor(settings): swap delete-account modal to shared <Modal>` — replaced the local `Overlay`/`Backdrop`/`Modal`/`ModalTitle`/`ModalActions` wrappers with `<Modal open onClose title="Delete account?" size="sm">` + `<ModalFooter>`. Confirm is `<Button $variant="danger" $size="lg">`, cancel is `<Button $variant="secondary" $size="lg">`. Kept `ModalText`/`ModalInputWrap`/`ModalInput`/`ErrorText` as page-locals (form-state-specific shells).
+- **`69639df`** `refactor(settings): swap password + email modals to shared <Modal>` — same pattern applied to the other two modals. Password modal toggles title between `Change password`/`Set a password`/`Password updated` based on state; email modal cycles title across three steps (`verify`/`new`/`sent`). `hideClose={submitting}` replaces the old Backdrop onClick guard. 44px action buttons now use `<Button $size="lg">`; success-state "Done" uses `$fullWidth`. Dropped `Overlay`/`Backdrop`/local `Modal`/`ModalTitle`/`ModalActions` from the file entirely.
 
 **Still TBD for Phase 3.5** (not yet scheduled — await owner go-ahead):
-- Password-change modal → shared `<Modal>` + `<Button>` (form has current/new/confirm password fields with live validation).
-- Email-change modal → shared `<Modal>` + `<Button>` (form has new email + confirmation flow).
-- Local `Button` (5 variants: `primary`/`ghost`/`danger`/`dangerSolid`/`upgrade`, ~23 usages) — pixel-level differences from shared `Button $size="sm"` (local is 32/12/8, shared sm is 32/14/10), needs visual diff before swap.
-- `Section` wrappers → `<Accordion>` / `<Card>` per `migrations/SETTINGS_MIGRATION.md` (biggest structural win; deferred because each section has custom heading/subtitle/icon layout that must be audited).
+- Local `Button` (5 variants: `primary`/`ghost`/`danger`/`dangerSolid`/`upgrade`, ~23 usages inside settings sections). Shared `Button $size="sm"` is 32/14/12-radius while the local is 32/12/8-radius, and `dangerSolid` + `upgrade` don't have exact variant matches (closest: `accent` gradient for upgrade). Swapping needs a side-by-side screenshot pass and probably one new `$variant` added to shared `Button`.
+- `Section` wrappers → `<Accordion>` / `<Card>` per `migrations/SETTINGS_MIGRATION.md`. Each of the 6 sections currently has a custom header (icon + title + subtitle) and is always-expanded; the cleanest swap is `<Card $variant="subtle" $padding="lg">` (keeps always-expanded semantics) rather than `<Accordion>`. Deferred because header composition needs per-section review.
 
 ### Infra / dev tooling commits (unrelated to cleanup but on `design-experiment`)
 - `aa1498c` — original foundation dump (Polar billing, landing polish, initial dev feedback tool)
@@ -91,6 +90,7 @@ All pushed to `origin`. `design-experiment` is the integration branch; each phas
 - `radii-colors-cleanup` ← merged
 - `spacing-safe-cleanup` ← merged
 - `migrate-settings-structural` ← merged (delete-modal swap, `734b57d`)
+- `migrate-settings-modals` ← merged (password + email modals, `69639df`)
 - (pre-roadmap branches implied by commits above were merged inline, no standalone branches)
 
 Main is stable at `aa1498c` (nothing from this cleanup campaign has been promoted to `main` yet — per roadmap guardrail).
