@@ -1060,7 +1060,7 @@ const DashboardView: React.FC<{
   onEditWidget?: (widget: SavedWidget) => void;
 }> = ({ onNavigate, onCreateType, onEditWidget }) => {
   const navigate = useNavigate();
-  const { isRegistered, user } = useAuth();
+  const { isRegistered, user, isPro } = useAuth();
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -1084,7 +1084,7 @@ const DashboardView: React.FC<{
   return (
     <Container>
       <TopBar>
-        <PlanPill>Free</PlanPill>
+        <PlanPill $pro={isPro}>{isPro ? 'Pro' : 'Free'}</PlanPill>
         <AvatarCircle>{initials}</AvatarCircle>
       </TopBar>
 
