@@ -636,29 +636,7 @@ const MobileBuyPriceLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
-const MobileBuyBtn = styled.button<{ $added?: boolean }>`
-  flex: 1;
-  height: 48px;
-  border-radius: ${({ theme }) => theme.radii.button};
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  letter-spacing: -0.01em;
-  border: none;
-  transition: all ${({ theme }) => theme.transitions.base};
-  background: ${({ $added, theme }) => $added ? theme.colors.success : theme.colors.text.primary};
-  color: #fff;
-  text-decoration: none;
-
-  svg { width: 16px; height: 16px; }
-
-  &:active { transform: scale(0.98); }
-`;
+/* MobileBuyBtn replaced by shared <Button $variant="primary|success" $size="xl">. */
 
 /* ── Component ── */
 
@@ -887,26 +865,29 @@ export const TemplateDetailPage: React.FC = () => {
             <MobileBuyPriceLabel>one-time</MobileBuyPriceLabel>
           </MobileBuyPrice>
           {FEATURES.ENABLE_LOCAL_CHECKOUT && inCart ? (
-            <MobileBuyBtn $added onClick={() => removeItem(template.id)}>
+            <Button $variant="success" $size="xl" onClick={() => removeItem(template.id)} style={{ flex: 1 }}>
               <Check /> Added
-            </MobileBuyBtn>
+            </Button>
           ) : template.polarProductId && !isFree ? (
-            <MobileBuyBtn onClick={handleBuyNow} disabled={buying}>
+            <Button $variant="primary" $size="xl" onClick={handleBuyNow} disabled={buying} style={{ flex: 1 }}>
               {buying ? 'Opening…' : 'Buy Now'}
-            </MobileBuyBtn>
+            </Button>
           ) : template.etsyUrl ? (
-            <MobileBuyBtn
+            <Button
+              $variant="primary"
+              $size="xl"
               as="a"
               href={template.etsyUrl}
               target="_blank"
               rel="noopener noreferrer"
+              style={{ flex: 1 }}
             >
               {isFree ? 'Get for Free' : 'Buy on Etsy'}
-            </MobileBuyBtn>
+            </Button>
           ) : (
-            <MobileBuyBtn onClick={handleAddToCart}>
+            <Button $variant="primary" $size="xl" onClick={handleAddToCart} style={{ flex: 1 }}>
               {isFree ? 'Get for Free' : 'Add to Cart'}
-            </MobileBuyBtn>
+            </Button>
           )}
         </MobileBuyBar>
       )}
