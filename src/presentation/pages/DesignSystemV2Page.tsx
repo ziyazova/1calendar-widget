@@ -46,56 +46,62 @@ export const DesignSystemV2Page: React.FC = () => {
       {/* ─────── Buttons ─────── */}
       <Section>
         <SectionHeader>
-          <SectionTitle>Buttons</SectionTitle>
+          <SectionTitle>Variants</SectionTitle>
           <SectionMeta>
-            {ALL_VARIANTS.length} variants × {ALL_SIZES.length} sizes — from{' '}
-            <code>buttonTokens.ts</code>
+            {ALL_VARIANTS.length} variants — all shown at <code>md</code> (36px).
+            Source: <code>buttonTokens.ts</code>.
           </SectionMeta>
         </SectionHeader>
 
-        <Matrix>
-          <MatrixHead>
-            <MatrixCell />
-            {ALL_SIZES.map((s) => (
-              <MatrixCell key={s}>
-                <SizeLabel>{s}</SizeLabel>
-                <SizeMeta>
-                  {buttonSizeTokens[s].height} · {sizeUsage(s)}
-                </SizeMeta>
-              </MatrixCell>
-            ))}
-          </MatrixHead>
-
+        <VariantGallery>
           {ALL_VARIANTS.map((v) => (
-            <MatrixRow key={v}>
-              <VariantCell>
+            <VariantTile key={v}>
+              <Button $variant={v} $size="md">{v === 'link' ? 'link' : 'Button'}</Button>
+              <VariantTileMeta>
                 <VariantName>{v}</VariantName>
                 <VariantMeta>{variantBlurb(v)}</VariantMeta>
-              </VariantCell>
-              {ALL_SIZES.map((s) => (
-                <MatrixCell key={s}>
-                  <Button $variant={v} $size={s}>
-                    {v === 'link' ? 'link' : 'Button'}
-                  </Button>
-                </MatrixCell>
-              ))}
-            </MatrixRow>
+              </VariantTileMeta>
+            </VariantTile>
           ))}
-        </Matrix>
+        </VariantGallery>
+      </Section>
 
-        <SubSection>
-          <SubTitle>Options — icons · pill · icon-only · disabled</SubTitle>
-          <Row>
-            <Button $variant="primary" $size="md"><Plus /> Create</Button>
-            <Button $variant="upgrade" $size="md"><Sparkle /> Upgrade</Button>
-            <Button $variant="outline" $size="md">Continue <ArrowRight /></Button>
-            <Button $variant="accent" $size="md" $pill>pill</Button>
-            <Button $variant="outline" $size="md" $iconOnly aria-label="Copy"><Copy /></Button>
-            <Button $variant="secondary" $size="md" $iconOnly aria-label="Settings"><Settings /></Button>
-            <Button $variant="danger" $size="md" $iconOnly aria-label="Delete"><Trash2 /></Button>
-            <Button $variant="primary" $size="md" disabled>disabled</Button>
-          </Row>
-        </SubSection>
+      {/* ─────── Sizes ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Sizes</SectionTitle>
+          <SectionMeta>
+            {ALL_SIZES.length} sizes — all used in the app.
+          </SectionMeta>
+        </SectionHeader>
+        <Row>
+          {ALL_SIZES.map((s) => (
+            <SizeCol key={s}>
+              <Button $variant="primary" $size={s}>Button</Button>
+              <SizeCaption>
+                <b>{s}</b> · {buttonSizeTokens[s].height}
+                <br />
+                <small>{sizeUsage(s)}</small>
+              </SizeCaption>
+            </SizeCol>
+          ))}
+        </Row>
+      </Section>
+
+      {/* ─────── Options ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Options</SectionTitle>
+          <SectionMeta>Icons · pill · icon-only · disabled.</SectionMeta>
+        </SectionHeader>
+        <Row>
+          <Button $variant="primary" $size="md"><Plus /> Create</Button>
+          <Button $variant="outline" $size="md">Continue <ArrowRight /></Button>
+          <Button $variant="accent" $size="md" $pill>pill</Button>
+          <Button $variant="outline" $size="md" $iconOnly aria-label="Copy"><Copy /></Button>
+          <Button $variant="danger" $size="md" $iconOnly aria-label="Delete"><Trash2 /></Button>
+          <Button $variant="primary" $size="md" disabled>disabled</Button>
+        </Row>
       </Section>
 
       {/* ─────── Patterns ─────── */}
@@ -685,42 +691,25 @@ const SegmentItem = styled.button<{ $active?: boolean }>`
   }
 `;
 
-/* ── Variant × size matrix ── */
+/* ── Variant gallery (clean grid of one-per-variant buttons) ── */
 
-const Matrix = styled.div`
+const VariantGallery = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+`;
+
+const VariantTile = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  gap: 10px;
+  padding: 20px 18px;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 16px;
-  overflow-x: auto;
+  border-radius: 12px;
 `;
 
-const MatrixHead = styled.div`
-  display: grid;
-  grid-template-columns: 180px repeat(5, minmax(140px, 1fr));
-  gap: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
-`;
-
-const MatrixRow = styled.div`
-  display: grid;
-  grid-template-columns: 180px repeat(5, minmax(140px, 1fr));
-  gap: 16px;
-  align-items: center;
-`;
-
-const MatrixCell = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 60px;
-`;
-
-const VariantCell = styled.div`
+const VariantTileMeta = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -728,27 +717,40 @@ const VariantCell = styled.div`
 
 const VariantName = styled.div`
   font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const VariantMeta = styled.div`
   font-size: 11px;
+  line-height: 1.4;
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
-const SizeLabel = styled.div`
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
+/* ── Size column (button + caption stacked) ── */
+
+const SizeCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
 `;
 
-const SizeMeta = styled.div`
-  font-size: 10px;
+const SizeCaption = styled.div`
+  font-size: 11px;
+  line-height: 1.4;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  font-family: ui-monospace, SFMono-Regular, monospace;
+
+  b {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-weight: 600;
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  small {
+    font-size: 10px;
+  }
 `;
 
 /* ── Tips ── */
