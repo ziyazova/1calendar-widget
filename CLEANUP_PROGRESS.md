@@ -4,7 +4,7 @@
 
 **Repo:** `https://github.com/ziyazova/1calendar-widget`
 **Working branch:** `design-experiment` (never push to `main`)
-**Updated:** 2026-04-21 (after Phase 3.2 — auth pages merged)
+**Updated:** 2026-04-21 (after Phase 3.2 / 3.5 / 3.6 / 3.8 — paused before 3.9 StudioPage per roadmap guardrail)
 
 ---
 
@@ -20,14 +20,14 @@
 | **3.2 Verify + Reset** (no SignupPage — signup lives inside LoginPage) | `migrate-auth-pages` | ✅ merged | `70327ee` + dedupe `382f465` |
 | **3.3 TemplatesPage** | `migrate-templates` | ✅ merged | `5fab668` |
 | **3.4 TemplateDetailPage** | `migrate-template-detail` | ✅ merged | `77b802a` + fix `a3c548e` |
-| **3.5 SettingsPage** | `migrate-settings` | ⏳ **next** | — |
-| **3.6 CheckoutPage** | `migrate-checkout` | ⏳ | — |
+| **3.5 SettingsPage** | `migrate-settings` | ✅ merged (partial — colors only; structural Accordion/Card/Button conversion TBD) | `ca81005` |
+| **3.6 CheckoutPage** | `migrate-checkout` | ✅ merged | `a22b7ca` |
 | **3.7 DesignSystemPage** | `migrate-design-system` | ⏸ **deferred** by owner — not touching `/dev` for now | — |
-| **3.8 LandingPage** | `migrate-landing` | ⏳ | — |
-| **3.9 StudioPage + WidgetStudioPage** | `migrate-studio` | ⏳ **MOST RISKY — design review first** | — |
+| **3.8 LandingPage** | `migrate-landing` | ✅ merged | `e68c5e5` |
+| **3.9 StudioPage + WidgetStudioPage** | `migrate-studio` | ⏸ **PAUSED — roadmap requires design review before touching live editor** | — |
 | **4. Final polish** | — | ⏳ after all pages | — |
 
-`origin/design-experiment` HEAD is `382f465` as of this report.
+`origin/design-experiment` HEAD is `e68c5e5` as of this report. Seven pages migrated (Login, Verify, Reset, Templates, TemplateDetail, Settings-colors, Checkout, Landing). Only `/dev` (deferred) and `/studio` + `/widgets` (paused) remain.
 
 ---
 
