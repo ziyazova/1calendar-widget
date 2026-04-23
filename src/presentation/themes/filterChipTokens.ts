@@ -69,6 +69,22 @@ export const filterChipSize = {
 } as const;
 
 /* ────────────────────────────────────────────────────────────────
+   SHAPE — choose per use-site via <FilterChip $shape="rect"|"pill">.
+     rect  — rounded square (default). Use when chips sit in a toolbar /
+             filter row inside a card; reads as a disclosed group.
+     pill  — fully pill-rounded. Use when chips float on bare canvas or
+             need a softer "Notion-embed" feel. Same height, same palette.
+   Single source — edit here, every FilterChip call-site follows.
+   ──────────────────────────────────────────────────────────────── */
+
+export type FilterChipShape = 'rect' | 'pill';
+
+export const filterChipShape: Record<FilterChipShape, string> = {
+  rect: '10px',
+  pill: '999px',
+};
+
+/* ────────────────────────────────────────────────────────────────
    MOTION
    ──────────────────────────────────────────────────────────────── */
 

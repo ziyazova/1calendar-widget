@@ -1,12 +1,33 @@
 export { Container } from './Container';
 export { Footer } from './Footer';
 export { FilterChip, FilterRow } from './FilterChip';
+export { Segment, SegmentGroup } from './Segment';
+export {
+  AccountPillWrap,
+  AccountPill,
+  PeachAvatar,
+  PillChevron,
+  AccountDropdown,
+  DropdownUserRow,
+  DropdownUserText,
+  DropdownName,
+  DropdownEmail,
+  DropdownDivider,
+  DropdownSpacer,
+  DropdownMenuGroup,
+  ProPlanRow,
+  ProPlanLabel,
+  ProManageLink,
+  UpgradeInner,
+  UpgradePrice,
+} from './AccountMenu';
 export { BackButton } from './BackButton';
 export { SectionHeader } from './SectionHeader';
 export { PageWrapper } from './PageWrapper';
 export { Button, PrimaryButton, SecondaryButton } from './Button';
 export { PageTransition } from './PageTransition';
 export {
+  Label,
   ProPill,
   NewPill,
   FreePill,
@@ -26,6 +47,7 @@ export {
   BADGE_ROSE_TEXT,
   badgeBase,
 } from './Badges';
+export type { LabelVariant, LabelSize } from './Badges';
 export { Card, CardHeader, CardTitle, CardSubtitle, CardSection } from './Card';
 export { Modal, ModalFooter } from './Modal';
 export { BottomSheet } from './BottomSheet';

@@ -2,7 +2,9 @@ import styled from 'styled-components';
 import {
   filterChipTokens,
   filterChipSize,
+  filterChipShape,
   filterChipTransition,
+  FilterChipShape,
 } from '../../themes/filterChipTokens';
 
 export const FilterRow = styled.div`
@@ -13,6 +15,7 @@ export const FilterRow = styled.div`
 
 interface FilterChipProps {
   $active: boolean;
+  $shape?: FilterChipShape;
 }
 
 export const FilterChip = styled.button<FilterChipProps>`
@@ -26,7 +29,7 @@ export const FilterChip = styled.button<FilterChipProps>`
   height: ${filterChipSize.height};
   padding: ${filterChipSize.padding};
   font-size: ${filterChipSize.fontSize};
-  border-radius: ${filterChipSize.radius};
+  border-radius: ${({ $shape = 'rect' }) => filterChipShape[$shape]};
 
   ${({ $active }) => {
     const state = $active ? filterChipTokens.active : filterChipTokens.inactive;

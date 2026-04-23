@@ -112,6 +112,7 @@ export const theme = {
       templateCard: 'linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%)',
       glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)',
       avatar: 'linear-gradient(135deg, #EDE4FF, #E0E8FF)',
+      avatarPeach: 'linear-gradient(135deg, #FFD4BE 0%, #FDB8AE 45%, #F8A2B0 100%)',
     },
 
     // Shadows that reference brand color (for accent buttons)
@@ -126,6 +127,10 @@ export const theme = {
     successShadow: {
       md: '0 2px 8px rgba(34, 197, 94, 0.3)',
     },
+    avatarPeachShadow:
+      'inset 0 1px 0 rgba(255, 255, 255, 0.45), ' +
+      '0 1px 2px rgba(180, 100, 140, 0.2), ' +
+      '0 2px 10px rgba(180, 100, 140, 0.22)',
   },
 
   // Typography

@@ -54,9 +54,11 @@ export type ButtonVariant =
   | 'primary'
   | 'accent'
   | 'upgrade'
+  | 'slate'
   | 'secondary'
   | 'outline'
   | 'ghost'
+  | 'ghostDanger'
   | 'danger'
   | 'dangerStrong'
   | 'success'
@@ -188,6 +190,25 @@ const upgrade: ButtonVariantTokens = {
   },
 };
 
+const slate: ButtonVariantTokens = {
+  base: {
+    bg: 'linear-gradient(135deg, #3384F4, #5BA0F7)',
+    fg: '#ffffff',
+    shadow: '0 2px 8px rgba(51, 132, 244, 0.3)',
+    fontWeight: 600,
+  },
+  hover: {
+    bg: 'linear-gradient(135deg, #2876E8 0%, #4A93F3 100%)',
+    transform: 'translateY(-0.5px)',
+    shadow: '0 4px 14px rgba(51, 132, 244, 0.4)',
+  },
+  active: {
+    bg: 'linear-gradient(135deg, #1D68DC 0%, #3A86EF 100%)',
+    transform: 'translateY(0)',
+    shadow: '0 1px 2px rgba(51, 132, 244, 0.25)',
+  },
+};
+
 /** Secondary — Notion-style paper gradient + hairline border + inset top highlight. */
 const secondary: ButtonVariantTokens = {
   base: {
@@ -239,6 +260,20 @@ const ghost: ButtonVariantTokens = {
   },
   active: {
     bg: 'rgba(0, 0, 0, 0.06)',
+  },
+};
+
+const ghostDanger: ButtonVariantTokens = {
+  base: {
+    bg: 'transparent',
+    fg: '#DC2828',
+  },
+  hover: {
+    bg: 'rgba(220, 38, 38, 0.08)',
+    fg: '#DC2828',
+  },
+  active: {
+    bg: 'rgba(220, 38, 38, 0.12)',
   },
 };
 
@@ -314,9 +349,11 @@ export const buttonVariantTokens: Record<ButtonVariant, ButtonVariantTokens> = {
   primary,
   accent,
   upgrade,
+  slate,
   secondary,
   outline,
   ghost,
+  ghostDanger,
   danger,
   dangerStrong,
   success,
@@ -325,7 +362,7 @@ export const buttonVariantTokens: Record<ButtonVariant, ButtonVariantTokens> = {
 
 /** Variants that deserve font-weight: 600 even if not set per-variant. */
 export const emphasisVariants: ReadonlySet<ButtonVariant> = new Set<ButtonVariant>([
-  'primary', 'accent', 'success',
+  'primary', 'accent', 'slate', 'success',
 ]);
 
 /* ────────────────────────────────────────────────────────────────

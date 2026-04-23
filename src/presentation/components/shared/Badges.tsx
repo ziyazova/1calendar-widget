@@ -1,135 +1,124 @@
 import styled from 'styled-components';
+import {
+  labelVariantTokens,
+  labelSizeTokens,
+  labelLetterSpacing,
+  labelTransition,
+  planBadgeTokens,
+  LabelVariant,
+  LabelSize,
+} from '../../themes/labelTokens';
 
-/*
-  Unified badge system — single source of truth for tier/state labels
-  (Pro / New / Free / Limited / Popular / Plan).
+export type { LabelVariant, LabelSize };
 
-  Rationale (mirrors the original DS commentary):
-  • One geometry for every badge — same radius, height, padding, type.
-  • Two color families: brand accent (purple) and ink-neutral.
-  • Visual differentiation comes from *texture* not more colors:
-    leading dots, subtle outlines, gentle gradients.
-  • No aggressive solid fills. The loudest variant is a soft-accent
-    solid with hairline inner highlight, used at most once per screen.
-*/
+function baseCss(size: LabelSize) {
+  const s = labelSizeTokens[size];
+  return `
+    display: inline-flex;
+    align-items: center;
+    gap: ${s.gap};
+    height: ${s.height};
+    padding: ${s.padding};
+    border-radius: ${s.radius};
+    font-size: ${s.fontSize};
+    font-weight: ${s.fontWeight};
+    letter-spacing: ${labelLetterSpacing};
+    line-height: 1;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: ${labelTransition};
 
-// Brand accent — project's #6366F1 (softer than #6366F1 vivid).
-export const BADGE_ACCENT = '#6366F1';
-export const BADGE_ACCENT_SOFT_BG = 'rgba(110, 127, 242, 0.1)';
-export const BADGE_ACCENT_TEXT = '#4F57C9';
+    svg { width: ${s.iconSize}; height: ${s.iconSize}; }
+  `;
+}
 
-// Ink-neutral.
-export const BADGE_NEUTRAL_BG = 'rgba(31, 31, 31, 0.05)';
-export const BADGE_NEUTRAL_FG = '#4A433D';
-export const BADGE_OUTLINE = 'rgba(31, 31, 31, 0.12)';
-
-// Sage (Free / non-pro plan).
-export const BADGE_SAGE_BG = 'rgba(102, 168, 92, 0.14)';
-export const BADGE_SAGE_TEXT = '#3E7A2F';
-
-// Rose (New).
-export const BADGE_ROSE_BG = 'rgba(232, 155, 155, 0.16)';
-export const BADGE_ROSE_TEXT = '#A85B5B';
-
-export const badgeBase = `
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 14px;
-  height: 28px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  text-transform: uppercase;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  transition: background 0.15s ease, border-color 0.15s ease;
-
-  svg { width: 12px; height: 12px; }
-`;
-
-// Leading dot — small visual rhythm marker for tinted variants.
-const dotBefore = `
-  &::before {
-    content: '';
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-    opacity: 0.7;
+function variantCss(variant: LabelVariant) {
+  const v = labelVariantTokens[variant];
+  const parts = [
+    `background: ${v.bg};`,
+    `color: ${v.fg};`,
+  ];
+  if (v.border) parts.push(`border: ${v.border};`);
+  if (v.shadow) parts.push(`box-shadow: ${v.shadow};`);
+  if (v.dot) {
+    parts.push(`
+      &::before {
+        content: '';
+        width: ${labelSizeTokens.md.dotSize};
+        height: ${labelSizeTokens.md.dotSize};
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+        opacity: 0.7;
+      }
+    `);
   }
+  return parts.join('\n');
+}
+
+/** Generic label — pick any variant from the token system. */
+export const Label = styled.span<{ $variant?: LabelVariant; $size?: LabelSize }>`
+  ${({ $size = 'md' }) => baseCss($size)}
+  ${({ $variant = 'neutral' }) => variantCss($variant)}
 `;
 
-/* Premium tier — accent tint, no dot (cleanest). "This is premium." */
-export const ProPill = styled.span`
-  ${badgeBase}
-  background: ${BADGE_ACCENT_SOFT_BG};
-  color: ${BADGE_ACCENT_TEXT};
-`;
+/* Named shortcuts — semantic wrappers for the variants used across the app. */
 
-/* One-per-screen highlight — minimal solid accent fill + white text.
-   Positioned absolute top-right by default (matches the pricing-card usage);
-   override via inline style when needed. */
-export const PopularPill = styled.span`
-  ${badgeBase}
+export const ProPill = styled(Label).attrs({ $variant: 'pro' as const })``;
+
+export const FreePill = styled(Label).attrs({ $variant: 'free' as const })``;
+
+export const NewPill = styled(Label).attrs({ $variant: 'new' as const })``;
+
+export const LimitedPill = styled(Label).attrs({ $variant: 'limited' as const })``;
+
+export const PopularPill = styled(Label).attrs({ $variant: 'popular' as const })`
   position: absolute;
   top: 12px;
   right: 12px;
-  background: ${BADGE_ACCENT};
-  color: #fff;
 `;
 
-/* Recently added — rose tint. Different hue from Pro so "new" reads as
-   fresh/warm, not premium/gated. */
-export const NewPill = styled.span`
-  ${badgeBase}
-  ${dotBefore}
-  background: ${BADGE_ROSE_BG};
-  color: ${BADGE_ROSE_TEXT};
-`;
-
-/* Limited — slate-blue tint. Fourth hue; calm, archival feel — suits
-   "limited edition / ending soon" without urgency-orange. */
-export const LimitedPill = styled.span`
-  ${badgeBase}
-  ${dotBefore}
-  background: rgba(143, 166, 200, 0.16);
-  color: #556B8C;
-`;
-
-/* Free — pleasant regular green. Muted enough to feel calm. */
-export const FreePill = styled.span`
-  ${badgeBase}
-  background: ${BADGE_SAGE_BG};
-  color: ${BADGE_SAGE_TEXT};
-`;
-
-/* Plan indicator — Pro uses accent tint, Free uses sage.
-   Shared language across tier badges. */
+/* Plan indicator — Pro tints accent, Free tints sage. */
 export const PlanPill = styled.span<{ $pro?: boolean }>`
-  ${badgeBase}
-  background: ${({ $pro }) => ($pro ? BADGE_ACCENT_SOFT_BG : BADGE_SAGE_BG)};
-  color: ${({ $pro }) => ($pro ? BADGE_ACCENT_TEXT : BADGE_SAGE_TEXT)};
+  ${baseCss('md')}
+  ${({ $pro }) => variantCss($pro ? 'pro' : 'free')}
 `;
 
-/* Compact plan badge — smaller (22px), bolder (gradient fill on Pro, neutral gray on Free).
-   Used inside cards (Settings profile card, avatar-dropdown Pro status row) where PlanPill
-   would read too large. Visually distinct from PlanPill — it's a chip inside a compound row,
-   not a standalone indicator. */
+/* Compact plan badge — smaller (22px), gradient Pro fill, neutral Free. */
 export const PlanBadge = styled.span<{ $pro?: boolean }>`
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  height: ${labelSizeTokens.sm.height};
+  padding: ${labelSizeTokens.sm.padding};
+  border-radius: ${labelSizeTokens.sm.radius};
+  font-size: ${labelSizeTokens.sm.fontSize};
+  font-weight: ${labelSizeTokens.sm.fontWeight};
+  letter-spacing: ${labelLetterSpacing};
   text-transform: uppercase;
-  ${({ $pro }) => $pro
-    ? `color: #fff; background: linear-gradient(135deg, #6366F1, #818CF8); border: none; box-shadow: 0 1px 4px rgba(99,102,241,0.25);`
-    : `color: #6E6E73; background: #F2F2EF; border: 1px solid rgba(0, 0, 0, 0.04);`}
+
+  ${({ $pro }) => {
+    const t = $pro ? planBadgeTokens.pro : planBadgeTokens.free;
+    return `
+      background: ${t.bg};
+      color: ${t.fg};
+      border: ${t.border};
+      box-shadow: ${t.shadow};
+    `;
+  }}
 `;
+
+/* ── Legacy constants — re-exported for call-sites that still reference them. ── */
+
+export const BADGE_ACCENT = '#6366F1';
+export const BADGE_ACCENT_SOFT_BG = labelVariantTokens.pro.bg;
+export const BADGE_ACCENT_TEXT = labelVariantTokens.pro.fg;
+export const BADGE_NEUTRAL_BG = labelVariantTokens.neutral.bg;
+export const BADGE_NEUTRAL_FG = labelVariantTokens.neutral.fg;
+export const BADGE_OUTLINE = 'rgba(31, 31, 31, 0.12)';
+export const BADGE_SAGE_BG = labelVariantTokens.free.bg;
+export const BADGE_SAGE_TEXT = labelVariantTokens.free.fg;
+export const BADGE_ROSE_BG = labelVariantTokens.new.bg;
+export const BADGE_ROSE_TEXT = labelVariantTokens.new.fg;
+
+export const badgeBase = baseCss('md');
