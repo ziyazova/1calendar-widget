@@ -66,6 +66,44 @@ import { BigFooter } from '../components/landing/BigFooter';
 const ALL_VARIANTS: ButtonVariant[] = Object.keys(buttonVariantTokens) as ButtonVariant[];
 const ALL_SIZES: ButtonSize[] = Object.keys(buttonSizeTokens) as ButtonSize[];
 
+/* Mirror of `theme.typography.sizes` used by the Typography showcase.
+   Kept here so the DS reads the same order as the token file. */
+const TYPOGRAPHY_SIZES: Record<string, string> = {
+  '2xs': '10px',
+  xs: '11px',
+  sm: '12px',
+  md: '13px',
+  base: '14px',
+  lg: '15px',
+  xl: '16px',
+  '2xl': '18px',
+  '3xl': '20px',
+  '4xl': '22px',
+  '5xl': '26px',
+  '6xl': '28px',
+  '7xl': '32px',
+  '8xl': '40px',
+};
+
+/* What each size is actually used for in the app — sourced from the
+   inline comments in `theme.ts`. */
+const TYPOGRAPHY_USAGE: Record<string, string> = {
+  '2xs': 'CardBadge · MobileSectionTab',
+  xs: 'Pro pill · OverlayBadge',
+  sm: 'captions · muted labels',
+  md: 'small body · buttons · filter chips',
+  base: 'default body · CTA label',
+  lg: 'emphasised body · SectionTitle sm',
+  xl: 'link text · navbar items',
+  '2xl': 'section headlines',
+  '3xl': 'SectionTitle',
+  '4xl': 'large section',
+  '5xl': 'mobile page title',
+  '6xl': 'welcome h1',
+  '7xl': 'hero · page title',
+  '8xl': 'landing hero',
+};
+
 export const DesignSystemV2Page: React.FC = () => {
   const [filter, setFilter] = useState<string>('all');
 
@@ -79,6 +117,85 @@ export const DesignSystemV2Page: React.FC = () => {
           Edit a token → this page and every use-site update together.
         </Lead>
       </Hero>
+
+      {/* ─────── Typography ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Typography</SectionTitle>
+          <SectionMeta>
+            Type scale, fonts, and weights — all driven by <code>theme.typography.*</code>.
+            Use the token name (e.g. <code>theme.typography.sizes.base</code>) instead
+            of raw <code>px</code> values so a global bump stays one line.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SubTitle>Fonts</SubTitle>
+        <FontFamilyRow>
+          <FontFamilyTile>
+            <FontFamilyName>primary</FontFamilyName>
+            <FontFamilyStack>Inter · system fallback</FontFamilyStack>
+            <FontFamilySample $mono={false}>
+              The quick brown fox jumps over the lazy dog · 1234567890
+            </FontFamilySample>
+          </FontFamilyTile>
+          <FontFamilyTile>
+            <FontFamilyName>mono</FontFamilyName>
+            <FontFamilyStack>JetBrains Mono · system fallback</FontFamilyStack>
+            <FontFamilySample $mono>
+              const tokens = theme.typography; // 0O1Il
+            </FontFamilySample>
+          </FontFamilyTile>
+        </FontFamilyRow>
+
+        <SubTitle style={{ marginTop: 32 }}>Size scale</SubTitle>
+        <TypeScaleTable>
+          {(Object.entries(TYPOGRAPHY_SIZES) as [string, string][]).map(([name, px]) => (
+            <TypeScaleRow key={name}>
+              <TypeScaleName>{name}</TypeScaleName>
+              <TypeScaleValue>{px}</TypeScaleValue>
+              <TypeScaleSample style={{ fontSize: px }}>
+                The quick brown fox
+              </TypeScaleSample>
+              <TypeScaleUsage>{TYPOGRAPHY_USAGE[name] ?? ''}</TypeScaleUsage>
+            </TypeScaleRow>
+          ))}
+        </TypeScaleTable>
+
+        <SubTitle style={{ marginTop: 32 }}>Weights</SubTitle>
+        <WeightRow>
+          {([
+            { name: 'normal', weight: 400 },
+            { name: 'medium', weight: 500 },
+            { name: 'semibold', weight: 600 },
+            { name: 'bold', weight: 700 },
+          ] as const).map((w) => (
+            <WeightTile key={w.name}>
+              <WeightSample style={{ fontWeight: w.weight }}>Ag</WeightSample>
+              <WeightName>{w.name}</WeightName>
+              <WeightValue>{w.weight}</WeightValue>
+            </WeightTile>
+          ))}
+        </WeightRow>
+
+        <SubTitle style={{ marginTop: 32 }}>Line heights</SubTitle>
+        <LineHeightRow>
+          {([
+            { name: 'tight', value: 1.2 },
+            { name: 'snug', value: 1.3 },
+            { name: 'normal', value: 1.5 },
+            { name: 'relaxed', value: 1.6 },
+          ] as const).map((lh) => (
+            <LineHeightTile key={lh.name}>
+              <LineHeightName>{lh.name} · {lh.value}</LineHeightName>
+              <LineHeightSample style={{ lineHeight: lh.value }}>
+                Line one of sample text.<br />
+                Line two shows the vertical rhythm of this line-height token
+                when wrapped across multiple lines.
+              </LineHeightSample>
+            </LineHeightTile>
+          ))}
+        </LineHeightRow>
+      </Section>
 
       {/* ─────── Buttons ─────── */}
       <Section>
@@ -667,6 +784,155 @@ const SectionTitle = styled.h2`
   letter-spacing: 0.1em;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 6px;
+`;
+
+/* ── Typography showcase ──
+   Reads live from theme.typography so a token change updates the page
+   without editing this file. */
+const FontFamilyRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+`;
+
+const FontFamilyTile = styled.div`
+  padding: 20px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 14px;
+`;
+
+const FontFamilyName = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: 0;
+`;
+
+const FontFamilyStack = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 4px 0 16px;
+`;
+
+const FontFamilySample = styled.div<{ $mono: boolean }>`
+  font-family: ${({ $mono, theme }) =>
+    $mono ? theme.typography.fonts.mono : theme.typography.fonts.primary};
+  font-size: 18px;
+  color: ${({ theme }) => theme.colors.text.primary};
+  line-height: 1.4;
+  letter-spacing: ${({ $mono }) => ($mono ? '0' : '-0.01em')};
+`;
+
+const TypeScaleTable = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const TypeScaleRow = styled.div`
+  display: grid;
+  grid-template-columns: 72px 72px minmax(0, 1fr) 260px;
+  align-items: baseline;
+  gap: 20px;
+  padding: 14px 0;
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
+
+  &:first-child {
+    border-top: none;
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 64px 64px minmax(0, 1fr);
+    & > :nth-child(4) { display: none; }
+  }
+`;
+
+const TypeScaleName = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.body};
+`;
+
+const TypeScaleValue = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+`;
+
+const TypeScaleSample = styled.div`
+  color: ${({ theme }) => theme.colors.text.primary};
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const TypeScaleUsage = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  font-style: italic;
+`;
+
+const WeightRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+`;
+
+const WeightTile = styled.div`
+  padding: 18px 16px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 14px;
+  text-align: center;
+`;
+
+const WeightSample = styled.div`
+  font-size: 40px;
+  line-height: 1;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+`;
+
+const WeightName = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.body};
+`;
+
+const WeightValue = styled.div`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin-top: 2px;
+`;
+
+const LineHeightRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+`;
+
+const LineHeightTile = styled.div`
+  padding: 16px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 14px;
+`;
+
+const LineHeightName = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.body};
+  margin-bottom: 10px;
+`;
+
+const LineHeightSample = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.01em;
 `;
 
 /* Sub-section label inside a Section — e.g. "BigFooter — primary",
