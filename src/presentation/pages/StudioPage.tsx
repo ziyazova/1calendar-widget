@@ -450,6 +450,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editingWidgetName, setEditingWidgetName] = useState<string>('');
   const [editorOpen, setEditorOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedWidgetId, setCopiedWidgetId] = useState<string | null>(null);
   const [studioZoom, setStudioZoom] = useState(1.2);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const lastSavedRef = useRef<string>('');
@@ -1082,6 +1083,23 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       <WidgetName>{w.name}</WidgetName>
                       <WidgetActions>
                         <SharedButton $variant="outline" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
+                        <SharedButton
+                          $variant="outline"
+                          $size="sm"
+                          $iconOnly
+                          aria-label={copiedWidgetId === w.id ? 'Copied' : 'Copy embed URL'}
+                          title={copiedWidgetId === w.id ? 'Copied!' : 'Copy embed URL'}
+                          onClick={() => {
+                            if (w.embed_url) {
+                              navigator.clipboard.writeText(w.embed_url).then(() => {
+                                setCopiedWidgetId(w.id);
+                                setTimeout(() => setCopiedWidgetId(null), 2000);
+                              });
+                            }
+                          }}
+                        >
+                          {copiedWidgetId === w.id ? <Check /> : <Copy />}
+                        </SharedButton>
                         <SharedButton $variant="danger" $size="sm" onClick={() => handleDelete(w.id)}><Trash2 /></SharedButton>
                       </WidgetActions>
                     </WidgetBottom>
