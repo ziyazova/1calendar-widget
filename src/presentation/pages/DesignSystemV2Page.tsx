@@ -417,40 +417,89 @@ export const DesignSystemV2Page: React.FC = () => {
         <SectionHeader>
           <SectionTitle>Template mockup cards</SectionTitle>
           <SectionMeta>
-            Single primitive (<code>shared/TemplateMockupCard.tsx</code>) for every place
-            we show a product mockup on a cloudy backdrop: landing marquee, /templates grid,
-            /templates/:id carousel, and the Related rail. Size presets live in
-            <code> themes/templateCardTokens.ts</code>.
+            Single primitive for every product mockup on a cloudy backdrop. Pick a size
+            preset by <em>placement</em> — don't invent new ones. All four share the same
+            gradient, border, and shadow; only aspect, image scale, and drop-shadow change.
+            <br /><br />
+            Files: <code>shared/TemplateMockupCard.tsx</code> · <code>themes/templateCardTokens.ts</code>.
           </SectionMeta>
         </SectionHeader>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
-          <div>
-            <SubTitle style={{ marginBottom: 8 }}>grid</SubTitle>
+        {/* grid — /templates page */}
+        <MockupRow>
+          <MockupMeta>
+            <MockupName>grid</MockupName>
+            <MockupWhere>Used on <code>/templates</code> (3-column catalog)</MockupWhere>
+            <MockupProps>288 / 228 · 80% image · radius 2xl · $interactive</MockupProps>
+            <MockupCode>{`<TemplateMockupCard $size="grid" $interactive>
+  <TemplateMockupImage $size="grid" src={t.image} />
+</TemplateMockupCard>`}</MockupCode>
+          </MockupMeta>
+          <MockupPreview style={{ maxWidth: 260 }}>
             <TemplateMockupCard $size="grid" $interactive>
               <TemplateMockupImage $size="grid" src="/template-main.png" alt="Grid card" />
             </TemplateMockupCard>
-          </div>
-          <div>
-            <SubTitle style={{ marginBottom: 8 }}>marquee</SubTitle>
+          </MockupPreview>
+        </MockupRow>
+
+        {/* marquee — landing Top templates */}
+        <MockupRow>
+          <MockupMeta>
+            <MockupName>marquee</MockupName>
+            <MockupWhere>Landing "Top templates" horizontal scroller</MockupWhere>
+            <MockupProps>288 / 220 · 80% image · tight drop-shadow · $interactive</MockupProps>
+            <MockupCode>{`<TemplateMockupCard $size="marquee" $interactive>
+  <TemplateMockupImage $size="marquee" src={t.image} />
+</TemplateMockupCard>`}</MockupCode>
+          </MockupMeta>
+          <MockupPreview style={{ maxWidth: 280 }}>
             <TemplateMockupCard $size="marquee" $interactive>
               <TemplateMockupImage $size="marquee" src="/template-main.png" alt="Marquee card" />
             </TemplateMockupCard>
-          </div>
-          <div>
-            <SubTitle style={{ marginBottom: 8 }}>thumb (Related rail)</SubTitle>
+          </MockupPreview>
+        </MockupRow>
+
+        {/* thumb — Related rail */}
+        <MockupRow>
+          <MockupMeta>
+            <MockupName>thumb</MockupName>
+            <MockupWhere>Related templates rail on <code>/templates/:id</code></MockupWhere>
+            <MockupProps>35 / 24 · fixed 140px width · radius md</MockupProps>
+            <MockupCode>{`<div style={{ width: 140 }}>
+  <TemplateMockupCard $size="thumb" $interactive>
+    <TemplateMockupImage $size="thumb" src={r.image} />
+  </TemplateMockupCard>
+</div>`}</MockupCode>
+          </MockupMeta>
+          <MockupPreview>
             <div style={{ width: 140 }}>
               <TemplateMockupCard $size="thumb" $interactive>
                 <TemplateMockupImage $size="thumb" src="/template-main.png" alt="Thumb" />
               </TemplateMockupCard>
             </div>
-          </div>
-        </div>
+          </MockupPreview>
+        </MockupRow>
 
-        <SubTitle style={{ marginTop: 24 }}>hero (carousel) — $hoverZoom=false</SubTitle>
-        <TemplateMockupCard $size="hero">
-          <TemplateMockupImage $size="hero" $hoverZoom={false} src="/template-main.png" alt="Hero slide" />
-        </TemplateMockupCard>
+        {/* hero — carousel on detail page */}
+        <MockupRow>
+          <MockupMeta>
+            <MockupName>hero</MockupName>
+            <MockupWhere>Big carousel slide on <code>/templates/:id</code></MockupWhere>
+            <MockupProps>560 / 380 · 70% image · loose drop-shadow · $hoverZoom=false</MockupProps>
+            <MockupCode>{`<TemplateMockupCard $size="hero">
+  <TemplateMockupImage
+    $size="hero"
+    $hoverZoom={false}
+    src={t.image}
+  />
+</TemplateMockupCard>`}</MockupCode>
+          </MockupMeta>
+          <MockupPreview style={{ maxWidth: 420 }}>
+            <TemplateMockupCard $size="hero">
+              <TemplateMockupImage $size="hero" $hoverZoom={false} src="/template-main.png" alt="Hero slide" />
+            </TemplateMockupCard>
+          </MockupPreview>
+        </MockupRow>
       </Section>
 
       {/* ─────── How to edit ─────── */}
@@ -713,6 +762,85 @@ const SubTitle = styled.h3`
   letter-spacing: 0.08em;
   color: ${({ theme }) => theme.colors.text.body};
   margin: 0 0 10px;
+`;
+
+/* ── Template mockup documentation rows ──
+   Each row is "what / where / props / code" on the left, visual preview
+   on the right. Collapses vertically on narrow viewports. */
+const MockupRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 440px);
+  gap: 28px;
+  align-items: start;
+  padding: 20px 0;
+
+  & + & {
+    border-top: 1px solid ${({ theme }) => theme.colors.border.light};
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const MockupMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+`;
+
+const MockupName = styled.h3`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 15px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0;
+  letter-spacing: -0.01em;
+`;
+
+const MockupWhere = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.body};
+  line-height: 1.5;
+
+  code {
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    border: 1px solid ${({ theme }) => theme.colors.border.light};
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-size: 12px;
+  }
+`;
+
+const MockupProps = styled.div`
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  letter-spacing: 0;
+`;
+
+const MockupCode = styled.pre`
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 8px;
+  font-family: ${({ theme }) => theme.typography.fonts.mono};
+  font-size: 12px;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.text.primary};
+  white-space: pre;
+  overflow-x: auto;
+`;
+
+const MockupPreview = styled.div`
+  width: 100%;
+  justify-self: end;
+
+  @media (max-width: 860px) {
+    justify-self: start;
+  }
 `;
 
 const SectionMeta = styled.div`
