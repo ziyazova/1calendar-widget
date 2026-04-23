@@ -5,6 +5,8 @@ export { Segment, SegmentGroup } from './Segment';
 export { GoogleIcon } from './GoogleIcon';
 export { Switch, ToggleTabs, ToggleRow, ToggleLabel, HiddenCheckbox } from './Toggle';
 export { Input, InputRow, InputLabel } from './Input';
+export { FormField } from './FormField';
+export type { InputSize, InputState } from './FormField';
 export {
   AccountPillWrap,
   AccountPill,

@@ -28,13 +28,14 @@ import {
   ToggleRow,
   ToggleLabel,
   Input,
+  FormField,
 } from '../components/shared';
 import { labelVariantTokens } from '../themes/labelTokens';
 import type { LabelVariant } from '../components/shared';
 import {
   Plus, Trash2, Copy, ArrowRight,
   Settings, Sparkles,
-  LogOut, Home,
+  LogOut, Home, Mail, Lock, Eye, EyeOff, Check,
 } from 'lucide-react';
 import {
   buttonVariantTokens,
@@ -398,8 +399,9 @@ const FormControlsDemo: React.FC = () => {
   const [dayGrid, setDayGrid] = useState(true);
   const [weekStart, setWeekStart] = useState<'monday' | 'sunday'>('monday');
   const [urlText, setUrlText] = useState('');
+  const [showPw, setShowPw] = useState(false);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 360 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 460 }}>
       <VariantLabel>Switch — on/off toggle</VariantLabel>
       <ToggleRow>
         <ToggleLabel>Day grid</ToggleLabel>
@@ -417,12 +419,77 @@ const FormControlsDemo: React.FC = () => {
         />
       </ToggleRow>
 
-      <VariantLabel style={{ marginTop: 12 }}>Input — text field</VariantLabel>
+      <VariantLabel style={{ marginTop: 12 }}>Input — panel text field (34px)</VariantLabel>
       <Input
         type="text"
         placeholder="https://..."
         value={urlText}
         onChange={(e) => setUrlText(e.target.value)}
+      />
+
+      <VariantLabel style={{ marginTop: 20 }}>FormField — 44px · default (empty)</VariantLabel>
+      <FormField
+        label="Email"
+        hint="Optional"
+        helper="We'll never share your email."
+        icon={<Mail />}
+        placeholder="you@peachy.studio"
+      />
+
+      <VariantLabel style={{ marginTop: 12 }}>FormField — focused</VariantLabel>
+      <FormField
+        label="Email"
+        hint="(focused)"
+        icon={<Mail />}
+        defaultValue="hello@peachy.studio"
+        autoFocus
+      />
+
+      <VariantLabel style={{ marginTop: 12 }}>FormField — password with trailing action</VariantLabel>
+      <FormField
+        label="Password"
+        helper="8+ characters, mix of letters and numbers."
+        icon={<Lock />}
+        type={showPw ? 'text' : 'password'}
+        defaultValue="supersecret"
+        trailing={
+          <button
+            type="button"
+            onClick={() => setShowPw((v) => !v)}
+            aria-label={showPw ? 'Hide password' : 'Show password'}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', padding: 0, display: 'inline-flex' }}
+          >
+            {showPw ? <EyeOff /> : <Eye />}
+          </button>
+        }
+      />
+
+      <VariantLabel style={{ marginTop: 12 }}>FormField — error</VariantLabel>
+      <FormField
+        label="Email"
+        state="error"
+        icon={<Mail />}
+        defaultValue="not-an-email"
+        helper="Please enter a valid email address."
+      />
+
+      <VariantLabel style={{ marginTop: 12 }}>FormField — success</VariantLabel>
+      <FormField
+        label="Email"
+        state="success"
+        icon={<Mail />}
+        defaultValue="hello@peachy.studio"
+        helper="Email verified."
+        trailing={<Check />}
+      />
+
+      <VariantLabel style={{ marginTop: 12 }}>FormField — disabled / locked</VariantLabel>
+      <FormField
+        label="Email"
+        disabled
+        icon={<Lock />}
+        defaultValue="locked@peachy.studio"
+        helper="Managed by SSO — contact admin to change."
       />
     </div>
   );
