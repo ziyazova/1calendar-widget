@@ -23,6 +23,11 @@ import {
   UpgradePrice,
   Label,
   PlanBadge,
+  Switch,
+  ToggleTabs,
+  ToggleRow,
+  ToggleLabel,
+  Input,
 } from '../components/shared';
 import { labelVariantTokens } from '../themes/labelTokens';
 import type { LabelVariant } from '../components/shared';
@@ -275,6 +280,21 @@ export const DesignSystemV2Page: React.FC = () => {
         </SurfaceCard>
       </Section>
 
+      {/* ─────── Form controls ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Form controls</SectionTitle>
+          <SectionMeta>
+            Switch · ToggleTabs · Input — used in CustomizationPanel ·{' '}
+            <code>toggleTokens.ts</code> · <code>inputTokens.ts</code>.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SurfaceCard>
+          <FormControlsDemo />
+        </SurfaceCard>
+      </Section>
+
       {/* ─────── Labels & badges ─────── */}
       <Section>
         <SectionHeader>
@@ -373,6 +393,40 @@ function variantBlurb(v: ButtonVariant): string {
   };
   return blurbs[v] || '';
 }
+
+const FormControlsDemo: React.FC = () => {
+  const [dayGrid, setDayGrid] = useState(true);
+  const [weekStart, setWeekStart] = useState<'monday' | 'sunday'>('monday');
+  const [urlText, setUrlText] = useState('');
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 360 }}>
+      <VariantLabel>Switch — on/off toggle</VariantLabel>
+      <ToggleRow>
+        <ToggleLabel>Day grid</ToggleLabel>
+        <Switch checked={dayGrid} onChange={setDayGrid} aria-label="Day grid" />
+      </ToggleRow>
+
+      <VariantLabel style={{ marginTop: 12 }}>ToggleTabs — 2-choice sliding</VariantLabel>
+      <ToggleRow as="div">
+        <ToggleLabel>Week start</ToggleLabel>
+        <ToggleTabs<'monday' | 'sunday'>
+          value={weekStart}
+          options={['monday', 'sunday']}
+          labels={['Mon', 'Sun']}
+          onChange={setWeekStart}
+        />
+      </ToggleRow>
+
+      <VariantLabel style={{ marginTop: 12 }}>Input — text field</VariantLabel>
+      <Input
+        type="text"
+        placeholder="https://..."
+        value={urlText}
+        onChange={(e) => setUrlText(e.target.value)}
+      />
+    </div>
+  );
+};
 
 const SegmentDemo: React.FC = () => {
   const [tab, setTab] = useState<'widgets' | 'templates'>('widgets');
