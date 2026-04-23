@@ -4,6 +4,8 @@ export { FilterChip, FilterRow } from './FilterChip';
 export { Slider, SliderInput, SliderValue } from './Slider';
 export { OverlayBadge } from './OverlayBadge';
 export type { OverlayBadgeTone } from './OverlayBadge';
+export { Card } from './Card';
+export { Accordion } from './Accordion';
 /* Site chrome — re-exported from their canonical locations so pages
    can import the whole design system from one place. */
 export { TopNav } from '../layout/TopNav';
