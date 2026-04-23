@@ -1,10 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, Sparkles } from 'lucide-react';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
+import {
+  Button,
+  AccountPillWrap,
+  AccountPill,
+  PeachAvatar,
+  PillChevron,
+  AccountDropdown,
+  DropdownUserRow,
+  DropdownUserText,
+  DropdownName,
+  DropdownEmail,
+  DropdownDivider,
+  DropdownSpacer,
+  DropdownMenuGroup,
+  ProPlanRow,
+  ProPlanLabel,
+  ProManageLink,
+  UpgradeInner,
+  UpgradePrice,
+} from '@/presentation/components/shared';
 
 interface TopNavProps {
   logoPressed?: boolean;
@@ -106,27 +126,6 @@ const NavLink = styled.button<{ $active?: boolean }>`
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
-const NavCTA = styled.button`
-  height: 34px;
-  padding: 0 16px;
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #ffffff;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  transition: all ${({ theme }) => theme.transitions.base};
-  white-space: nowrap;
-
-  &:hover {
-    background: #333;
-    transform: translateY(-1px);
-  }
-`;
-
 /* ── Burger ── */
 const BurgerButton = styled.button`
   display: flex;
@@ -188,24 +187,6 @@ const MobileLink = styled.button<{ $active?: boolean }>`
     background: rgba(0, 0, 0, 0.03);
     color: ${({ theme }) => theme.colors.text.primary};
   }
-`;
-
-const MobileCTA = styled.button`
-  width: 100%;
-  height: 48px;
-  margin-top: 12px;
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #ffffff;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  transition: all 0.2s ease;
-
-  &:hover { background: #333; }
 `;
 
 /* ── Cart ── */
@@ -402,23 +383,6 @@ const CartTotalValue = styled.span`
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
 `;
 
-const CartCheckoutBtn = styled.button`
-  width: 100%;
-  height: 44px;
-  background: ${({ theme }) => theme.colors.text.primary};
-  color: #fff;
-  border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  font-family: inherit;
-  cursor: pointer;
-  letter-spacing: -0.01em;
-  transition: all ${({ theme }) => theme.transitions.base};
-
-  &:hover { background: #333; }
-`;
-
 const CartWrap = styled.div`
   position: relative;
 `;
@@ -522,7 +486,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
               <span>Total</span>
               <CartTotalValue>{total === 0 ? 'Free' : `$${total.toFixed(2)}`}</CartTotalValue>
             </CartTotal>
-            <CartCheckoutBtn onClick={() => { setCartOpen(false); navigate('/checkout'); }}>Checkout</CartCheckoutBtn>
+            <Button $variant="primary" $size="lg" $fullWidth onClick={() => { setCartOpen(false); navigate('/checkout'); }}>Checkout</Button>
           </CartFooter>
         </>
       )}
@@ -553,188 +517,104 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
             )}
           </CartWrap>}
           {isLoggedIn ? (
-            <div ref={avatarRef} style={{ position: 'relative' }}>
-              <div
+            <AccountPillWrap ref={avatarRef}>
+              <AccountPill
+                $open={avatarOpen}
                 onClick={() => setAvatarOpen(v => !v)}
-                role="button"
                 aria-haspopup="menu"
                 aria-expanded={avatarOpen}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setAvatarOpen(v => !v);
-                  }
-                }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  cursor: 'pointer',
-                  padding: '5px 14px 5px 5px',
-                  borderRadius: 24,
-                  background: avatarOpen ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)',
-                  border: 'none',
-                  transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
-                }}
               >
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, color: '#fff',
-                  flexShrink: 0, letterSpacing: '0.02em',
-                  boxShadow: '0 2px 8px rgba(255, 160, 140, 0.28)',
-                }}>
+                <PeachAvatar $size={30} $fontSize={11}>
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: avatarOpen ? '#1F1F1F' : '#666', transition: 'color 0.2s' }}>Dashboard</span>
-                <ChevronDown style={{ width: 14, height: 14, color: '#bbb', transition: 'transform 0.2s', transform: avatarOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
-              </div>
+                </PeachAvatar>
+                Dashboard
+                <PillChevron $open={avatarOpen} />
+              </AccountPill>
+
               {avatarOpen && (
-                <>
-                  <div style={{
-                    position: 'absolute', top: 'calc(100% + 10px)', right: -8, zIndex: 100,
-                    background: '#fff', borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)',
-                    boxShadow: '0 16px 48px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04)',
-                    padding: 0, minWidth: 240, overflow: 'hidden',
-                    animation: 'avatarDropIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
-                  }}>
-                    <style>{`@keyframes avatarDropIn { from { opacity: 0; transform: translateY(-10px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
+                <AccountDropdown role="menu">
+                  <DropdownUserRow>
+                    <PeachAvatar $size={44} $fontSize={15}>
+                      {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                    </PeachAvatar>
+                    <DropdownUserText>
+                      <DropdownName>{user?.name || 'User'}</DropdownName>
+                      <DropdownEmail>{user?.email || ''}</DropdownEmail>
+                    </DropdownUserText>
+                  </DropdownUserRow>
 
-                    {/* User info — compact, no cheap inline pill anymore; Upgrade
-                        lives as a proper first-class menu item below. */}
-                    <div style={{
-                      padding: '16px 16px 14px',
-                      background: 'linear-gradient(135deg, rgba(237,228,255,0.3) 0%, rgba(232,237,255,0.2) 100%)',
-                      borderBottom: '1px solid rgba(0,0,0,0.04)',
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{
-                          width: 36, height: 36, borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
-                          boxShadow: '0 2px 8px rgba(255, 160, 140, 0.28)',
-                          letterSpacing: '0.02em',
-                        }}>
-                          {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                        </div>
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#1F1F1F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.name || 'User'}</div>
-                          <div style={{ fontSize: 11.5, color: '#8E8E93', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{user?.email || ''}</div>
-                        </div>
-                      </div>
-                    </div>
+                  <DropdownDivider />
 
-                    {/* Pro users get a status badge instead of the upgrade CTA */}
-                    {!planLoading && isPro && (
-                      <div style={{ padding: '8px 8px 4px' }}>
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px',
-                          borderRadius: 12,
-                          background: 'linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%)',
-                          border: '1px solid rgba(99, 102, 241, 0.18)',
-                        }}>
-                          <span style={{
-                            display: 'inline-flex', alignItems: 'center', height: 22, padding: '0 10px',
-                            borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
-                            textTransform: 'uppercase' as const,
-                            color: '#fff', background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-                            boxShadow: '0 1px 4px rgba(99,102,241,0.25)',
-                          }}>Pro</span>
-                          <span style={{ fontSize: 12.5, fontWeight: 600, color: '#4F46E5' }}>Unlimited widgets</span>
-                        </div>
-                      </div>
-                    )}
+                  {!planLoading && isPro && (
+                    <ProPlanRow>
+                      <ProPlanLabel>
+                        <Sparkles fill="currentColor" strokeWidth={1.5} />
+                        Pro plan
+                      </ProPlanLabel>
+                      <ProManageLink onClick={(e) => { e.preventDefault(); setAvatarOpen(false); navigate('/settings'); }}>
+                        Manage
+                      </ProManageLink>
+                    </ProPlanRow>
+                  )}
 
-                    {/* Upgrade to Pro — headline CTA in the menu (hidden for Pro users and while plan loads) */}
-                    {!planLoading && !isPro && <div style={{ padding: '8px 8px 4px' }}>
-                      <button
-                        onClick={() => { setAvatarOpen(false); openUpgrade(); }}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px',
-                          border: '1px solid rgba(99, 102, 241, 0.18)', cursor: 'pointer',
-                          background: 'linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%)',
-                          color: '#4F46E5', fontFamily: 'inherit', borderRadius: 12,
-                          fontSize: 12.5, fontWeight: 600, letterSpacing: '-0.005em',
-                          transition: 'transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease',
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.36)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.16)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.18)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                      >
-                        <ArrowUpRight style={{ width: 14, height: 14, strokeWidth: 2, color: '#6366F1', flexShrink: 0 }} />
-                        <span style={{ flex: 1, textAlign: 'left' }}>Upgrade to Pro</span>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const,
-                          color: '#6366F1', background: 'rgba(255,255,255,0.65)',
-                          padding: '2px 6px', borderRadius: 4,
-                        }}>$4/mo</span>
-                      </button>
-                    </div>}
+                  {!planLoading && !isPro && (
+                    <Button
+                      $variant="accent"
+                      $size="xl"
+                      $fullWidth
+                      onClick={() => { setAvatarOpen(false); openUpgrade(); }}
+                      style={{ justifyContent: 'space-between' }}
+                    >
+                      <UpgradeInner>
+                        <Sparkles fill="currentColor" strokeWidth={1.5} />
+                        Upgrade to Pro
+                      </UpgradeInner>
+                      <UpgradePrice>$4/mo</UpgradePrice>
+                    </Button>
+                  )}
 
-                    {/* Menu items */}
-                    <div style={{ padding: '4px 8px 8px' }}>
-                      {[
-                        { icon: Home, label: 'Dashboard', onClick: () => { setAvatarOpen(false); navigate('/studio'); } },
-                        { icon: Settings, label: 'Settings', onClick: () => { setAvatarOpen(false); navigate('/settings'); } },
-                      ].map(item => (
-                        <button
-                          key={item.label}
-                          onClick={item.onClick}
-                          style={{
-                            display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
-                            border: 'none', background: 'transparent', cursor: 'pointer',
-                            fontSize: 13, fontWeight: 500, color: '#1F1F1F',
-                            fontFamily: 'inherit', borderRadius: 8, transition: 'background 0.12s',
-                            letterSpacing: '-0.005em',
-                          }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.035)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                        >
-                          <item.icon style={{ width: 15, height: 15, strokeWidth: 1.75, color: '#8E8E93', flexShrink: 0 }} />
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
+                  <DropdownSpacer />
 
-                    <div style={{ height: 1, margin: '0 12px', background: 'rgba(0,0,0,0.04)' }} />
+                  <DropdownMenuGroup>
+                    <Button
+                      $variant="ghost"
+                      $size="md"
+                      $fullWidth
+                      onClick={() => { setAvatarOpen(false); navigate('/studio'); }}
+                      style={{ justifyContent: 'flex-start', gap: 12 }}
+                    >
+                      <Home />
+                      Dashboard
+                    </Button>
+                    <Button
+                      $variant="ghost"
+                      $size="md"
+                      $fullWidth
+                      onClick={() => { setAvatarOpen(false); navigate('/settings'); }}
+                      style={{ justifyContent: 'flex-start', gap: 12 }}
+                    >
+                      <Settings />
+                      Settings
+                    </Button>
+                  </DropdownMenuGroup>
 
-                    {/* Logout — soft red destructive hover. */}
-                    <div style={{ padding: '8px 8px' }}>
-                      <button
-                        onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px',
-                          border: 'none', background: 'transparent', cursor: 'pointer',
-                          fontSize: 13, fontWeight: 500, color: '#8E8E93',
-                          fontFamily: 'inherit', borderRadius: 8,
-                          transition: 'background 0.12s, color 0.12s',
-                          letterSpacing: '-0.005em',
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.background = 'rgba(220, 60, 60, 0.08)';
-                          e.currentTarget.style.color = '#C23B3B';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.color = '#8E8E93';
-                        }}
-                      >
-                        <LogOut style={{ width: 15, height: 15, strokeWidth: 1.75, flexShrink: 0 }} />
-                        Log out
-                      </button>
-                    </div>
-                  </div>
-                </>
+                  <DropdownDivider />
+
+                  <Button
+                    $variant="ghostDanger"
+                    $size="md"
+                    $fullWidth
+                    onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
+                    style={{ justifyContent: 'flex-start', gap: 12 }}
+                  >
+                    <LogOut />
+                    Log out
+                  </Button>
+                </AccountDropdown>
               )}
-            </div>
+            </AccountPillWrap>
           ) : (
-            <NavCTA onClick={() => navigate('/login')}>Log in</NavCTA>
+            <Button $variant="primary" $size="sm" onClick={() => navigate('/login')}>Log in</Button>
           )}
         </NavLinks>
         <MobileRight>
@@ -766,9 +646,15 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
       <MobileMenu>
         <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
         <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav('/widgets')}>Notion Widgets</MobileLink>
-        <MobileCTA onClick={() => handleNav(isLoggedIn ? '/studio' : '/login')}>
+        <Button
+          $variant="primary"
+          $size="xl"
+          $fullWidth
+          style={{ marginTop: 12 }}
+          onClick={() => handleNav(isLoggedIn ? '/studio' : '/login')}
+        >
           {isLoggedIn ? 'Studio' : 'Log in'}
-        </MobileCTA>
+        </Button>
       </MobileMenu>
     )}
     </>

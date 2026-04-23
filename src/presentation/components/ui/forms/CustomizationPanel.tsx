@@ -222,15 +222,15 @@ const Slider = styled.input`
     height: 16px;
     border-radius: 50%;
     background: #ffffff;
-    border: 2px solid #3384F4;
+    border: 2px solid ${({ theme }) => theme.colors.brand.indigo};
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(51, 132, 244, 0.25);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
     transition: all 0.15s ease;
   }
 
   &::-webkit-slider-thumb:hover {
     transform: scale(1.15);
-    box-shadow: 0 3px 10px rgba(51, 132, 244, 0.35);
+    box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
   }
 
   &::-webkit-slider-thumb:active {
@@ -288,8 +288,8 @@ const ToggleSwitch = styled.div<{ $checked: boolean }>`
   width: 40px;
   height: 22px;
   border-radius: 12px;
-  background: ${({ $checked }) => $checked
-    ? 'linear-gradient(135deg, #3384F4, #5BA0F7)'
+  background: ${({ $checked, theme }) => $checked
+    ? `linear-gradient(135deg, ${theme.colors.brand.indigo}, ${theme.colors.brand.indigoLight})`
     : 'rgba(0, 0, 0, 0.08)'};
   box-shadow: ${({ $checked, theme }) => $checked ? 'none' : theme.shadows.form};
   position: relative;
@@ -439,12 +439,12 @@ const ImageUrlInput = styled.input`
   transition: all 0.15s ease;
 
   &:hover {
-    border-color: rgba(51, 132, 244, 0.3);
+    border-color: rgba(99, 102, 241, 0.3);
   }
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
   &::placeholder {
     color: ${({ theme }) => theme.colors.text.secondary};
@@ -592,9 +592,9 @@ const LayoutOption = styled.button<{ $active: boolean }>`
   flex: 1;
   height: 36px;
   border: none;
-  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.04)' : 'rgba(0, 0, 0, 0.03)'};
-  box-shadow: ${({ $active, theme }) => $active ? '0 0 0 1px rgba(51, 132, 244, 0.3)' : theme.shadows.form};
-  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
+  background: ${({ $active, theme }) => $active ? theme.colors.interactive.accentHover : theme.colors.interactive.hover};
+  box-shadow: ${({ $active, theme }) => $active ? `0 0 0 1px ${theme.colors.brand.indigo}` : theme.shadows.form};
+  color: ${({ $active, theme }) => $active ? theme.colors.brand.indigo : theme.colors.text.secondary};
   border-radius: ${({ theme }) => theme.radii.button};
   font-size: 12px;
   font-weight: 500;
@@ -604,9 +604,9 @@ const LayoutOption = styled.button<{ $active: boolean }>`
   transition: all 0.15s ease;
 
   &:hover {
-    box-shadow: 0 0 0 1px rgba(51, 132, 244, 0.3);
-    background: rgba(51, 132, 244, 0.04);
-    color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.brand.indigo};
+    background: ${({ theme }) => theme.colors.interactive.accentHover};
+    color: ${({ $active, theme }) => $active ? theme.colors.brand.indigo : theme.colors.text.primary};
   }
 
   @media (max-width: 768px) { height: 40px; font-size: 13px; }
@@ -656,7 +656,7 @@ const CompactOption = styled.button<{ $active: boolean }>`
   height: 100%;
   border: none;
   background: transparent;
-  color: ${({ $active, theme }) => $active ? '#3384F4' : theme.colors.text.secondary};
+  color: ${({ $active, theme }) => $active ? theme.colors.brand.indigo : theme.colors.text.secondary};
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;

@@ -13,7 +13,7 @@ import { PurchaseService, type Purchase } from '@/infrastructure/services/Purcha
 import { TEMPLATES } from '@/presentation/data/templates';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
-import { PlanPill, Button as SharedButton, Card as SharedCard } from '@/presentation/components/shared';
+import { PlanPill, Button as SharedButton, Card as SharedCard, FilterChip as SharedFilterChip, FilterRow as SharedFilterRow } from '@/presentation/components/shared';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
 import { getContrastColor } from '@/presentation/themes/colors';
 
@@ -62,12 +62,10 @@ const Grid = styled.div`
   gap: 12px;
 `;
 
-const FilterRow = styled.div`
-  display: flex;
+const FilterRow = styled(SharedFilterRow)`
   align-items: center;
   gap: 6px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
 `;
 
 const FilterSpacer = styled.div`
@@ -103,29 +101,6 @@ const SortSelect = styled.select`
   }
 `;
 
-const FilterChip = styled.button<{ $active: boolean }>`
-  height: 32px;
-  padding: 0 14px;
-  background: ${({ $active, theme }) => $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.03)'};
-  color: ${({ $active, theme }) => $active ? theme.colors.text.inverse : theme.colors.text.subtle};
-  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.06)'};
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-  letter-spacing: -0.01em;
-
-  &:hover {
-    background: ${({ $active, theme }) => $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.06)'};
-    color: ${({ $active, theme }) => $active ? theme.colors.text.inverse : theme.colors.text.dim};
-  }
-`;
 
 const ChipCount = styled.span`
   font-size: 11px;
@@ -868,9 +843,9 @@ const WidgetsGalleryView: React.FC<{ onAddNew?: () => void }> = ({ onAddNew }) =
 
       <FilterRow>
         {EXPLORE_FILTERS.map(f => (
-          <FilterChip key={f.key} $active={filter === f.key} onClick={() => setFilter(f.key)}>
+          <SharedFilterChip key={f.key} $shape="pill" $active={filter === f.key} onClick={() => setFilter(f.key)}>
             {f.label}
-          </FilterChip>
+          </SharedFilterChip>
         ))}
       </FilterRow>
 

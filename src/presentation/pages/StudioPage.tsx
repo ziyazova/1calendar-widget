@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -57,39 +57,8 @@ const cardAppear = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-/* Tab bar */
-const TabBar = styled.div`
-  display: inline-flex;
-  gap: 4px;
-  background: ${({ theme }) => theme.colors.background.surfaceMuted};
-  border-radius: 12px;
-  padding: 4px;
+const TabBarWrap = styled.div`
   margin-bottom: 32px;
-`;
-
-const Tab = styled.button<{ $active: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 28px;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  transition:
-    background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  background: ${({ $active, theme }) => $active ? theme.colors.background.elevated : 'transparent'};
-  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : '#888'};
-  box-shadow: ${({ $active, theme }) => $active ? theme.shadows.tab : '0 0 0 rgba(0,0,0,0)'};
-
-  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 /* Section headers */
@@ -849,16 +818,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   </svg>
                   <span style={{ fontSize: 12, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length}/3</span>
                 </div>
-                <button onClick={() => openUpgrade()} style={{
-                  display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 16px',
-                  border: 'none', borderRadius: 12,
-                  background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-                  fontSize: 13, fontWeight: 600, fontFamily: 'inherit', color: '#fff', cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
-                }}>
+                <SharedButton $variant="accent" $size="sm" onClick={() => openUpgrade()}>
                   Upgrade now
-                </button>
+                </SharedButton>
               </>
             )}
           </div>
@@ -911,16 +873,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#777',
                 outline: 'none',
               }} onClick={e => (e.target as HTMLInputElement).select()} />
-              <button onClick={() => { navigator.clipboard.writeText(embedUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); }} style={{
-                display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 18px',
-                border: 'none', borderRadius: 12,
-                background: copied ? '#22C55E' : 'linear-gradient(135deg, #3384F4, #5BA0F7)',
-                color: '#fff', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
-                cursor: 'pointer', boxShadow: copied ? '0 2px 8px rgba(34,197,94,0.3)' : '0 2px 8px rgba(51,132,244,0.3)',
-                transition: 'all 0.15s',
-              }}>
-                {copied ? <><Check style={{ width: 14, height: 14 }} /> Copied!</> : <><Copy style={{ width: 14, height: 14 }} /> Copy</>}
-              </button>
+              <SharedButton
+                $variant={copied ? 'success' : 'slate'}
+                $size="md"
+                onClick={() => { navigator.clipboard.writeText(embedUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); }}
+              >
+                {copied ? <><Check /> Copied!</> : <><Copy /> Copy</>}
+              </SharedButton>
             </div>
           </div>
 
@@ -1052,25 +1011,20 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 </svg>
                 <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
               </div>
-              <button onClick={() => openUpgrade()} style={{
-                fontSize: 14, fontWeight: 600, color: '#fff',
-                background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-                padding: '10px 28px', borderRadius: 12,
-                border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                whiteSpace: 'nowrap' as const, transition: 'all 0.15s',
-                boxShadow: '0 2px 8px rgba(99,102,241,0.25)',
-              }}>
+              <SharedButton $variant="accent" $size="md" onClick={() => openUpgrade()}>
                 Upgrade now
-              </button>
+              </SharedButton>
             </div>
           )}
         </div>
 
         {/* Tab bar */}
-        <TabBar>
-          <Tab $active={tab === 'widgets'} onClick={() => setTab('widgets')}>Widgets</Tab>
-          <Tab $active={tab === 'templates'} onClick={() => setTab('templates')}>Templates</Tab>
-        </TabBar>
+        <TabBarWrap>
+          <SegmentGroup>
+            <Segment $active={tab === 'widgets'} onClick={() => setTab('widgets')}>Widgets</Segment>
+            <Segment $active={tab === 'templates'} onClick={() => setTab('templates')}>Templates</Segment>
+          </SegmentGroup>
+        </TabBarWrap>
 
         {/* ── Widgets Tab ── */}
         {tab === 'widgets' && (

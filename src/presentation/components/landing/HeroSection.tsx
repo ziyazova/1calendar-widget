@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { PrimaryButton, SecondaryButton } from '../shared/Button';
+import { Button } from '../shared/Button';
 
 /* ── Rotating text ── */
 const RotatingLine = styled.span<{ $width: number }>`
@@ -215,29 +215,6 @@ const HeroSubtitle = styled.p`
   }
 `;
 
-const HeroPrimary = styled(PrimaryButton)`
-  height: 48px;
-  border-radius: 16px;
-  background: #1A1A1E;
-  padding: 0 26px;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.12) inset,
-    0 1px 2px rgba(20, 20, 40, 0.08),
-    0 8px 24px -10px rgba(20, 20, 40, 0.28);
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-
-  &:hover {
-    background: #2A2A30;
-    transform: translateY(-1px);
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.14) inset,
-      0 2px 4px rgba(20, 20, 40, 0.1),
-      0 12px 32px -10px rgba(20, 20, 40, 0.32);
-  }
-`;
-
 const TrustRow = styled.div`
   display: flex;
   align-items: center;
@@ -268,32 +245,6 @@ const TrustDot = styled.span`
   background: currentColor;
   opacity: 0.35;
   flex-shrink: 0;
-`;
-
-const GhostButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 48px;
-  padding: 0 26px;
-  background: #ffffff;
-  color: ${({ theme }) => theme.colors.text.primary};
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  line-height: 1;
-  cursor: pointer;
-  letter-spacing: -0.01em;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text.primary};
-    border-color: rgba(0, 0, 0, 0.32);
-    background: rgba(0, 0, 0, 0.02);
-    transform: translateY(-1px);
-  }
 `;
 
 const ButtonRow = styled.div`
@@ -364,10 +315,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onBrowseTemplates, onE
         feel calm, clear, and a little more yours.
       </HeroSubtitle>
       <ButtonRow>
-        <HeroPrimary onClick={onBrowseTemplates}>
+        <Button $variant="primary" $size="xl" onClick={onBrowseTemplates}>
           Browse Templates
-        </HeroPrimary>
-        <GhostButton onClick={onExploreWidgets}>Start for free</GhostButton>
+        </Button>
+        <Button $variant="outline" $size="xl" onClick={onExploreWidgets}>
+          Start for free
+        </Button>
       </ButtonRow>
       <TrustRow data-ux="Hero Trust Row">
         <TrustItem>Works instantly in Notion</TrustItem>

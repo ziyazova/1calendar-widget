@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { X, Pencil, Lock } from 'lucide-react';
+import { Button } from '@/presentation/components/shared';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -439,38 +440,6 @@ const ModalActions = styled.div`
   justify-content: flex-end;
 `;
 
-const ModalCancelBtn = styled.button`
-  height: 40px;
-  padding: 0 20px;
-  border: none;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.05);
-  color: #6B6B6B;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-
-  &:hover { background: rgba(0, 0, 0, 0.08); }
-`;
-
-const ModalConfirmBtn = styled.button`
-  height: 40px;
-  padding: 0 24px;
-  border: none;
-  border-radius: 12px;
-  background: #1F1F1F;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s ease;
-
-  &:hover { background: #333; }
-  &:active { transform: scale(0.97); }
-`;
 
 /* ── Component ── */
 
@@ -600,8 +569,8 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
               onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmEdit(); }}
             />
             <ModalActions>
-              <ModalCancelBtn onClick={() => setNameModal(null)}>Cancel</ModalCancelBtn>
-              <ModalConfirmBtn onClick={handleConfirmEdit}>Create & Edit</ModalConfirmBtn>
+              <Button $variant="secondary" $size="md" onClick={() => setNameModal(null)}>Cancel</Button>
+              <Button $variant="primary" $size="md" onClick={handleConfirmEdit}>Create & Edit</Button>
             </ModalActions>
           </ModalCard>
         </ModalOverlay>,
