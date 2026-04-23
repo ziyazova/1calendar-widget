@@ -26,6 +26,8 @@ import {
   OverlayBadge,
   PlanBadge,
   Footer,
+  TemplateMockupCard,
+  TemplateMockupImage,
   Switch,
   ToggleTabs,
   ToggleRow,
@@ -48,6 +50,8 @@ import {
   ButtonSize,
 } from '../themes/buttonTokens';
 import { filterChipSize } from '../themes/filterChipTokens';
+import { TopNav } from '../components/layout/TopNav';
+import { BigFooter } from '../components/landing/BigFooter';
 
 /**
  * DesignSystemV2Page — live showcase rendered straight from tokens.
@@ -378,19 +382,75 @@ export const DesignSystemV2Page: React.FC = () => {
         </SurfaceCard>
       </Section>
 
-      {/* ─────── Layout: Footer ─────── */}
+      {/* ─────── Layout: Site chrome ─────── */}
       <Section>
         <SectionHeader>
-          <SectionTitle>Layout — Footer</SectionTitle>
+          <SectionTitle>Site chrome — TopNav + footers</SectionTitle>
           <SectionMeta>
-            Classic footer used on Login, Settings, Privacy, and auth pages · <code>shared/Footer.tsx</code>.
-            TopNav lives in <code>components/layout/TopNav.tsx</code> and auto-renders on every page.
+            <code>components/layout/TopNav.tsx</code> auto-renders on every page;
+            <code>components/landing/BigFooter.tsx</code> is the primary site footer;
+            <code>shared/Footer.tsx</code> is the minimal footer used on legal/auth pages.
           </SectionMeta>
         </SectionHeader>
 
+        {/* TopNav preview — shown in a bounded frame so the fixed nav
+            doesn't overlay the showcase. */}
+        <div style={{ position: 'relative', height: 96, marginBottom: 24, border: '1px solid rgba(0,0,0,0.06)', borderRadius: 14, overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, transform: 'translateZ(0)' }}>
+            <TopNav activeLink="studio" logoSub="Studio" />
+          </div>
+        </div>
+
+        <SubTitle>BigFooter — primary site footer</SubTitle>
+        <SurfaceCard style={{ padding: 0, overflow: 'hidden', marginBottom: 24 }}>
+          <BigFooter onNavigate={() => { /* preview — no nav */ }} noDivider />
+        </SurfaceCard>
+
+        <SubTitle>Footer — minimal (auth / legal pages)</SubTitle>
         <SurfaceCard style={{ padding: 0, overflow: 'hidden' }}>
           <Footer />
         </SurfaceCard>
+      </Section>
+
+      {/* ─────── Template mockup cards ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Template mockup cards</SectionTitle>
+          <SectionMeta>
+            Single primitive (<code>shared/TemplateMockupCard.tsx</code>) for every place
+            we show a product mockup on a cloudy backdrop: landing marquee, /templates grid,
+            /templates/:id carousel, and the Related rail. Size presets live in
+            <code> themes/templateCardTokens.ts</code>.
+          </SectionMeta>
+        </SectionHeader>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+          <div>
+            <SubTitle style={{ marginBottom: 8 }}>grid</SubTitle>
+            <TemplateMockupCard $size="grid" $interactive>
+              <TemplateMockupImage $size="grid" src="/template-main.png" alt="Grid card" />
+            </TemplateMockupCard>
+          </div>
+          <div>
+            <SubTitle style={{ marginBottom: 8 }}>marquee</SubTitle>
+            <TemplateMockupCard $size="marquee" $interactive>
+              <TemplateMockupImage $size="marquee" src="/template-main.png" alt="Marquee card" />
+            </TemplateMockupCard>
+          </div>
+          <div>
+            <SubTitle style={{ marginBottom: 8 }}>thumb (Related rail)</SubTitle>
+            <div style={{ width: 140 }}>
+              <TemplateMockupCard $size="thumb" $interactive>
+                <TemplateMockupImage $size="thumb" src="/template-main.png" alt="Thumb" />
+              </TemplateMockupCard>
+            </div>
+          </div>
+        </div>
+
+        <SubTitle style={{ marginTop: 24 }}>hero (carousel) — $hoverZoom=false</SubTitle>
+        <TemplateMockupCard $size="hero">
+          <TemplateMockupImage $size="hero" $hoverZoom={false} src="/template-main.png" alt="Hero slide" />
+        </TemplateMockupCard>
       </Section>
 
       {/* ─────── How to edit ─────── */}
@@ -642,6 +702,17 @@ const SectionTitle = styled.h2`
   letter-spacing: 0.1em;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 6px;
+`;
+
+/* Sub-section label inside a Section — e.g. "BigFooter — primary",
+   "Footer — minimal", size-preset names for Template mockup cards. */
+const SubTitle = styled.h3`
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: ${({ theme }) => theme.colors.text.body};
+  margin: 0 0 10px;
 `;
 
 const SectionMeta = styled.div`

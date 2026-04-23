@@ -78,11 +78,11 @@ export const templateCardSizeTokens: Record<
     radius: '2xl',
     radiusMobile: 'lg',
   },
-  /** Related templates rail — compact thumbnail. */
+  /** Related templates rail — compact horizontal thumbnail (140×96 ≈ 35/24). */
   thumb: {
-    aspect: '1 / 1',
+    aspect: '35 / 24',
     imageScale: '80%',
-    imageShadow: templateImageShadowTight,
+    imageShadow: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1))',
     radius: 'md',
   },
 };

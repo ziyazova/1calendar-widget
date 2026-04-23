@@ -460,27 +460,11 @@ const RelatedCard = styled.div`
   position: relative;
 `;
 
-const RelatedThumb = styled.div`
+/* Fixed-width wrapper so the shared <TemplateMockupCard $size="thumb"> (aspect
+   35/24) sits at exactly 140×96 in the Related rail. */
+const RelatedThumbSlot = styled.div`
   width: 140px;
-  height: 96px;
-  border-radius: ${({ theme }) => theme.radii.md};
-  overflow: hidden;
-  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
   flex-shrink: 0;
-  position: relative;
-`;
-
-const RelatedImg = styled.img`
-  width: 80%;
-  height: 80%;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
 `;
 
 const RelatedPreview = styled.div`
@@ -804,9 +788,11 @@ export const TemplateDetailPage: React.FC = () => {
               {related.map(r => (
                 <RelatedCard key={r.id} onClick={() => navigate(`/templates/${r.id}`)}>
                   <RelatedPreview><img src={r.image} alt={r.title} /></RelatedPreview>
-                  <RelatedThumb>
-                    <RelatedImg src={r.image} alt={r.title} />
-                  </RelatedThumb>
+                  <RelatedThumbSlot>
+                    <TemplateMockupCard $size="thumb" $interactive>
+                      <TemplateMockupImage $size="thumb" src={r.image} alt={r.title} />
+                    </TemplateMockupCard>
+                  </RelatedThumbSlot>
                   <RelatedInfo>
                     <RelatedTitle>{r.title}</RelatedTitle>
                     <RelatedPrice>{r.price}</RelatedPrice>
