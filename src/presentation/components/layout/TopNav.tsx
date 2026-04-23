@@ -5,6 +5,14 @@ import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, ChevronDown, Arr
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
+import {
+  navBarTokens,
+  navLogoTokens,
+  navLinkTokens,
+  navCtaTokens,
+  navMobileTokens,
+  navCartTokens,
+} from '@/presentation/themes/navTokens';
 
 interface TopNavProps {
   logoPressed?: boolean;
@@ -18,61 +26,61 @@ const Nav = styled.nav`
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  height: 72px;
+  z-index: ${navBarTokens.zIndex};
+  background: ${navBarTokens.bg};
+  backdrop-filter: blur(${navBarTokens.blur});
+  -webkit-backdrop-filter: blur(${navBarTokens.blur});
+  border-bottom: ${navBarTokens.borderBottom};
+  height: ${navBarTokens.height};
   padding-top: env(safe-area-inset-top, 0px);
 `;
 
 const NavSpacer = styled.div`
-  height: calc(65px + env(safe-area-inset-top, 0px));
+  height: calc(${navBarTokens.spacerHeight} + env(safe-area-inset-top, 0px));
 `;
 
 const NavInner = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 46px;
-  max-width: 1300px;
+  padding: 0 ${navBarTokens.paddingX};
+  max-width: ${navBarTokens.maxWidth};
   height: 100%;
   margin: 0 auto;
 
   @media (max-width: 768px) {
-    padding: 16px 24px;
+    padding: ${navBarTokens.paddingYMobile} ${navBarTokens.paddingXMobile};
   }
 `;
 
 const LogoRow = styled.div<{ $pressed?: boolean; $disabled?: boolean }>`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: ${navLogoTokens.gap};
   cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-  transform: ${({ $pressed }) => $pressed ? 'scale(0.88)' : 'scale(1)'};
-  opacity: ${({ $pressed }) => $pressed ? 0.4 : 1};
+  transition: ${navLogoTokens.transition};
+  transform: ${({ $pressed }) => $pressed ? `scale(${navLogoTokens.scalePressed})` : 'scale(1)'};
+  opacity: ${({ $pressed }) => $pressed ? navLogoTokens.opacityPressed : 1};
   transform-origin: left center;
   flex-shrink: 0;
 
   &:hover {
-    opacity: ${({ $disabled }) => $disabled ? 1 : 0.8};
-    transform: ${({ $disabled }) => $disabled ? 'scale(1)' : 'scale(0.98)'};
+    opacity: ${({ $disabled }) => $disabled ? 1 : navLogoTokens.opacityHover};
+    transform: ${({ $disabled }) => $disabled ? 'scale(1)' : `scale(${navLogoTokens.scaleHover})`};
   }
 
   &:active {
-    transform: ${({ $disabled }) => $disabled ? 'scale(1)' : 'scale(0.92)'};
+    transform: ${({ $disabled }) => $disabled ? 'scale(1)' : `scale(${navLogoTokens.scaleActive})`};
     opacity: ${({ $disabled }) => $disabled ? 1 : 0.5};
     transition: transform 0.1s ease, opacity 0.1s ease;
   }
 `;
 
 const LogoText = styled.span`
-  font-size: 16px;
-  font-weight: 600;
+  font-size: ${navLogoTokens.fontSize};
+  font-weight: ${navLogoTokens.fontWeight};
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.02em;
+  letter-spacing: ${navLogoTokens.letterSpacing};
   white-space: nowrap;
 `;
 
@@ -84,7 +92,7 @@ const LogoSub = styled.span`
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: ${navLinkTokens.gap};
   flex-shrink: 0;
 
   @media (max-width: 768px) {
@@ -93,28 +101,28 @@ const NavLinks = styled.div`
 `;
 
 const NavLink = styled.button<{ $active?: boolean }>`
-  font-size: 13px;
-  font-weight: ${({ $active }) => $active ? '500' : '400'};
-  color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
+  font-size: ${navLinkTokens.fontSize};
+  font-weight: ${({ $active }) => $active ? navLinkTokens.weightActive : navLinkTokens.weightInactive};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.secondary};
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
-  letter-spacing: -0.01em;
-  transition: color 0.15s ease;
+  letter-spacing: ${navLinkTokens.letterSpacing};
+  transition: ${navLinkTokens.transition};
   white-space: nowrap;
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 const NavCTA = styled.button`
-  height: 34px;
-  padding: 0 16px;
+  height: ${navCtaTokens.height};
+  padding: 0 ${navCtaTokens.paddingX};
   background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.button};
-  font-size: 13px;
-  font-weight: 500;
+  font-size: ${navCtaTokens.fontSize};
+  font-weight: ${navCtaTokens.fontWeight};
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
@@ -122,8 +130,8 @@ const NavCTA = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: #333;
-    transform: translateY(-1px);
+    background: ${navCtaTokens.bgHover};
+    transform: translateY(${navCtaTokens.hoverLift});
   }
 `;
 
@@ -132,14 +140,14 @@ const BurgerButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: ${navMobileTokens.burgerSize};
+  height: ${navMobileTokens.burgerSize};
   background: none;
   border: none;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text.primary};
 
-  svg { width: 20px; height: 20px; }
+  svg { width: ${navMobileTokens.iconSize}; height: ${navMobileTokens.iconSize}; }
 `;
 
 const fadeIn = keyframes`
@@ -154,28 +162,28 @@ const slideUp = keyframes`
 
 const MobileMenu = styled.div`
   position: fixed;
-  top: 57px;
+  top: ${navMobileTokens.topOffset};
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 99;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  z-index: ${navBarTokens.zIndex - 1};
+  background: ${navMobileTokens.menuBg};
+  backdrop-filter: blur(${navMobileTokens.menuBlur});
+  -webkit-backdrop-filter: blur(${navMobileTokens.menuBlur});
   padding: 16px 24px;
   animation: ${fadeIn} 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: ${navMobileTokens.linkGap};
 `;
 
 const MobileLink = styled.button<{ $active?: boolean }>`
   width: 100%;
   text-align: left;
-  padding: 14px 16px;
-  font-size: 15px;
+  padding: ${navMobileTokens.linkPadding};
+  font-size: ${navMobileTokens.linkFontSize};
   font-weight: ${({ $active }) => $active ? '600' : '400'};
-  color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.secondary};
   background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.03)' : 'none'};
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
@@ -192,20 +200,20 @@ const MobileLink = styled.button<{ $active?: boolean }>`
 
 const MobileCTA = styled.button`
   width: 100%;
-  height: 48px;
+  height: ${navMobileTokens.ctaHeight};
   margin-top: 12px;
   background: ${({ theme }) => theme.colors.text.primary};
   color: #ffffff;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  font-size: 15px;
+  font-size: ${navMobileTokens.linkFontSize};
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
   transition: all 0.2s ease;
 
-  &:hover { background: #333; }
+  &:hover { background: ${navCtaTokens.bgHover}; }
 `;
 
 /* ── Cart ── */
@@ -215,15 +223,15 @@ const CartButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: ${navCartTokens.buttonSize};
+  height: ${navCartTokens.buttonSize};
   background: none;
   border: none;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text.primary};
   transition: all ${({ theme }) => theme.transitions.fast};
 
-  svg { width: 18px; height: 18px; }
+  svg { width: ${navCartTokens.iconSize}; height: ${navCartTokens.iconSize}; }
 
   &:hover { opacity: 0.7; }
 `;
@@ -232,12 +240,12 @@ const CartBadge = styled.span`
   position: absolute;
   top: 2px;
   right: 0px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  min-width: ${navCartTokens.badgeMinWidth};
+  height: ${navCartTokens.badgeHeight};
+  padding: 0 ${navCartTokens.badgePaddingX};
   background: ${({ theme }) => theme.colors.accent};
   color: #fff;
-  font-size: 10px;
+  font-size: ${navCartTokens.badgeFontSize};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   border-radius: ${({ theme }) => theme.radii.full};
   display: flex;
@@ -249,9 +257,9 @@ const CartBadge = styled.span`
 /* Desktop dropdown */
 const CartDropdown = styled.div`
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + ${navCartTokens.dropdownOffset});
   right: -16px;
-  width: 320px;
+  width: ${navCartTokens.dropdownWidth};
   background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.lg};
@@ -273,7 +281,7 @@ const CartSheet = styled.div`
   border-top-right-radius: ${({ theme }) => theme.radii.xl};
   box-shadow: ${({ theme }) => theme.shadows.heavy};
   animation: ${slideUp} 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  max-height: 60vh;
+  max-height: ${navCartTokens.sheetMaxHeight};
   overflow-y: auto;
 `;
 

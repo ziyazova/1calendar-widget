@@ -7,6 +7,7 @@ import { CalendarSettings } from '../../../../domain/value-objects/CalendarSetti
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../../../domain/value-objects/BoardSettings';
 import { ColorPicker } from '../ColorPicker';
+import { Slider as SharedSlider } from '@/presentation/components/shared/Slider';
 
 export type PanelSection = 'style' | 'content' | 'color' | 'layout' | null;
 
@@ -197,64 +198,6 @@ const Select = styled.select`
     border-color: ${({ theme }) => theme.colors.accent};
     box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
   }
-`;
-
-const SliderRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const Slider = styled.input`
-  flex: 1;
-  height: 4px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.03);
-  box-shadow: ${({ theme }) => theme.shadows.form};
-  outline: none;
-  -webkit-appearance: none;
-  margin: 0;
-  padding: 0;
-
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid #3384F4;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(51, 132, 244, 0.25);
-    transition: all 0.15s ease;
-  }
-
-  &::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-    box-shadow: 0 3px 10px rgba(51, 132, 244, 0.35);
-  }
-
-  &::-webkit-slider-thumb:active {
-    transform: scale(0.95);
-  }
-
-  @media (max-width: 768px) {
-    touch-action: none;
-    height: 6px;
-
-    &::-webkit-slider-thumb {
-      width: 22px;
-      height: 22px;
-    }
-  }
-`;
-
-const SliderValue = styled.span`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  min-width: 32px;
-  text-align: right;
 `;
 
 const Toggle = styled.label`
@@ -1092,18 +1035,16 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <SectionTitle>Layout</SectionTitle>
 
           <FormGroup>
-            <Label>Corners</Label>
-            <SliderRow>
-              <Slider
-                type="range"
-                min="0"
-                max="24"
-                step="2"
-                value={settings.borderRadius}
-                onChange={(e) => onSettingsChange({ borderRadius: parseInt(e.target.value) })}
-              />
-              <SliderValue>{settings.borderRadius}px</SliderValue>
-            </SliderRow>
+            <SharedSlider
+              id="corners"
+              label="Corners"
+              min={0}
+              max={24}
+              step={2}
+              value={settings.borderRadius ?? 0}
+              formatValue={(v) => `${v}px`}
+              onChange={(v) => onSettingsChange({ borderRadius: v })}
+            />
           </FormGroup>
 
           <FormGroup>

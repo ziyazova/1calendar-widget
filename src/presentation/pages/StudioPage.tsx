@@ -10,6 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
+import { OverlayBadge } from '../components/shared/OverlayBadge';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -162,20 +163,6 @@ const WidgetPreviewWrap = styled.div`
   background: #FAFAF9;
   cursor: pointer;
   position: relative;
-`;
-
-const WidgetLabel = styled.span`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #6366F1;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(8px);
-  padding: 3px 10px;
-  border-radius: 6px;
-  z-index: 1;
 `;
 
 const WidgetBottom = styled.div`
@@ -1251,7 +1238,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 {widgets.map((w, i) => (
                   <WidgetCard key={w.id} $i={i}>
                     <WidgetPreviewWrap onClick={() => handleEdit(w)}>
-                      <WidgetLabel>{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</WidgetLabel>
+                      <OverlayBadge $tone="accent">{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
                       <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                     </WidgetPreviewWrap>
                     <WidgetBottom>

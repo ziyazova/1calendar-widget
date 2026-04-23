@@ -1,19 +1,32 @@
 import React from 'react';
 import styled from 'styled-components';
+import {
+  footerLayoutTokens,
+  footerBrandTokens,
+  footerNavTokens,
+  footerCopyTokens,
+} from '@/presentation/themes/footerTokens';
+
+/**
+ * BigFooter — primary site-wide footer (brand + nav columns + copyright).
+ * Tokenized via `themes/footerTokens.ts`. Also re-exported through
+ * `components/shared/index.ts` so consumers can import from the DS
+ * barrel; the file stays here to preserve the 15+ existing imports.
+ */
 
 const FooterOuter = styled.div`
-  margin-top: 120px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  padding-top: 48px;
+  margin-top: ${footerLayoutTokens.marginTop};
+  border-top: ${footerLayoutTokens.divider};
+  padding-top: ${footerLayoutTokens.outerPaddingTop};
 `;
 
 const FooterWrapper = styled.footer`
-  max-width: 1200px;
+  max-width: ${footerLayoutTokens.maxWidth};
   margin: 0 auto;
-  padding: 68px 48px 0;
+  padding: ${footerLayoutTokens.paddingTop} ${footerLayoutTokens.paddingX} 0;
 
   @media (max-width: 768px) {
-    padding: 52px 24px 0;
+    padding: ${footerLayoutTokens.paddingTopMobile} ${footerLayoutTokens.paddingXMobile} 0;
   }
 `;
 
@@ -21,36 +34,36 @@ const FooterTop = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 48px;
-  margin-bottom: 40px;
+  gap: ${footerLayoutTokens.paddingX};
+  margin-bottom: ${footerNavTokens.topRowMarginBottom};
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 28px;
-    margin-bottom: 28px;
+    gap: ${footerNavTokens.columnGapMobile};
+    margin-bottom: ${footerNavTokens.topRowMarginBottomMobile};
   }
 `;
 
 const FooterBrand = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: ${footerBrandTokens.logoGap};
   flex-shrink: 0;
 `;
 
 const BrandName = styled.span`
-  font-size: 17px;
-  font-weight: 600;
+  font-size: ${footerBrandTokens.nameFontSize};
+  font-weight: ${footerBrandTokens.nameWeight};
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.02em;
+  letter-spacing: ${footerBrandTokens.nameLetterSpacing};
 `;
 
 const FooterNav = styled.div`
   display: flex;
-  gap: 40px;
+  gap: ${footerNavTokens.columnGap};
 
   @media (max-width: 768px) {
-    gap: 24px;
+    gap: ${footerNavTokens.columnGapMobile};
     flex-wrap: wrap;
   }
 `;
@@ -58,33 +71,46 @@ const FooterNav = styled.div`
 const NavGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 110px;
+  gap: ${footerNavTokens.innerGap};
+  min-width: ${footerNavTokens.columnMinWidth};
 `;
 
 const NavTitle = styled.span`
-  font-size: 12px;
-  font-weight: 600;
+  font-size: ${footerCopyTokens.titleFontSize};
+  font-weight: ${footerCopyTokens.titleWeight};
   color: ${({ theme }) => theme.colors.text.primary};
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 2px;
+  text-transform: ${footerCopyTokens.titleCase};
+  letter-spacing: ${footerCopyTokens.titleTracking};
+  margin-bottom: ${footerCopyTokens.titleMarginBottom};
 `;
 
 const NavLink = styled.span`
-  font-size: 13px;
+  font-size: ${footerCopyTokens.linkFontSize};
   color: ${({ theme }) => theme.colors.text.tertiary};
   cursor: pointer;
-  transition: color 0.15s ease;
-  letter-spacing: -0.01em;
+  transition: ${footerCopyTokens.linkTransition};
+  letter-spacing: ${footerCopyTokens.linkLetterSpacing};
 
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
+const FooterBottomBand = styled.div`
+  display: flex;
+  justify-content: center;
+  padding-top: ${footerCopyTokens.copyBoxMarginTop};
+`;
+
+const FooterBottomBox = styled.div`
+  border-top: ${footerLayoutTokens.dividerInner};
+  padding-top: ${footerCopyTokens.copyBoxPaddingTop};
+  text-align: center;
+  width: ${footerCopyTokens.copyBoxWidth};
+`;
+
 const FooterBottom = styled.div`
-  font-size: 13px;
+  font-size: ${footerCopyTokens.copyFontSize};
   color: ${({ theme }) => theme.colors.text.muted};
-  letter-spacing: -0.01em;
+  letter-spacing: ${footerCopyTokens.linkLetterSpacing};
 `;
 
 interface BigFooterProps {
@@ -94,37 +120,43 @@ interface BigFooterProps {
 
 export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) => (
   <FooterOuter style={noDivider ? { marginTop: 0, borderTop: 'none', paddingTop: 0 } : undefined}>
-  <FooterWrapper>
-    <FooterTop>
-      <FooterBrand>
-        <img src="/PeachyLogo.png" alt="Peachy" width="24" height="24" style={{ objectFit: 'contain' }} />
-        <BrandName>Peachy</BrandName>
-      </FooterBrand>
-      <FooterNav>
-        <NavGroup>
-          <NavTitle>Product</NavTitle>
-          <NavLink onClick={() => onNavigate('/templates')}>Templates</NavLink>
-          <NavLink onClick={() => onNavigate('/widgets')}>Widget Studio</NavLink>
-        </NavGroup>
-        <NavGroup>
-          <NavTitle>Social</NavTitle>
-          <NavLink onClick={() => window.open('https://etsy.com', '_blank')}>Etsy</NavLink>
-          <NavLink onClick={() => window.open('https://instagram.com', '_blank')}>Instagram</NavLink>
-        </NavGroup>
-        <NavGroup>
-          <NavTitle>Legal</NavTitle>
-          <NavLink onClick={() => onNavigate('/privacy')}>Privacy</NavLink>
-          <NavLink onClick={() => onNavigate('/terms')}>Terms</NavLink>
-        </NavGroup>
-      </FooterNav>
-    </FooterTop>
-    <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 32 }}>
-      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 20, textAlign: 'center', width: 360 }}>
-        <FooterBottom>
-          © {new Date().getFullYear()} Peachy Studio. All rights reserved.
-        </FooterBottom>
-      </div>
-    </div>
-  </FooterWrapper>
+    <FooterWrapper>
+      <FooterTop>
+        <FooterBrand>
+          <img
+            src="/PeachyLogo.png"
+            alt="Peachy"
+            width={footerBrandTokens.logoSize.replace('px', '')}
+            height={footerBrandTokens.logoSize.replace('px', '')}
+            style={{ objectFit: 'contain' }}
+          />
+          <BrandName>Peachy</BrandName>
+        </FooterBrand>
+        <FooterNav>
+          <NavGroup>
+            <NavTitle>Product</NavTitle>
+            <NavLink onClick={() => onNavigate('/templates')}>Templates</NavLink>
+            <NavLink onClick={() => onNavigate('/widgets')}>Widget Studio</NavLink>
+          </NavGroup>
+          <NavGroup>
+            <NavTitle>Social</NavTitle>
+            <NavLink onClick={() => window.open('https://etsy.com', '_blank')}>Etsy</NavLink>
+            <NavLink onClick={() => window.open('https://instagram.com', '_blank')}>Instagram</NavLink>
+          </NavGroup>
+          <NavGroup>
+            <NavTitle>Legal</NavTitle>
+            <NavLink onClick={() => onNavigate('/privacy')}>Privacy</NavLink>
+            <NavLink onClick={() => onNavigate('/terms')}>Terms</NavLink>
+          </NavGroup>
+        </FooterNav>
+      </FooterTop>
+      <FooterBottomBand>
+        <FooterBottomBox>
+          <FooterBottom>
+            © {new Date().getFullYear()} Peachy Studio. All rights reserved.
+          </FooterBottom>
+        </FooterBottomBox>
+      </FooterBottomBand>
+    </FooterWrapper>
   </FooterOuter>
 );

@@ -1,6 +1,13 @@
 export { Container } from './Container';
 export { Footer } from './Footer';
 export { FilterChip, FilterRow } from './FilterChip';
+export { Slider, SliderInput, SliderValue } from './Slider';
+export { OverlayBadge } from './OverlayBadge';
+export type { OverlayBadgeTone } from './OverlayBadge';
+/* Site chrome — re-exported from their canonical locations so pages
+   can import the whole design system from one place. */
+export { TopNav } from '../layout/TopNav';
+export { BigFooter } from '../landing/BigFooter';
 export { BackButton } from './BackButton';
 export { SectionHeader } from './SectionHeader';
 export { PageWrapper } from './PageWrapper';
