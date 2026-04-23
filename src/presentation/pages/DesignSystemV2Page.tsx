@@ -1,10 +1,35 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button, FilterChip, FilterRow } from '../components/shared';
 import {
-  Plus, Trash2, Check, ArrowRight, ArrowLeft,
-  Settings, Sparkle, X, Copy, Pencil,
-  LogOut, Home, ArrowUpRight, ChevronDown,
+  Button,
+  FilterChip,
+  FilterRow,
+  Segment,
+  SegmentGroup,
+  AccountPill,
+  PeachAvatar,
+  PillChevron,
+  DropdownUserRow,
+  DropdownUserText,
+  DropdownName,
+  DropdownEmail,
+  DropdownDivider,
+  DropdownSpacer,
+  DropdownMenuGroup,
+  ProPlanRow,
+  ProPlanLabel,
+  ProManageLink,
+  UpgradeInner,
+  UpgradePrice,
+  Label,
+  PlanBadge,
+} from '../components/shared';
+import { labelVariantTokens } from '../themes/labelTokens';
+import type { LabelVariant } from '../components/shared';
+import {
+  Plus, Trash2, Copy, ArrowRight,
+  Settings, Sparkles,
+  LogOut, Home,
 } from 'lucide-react';
 import {
   buttonVariantTokens,
@@ -33,23 +58,20 @@ export const DesignSystemV2Page: React.FC = () => {
   return (
     <Page>
       <Hero>
-        <Pill>DS v2 · Token-driven · Live preview</Pill>
+        <Pill>Live preview · Token-driven</Pill>
         <H1>Design system</H1>
         <Lead>
-          Every button and chip here is rendered from
-          <code> src/presentation/themes/buttonTokens.ts</code> and
-          <code> filterChipTokens.ts</code>. Change a value there → this
-          page + entire app update together.
+          Every element below is rendered straight from the token files.
+          Edit a token → this page and every use-site update together.
         </Lead>
       </Hero>
 
       {/* ─────── Buttons ─────── */}
       <Section>
         <SectionHeader>
-          <SectionTitle>Variants</SectionTitle>
+          <SectionTitle>Buttons · variants</SectionTitle>
           <SectionMeta>
-            {ALL_VARIANTS.length} variants — all shown at <code>md</code> (36px).
-            Source: <code>buttonTokens.ts</code>.
+            {ALL_VARIANTS.length} variants at <code>md</code> · <code>buttonTokens.ts</code>.
           </SectionMeta>
         </SectionHeader>
 
@@ -71,7 +93,7 @@ export const DesignSystemV2Page: React.FC = () => {
         <SectionHeader>
           <SectionTitle>Sizes</SectionTitle>
           <SectionMeta>
-            {ALL_SIZES.length} sizes — all used in the app.
+            {ALL_SIZES.length} sizes · primary variant shown · <code>buttonSizeTokens</code>.
           </SectionMeta>
         </SectionHeader>
         <SurfaceCard>
@@ -108,156 +130,22 @@ export const DesignSystemV2Page: React.FC = () => {
         </SurfaceCard>
       </Section>
 
-      {/* ─────── Patterns ─────── */}
-      <Section>
-        <SectionHeader>
-          <SectionTitle>Patterns</SectionTitle>
-          <SectionMeta>
-            Real-world usage — how variants come together in the product.
-          </SectionMeta>
-        </SectionHeader>
-
-        {/* Upgrade */}
-        <SubSection>
-          <SubTitle>Upgrade CTA · three sizes</SubTitle>
-          <PatternMeta>
-            Outlined indigo — lighter than filled <code>accent</code>. Pair with{' '}
-            <code>&lt;Sparkle /&gt;</code>.
-          </PatternMeta>
-          <Row>
-            <Button $variant="upgrade" $size="sm"><Sparkle /> Upgrade</Button>
-            <Button $variant="upgrade" $size="md"><Sparkle /> Upgrade to Pro</Button>
-            <Button $variant="upgrade" $size="lg"><Sparkle /> Upgrade to Pro · $9/mo</Button>
-          </Row>
-        </SubSection>
-
-        {/* Navigation toolkit — back, close, nav items */}
-        <SubSection>
-          <SubTitle>Navigation — back / close / nav items</SubTitle>
-          <PatternMeta>
-            Back link = <code>outline + ArrowLeft</code>. Close × =
-            <code> ghost iconOnly</code>. Top-nav links = <code>ghost md</code>.
-          </PatternMeta>
-          <Row>
-            <Button $variant="outline" $size="sm"><ArrowLeft /> Templates</Button>
-            <Button $variant="ghost" $size="sm" $iconOnly aria-label="Close"><X /></Button>
-            <Button $variant="ghost" $size="md">Dashboard</Button>
-            <Button $variant="ghost" $size="md">Templates</Button>
-          </Row>
-        </SubSection>
-
-        {/* Card actions + links */}
-        <SubSection>
-          <SubTitle>Card actions &amp; inline links</SubTitle>
-          <PatternMeta>
-            Customize = <code>primary sm</code>. Copy = <code>ghost sm iconOnly</code>
-            {' '}(✓ feedback on click). Inline link = underline on hover.
-          </PatternMeta>
-          <Row>
-            <Button $variant="primary" $size="sm"><Pencil /> Customize</Button>
-            <CopyButtonDemo />
-            <Button $variant="danger" $size="sm" $iconOnly aria-label="Delete"><Trash2 /></Button>
-            <Button $variant="link">Forgot password?</Button>
-          </Row>
-        </SubSection>
-
-        {/* Dropdown menu */}
-        <SubSection>
-          <SubTitle>Dropdown menu — avatar in TopNav</SubTitle>
-          <PatternMeta>
-            Trigger = avatar + "Dashboard" + chevron. Opens a 260px card with:
-            soft-indigo Upgrade banner (Free users only) OR Pro banner
-            (Pro users), Dashboard, Settings, divider, Log out. Menu items are
-            <code> ghost sm fullWidth</code>.
-          </PatternMeta>
-          <Row>
-            <DashTrigger>
-              <Avatar>GU</Avatar>
-              <span className="label">Dashboard</span>
-              <ChevronDown className="chev" />
-            </DashTrigger>
-          </Row>
-          <Spacer16 />
-          <Row>
-            {/* Free-user menu */}
-            <MenuShell>
-              <UpgradeRow>
-                <ArrowUpRight size={14} />
-                <span style={{ flex: 1, textAlign: 'left' }}>Upgrade to Pro</span>
-                <UpgradeBadge>$4/mo</UpgradeBadge>
-              </UpgradeRow>
-              <MenuItem>
-                <Button $variant="ghost" $size="sm" $fullWidth><Home /> Dashboard</Button>
-              </MenuItem>
-              <MenuItem>
-                <Button $variant="ghost" $size="sm" $fullWidth><Settings /> Settings</Button>
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem>
-                <Button $variant="ghost" $size="sm" $fullWidth><LogOut /> Log out</Button>
-              </MenuItem>
-            </MenuShell>
-
-            {/* Pro-user menu */}
-            <MenuShell>
-              <ProRow>
-                <ProPillBadge>Pro</ProPillBadge>
-                <span>Unlimited widgets</span>
-              </ProRow>
-              <MenuItem>
-                <Button $variant="ghost" $size="sm" $fullWidth><Home /> Dashboard</Button>
-              </MenuItem>
-              <MenuItem>
-                <Button $variant="ghost" $size="sm" $fullWidth><Settings /> Settings</Button>
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem>
-                <Button $variant="ghost" $size="sm" $fullWidth><LogOut /> Log out</Button>
-              </MenuItem>
-            </MenuShell>
-          </Row>
-        </SubSection>
-
-        {/* Segmented toggle */}
-        <SubSection>
-          <SubTitle>Segmented toggle — Widgets / Templates</SubTitle>
-          <PatternMeta>
-            Two-choice switch used at the top of <code>/studio</code>. Active pill
-            is dark; inactive is transparent. Container has a subtle grey bg.
-          </PatternMeta>
-          <Segment>
-            <SegmentItem $active>Widgets</SegmentItem>
-            <SegmentItem>Templates</SegmentItem>
-          </Segment>
-        </SubSection>
-
-        {/* Real-world CTAs */}
-        <SubSection>
-          <SubTitle>Real-world CTAs</SubTitle>
-          <Row>
-            <Button $variant="primary" $size="lg">Sign in</Button>
-            <Button $variant="upgrade" $size="lg"><Sparkle /> Upgrade to Pro · $9/mo</Button>
-            <Button $variant="secondary" $size="lg"><GoogleIcon /> Continue with Google</Button>
-          </Row>
-        </SubSection>
-      </Section>
 
       {/* ─────── Filter chips ─────── */}
       <Section>
         <SectionHeader>
           <SectionTitle>Filter chips</SectionTitle>
           <SectionMeta>
-            Tab-like selectable pills — from <code>filterChipTokens.ts</code>.
-            Single size ({filterChipSize.height}) — aligns with{' '}
-            <code>Button $size="sm"</code>.
+            Selectable pills — {filterChipSize.height} tall, <code>$shape="rect"|"pill"</code> · <code>filterChipTokens.ts</code>.
           </SectionMeta>
         </SectionHeader>
 
         <SurfaceCard>
+          <VariantLabel>$shape="rect" — default · 10px radius</VariantLabel>
           <FilterRow>
             {['all', 'planners', 'student', 'wellness', 'finance', 'focus'].map((c) => (
               <FilterChip
-                key={c}
+                key={`rect-${c}`}
                 $active={filter === c}
                 onClick={() => setFilter(c)}
               >
@@ -265,6 +153,152 @@ export const DesignSystemV2Page: React.FC = () => {
               </FilterChip>
             ))}
           </FilterRow>
+
+          <VariantLabel style={{ marginTop: 20 }}>$shape="pill" — 999px radius</VariantLabel>
+          <FilterRow>
+            {['all', 'planners', 'student', 'wellness', 'finance', 'focus'].map((c) => (
+              <FilterChip
+                key={`pill-${c}`}
+                $shape="pill"
+                $active={filter === c}
+                onClick={() => setFilter(c)}
+              >
+                {c}
+              </FilterChip>
+            ))}
+          </FilterRow>
+        </SurfaceCard>
+      </Section>
+
+      {/* ─────── Segmented tabs ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Segmented tabs</SectionTitle>
+          <SectionMeta>
+            Tab-switch · active = paper tile on neutral · <code>segmentTokens.ts</code>.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SurfaceCard>
+          <SegmentDemo />
+        </SurfaceCard>
+      </Section>
+
+      {/* ─────── Dashboard account menu ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Dashboard account menu</SectionTitle>
+          <SectionMeta>
+            Top-nav pill + dropdown (free / pro states) · <code>AccountMenu.tsx</code>.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SurfaceCard>
+          <VariantLabel>Trigger pill — idle &amp; opened</VariantLabel>
+          <Row style={{ gap: 24, marginBottom: 16 }}>
+            <AccountPill $open={false} type="button">
+              <PeachAvatar $size={30} $fontSize={11}>GU</PeachAvatar>
+              Dashboard
+              <PillChevron $open={false} />
+            </AccountPill>
+            <AccountPill $open={true} type="button">
+              <PeachAvatar $size={30} $fontSize={11}>GU</PeachAvatar>
+              Dashboard
+              <PillChevron $open={true} />
+            </AccountPill>
+          </Row>
+
+          <VariantLabel style={{ marginTop: 24 }}>Dropdown — free plan · Upgrade CTA</VariantLabel>
+          <Row style={{ gap: 32, flexWrap: 'wrap' }}>
+            <StaticDropdown>
+              <DropdownUserRow>
+                <PeachAvatar $size={44} $fontSize={15}>GU</PeachAvatar>
+                <DropdownUserText>
+                  <DropdownName>Guest User</DropdownName>
+                  <DropdownEmail>guest@peachy.studio</DropdownEmail>
+                </DropdownUserText>
+              </DropdownUserRow>
+              <DropdownDivider />
+              <Button $variant="accent" $size="xl" $fullWidth style={{ justifyContent: 'space-between' }}>
+                <UpgradeInner>
+                  <Sparkles fill="currentColor" strokeWidth={1.5} />
+                  Upgrade to Pro
+                </UpgradeInner>
+                <UpgradePrice>$4/mo</UpgradePrice>
+              </Button>
+              <DropdownSpacer />
+              <DropdownMenuGroup>
+                <Button $variant="ghost" $size="md" $fullWidth style={{ justifyContent: 'flex-start', gap: 12 }}>
+                  <Home /> Dashboard
+                </Button>
+                <Button $variant="ghost" $size="md" $fullWidth style={{ justifyContent: 'flex-start', gap: 12 }}>
+                  <Settings /> Settings
+                </Button>
+              </DropdownMenuGroup>
+              <DropdownDivider />
+              <Button $variant="ghostDanger" $size="md" $fullWidth style={{ justifyContent: 'flex-start', gap: 12 }}>
+                <LogOut /> Log out
+              </Button>
+            </StaticDropdown>
+
+            <StaticDropdown>
+              <DropdownUserRow>
+                <PeachAvatar $size={44} $fontSize={15}>GU</PeachAvatar>
+                <DropdownUserText>
+                  <DropdownName>Guest User</DropdownName>
+                  <DropdownEmail>guest@peachy.studio</DropdownEmail>
+                </DropdownUserText>
+              </DropdownUserRow>
+              <DropdownDivider />
+              <ProPlanRow>
+                <ProPlanLabel>
+                  <Sparkles fill="currentColor" strokeWidth={1.5} />
+                  Pro plan
+                </ProPlanLabel>
+                <ProManageLink onClick={(e) => e.preventDefault()}>Manage</ProManageLink>
+              </ProPlanRow>
+              <DropdownSpacer />
+              <DropdownMenuGroup>
+                <Button $variant="ghost" $size="md" $fullWidth style={{ justifyContent: 'flex-start', gap: 12 }}>
+                  <Home /> Dashboard
+                </Button>
+                <Button $variant="ghost" $size="md" $fullWidth style={{ justifyContent: 'flex-start', gap: 12 }}>
+                  <Settings /> Settings
+                </Button>
+              </DropdownMenuGroup>
+              <DropdownDivider />
+              <Button $variant="ghostDanger" $size="md" $fullWidth style={{ justifyContent: 'flex-start', gap: 12 }}>
+                <LogOut /> Log out
+              </Button>
+            </StaticDropdown>
+          </Row>
+        </SurfaceCard>
+      </Section>
+
+      {/* ─────── Labels & badges ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Labels &amp; badges</SectionTitle>
+          <SectionMeta>
+            Tier / state tags — Pro, Free, New, Limited, Popular, Neutral · <code>labelTokens.ts</code>.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SurfaceCard>
+          <VariantLabel>$variant — 6 tier tints</VariantLabel>
+          <Row>
+            {(Object.keys(labelVariantTokens) as LabelVariant[]).map((v) => (
+              <Label key={v} $variant={v} style={v === 'popular' ? { position: 'static' } : undefined}>
+                {v}
+              </Label>
+            ))}
+          </Row>
+
+          <VariantLabel style={{ marginTop: 24 }}>PlanBadge — compact gradient chip (Pro / Free)</VariantLabel>
+          <Row>
+            <PlanBadge $pro>Pro</PlanBadge>
+            <PlanBadge>Free</PlanBadge>
+          </Row>
         </SurfaceCard>
       </Section>
 
@@ -327,9 +361,11 @@ function variantBlurb(v: ButtonVariant): string {
     primary: 'Default dark CTA · carved depth',
     accent: 'Indigo gradient · Pro/Upgrade',
     upgrade: 'Outlined indigo · inline upgrade',
+    slate: 'Slate-warm neutral · editorial CTA (replaces blue)',
     secondary: 'Notion paper · neutral CTA',
     outline: 'Transparent + border',
     ghost: 'Minimal · nav / menu / inline',
+    ghostDanger: 'Borderless destructive · menu log out',
     danger: 'Muted wine · reversible destructive',
     dangerStrong: 'Saturated red · irreversible',
     success: 'Emerald · confirm / saved',
@@ -338,34 +374,15 @@ function variantBlurb(v: ButtonVariant): string {
   return blurbs[v] || '';
 }
 
-/* ── Copy button with ✓ feedback — outlined 32×32 ── */
-const CopyButtonDemo: React.FC = () => {
-  const [copied, setCopied] = useState(false);
+const SegmentDemo: React.FC = () => {
+  const [tab, setTab] = useState<'widgets' | 'templates'>('widgets');
   return (
-    <Button
-      $variant="outline"
-      $size="sm"
-      $iconOnly
-      aria-label={copied ? 'Copied' : 'Copy embed URL'}
-      onClick={() => {
-        setCopied(true);
-        window.setTimeout(() => setCopied(false), 1500);
-      }}
-    >
-      {copied ? <Check /> : <Copy />}
-    </Button>
+    <SegmentGroup>
+      <Segment $active={tab === 'widgets'} onClick={() => setTab('widgets')}>Widgets</Segment>
+      <Segment $active={tab === 'templates'} onClick={() => setTab('templates')}>Templates</Segment>
+    </SegmentGroup>
   );
 };
-
-/* ── Google G logo (for "Continue with Google") ── */
-const GoogleIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" />
-    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
-    <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" />
-    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" />
-  </svg>
-);
 
 /* ─────── Layout ─────── */
 
@@ -484,37 +501,6 @@ const SurfaceCard = styled.div`
   }
 `;
 
-const SubSection = styled.div`
-  padding: 24px;
-  background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 14px;
-
-  & + & { margin-top: 16px; }
-
-  @media (max-width: 900px) {
-    padding: 18px;
-  }
-`;
-
-const SubTitle = styled.h3`
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 6px;
-
-  code {
-    font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 13px;
-    background: ${({ theme }) => theme.colors.background.surfaceAlt};
-    padding: 1px 5px;
-    border-radius: 4px;
-    color: ${({ theme }) => theme.colors.text.primary};
-    font-weight: 500;
-  }
-`;
-
 const Row = styled.div`
   display: flex;
   gap: 12px;
@@ -522,199 +508,36 @@ const Row = styled.div`
   align-items: center;
 `;
 
-const PatternMeta = styled.p`
-  font-size: 13px;
-  line-height: 1.55;
+const StaticDropdown = styled.div`
+  width: 240px;
+  padding: 8px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: 16px;
+  box-shadow: ${({ theme }) => theme.shadows.floating};
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+`;
+
+const VariantLabel = styled.div`
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 18px;
-  max-width: 640px;
+  margin: 0 0 10px;
 
   code {
     font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 12px;
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: none;
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
-    border: 1px solid ${({ theme }) => theme.colors.border.light};
     padding: 1px 5px;
     border-radius: 4px;
     color: ${({ theme }) => theme.colors.text.primary};
-  }
-`;
-
-/* ── Dropdown-menu preview shell ── */
-
-const MenuShell = styled.div`
-  width: 260px;
-  padding: 6px;
-  background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 12px;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 8px 24px rgba(0, 0, 0, 0.08);
-`;
-
-const MenuItem = styled.div`
-  /* Button already handles its own hover/bg — this just ensures alignment. */
-  & > button {
-    justify-content: flex-start;
-  }
-`;
-
-const MenuDivider = styled.div`
-  height: 1px;
-  margin: 4px 2px;
-  background: ${({ theme }) => theme.colors.border.light};
-`;
-
-/** Upgrade banner row — soft indigo gradient, price badge right-aligned.
- *  Matches TopNav real dropdown exactly. */
-const UpgradeRow = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 4px;
-  background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
-  border: 1px solid rgba(99, 102, 241, 0.18);
-  color: #4F46E5;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
-
-  svg { color: #6366F1; flex-shrink: 0; }
-
-  &:hover {
-    border-color: rgba(99, 102, 241, 0.36);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.16);
-  }
-`;
-
-const UpgradeBadge = styled.span`
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #6366F1;
-  background: rgba(255, 255, 255, 0.65);
-  padding: 2px 6px;
-  border-radius: 4px;
-`;
-
-/* Pro banner row — shown instead of UpgradeRow when user is Pro */
-const ProRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 4px;
-  background: linear-gradient(135deg, #EEF0FF 0%, #E2E7FF 100%);
-  border: 1px solid rgba(99, 102, 241, 0.18);
-  border-radius: 10px;
-  color: #4F46E5;
-  font-size: 12.5px;
-  font-weight: 600;
-`;
-
-const ProPillBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  height: 22px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #fff;
-  background: linear-gradient(135deg, #6366F1, #818CF8);
-  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.25);
-`;
-
-/* Dashboard trigger — matches real TopNav exactly: peach avatar + grey
- * "Dashboard" label + ChevronDown. Soft grey pill bg, darker when open. */
-const DashTrigger = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 14px 5px 5px;
-  background: rgba(0, 0, 0, 0.02);
-  border: none;
-  border-radius: 24px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.04);
-  }
-
-  span.label {
-    font-size: 13px;
     font-weight: 500;
-    color: #666;
-    transition: color 0.2s;
-  }
-
-  &:hover span.label { color: #1F1F1F; }
-
-  svg.chev {
-    width: 14px;
-    height: 14px;
-    color: #bbb;
-  }
-`;
-
-/* Peach-gradient initials avatar, exactly like TopNav. */
-const Avatar = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FFD4B8 0%, #FFB3A0 40%, #E8B4E3 100%);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 8px rgba(255, 160, 140, 0.28);
-`;
-
-const Spacer16 = styled.div`
-  height: 16px;
-`;
-
-/* Segmented toggle — Studio Widgets/Templates */
-const Segment = styled.div`
-  display: inline-flex;
-  padding: 4px;
-  background: ${({ theme }) => theme.colors.background.surfaceAlt};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 12px;
-`;
-
-const SegmentItem = styled.button<{ $active?: boolean }>`
-  height: 36px;
-  padding: 0 18px;
-  background: ${({ $active, theme }) => ($active ? theme.colors.text.primary : 'transparent')};
-  color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.text.body)};
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-
-  &:hover {
-    background: ${({ $active, theme }) =>
-      $active ? theme.colors.text.primary : 'rgba(0, 0, 0, 0.04)'};
   }
 `;
 
