@@ -848,14 +848,14 @@ export const WidgetStudioPage: React.FC = () => {
                   </SharedButton>
                 </EmailRow>
                 {codeError && <CodeError>{codeError}</CodeError>}
-                <AuthDivider>or sign up with</AuthDivider>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                  <SharedButton $variant="secondary" $size="lg" onClick={() => loginWithGoogle()}>
+                <AuthDivider>or</AuthDivider>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <SharedButton type="button" $variant="primary" $size="md" onClick={() => navigate('/login')}>
+                    Already have an account? Log in
+                  </SharedButton>
+                  <SharedButton $variant="secondary" $size="md" onClick={() => loginWithGoogle()}>
                     <GoogleIcon />
                     Continue with Google
-                  </SharedButton>
-                  <SharedButton type="button" $variant="link" $size="sm" onClick={() => navigate('/login')}>
-                    Already have an account? Log in
                   </SharedButton>
                 </div>
               </>

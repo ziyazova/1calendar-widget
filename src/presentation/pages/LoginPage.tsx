@@ -673,7 +673,7 @@ export const LoginPage: React.FC = () => {
           <Button
             type="submit"
             $variant="primary"
-            $size="lg"
+            $size="md"
             $fullWidth
             disabled={submitting || (isSignUp ? !canSubmitSignup : !canSubmitLogin)}
             style={{ marginTop: 8 }}
@@ -691,7 +691,7 @@ export const LoginPage: React.FC = () => {
 
         <Divider>or</Divider>
 
-        <Button $variant="secondary" $size="lg" $fullWidth onClick={() => auth.loginWithGoogle()}>
+        <Button $variant="secondary" $size="md" $fullWidth onClick={() => auth.loginWithGoogle()}>
           <GoogleIcon />
           Continue with Google
         </Button>
