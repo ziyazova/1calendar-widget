@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Star, Sparkle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill, Button as SharedButton, GoogleIcon } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill, Button as SharedButton, GoogleIcon, Modal, ModalFooter } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
@@ -16,6 +16,29 @@ const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
   transition: opacity 0.3s ease;
   pointer-events: ${({ $hide }) => $hide ? 'none' : 'auto'};
+`;
+
+/* Name-your-widget text input inside the shared <Modal>. Theme-driven so
+   it matches SettingsPage modal inputs visually. */
+const NameModalInput = styled.input`
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid ${({ theme }) => theme.colors.border.medium};
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }
+  &:focus {
+    border-color: ${({ theme }) => theme.colors.accent};
+    background: ${({ theme }) => theme.colors.background.elevated};
+  }
 `;
 
 /* ── Hero Card ── */
@@ -732,67 +755,47 @@ export const WidgetStudioPage: React.FC = () => {
         </WidgetGalleryGrid>
         <BigFooter onNavigate={(path) => navigate(path)} />
 
-        {/* Name Modal */}
-        {nameModal && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div onClick={() => setNameModal(null)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
-            <div style={{
-              position: 'relative', background: '#fff', borderRadius: 24, padding: '36px 32px',
-              width: 440, maxWidth: '92vw', boxShadow: '0 24px 64px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.08)',
-              animation: 'modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
-            }}>
-              <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }`}</style>
-              <button onClick={() => setNameModal(null)} style={{
-                position: 'absolute', top: 18, right: 18, width: 32, height: 32, border: 'none',
-                background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer', fontSize: 18, color: '#999',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>×</button>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#6366F1', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: 8 }}>
-                New {nameModal.category === 'calendar' ? 'Calendar' : nameModal.category === 'clock' ? 'Clock' : 'Board'}
-              </div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#1F1F1F', marginBottom: 24, letterSpacing: '-0.03em' }}>
-                Name your widget
-              </div>
-              <input
-                autoFocus
-                value={widgetName}
-                onChange={e => setWidgetName(e.target.value)}
-                placeholder="My awesome widget..."
-                style={{
-                  width: '100%', height: 48, padding: '0 16px', border: '1.5px solid rgba(0,0,0,0.1)',
-                  borderRadius: 12, fontSize: 15, fontFamily: 'inherit', color: '#1F1F1F',
-                  outline: 'none', background: '#FAFAFA', marginBottom: 24, boxSizing: 'border-box' as const,
-                }}
-                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.background = '#fff'; }}
-                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.background = '#FAFAFA'; }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && widgetName.trim()) {
-                    setNameModal(null);
-                    navigate('/studio');
-                  }
-                }}
-              />
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <SharedButton $variant="outline" $size="lg" onClick={() => setNameModal(null)}>
-                  Cancel
-                </SharedButton>
-                <SharedButton
-                  $variant="primary"
-                  $size="lg"
-                  onClick={() => {
-                    if (widgetName.trim() && nameModal) {
-                      const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
-                      setNameModal(null);
-                      navigate('/studio', { state: { newWidget: data } });
-                    }
-                  }}
-                >
-                  Create &amp; Edit
-                </SharedButton>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Name Modal — uses shared <Modal> so it matches the Delete confirmation dialog. */}
+        <Modal
+          open={!!nameModal}
+          onClose={() => setNameModal(null)}
+          title="Name your widget"
+          subtitle={nameModal ? `New ${nameModal.category === 'calendar' ? 'Calendar' : nameModal.category === 'clock' ? 'Clock' : 'Board'}` : undefined}
+          size="sm"
+        >
+          <NameModalInput
+            autoFocus
+            value={widgetName}
+            onChange={e => setWidgetName(e.target.value)}
+            placeholder="My awesome widget..."
+            onKeyDown={e => {
+              if (e.key === 'Enter' && widgetName.trim() && nameModal) {
+                const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
+                setNameModal(null);
+                navigate('/studio', { state: { newWidget: data } });
+              }
+            }}
+          />
+          <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -20, marginTop: 16 }}>
+            <SharedButton type="button" $variant="secondary" $size="lg" onClick={() => setNameModal(null)}>
+              Cancel
+            </SharedButton>
+            <SharedButton
+              type="button"
+              $variant="primary"
+              $size="lg"
+              onClick={() => {
+                if (widgetName.trim() && nameModal) {
+                  const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
+                  setNameModal(null);
+                  navigate('/studio', { state: { newWidget: data } });
+                }
+              }}
+            >
+              Create &amp; Edit
+            </SharedButton>
+          </ModalFooter>
+        </Modal>
 
         {/* Upgrade Modal */}
       </PageWrapper>
