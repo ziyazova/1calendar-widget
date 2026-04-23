@@ -412,95 +412,11 @@ export const DesignSystemV2Page: React.FC = () => {
         </SurfaceCard>
       </Section>
 
-      {/* ─────── Template mockup cards ─────── */}
-      <Section>
-        <SectionHeader>
-          <SectionTitle>Template mockup cards</SectionTitle>
-          <SectionMeta>
-            Single primitive for every product mockup on a cloudy backdrop. Pick a size
-            preset by <em>placement</em> — don't invent new ones. All four share the same
-            gradient, border, and shadow; only aspect, image scale, and drop-shadow change.
-            <br /><br />
-            Files: <code>shared/TemplateMockupCard.tsx</code> · <code>themes/templateCardTokens.ts</code>.
-          </SectionMeta>
-        </SectionHeader>
-
-        {/* grid — /templates page */}
-        <MockupRow>
-          <MockupMeta>
-            <MockupName>grid</MockupName>
-            <MockupWhere>Used on <code>/templates</code> (3-column catalog)</MockupWhere>
-            <MockupProps>288 / 228 · 80% image · radius 2xl · $interactive</MockupProps>
-            <MockupCode>{`<TemplateMockupCard $size="grid" $interactive>
-  <TemplateMockupImage $size="grid" src={t.image} />
-</TemplateMockupCard>`}</MockupCode>
-          </MockupMeta>
-          <MockupPreview style={{ maxWidth: 260 }}>
-            <TemplateMockupCard $size="grid" $interactive>
-              <TemplateMockupImage $size="grid" src="/template-main.png" alt="Grid card" />
-            </TemplateMockupCard>
-          </MockupPreview>
-        </MockupRow>
-
-        {/* marquee — landing Top templates */}
-        <MockupRow>
-          <MockupMeta>
-            <MockupName>marquee</MockupName>
-            <MockupWhere>Landing "Top templates" horizontal scroller</MockupWhere>
-            <MockupProps>288 / 220 · 80% image · tight drop-shadow · $interactive</MockupProps>
-            <MockupCode>{`<TemplateMockupCard $size="marquee" $interactive>
-  <TemplateMockupImage $size="marquee" src={t.image} />
-</TemplateMockupCard>`}</MockupCode>
-          </MockupMeta>
-          <MockupPreview style={{ maxWidth: 280 }}>
-            <TemplateMockupCard $size="marquee" $interactive>
-              <TemplateMockupImage $size="marquee" src="/template-main.png" alt="Marquee card" />
-            </TemplateMockupCard>
-          </MockupPreview>
-        </MockupRow>
-
-        {/* thumb — Related rail */}
-        <MockupRow>
-          <MockupMeta>
-            <MockupName>thumb</MockupName>
-            <MockupWhere>Related templates rail on <code>/templates/:id</code></MockupWhere>
-            <MockupProps>35 / 24 · fixed 140px width · radius md</MockupProps>
-            <MockupCode>{`<div style={{ width: 140 }}>
-  <TemplateMockupCard $size="thumb" $interactive>
-    <TemplateMockupImage $size="thumb" src={r.image} />
-  </TemplateMockupCard>
-</div>`}</MockupCode>
-          </MockupMeta>
-          <MockupPreview>
-            <div style={{ width: 140 }}>
-              <TemplateMockupCard $size="thumb" $interactive>
-                <TemplateMockupImage $size="thumb" src="/template-main.png" alt="Thumb" />
-              </TemplateMockupCard>
-            </div>
-          </MockupPreview>
-        </MockupRow>
-
-        {/* hero — carousel on detail page */}
-        <MockupRow>
-          <MockupMeta>
-            <MockupName>hero</MockupName>
-            <MockupWhere>Big carousel slide on <code>/templates/:id</code></MockupWhere>
-            <MockupProps>560 / 380 · 70% image · loose drop-shadow · $hoverZoom=false</MockupProps>
-            <MockupCode>{`<TemplateMockupCard $size="hero">
-  <TemplateMockupImage
-    $size="hero"
-    $hoverZoom={false}
-    src={t.image}
-  />
-</TemplateMockupCard>`}</MockupCode>
-          </MockupMeta>
-          <MockupPreview style={{ maxWidth: 420 }}>
-            <TemplateMockupCard $size="hero">
-              <TemplateMockupImage $size="hero" $hoverZoom={false} src="/template-main.png" alt="Hero slide" />
-            </TemplateMockupCard>
-          </MockupPreview>
-        </MockupRow>
-      </Section>
+      {/* Product cards are not showcased here: they auto-render from
+          `src/presentation/data/templates.ts` via the shared
+          `TemplateMockupCard` primitive. To add a new product, add one
+          entry to that file — it appears on landing, /templates,
+          Related rail, and the detail carousel with zero extra work. */}
 
       {/* ─────── How to edit ─────── */}
       <Section>

@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Star, Sparkle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill, Button as SharedButton, GoogleIcon, Modal, ModalFooter } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill, Button as SharedButton, GoogleIcon, Modal, ModalFooter, OverlayBadge } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
@@ -425,22 +425,6 @@ const GalleryProBadgeSlot = styled.span`
   z-index: 1;
 `;
 
-const GalleryCardLabel = styled.span`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 11px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(8px);
-  padding: 4px 10px;
-  border-radius: 8px;
-  letter-spacing: -0.01em;
-  z-index: 1;
-`;
-
-
 const GalleryCard = styled.div`
   border-radius: 20px;
   overflow: hidden;
@@ -739,6 +723,7 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
+                <OverlayBadge $tone="accent">{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
                 {item.pro && <GalleryProBadgeSlot><ProPill><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill></GalleryProBadgeSlot>}
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
@@ -890,6 +875,7 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
+                <OverlayBadge $tone="accent">{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
                 {item.pro && <GalleryProBadgeSlot><ProPill><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill></GalleryProBadgeSlot>}
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
