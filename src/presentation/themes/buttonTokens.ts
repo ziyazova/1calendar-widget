@@ -62,6 +62,7 @@ export type ButtonVariant =
   | 'danger'
   | 'dangerStrong'
   | 'success'
+  | 'successSoft'
   | 'link';
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -336,6 +337,27 @@ const success: ButtonVariantTokens = {
   },
 };
 
+/** Success soft — semi-transparent sage fill, emerald text, subtle tinted
+    shadow. Used for reversible confirmation states (e.g. "Copied!") where
+    the loud saturated `success` green would feel aggressive. */
+const successSoft: ButtonVariantTokens = {
+  base: {
+    bg: 'rgba(16, 185, 129, 0.12)',
+    fg: '#0B8D62',
+    border: '1px solid rgba(16, 185, 129, 0.25)',
+    shadow: '0 1px 2px rgba(16, 185, 129, 0.08), 0 2px 8px rgba(16, 185, 129, 0.12)',
+    fontWeight: 600,
+  },
+  hover: {
+    bg: 'rgba(16, 185, 129, 0.16)',
+    shadow: '0 1px 3px rgba(16, 185, 129, 0.12), 0 4px 12px rgba(16, 185, 129, 0.16)',
+  },
+  active: {
+    bg: 'rgba(16, 185, 129, 0.2)',
+    shadow: '0 1px 2px rgba(16, 185, 129, 0.12)',
+  },
+};
+
 /** Link — text-styled, underline on hover. Used inline as a CTA text. */
 const link: ButtonVariantTokens = {
   base: {
@@ -357,6 +379,7 @@ export const buttonVariantTokens: Record<ButtonVariant, ButtonVariantTokens> = {
   danger,
   dangerStrong,
   success,
+  successSoft,
   link,
 };
 

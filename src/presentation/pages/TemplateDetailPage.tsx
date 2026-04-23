@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ChevronDown, Eye, ShoppingCart, Check } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, BackButton, Button, Card, Accordion } from '@/presentation/components/shared';
+import { PageWrapper, BackButton, Button, Card, Accordion, TemplateMockupCard, TemplateMockupImage } from '@/presentation/components/shared';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, FAQ_ITEMS } from '@/presentation/data/templates';
@@ -150,35 +150,7 @@ const Description = styled.p`
   }
 `;
 
-/* ── Image carousel ── */
-
-const CarouselWrap = styled.div`
-  position: relative;
-  width: 100%;
-  aspect-ratio: 560 / 380;
-  border-radius: ${({ theme }) => theme.radii['2xl']};
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.background.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  margin-bottom: 12px;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    aspect-ratio: 4 / 3;
-    border-radius: ${({ theme }) => theme.radii.lg};
-    margin-bottom: 12px;
-  }
-`;
-
-const CarouselImage = styled.img`
-  width: 70%;
-  height: 70%;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-  position: absolute;
-  inset: 0;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.12));
-`;
+/* ── Image carousel ── (card surface now comes from shared TemplateMockupCard) */
 
 const CarouselLabel = styled.div`
   position: absolute;
@@ -705,16 +677,17 @@ export const TemplateDetailPage: React.FC = () => {
             <Title>{template.title}</Title>
             <Description>{template.description}</Description>
 
-            {/* Carousel */}
-            <CarouselWrap style={{ background: 'linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%)' }}>
-              <CarouselImage src={template.image} alt={template.title} />
+            {/* Carousel — shared TemplateMockupCard (hero size) +
+                carousel chevrons layered on top. */}
+            <TemplateMockupCard $size="hero" style={{ marginBottom: 12 }}>
+              <TemplateMockupImage $size="hero" $hoverZoom={false} src={template.image} alt={template.title} />
               <CarouselBtn $side="left" onClick={() => setActiveSlide(i => i > 0 ? i - 1 : slides.length - 1)}>
                 <ChevronLeft />
               </CarouselBtn>
               <CarouselBtn $side="right" onClick={() => setActiveSlide(i => i < slides.length - 1 ? i + 1 : 0)}>
                 <ChevronRight />
               </CarouselBtn>
-            </CarouselWrap>
+            </TemplateMockupCard>
 
             {/* Thumbnails hidden until real images are added
             <Thumbnails>

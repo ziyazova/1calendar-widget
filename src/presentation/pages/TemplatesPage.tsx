@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, BackButton, FilterRow, FilterChip } from '@/presentation/components/shared';
+import { PageWrapper, BackButton, FilterRow, FilterChip, TemplateMockupCard, TemplateMockupImage } from '@/presentation/components/shared';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, CATEGORIES, type Category } from '@/presentation/data/templates';
@@ -136,39 +136,6 @@ const TemplateCardWrap = styled.div`
   animation: ${fadeUp} 0.25s ease both;
 `;
 
-const CardInner = styled.img`
-  position: absolute;
-  inset: 0;
-  width: 80%;
-  height: 80%;
-  margin: auto;
-  object-fit: contain;
-  object-position: center center;
-  transform: scale(1);
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.12));
-`;
-
-const CardImage = styled.div<{ $gradient: string }>`
-  width: 100%;
-  aspect-ratio: 288 / 228;
-  position: relative;
-  border-radius: ${({ theme }) => theme.radii['2xl']};
-  overflow: clip;
-  cursor: pointer;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  box-shadow: ${({ theme }) => theme.shadows.subtle};
-  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
-
-  &:hover ${CardInner} {
-    transform: scale(1.06);
-  }
-
-  @media (max-width: 768px) {
-    border-radius: ${({ theme }) => theme.radii.lg};
-  }
-`;
-
 
 const CardMeta = styled.div`
   padding: 10px 6px 0;
@@ -281,9 +248,9 @@ export const TemplatesPage: React.FC = () => {
         ) : (
           filtered.map((template, i) => (
             <TemplateCardWrap key={template.id} style={{ animationDelay: `${i * 0.04}s` }} onClick={() => navigate(`/templates/${template.id}`)}>
-              <CardImage className="card-preview" $gradient={template.gradient}>
-                <CardInner src={template.image} alt={template.title} />
-              </CardImage>
+              <TemplateMockupCard $size="grid" $interactive>
+                <TemplateMockupImage $size="grid" src={template.image} alt={template.title} />
+              </TemplateMockupCard>
               <CardMeta>
                 <CardTitle>{template.title}</CardTitle>
                 <Price $free={template.price === 'Free'}>{template.price}</Price>

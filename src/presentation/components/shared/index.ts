@@ -59,6 +59,9 @@ export {
 export type { LabelVariant, LabelSize } from './Badges';
 export { Card, CardHeader, CardTitle, CardSubtitle, CardSection } from './Card';
 export { Modal, ModalFooter } from './Modal';
+export { Toast } from './Toast';
+export type { ToastTone } from './Toast';
+export { TemplateMockupCard, TemplateMockupImage } from './TemplateMockupCard';
 export { BottomSheet } from './BottomSheet';
 export { Accordion, AccordionGroup } from './Accordion';
 export { PlanRing } from './PlanRing';

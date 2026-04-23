@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
-import { FilterChip, Button as SharedButton } from '../shared';
+import { FilterChip, Button as SharedButton, TemplateMockupCard, TemplateMockupImage } from '../shared';
 import { TEMPLATES, type Category } from '@/presentation/data/templates';
 
 const fadeUp = keyframes`
@@ -184,50 +184,12 @@ const TemplateCardWrap = styled.div`
   }
 `;
 
-const TemplateCard = styled.div`
-  width: 100%;
-  aspect-ratio: 288 / 220;
-  position: relative;
-  border-radius: ${({ theme }) => theme.radii['2xl']};
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid rgba(43, 35, 32, 0.06);
-  background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
+/* Spacing wrapper around the shared <TemplateMockupCard> so the card has
+   the same bottom gap as other cards in the marquee. Visual chrome comes
+   from templateCardTokens. */
+const TemplateCardSlot = styled.div`
   margin-bottom: 12px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 2px 6px rgba(43, 35, 32, 0.04),
-    0 12px 28px -16px rgba(43, 35, 32, 0.12);
-  transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
-
-  ${TemplateCardWrap}:hover & {
-    border-color: rgba(43, 35, 32, 0.12);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.7),
-      0 4px 10px rgba(43, 35, 32, 0.06),
-      0 20px 44px -18px rgba(43, 35, 32, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    border-radius: ${({ theme }) => theme.radii.md};
-    margin-bottom: 8px;
-  }
-`;
-
-const TemplateCardImage = styled.img`
-  width: 80%;
-  height: 80%;
-  object-fit: contain;
-  display: block;
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.1));
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-
-  ${TemplateCardWrap}:hover & {
-    transform: scale(1.06);
-  }
+  @media (max-width: 768px) { margin-bottom: 8px; }
 `;
 
 const TemplateCardMeta = styled.div`
@@ -332,9 +294,11 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
         <TemplateMarqueeTrack $duration={60}>
           {filteredTemplates.map((t) => (
             <TemplateCardWrap key={t.id} onClick={() => onNavigate(`/templates/${t.id}`)}>
-              <TemplateCard data-ux="Template Card">
-                <TemplateCardImage src={t.image} alt={t.title} />
-              </TemplateCard>
+              <TemplateCardSlot>
+                <TemplateMockupCard $size="marquee" $interactive data-ux="Template Card">
+                  <TemplateMockupImage $size="marquee" src={t.image} alt={t.title} />
+                </TemplateMockupCard>
+              </TemplateCardSlot>
               <TemplateCardMeta>
                 <TemplateCardTitle>{t.title}</TemplateCardTitle>
                 <TemplateCardPrice>{t.price}</TemplateCardPrice>

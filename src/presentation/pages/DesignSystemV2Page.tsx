@@ -460,6 +460,7 @@ function variantBlurb(v: ButtonVariant): string {
     danger: 'Muted wine · reversible destructive',
     dangerStrong: 'Saturated red · irreversible',
     success: 'Emerald · confirm / saved',
+    successSoft: 'Soft sage · reversible confirm (Copied)',
     link: 'Underline on hover',
   };
   return blurbs[v] || '';

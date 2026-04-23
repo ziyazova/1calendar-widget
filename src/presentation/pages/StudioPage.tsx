@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, OverlayBadge } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, OverlayBadge, Toast } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -136,6 +136,20 @@ const WidgetName = styled.div`
 const WidgetActions = styled.div`
   display: flex;
   gap: 6px;
+`;
+
+/* Body copy for the Delete confirmation Modal. Mirrors the pattern used
+   in SettingsPage so both confirmation dialogs read identically. */
+const DeleteModalText = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.body};
+  line-height: 1.5;
+  margin: 0;
+
+  strong {
+    color: ${({ theme }) => theme.colors.text.primary};
+    font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  }
 `;
 
 /* Empty state */
@@ -845,7 +859,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 outline: 'none',
               }} onClick={e => (e.target as HTMLInputElement).select()} />
               <SharedButton
-                $variant={copied ? 'success' : 'slate'}
+                $variant={copied ? 'successSoft' : 'slate'}
                 $size="md"
                 onClick={() => { navigator.clipboard.writeText(embedUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); }}
               >
@@ -1024,7 +1038,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                       <WidgetActions>
                         <SharedButton $variant="primary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
                         <SharedButton
-                          $variant={copiedWidgetId === w.id ? 'success' : 'outline'}
+                          $variant={copiedWidgetId === w.id ? 'successSoft' : 'outline'}
                           $size="sm"
                           $iconOnly
                           aria-label={copiedWidgetId === w.id ? 'Copied' : 'Copy embed URL'}
@@ -1124,17 +1138,23 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         title="Delete widget?"
         size="sm"
       >
-        <p style={{ margin: 0, fontSize: 14, color: '#555', lineHeight: 1.5 }}>
-          <strong style={{ color: '#1F1F1F' }}>{deleteTarget?.name}</strong> will be permanently removed.
+        <DeleteModalText>
+          <strong>{deleteTarget?.name}</strong> will be permanently removed.
           Any embeds using this widget will stop working.
-        </p>
-        <ModalFooter>
-          <SharedButton $variant="ghost" $size="md" onClick={() => setDeleteTarget(null)}>
+        </DeleteModalText>
+        <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -20, marginTop: 16 }}>
+          <SharedButton
+            type="button"
+            $variant="secondary"
+            $size="lg"
+            onClick={() => setDeleteTarget(null)}
+          >
             Cancel
           </SharedButton>
           <SharedButton
+            type="button"
             $variant="danger"
-            $size="md"
+            $size="lg"
             onClick={() => {
               if (deleteTarget) {
                 handleDelete(deleteTarget.id);
@@ -1142,10 +1162,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               }
             }}
           >
-            <Trash2 /> Delete
+            <Trash2 /> Delete widget
           </SharedButton>
         </ModalFooter>
       </Modal>
+
+      <Toast open={copiedWidgetId !== null} onClose={() => setCopiedWidgetId(null)} tone="success">
+        Embed code copied
+      </Toast>
 
       {/* Upgrade modal is rendered globally via UpgradeModalProvider (see App.tsx). */}
     </Page>
