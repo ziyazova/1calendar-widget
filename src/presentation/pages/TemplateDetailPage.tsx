@@ -464,15 +464,6 @@ const InfoValue = styled.span`
   font-weight: ${({ theme }) => theme.typography.weights.medium};
 `;
 
-const CategoryTag = styled.span`
-  display: inline-block;
-  padding: 2px 10px;
-  background: ${({ theme }) => theme.colors.background.surface};
-  border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
 
 /* ── Related templates ── */
 

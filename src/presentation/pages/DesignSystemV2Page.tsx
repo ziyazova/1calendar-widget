@@ -22,7 +22,10 @@ import {
   UpgradeInner,
   UpgradePrice,
   Label,
+  Tag,
+  OverlayBadge,
   PlanBadge,
+  Footer,
   Switch,
   ToggleTabs,
   ToggleRow,
@@ -226,7 +229,7 @@ export const DesignSystemV2Page: React.FC = () => {
                 </DropdownUserText>
               </DropdownUserRow>
               <DropdownDivider />
-              <Button $variant="accent" $size="xl" $fullWidth style={{ justifyContent: 'space-between' }}>
+              <Button $variant="accent" $size="xl" $fullWidth style={{ justifyContent: 'space-between', padding: '0 16px' }}>
                 <UpgradeInner>
                   <Sparkles fill="currentColor" strokeWidth={1.5} />
                   Upgrade to Pro
@@ -354,6 +357,39 @@ export const DesignSystemV2Page: React.FC = () => {
             <PlanBadge $pro>Pro</PlanBadge>
             <PlanBadge>Free</PlanBadge>
           </Row>
+
+          <VariantLabel style={{ marginTop: 24 }}>Tag — inline metadata chip (subtle, lowercase)</VariantLabel>
+          <Row>
+            <Tag>Productivity</Tag>
+            <Tag>Notion</Tag>
+            <Tag>Planners</Tag>
+            <Tag>Student</Tag>
+          </Row>
+
+          <VariantLabel style={{ marginTop: 24 }}>OverlayBadge — glass chip on card art (top-left)</VariantLabel>
+          <Row>
+            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: 'linear-gradient(135deg, #E8D5FF, #FFD0E8)' }}>
+              <OverlayBadge>New</OverlayBadge>
+            </div>
+            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: 'linear-gradient(135deg, #D5E5FF, #E8FFE8)' }}>
+              <OverlayBadge>Popular</OverlayBadge>
+            </div>
+          </Row>
+        </SurfaceCard>
+      </Section>
+
+      {/* ─────── Layout: Footer ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Layout — Footer</SectionTitle>
+          <SectionMeta>
+            Classic footer used on Login, Settings, Privacy, and auth pages · <code>shared/Footer.tsx</code>.
+            TopNav lives in <code>components/layout/TopNav.tsx</code> and auto-renders on every page.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SurfaceCard style={{ padding: 0, overflow: 'hidden' }}>
+          <Footer />
         </SurfaceCard>
       </Section>
 

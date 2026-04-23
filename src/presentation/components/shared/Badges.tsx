@@ -108,6 +108,41 @@ export const PlanBadge = styled.span<{ $pro?: boolean }>`
   }}
 `;
 
+/* Tag — subtle inline category/metadata chip (lowercase, surface bg).
+   Use for taxonomy markers like "planners", "student", "productivity" —
+   NOT tier indicators (those use <Label $variant>). */
+export const Tag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: ${({ theme }) => theme.colors.background.surface};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+`;
+
+/* OverlayBadge — glass chip pinned top-left of card art (e.g., "New"
+   on a template card). Absolute-positioned, transparent white bg
+   with backdrop blur. Use on top of images/previews. */
+export const OverlayBadge = styled.span`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: ${({ theme }) => theme.colors.text.primary};
+  border-radius: 6px;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+`;
+
 /* ── Legacy constants — re-exported for call-sites that still reference them. ── */
 
 export const BADGE_ACCENT = '#6366F1';

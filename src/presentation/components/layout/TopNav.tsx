@@ -563,7 +563,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                       $size="xl"
                       $fullWidth
                       onClick={() => { setAvatarOpen(false); openUpgrade(); }}
-                      style={{ justifyContent: 'space-between' }}
+                      style={{ justifyContent: 'space-between', padding: '0 16px' }}
                     >
                       <UpgradeInner>
                         <Sparkles fill="currentColor" strokeWidth={1.5} />

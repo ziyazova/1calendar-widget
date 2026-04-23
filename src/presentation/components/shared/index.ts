@@ -35,6 +35,8 @@ export { Button, PrimaryButton, SecondaryButton } from './Button';
 export { PageTransition } from './PageTransition';
 export {
   Label,
+  Tag,
+  OverlayBadge,
   ProPill,
   NewPill,
   FreePill,

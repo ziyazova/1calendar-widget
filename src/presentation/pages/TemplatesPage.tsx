@@ -169,18 +169,6 @@ const CardImage = styled.div<{ $gradient: string }>`
   }
 `;
 
-const CardBadge = styled.span`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 8px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  color: ${({ theme }) => theme.colors.text.primary};
-  border-radius: 6px;
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-`;
 
 const CardMeta = styled.div`
   padding: 10px 6px 0;
