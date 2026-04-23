@@ -3,6 +3,8 @@ export { Footer } from './Footer';
 export { FilterChip, FilterRow } from './FilterChip';
 export { Segment, SegmentGroup } from './Segment';
 export { GoogleIcon } from './GoogleIcon';
+export { Switch, ToggleTabs, ToggleRow, ToggleLabel, HiddenCheckbox } from './Toggle';
+export { Input, InputRow, InputLabel } from './Input';
 export {
   AccountPillWrap,
   AccountPill,

@@ -7,6 +7,13 @@ import { CalendarSettings } from '../../../../domain/value-objects/CalendarSetti
 import { ClockSettings } from '../../../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../../../domain/value-objects/BoardSettings';
 import { ColorPicker } from '../ColorPicker';
+import {
+  ToggleRow,
+  ToggleLabel,
+  Switch,
+  ToggleTabs,
+  Input as SharedInput,
+} from '@/presentation/components/shared';
 
 export type PanelSection = 'style' | 'content' | 'color' | 'layout' | null;
 
@@ -257,76 +264,6 @@ const SliderValue = styled.span`
   text-align: right;
 `;
 
-const Toggle = styled.label`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  padding: 4px 0;
-  border-radius: 4px;
-  transition: opacity 0.12s ease;
-
-  @media (max-width: 768px) {
-    padding: 6px 0;
-  }
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-const ToggleText = styled.span`
-  font-size: 12px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.01em;
-
-  @media (max-width: 768px) { font-size: 13px; }
-`;
-
-const ToggleSwitch = styled.div<{ $checked: boolean }>`
-  width: 40px;
-  height: 22px;
-  border-radius: 12px;
-  background: ${({ $checked, theme }) => $checked
-    ? `linear-gradient(135deg, ${theme.colors.brand.indigo}, ${theme.colors.brand.indigoLight})`
-    : 'rgba(0, 0, 0, 0.08)'};
-  box-shadow: ${({ $checked, theme }) => $checked ? 'none' : theme.shadows.form};
-  position: relative;
-  transition: background 0.25s ease;
-  flex-shrink: 0;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: ${({ $checked }) => $checked ? '20px' : '2px'};
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @media (max-width: 768px) {
-    width: 46px;
-    height: 26px;
-    border-radius: 12px;
-
-    &::after {
-      width: 22px;
-      height: 22px;
-      left: ${({ $checked }) => $checked ? '22px' : '2px'};
-    }
-  }
-`;
-
-const HiddenCheckbox = styled.input`
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-`;
 
 const EmptyState = styled.div`
   text-align: center;
@@ -425,31 +362,6 @@ const ImageInputRow = styled.div`
   gap: 8px;
 `;
 
-const ImageUrlInput = styled.input`
-  flex: 1;
-  min-width: 0;
-  height: 34px;
-  padding: 0 12px;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: rgba(255, 255, 255, 0.8);
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: 12px;
-  font-family: inherit;
-  transition: all 0.15s ease;
-
-  &:hover {
-    border-color: rgba(99, 102, 241, 0.3);
-  }
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  }
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.text.secondary};
-  }
-`;
 
 const AddButton = styled.button`
   height: 36px;
@@ -617,59 +529,6 @@ const LayoutOptions = styled.div`
   gap: 8px;
 `;
 
-const CompactOptions = styled.div`
-  width: 96px;
-  height: 27px;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.08);
-  border: none;
-  box-shadow: ${({ theme }) => theme.shadows.form};
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-
-  @media (max-width: 768px) { width: 108px; height: 32px; }
-`;
-
-const CompactSlider = styled.div<{ $activeIndex: number }>`
-  position: absolute;
-  top: 2px;
-  left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 45px - 2px)'};
-  width: 45px;
-  height: calc(100% - 4px);
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: #ffffff;
-  border: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-  @media (max-width: 768px) {
-    width: 52px;
-    left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 52px - 2px)'};
-  }
-`;
-
-const CompactOption = styled.button<{ $active: boolean }>`
-  flex: 1;
-  height: 100%;
-  border: none;
-  background: transparent;
-  color: ${({ $active, theme }) => $active ? theme.colors.brand.indigo : theme.colors.text.secondary};
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  position: relative;
-  z-index: 1;
-  transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0;
-  line-height: 21px;
-
-  @media (max-width: 768px) { font-size: 13px; }
-`;
 
 export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   widget,
@@ -836,36 +695,26 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           {widget.type === 'calendar' && (
           <>
             <FormGroup>
-              <Toggle as="div">
-                <ToggleText>Week start</ToggleText>
-                <CompactOptions>
-                  <CompactSlider $activeIndex={(settings as CalendarSettings).weekStart === 'monday' ? 0 : 1} />
-                  <CompactOption
-                    $active={(settings as CalendarSettings).weekStart === 'monday'}
-                    onClick={() => onSettingsChange({ weekStart: 'monday' })}
-                  >
-                    Mon
-                  </CompactOption>
-                  <CompactOption
-                    $active={(settings as CalendarSettings).weekStart === 'sunday'}
-                    onClick={() => onSettingsChange({ weekStart: 'sunday' })}
-                  >
-                    Sun
-                  </CompactOption>
-                </CompactOptions>
-              </Toggle>
+              <ToggleRow as="div">
+                <ToggleLabel>Week start</ToggleLabel>
+                <ToggleTabs<'monday' | 'sunday'>
+                  value={(settings as CalendarSettings).weekStart}
+                  options={['monday', 'sunday']}
+                  labels={['Mon', 'Sun']}
+                  onChange={(v) => onSettingsChange({ weekStart: v })}
+                />
+              </ToggleRow>
             </FormGroup>
 
             <FormGroup>
-              <Toggle>
-                <ToggleText>Day grid</ToggleText>
-                <ToggleSwitch $checked={(settings as CalendarSettings).showDayBorders} />
-                <HiddenCheckbox
-                  type="checkbox"
+              <ToggleRow>
+                <ToggleLabel>Day grid</ToggleLabel>
+                <Switch
                   checked={(settings as CalendarSettings).showDayBorders}
-                  onChange={(e) => onSettingsChange({ showDayBorders: e.target.checked })}
+                  onChange={(v) => onSettingsChange({ showDayBorders: v })}
+                  aria-label="Day grid"
                 />
-              </Toggle>
+              </ToggleRow>
             </FormGroup>
           </>
           )}
@@ -874,52 +723,41 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           <>
             {!isFlowerClockStyle && (
             <FormGroup>
-              <Toggle as="div">
-                <ToggleText>Format</ToggleText>
-                <CompactOptions>
-                  <CompactSlider $activeIndex={(settings as ClockSettings).format24h ? 1 : 0} />
-                  <CompactOption
-                    $active={!(settings as ClockSettings).format24h}
-                    onClick={() => onSettingsChange({ format24h: false })}
-                  >
-                    12h
-                  </CompactOption>
-                  <CompactOption
-                    $active={(settings as ClockSettings).format24h}
-                    onClick={() => onSettingsChange({ format24h: true })}
-                  >
-                    24h
-                  </CompactOption>
-                </CompactOptions>
-              </Toggle>
+              <ToggleRow as="div">
+                <ToggleLabel>Format</ToggleLabel>
+                <ToggleTabs<'12' | '24'>
+                  value={(settings as ClockSettings).format24h ? '24' : '12'}
+                  options={['12', '24']}
+                  labels={['12h', '24h']}
+                  onChange={(v) => onSettingsChange({ format24h: v === '24' })}
+                />
+              </ToggleRow>
             </FormGroup>
             )}
 
             {!isDuoClockStyle && (
             <FormGroup>
-              <Toggle>
-                <ToggleText>Seconds</ToggleText>
-                <ToggleSwitch $checked={(settings as ClockSettings).showSeconds} />
-                <HiddenCheckbox
-                  type="checkbox"
+              <ToggleRow>
+                <ToggleLabel>Seconds</ToggleLabel>
+                <Switch
                   checked={(settings as ClockSettings).showSeconds}
-                  onChange={(e) => onSettingsChange({ showSeconds: e.target.checked })}
+                  onChange={(v) => onSettingsChange({ showSeconds: v })}
+                  aria-label="Seconds"
                 />
-              </Toggle>
+              </ToggleRow>
             </FormGroup>
             )}
 
             {!isFlowerClockStyle && (
             <FormGroup>
-              <Toggle>
-                <ToggleText>{isDuoClockStyle ? 'Weekdays' : 'Date'}</ToggleText>
-                <ToggleSwitch $checked={(settings as ClockSettings).showDate} />
-                <HiddenCheckbox
-                  type="checkbox"
+              <ToggleRow>
+                <ToggleLabel>{isDuoClockStyle ? 'Weekdays' : 'Date'}</ToggleLabel>
+                <Switch
                   checked={(settings as ClockSettings).showDate}
-                  onChange={(e) => onSettingsChange({ showDate: e.target.checked })}
+                  onChange={(v) => onSettingsChange({ showDate: v })}
+                  aria-label={isDuoClockStyle ? 'Weekdays' : 'Date'}
                 />
-              </Toggle>
+              </ToggleRow>
             </FormGroup>
             )}
 
@@ -946,12 +784,13 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </ImageHint>
             <FormGroup>
               <ImageInputRow>
-                <ImageUrlInput
+                <SharedInput
                   type="text"
                   placeholder="https://..."
                   value={imageUrlInput}
                   onChange={(e) => setImageUrlInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleAddImage(); }}
+                  style={{ flex: 1, minWidth: 0 }}
                 />
                 <AddButton
                   onClick={handleAddImage}
@@ -1107,15 +946,14 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
           </FormGroup>
 
           <FormGroup>
-            <Toggle>
-              <ToggleText>Widget border</ToggleText>
-              <ToggleSwitch $checked={settings.showBorder} />
-              <HiddenCheckbox
-                type="checkbox"
+            <ToggleRow>
+              <ToggleLabel>Widget border</ToggleLabel>
+              <Switch
                 checked={settings.showBorder}
-                onChange={(e) => onSettingsChange({ showBorder: e.target.checked })}
+                onChange={(v) => onSettingsChange({ showBorder: v })}
+                aria-label="Widget border"
               />
-            </Toggle>
+            </ToggleRow>
           </FormGroup>
         </Section>
         )}
