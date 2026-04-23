@@ -167,7 +167,7 @@ const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
   box-shadow: ${({ $selected, $color }) => {
     const darkBorder = `0 0 0 0.5px color-mix(in srgb, ${$color} 88%, #000)`;
     return $selected
-      ? `0 0 0 1.5px #fff, 0 0 0 2.5px rgba(51,132,244,0.5), ${darkBorder}`
+      ? `0 0 0 1.5px #fff, 0 0 0 2.5px rgba(99,102,241,0.5), ${darkBorder}`
       : darkBorder;
   }};
   background-color: ${({ $color }) => $color};
@@ -370,7 +370,7 @@ const PickerHexInput = styled.input`
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.accent};
-    box-shadow: 0 0 0 2px rgba(51, 132, 244, 0.1);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
     color: ${({ theme }) => theme.colors.text.primary};
   }
 `;

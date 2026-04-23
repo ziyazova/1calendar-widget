@@ -29,6 +29,7 @@ import {
   ToggleLabel,
   Input,
   FormField,
+  PlanUsageCard,
 } from '../components/shared';
 import { labelVariantTokens } from '../themes/labelTokens';
 import type { LabelVariant } from '../components/shared';
@@ -281,6 +282,39 @@ export const DesignSystemV2Page: React.FC = () => {
         </SurfaceCard>
       </Section>
 
+      {/* ─────── Plan usage card ─────── */}
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Plan usage card</SectionTitle>
+          <SectionMeta>
+            Usage ring + Upgrade/Manage — Studio header + widgets row ·{' '}
+            <code>PlanUsageCard.tsx</code>.
+          </SectionMeta>
+        </SectionHeader>
+
+        <SurfaceCard>
+          <VariantLabel>Free · wide (under widgets row)</VariantLabel>
+          <Row>
+            <PlanUsageCard mode="free" $size="wide" used={9} limit={3} onUpgrade={() => {}} />
+          </Row>
+
+          <VariantLabel style={{ marginTop: 20 }}>Free · compact (top bar)</VariantLabel>
+          <Row>
+            <PlanUsageCard mode="free" $size="compact" used={9} limit={3} onUpgrade={() => {}} />
+          </Row>
+
+          <VariantLabel style={{ marginTop: 20 }}>Pro · wide (active plan)</VariantLabel>
+          <Row>
+            <PlanUsageCard mode="pro" $size="wide" onManage={() => {}} />
+          </Row>
+
+          <VariantLabel style={{ marginTop: 20 }}>Pro · compact</VariantLabel>
+          <Row>
+            <PlanUsageCard mode="pro" $size="compact" onManage={() => {}} />
+          </Row>
+        </SurfaceCard>
+      </Section>
+
       {/* ─────── Form controls ─────── */}
       <Section>
         <SectionHeader>
@@ -427,7 +461,7 @@ const FormControlsDemo: React.FC = () => {
         onChange={(e) => setUrlText(e.target.value)}
       />
 
-      <VariantLabel style={{ marginTop: 20 }}>FormField — 44px · default (empty)</VariantLabel>
+      <VariantLabel style={{ marginTop: 20 }}>FormField — 5 states (44px)</VariantLabel>
       <FormField
         label="Email"
         hint="Optional"
@@ -435,20 +469,8 @@ const FormControlsDemo: React.FC = () => {
         icon={<Mail />}
         placeholder="you@peachy.studio"
       />
-
-      <VariantLabel style={{ marginTop: 12 }}>FormField — focused</VariantLabel>
-      <FormField
-        label="Email"
-        hint="(focused)"
-        icon={<Mail />}
-        defaultValue="hello@peachy.studio"
-        autoFocus
-      />
-
-      <VariantLabel style={{ marginTop: 12 }}>FormField — password with trailing action</VariantLabel>
       <FormField
         label="Password"
-        helper="8+ characters, mix of letters and numbers."
         icon={<Lock />}
         type={showPw ? 'text' : 'password'}
         defaultValue="supersecret"
@@ -463,8 +485,6 @@ const FormControlsDemo: React.FC = () => {
           </button>
         }
       />
-
-      <VariantLabel style={{ marginTop: 12 }}>FormField — error</VariantLabel>
       <FormField
         label="Email"
         state="error"
@@ -472,8 +492,6 @@ const FormControlsDemo: React.FC = () => {
         defaultValue="not-an-email"
         helper="Please enter a valid email address."
       />
-
-      <VariantLabel style={{ marginTop: 12 }}>FormField — success</VariantLabel>
       <FormField
         label="Email"
         state="success"
@@ -482,8 +500,6 @@ const FormControlsDemo: React.FC = () => {
         helper="Email verified."
         trailing={<Check />}
       />
-
-      <VariantLabel style={{ marginTop: 12 }}>FormField — disabled / locked</VariantLabel>
       <FormField
         label="Email"
         disabled

@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet, Segment, SegmentGroup } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -797,32 +797,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </div>
           {/* Status + Upgrade — right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {planLoading ? null : isPro ? (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', height: 22, padding: '0 10px',
-                borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
-                textTransform: 'uppercase' as const,
-                color: '#fff', background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-                boxShadow: '0 1px 4px rgba(99,102,241,0.25)',
-              }}>Pro</span>
-            ) : (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
-                    <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="3" />
-                    <circle cx="12" cy="12" r="9" fill="none"
-                      stroke={widgets.length >= 3 ? '#F49B8B' : '#6366F1'}
-                      strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
-                      style={{ transition: 'stroke-dasharray 0.3s' }}
-                    />
-                  </svg>
-                  <span style={{ fontSize: 12, fontWeight: 500, color: '#999', whiteSpace: 'nowrap' as const }}>{widgets.length}/3</span>
-                </div>
-                <SharedButton $variant="accent" $size="sm" onClick={() => openUpgrade()}>
-                  Upgrade now
-                </SharedButton>
-              </>
+            {planLoading ? null : (
+              <PlanUsageCard
+                mode={isPro ? 'pro' : 'free'}
+                $size="compact"
+                used={widgets.length}
+                limit={3}
+                onUpgrade={() => openUpgrade()}
+                onManage={() => navigate('/settings')}
+              />
             )}
           </div>
         </div>
@@ -977,45 +960,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             </h1>
             <p style={{ fontSize: 15, color: '#999', margin: 0 }}>Manage your widgets and templates</p>
           </div>
-          {planLoading ? null : isPro ? (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              background: '#FAFAFA', borderRadius: 16, padding: '10px 16px',
-              border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
-            }}>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', height: 22, padding: '0 10px',
-                borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
-                textTransform: 'uppercase' as const,
-                color: '#fff', background: 'linear-gradient(135deg, #6366F1, #818CF8)',
-                boxShadow: '0 1px 4px rgba(99,102,241,0.25)',
-              }}>Pro</span>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#555', whiteSpace: 'nowrap' as const }}>
-                {widgets.length} {widgets.length === 1 ? 'widget' : 'widgets'} · unlimited
-              </span>
-            </div>
-          ) : (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 16,
-              background: '#FAFAFA', borderRadius: 16, padding: '10px 16px',
-              border: '1px solid rgba(0,0,0,0.06)', marginTop: 2,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
-                  <circle cx="12" cy="12" r="9" fill="none" stroke="#EBEBEB" strokeWidth="3" />
-                  <circle cx="12" cy="12" r="9" fill="none"
-                    stroke={widgets.length >= 3 ? '#F49B8B' : '#6366F1'}
-                    strokeWidth="3" strokeLinecap="round"
-                    strokeDasharray={`${Math.min((widgets.length / 3), 1) * 56.5} 56.5`}
-                    style={{ transition: 'stroke-dasharray 0.3s' }}
-                  />
-                </svg>
-                <span style={{ fontSize: 12, fontWeight: 500, color: '#888', whiteSpace: 'nowrap' as const }}>{widgets.length} of 3 widgets</span>
-              </div>
-              <SharedButton $variant="accent" $size="md" onClick={() => openUpgrade()}>
-                Upgrade now
-              </SharedButton>
-            </div>
+          {planLoading ? null : (
+            <PlanUsageCard
+              mode={isPro ? 'pro' : 'free'}
+              $size="wide"
+              used={widgets.length}
+              limit={3}
+              onUpgrade={() => openUpgrade()}
+              onManage={() => navigate('/settings')}
+            />
           )}
         </div>
 

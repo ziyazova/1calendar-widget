@@ -7,6 +7,8 @@ export { Switch, ToggleTabs, ToggleRow, ToggleLabel, HiddenCheckbox } from './To
 export { Input, InputRow, InputLabel } from './Input';
 export { FormField } from './FormField';
 export type { InputSize, InputState } from './FormField';
+export { PlanUsageCard } from './PlanUsageCard';
+export type { PlanUsageMode, PlanUsageSize } from './PlanUsageCard';
 export {
   AccountPillWrap,
   AccountPill,

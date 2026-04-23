@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link, useLocation } from 'react-router-dom';
 import { Cookie } from 'lucide-react';
+import { Button } from './Button';
 
 const CONSENT_KEY = 'peachy_consent';
 
@@ -15,14 +16,14 @@ const Wrap = styled.div`
   left: 50%;
   bottom: 20px;
   transform: translateX(-50%);
-  z-index: 150;
+  z-index: ${({ theme }) => theme.zIndex.overlay};
   width: min(560px, calc(100vw - 32px));
-  background: rgba(255, 255, 255, 0.96);
+  background: ${({ theme }) => theme.colors.background.glassBright};
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid ${({ theme }) => theme.colors.border.subtle};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  box-shadow: ${({ theme }) => theme.shadows.floating};
   padding: 16px 18px;
   display: flex;
   align-items: center;
@@ -40,30 +41,34 @@ const IconWrap = styled.div`
   width: 38px;
   height: 38px;
   flex-shrink: 0;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.5));
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.gradients.softBanner};
   display: flex;
   align-items: center;
   justify-content: center;
 
-  svg { width: 18px; height: 18px; color: #6366F1; }
+  svg {
+    width: 18px;
+    height: 18px;
+    color: ${({ theme }) => theme.colors.brand.indigo};
+  }
 `;
 
 const Message = styled.div`
   flex: 1;
-  font-size: 13px;
-  color: #444;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: 1.5;
   letter-spacing: -0.01em;
 
-  strong { color: #1F1F1F; font-weight: 600; }
+  strong { color: ${({ theme }) => theme.colors.text.primary}; font-weight: 600; }
 `;
 
 const PrivacyLink = styled(Link)`
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.brand.indigo};
   text-decoration: none;
-  border-bottom: 1px solid rgba(99,102,241,0.25);
-  &:hover { border-bottom-color: #6366F1; }
+  border-bottom: 1px solid rgba(99, 102, 241, 0.25);
+  &:hover { border-bottom-color: ${({ theme }) => theme.colors.brand.indigo}; }
 `;
 
 const Actions = styled.div`
@@ -76,28 +81,11 @@ const Actions = styled.div`
   }
 `;
 
-const AcceptBtn = styled.button`
-  height: 34px;
-  padding: 0 16px;
-  border: none;
-  border-radius: 12px;
-  background: #1F1F1F;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s;
-  letter-spacing: -0.01em;
-
-  &:hover { background: #333; }
-`;
-
 const getInitialConsent = (): boolean => {
   try {
     return localStorage.getItem(CONSENT_KEY) === 'accepted';
   } catch {
-    return true; // if storage unavailable, don't block UI
+    return true;
   }
 };
 
@@ -105,10 +93,8 @@ export const ConsentBanner: React.FC = () => {
   const { pathname } = useLocation();
   const [accepted, setAccepted] = useState(() => getInitialConsent());
 
-  // Avoid hydration flashes when navigating between routes.
   useEffect(() => { setAccepted(getInitialConsent()); }, []);
 
-  // Never show the banner inside iframes used for Notion embeds.
   if (pathname.startsWith('/embed/')) return null;
   if (accepted) return null;
 
@@ -125,7 +111,7 @@ export const ConsentBanner: React.FC = () => {
         you agree to our <PrivacyLink to="/privacy">Privacy Policy</PrivacyLink>.
       </Message>
       <Actions>
-        <AcceptBtn onClick={handleAccept}>Accept</AcceptBtn>
+        <Button $variant="primary" $size="sm" onClick={handleAccept}>Accept</Button>
       </Actions>
     </Wrap>
   );
