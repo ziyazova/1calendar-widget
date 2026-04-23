@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, OverlayBadge } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -117,20 +117,6 @@ const WidgetPreviewWrap = styled.div`
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   cursor: pointer;
   position: relative;
-`;
-
-const WidgetLabel = styled.span`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.accent};
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(8px);
-  padding: 3px 10px;
-  border-radius: 6px;
-  z-index: 1;
 `;
 
 const WidgetBottom = styled.div`
@@ -451,6 +437,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedWidgetId, setCopiedWidgetId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SavedWidget | null>(null);
   const [studioZoom, setStudioZoom] = useState(1.2);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const lastSavedRef = useRef<string>('');
@@ -1029,15 +1016,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 {widgets.map((w, i) => (
                   <WidgetCard key={w.id} $i={i}>
                     <WidgetPreviewWrap onClick={() => handleEdit(w)}>
-                      <WidgetLabel>{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</WidgetLabel>
+                      <OverlayBadge $tone="accent">{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
                       <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                     </WidgetPreviewWrap>
                     <WidgetBottom>
                       <WidgetName>{w.name}</WidgetName>
                       <WidgetActions>
-                        <SharedButton $variant="outline" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
+                        <SharedButton $variant="primary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
                         <SharedButton
-                          $variant="outline"
+                          $variant={copiedWidgetId === w.id ? 'success' : 'outline'}
                           $size="sm"
                           $iconOnly
                           aria-label={copiedWidgetId === w.id ? 'Copied' : 'Copy embed URL'}
@@ -1053,7 +1040,16 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                         >
                           {copiedWidgetId === w.id ? <Check /> : <Copy />}
                         </SharedButton>
-                        <SharedButton $variant="danger" $size="sm" onClick={() => handleDelete(w.id)}><Trash2 /></SharedButton>
+                        <SharedButton
+                          $variant="danger"
+                          $size="sm"
+                          $iconOnly
+                          aria-label="Delete widget"
+                          style={{ marginLeft: 'auto' }}
+                          onClick={() => setDeleteTarget(w)}
+                        >
+                          <Trash2 />
+                        </SharedButton>
                       </WidgetActions>
                     </WidgetBottom>
                   </WidgetCard>
@@ -1121,6 +1117,35 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </>
         )}
       </Container>
+
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete widget?"
+        size="sm"
+      >
+        <p style={{ margin: 0, fontSize: 14, color: '#555', lineHeight: 1.5 }}>
+          <strong style={{ color: '#1F1F1F' }}>{deleteTarget?.name}</strong> will be permanently removed.
+          Any embeds using this widget will stop working.
+        </p>
+        <ModalFooter>
+          <SharedButton $variant="ghost" $size="md" onClick={() => setDeleteTarget(null)}>
+            Cancel
+          </SharedButton>
+          <SharedButton
+            $variant="danger"
+            $size="md"
+            onClick={() => {
+              if (deleteTarget) {
+                handleDelete(deleteTarget.id);
+                setDeleteTarget(null);
+              }
+            }}
+          >
+            <Trash2 /> Delete
+          </SharedButton>
+        </ModalFooter>
+      </Modal>
 
       {/* Upgrade modal is rendered globally via UpgradeModalProvider (see App.tsx). */}
     </Page>

@@ -30,12 +30,12 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tightest};
   text-align: center;
-  margin: 0 0 ${({ theme }) => theme.spacing['2']};
+  margin: 0 0 ${({ theme }) => theme.spacing['3']};
 `;
 
 const Subtitle = styled.p`
@@ -673,7 +673,7 @@ export const LoginPage: React.FC = () => {
           <Button
             type="submit"
             $variant="primary"
-            $size="xl"
+            $size="lg"
             $fullWidth
             disabled={submitting || (isSignUp ? !canSubmitSignup : !canSubmitLogin)}
             style={{ marginTop: 8 }}
@@ -691,7 +691,7 @@ export const LoginPage: React.FC = () => {
 
         <Divider>or</Divider>
 
-        <Button $variant="secondary" $size="xl" $fullWidth onClick={() => auth.loginWithGoogle()}>
+        <Button $variant="secondary" $size="lg" $fullWidth onClick={() => auth.loginWithGoogle()}>
           <GoogleIcon />
           Continue with Google
         </Button>
