@@ -40,14 +40,15 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — shrink vertical footprint. min-height:auto lets the section
-   * size to its content instead of 620px empty. Vertical padding is
-   * balanced (equal top + bottom) so flex centering lands the content
-   * in the visual middle of the filled hero card. */
+  /* Phone — shrink vertical footprint + pin the social-proof eyebrow
+   * near the top of the filled card. Rest of the content (headline,
+   * sub, CTAs, meta) is centered vertically below it by the flex rules
+   * above. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 24px 20px 24px;
+    padding: 12px 20px 32px;
+    justify-content: flex-start;
   }
 `;
 

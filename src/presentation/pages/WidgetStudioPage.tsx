@@ -575,13 +575,12 @@ const PricingPlanRow = styled.div`
   margin-bottom: 4px;
 `;
 
-const PricingPlan = styled.div<{ $highlighted?: boolean }>`
+const PricingPlan = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: ${({ $highlighted, theme }) =>
-    $highlighted ? theme.colors.accent : theme.colors.text.tertiary};
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const PricingPlanDesc = styled.div`
@@ -598,7 +597,7 @@ const PricingPriceRow = styled.div`
 `;
 
 const PricingPrice = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
+  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -630,6 +629,32 @@ const PricingFeatures = styled.ul`
     width: 16px;
     height: 16px;
     color: ${({ theme }) => theme.colors.accent};
+    flex-shrink: 0;
+  }
+`;
+
+const PricingReassure = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 32px;
+  margin-top: 32px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  span::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.colors.peach.deepWarm};
     flex-shrink: 0;
   }
 `;
@@ -990,6 +1015,11 @@ export const WidgetStudioPage: React.FC = () => {
                 <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch}>Get Pro</SharedButton>
               </PricingCard>
             </PricingGrid>
+            <PricingReassure>
+              <span>Works instantly in Notion</span>
+              <span>No sign-up required</span>
+              <span>Easy to customize</span>
+            </PricingReassure>
           </PricingSection>
           </Section>
 
