@@ -69,6 +69,13 @@ export {
   ConsentBannerPrivacyLink,
   ConsentBannerActions,
 } from './ConsentBanner';
+export {
+  InfoBanner,
+  InfoBannerIcon,
+  InfoBannerBody,
+  InfoBannerTitle,
+  InfoBannerSub,
+} from './InfoBanner';
 export { TemplateMockupCard, TemplateMockupImage } from './TemplateMockupCard';
 export { BottomSheet } from './BottomSheet';
 export { Accordion, AccordionGroup } from './Accordion';

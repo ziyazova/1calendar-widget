@@ -214,13 +214,15 @@ const FeatureCardImage = styled.div`
   border: none;
   background: transparent;
   position: relative;
-  border-radius: ${({ theme }) => theme.radii['2xl']} 0 0 0;
+  border-radius: 0;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
+    transform: scale(1.35);
+    transform-origin: center;
     display: block;
   }
 

@@ -49,17 +49,24 @@ import {
   BannerIcon, BannerTitle, BannerActions,
   ToastShell, ToastIconBubble, ToastMessage,
   ConsentBannerWrap, ConsentBannerIcon, ConsentBannerMessage, ConsentBannerPrivacyLink, ConsentBannerActions,
+  InfoBanner, InfoBannerIcon, InfoBannerBody, InfoBannerTitle, InfoBannerSub,
 } from '../components/shared';
 import {
-  EmailVerificationBar, EmailVerificationInner, EmailVerificationText,
-  EmailVerificationResendBtn, EmailVerificationCloseBtn,
+  EmailVerificationBar,
+  EmailVerificationIcon,
+  EmailVerificationBody,
+  EmailVerificationTitle,
+  EmailVerificationSub,
+  EmailVerificationActions,
+  EmailVerificationResendBtn,
+  EmailVerificationCloseBtn,
 } from '../components/shared/EmailVerificationBanner';
 import {
   Plus, Trash2, Copy, ArrowRight,
   Settings, Sparkles,
   LogOut, Home, Mail, Lock, Eye, EyeOff, Check,
   Cookie, X, Clock, BadgePercent, Link2, BadgeCheck,
-  Palette, Pencil,
+  Palette, Pencil, ShieldCheck,
   Calendar as CalIcon, Image as ImgIcon, FileText, LayoutGrid,
 } from 'lucide-react';
 import {
@@ -1594,29 +1601,29 @@ export const DesignSystemPage: React.FC = () => {
             </ConsentBannerActions>
           </ConsentBannerWrap>
 
-          <VariantLabel style={{ marginTop: 28 }}>Email verification — top-of-page bar (<code>EmailVerificationBanner.tsx</code>)</VariantLabel>
+          <VariantLabel style={{ marginTop: 28 }}>Email verification — amber card (<code>EmailVerificationBanner.tsx</code>)</VariantLabel>
           <EmailVerificationBar role="status">
-            <EmailVerificationInner>
-              <Mail className="lead" />
-              <EmailVerificationText>
-                <strong>Verify your email.</strong> Click the link we sent to{' '}
-                <strong>you@peachy.studio</strong> to confirm your address.
-              </EmailVerificationText>
-              <EmailVerificationResendBtn type="button">Resend</EmailVerificationResendBtn>
+            <EmailVerificationIcon><ShieldCheck /></EmailVerificationIcon>
+            <EmailVerificationBody>
+              <EmailVerificationTitle>Verify your email</EmailVerificationTitle>
+              <EmailVerificationSub>Needed to save widgets and publish embeds.</EmailVerificationSub>
+            </EmailVerificationBody>
+            <EmailVerificationActions>
+              <EmailVerificationResendBtn type="button">Resend link</EmailVerificationResendBtn>
               <EmailVerificationCloseBtn type="button" aria-label="Dismiss">
                 <X />
               </EmailVerificationCloseBtn>
-            </EmailVerificationInner>
+            </EmailVerificationActions>
           </EmailVerificationBar>
 
           <VariantLabel style={{ marginTop: 28 }}>
             Subtle · indigo — primary upsell row
           </VariantLabel>
-          <GradientBanner $tone="indigo" $inline>
-            <BannerIcon $tone="indigo"><Sparkles /></BannerIcon>
+          <GradientBanner $tone="indigo">
+            <BannerIcon $tone="indigo" $emphasis="subtle"><Sparkles /></BannerIcon>
             <BannerBody>
-              <BannerTitle>Peachy Pro — unlock unlimited widgets</BannerTitle>
-              <BannerText>Free · 3 / 3 widgets used</BannerText>
+              <BannerTitle>Go unlimited with Peachy Pro</BannerTitle>
+              <BannerText>You've reached the free limit · 3 of 3 used</BannerText>
             </BannerBody>
             <BannerActions>
               <Button $variant="ghost" $size="sm">Later</Button>
@@ -1627,8 +1634,8 @@ export const DesignSystemPage: React.FC = () => {
           <VariantLabel style={{ marginTop: 24 }}>
             Strong · indigo — hero CTA banner
           </VariantLabel>
-          <GradientBanner $tone="indigo" $emphasis="strong" $inline>
-            <BannerIcon $tone="indigo"><BadgePercent /></BannerIcon>
+          <GradientBanner $tone="indigo" $emphasis="strong">
+            <BannerIcon $tone="indigo" $emphasis="strong"><BadgePercent /></BannerIcon>
             <BannerBody>
               <BannerTitle>Annual billing — save 20%</BannerTitle>
               <BannerText>$80/year instead of $108 · cancel anytime</BannerText>
@@ -1640,30 +1647,31 @@ export const DesignSystemPage: React.FC = () => {
           </GradientBanner>
 
           <VariantLabel style={{ marginTop: 24 }}>
-            Subtle · blue · sage · soft — info rows
+            Info rows — neutral white card, colored icon only ·{' '}
+            <code>InfoBanner.tsx</code>
           </VariantLabel>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <GradientBanner $tone="blue" $inline>
-              <BannerIcon $tone="blue"><Link2 /></BannerIcon>
-              <BannerBody>
-                <BannerTitle>Embed code copied</BannerTitle>
-                <BannerText>Paste into Notion with /embed</BannerText>
-              </BannerBody>
-            </GradientBanner>
-            <GradientBanner $tone="sage" $inline>
-              <BannerIcon $tone="sage"><BadgeCheck /></BannerIcon>
-              <BannerBody>
-                <BannerTitle>Widget saved</BannerTitle>
-                <BannerText>Synced to your account</BannerText>
-              </BannerBody>
-            </GradientBanner>
-            <GradientBanner $tone="soft" $inline>
-              <BannerIcon $tone="soft"><Clock /></BannerIcon>
-              <BannerBody>
-                <BannerTitle>Heads up — Notion caches for ~5 min</BannerTitle>
-                <BannerText>Changes may take a moment to appear in your page</BannerText>
-              </BannerBody>
-            </GradientBanner>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <InfoBanner>
+              <InfoBannerIcon $tone="blue"><Link2 /></InfoBannerIcon>
+              <InfoBannerBody>
+                <InfoBannerTitle>Embed code copied</InfoBannerTitle>
+                <InfoBannerSub>Paste into Notion with /embed</InfoBannerSub>
+              </InfoBannerBody>
+            </InfoBanner>
+            <InfoBanner>
+              <InfoBannerIcon $tone="sage"><Check /></InfoBannerIcon>
+              <InfoBannerBody>
+                <InfoBannerTitle>Widget saved</InfoBannerTitle>
+                <InfoBannerSub>Synced to your account</InfoBannerSub>
+              </InfoBannerBody>
+            </InfoBanner>
+            <InfoBanner>
+              <InfoBannerIcon $tone="mute"><Clock /></InfoBannerIcon>
+              <InfoBannerBody>
+                <InfoBannerTitle>Heads up, Notion caches for ~5 min</InfoBannerTitle>
+                <InfoBannerSub>Changes may take a moment to appear in your page</InfoBannerSub>
+              </InfoBannerBody>
+            </InfoBanner>
           </div>
 
           <VariantLabel style={{ marginTop: 28 }}>Toast — transient success pill (used in Studio on copy)</VariantLabel>

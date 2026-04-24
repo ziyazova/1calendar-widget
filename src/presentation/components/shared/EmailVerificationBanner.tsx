@@ -1,75 +1,136 @@
 import React, { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { Mail, X, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, X, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/presentation/context/AuthContext';
-
-export const EmailVerificationBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  background: linear-gradient(90deg, #FFF4E6 0%, #FFE8D1 100%);
-  border-bottom: 1px solid rgba(180, 98, 58, 0.18);
-  color: #6B3A1F;
-  font-size: 13px;
-  line-height: 1.5;
-  letter-spacing: -0.005em;
-
-  svg.lead { width: 16px; height: 16px; color: #B4623A; flex-shrink: 0; }
-`;
-
-export const EmailVerificationInner = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-export const EmailVerificationText = styled.div`
-  flex: 1;
-  min-width: 0;
-  strong { color: #4A2712; font-weight: 600; }
-`;
-
-export const EmailVerificationResendBtn = styled.button`
-  height: 30px;
-  padding: 0 14px;
-  background: #fff;
-  border: 1px solid rgba(180, 98, 58, 0.28);
-  border-radius: ${({ theme }) => theme.radii.full};
-  font-size: 12px;
-  font-weight: 600;
-  font-family: inherit;
-  color: #6B3A1F;
-  cursor: pointer;
-  transition: background ${({ theme }) => theme.transitions.fast}, border-color ${({ theme }) => theme.transitions.fast};
-  white-space: nowrap;
-
-  &:hover:not(:disabled) { background: #FFF9F2; border-color: rgba(180, 98, 58, 0.42); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
-`;
-
-export const EmailVerificationCloseBtn = styled.button`
-  background: none;
-  border: none;
-  padding: 4px;
-  color: #6B3A1F;
-  opacity: 0.6;
-  cursor: pointer;
-  display: flex;
-
-  &:hover { opacity: 1; }
-  svg { width: 14px; height: 14px; }
-`;
 
 /**
  * Shown on authenticated pages when the registered user has an email but
  * has not clicked the confirmation link yet. Gives them a one-click Resend.
  * Dismissal is per-session (not persisted) so it reappears after reload —
  * by design, since an unverified email is a real security gap.
+ *
+ * Visual spec — `06-banners` HTML mock (amber variant). Card form with
+ * rounded 14px corners + subtle amber border + shield+check icon; sits
+ * inside a page-edge container so it doesn't stretch to full viewport
+ * width.
  */
+
+/* Page-edge container: gives the card breathing room from viewport
+ * edges and caps its width to the same 1040px the mock uses. */
+export const EmailVerificationWrap = styled.div`
+  width: 100%;
+  padding: 16px 24px 0;
+  display: flex;
+  justify-content: center;
+
+  @media (max-width: 768px) { padding: 12px 16px 0; }
+`;
+
+/* Amber card — exact colours from the 06-banners mock. Kept local
+ * (not in theme.colors) because this is a one-off warm-amber palette
+ * used ONLY on the verify banner. */
+export const EmailVerificationBar = styled.div`
+  width: 100%;
+  max-width: 1040px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #FFF7E8;
+  border: 1px solid rgba(194, 114, 12, 0.22);
+  border-radius: 14px;
+  box-shadow: ${({ theme }) => theme.shadows.card};
+  letter-spacing: -0.005em;
+
+  @media (max-width: 520px) {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+`;
+
+/* Amber icon chip — shield+check in lucide's ShieldCheck. */
+export const EmailVerificationIcon = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(194, 114, 12, 0.10);
+  border: 1px solid rgba(194, 114, 12, 0.28);
+  color: #8A4F03;
+
+  svg { width: 17px; height: 17px; }
+`;
+
+export const EmailVerificationBody = styled.div`
+  flex: 1;
+  min-width: 0;
+  line-height: 1.38;
+`;
+
+export const EmailVerificationTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #5A3402;
+  letter-spacing: -0.008em;
+`;
+
+export const EmailVerificationSub = styled.div`
+  font-size: 12.5px;
+  color: #7A4503;
+  margin-top: 2px;
+
+  strong { color: #5A3402; font-weight: 600; }
+`;
+
+/* Legacy export name — kept so existing DS-v2 mirror imports still work. */
+export const EmailVerificationText = EmailVerificationSub;
+export const EmailVerificationInner = EmailVerificationBody;
+
+export const EmailVerificationActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+`;
+
+export const EmailVerificationResendBtn = styled.button`
+  height: 30px;
+  padding: 7px 13px;
+  background: #fff;
+  border: 1px solid rgba(138, 79, 3, 0.45);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #6B3D02;
+  cursor: pointer;
+  transition: background ${({ theme }) => theme.transitions.fast}, border-color ${({ theme }) => theme.transitions.fast};
+  white-space: nowrap;
+
+  &:hover:not(:disabled) { background: #FFFBF2; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+export const EmailVerificationCloseBtn = styled.button`
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: rgba(138, 79, 3, 0.55);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background ${({ theme }) => theme.transitions.fast}, color ${({ theme }) => theme.transitions.fast};
+
+  &:hover { background: rgba(194, 114, 12, 0.1); color: #8A4F03; }
+  svg { width: 14px; height: 14px; }
+`;
+
 export const EmailVerificationBanner: React.FC = () => {
   const theme = useTheme();
   const { isRegistered, isEmailVerified, user, resendVerificationForCurrent } = useAuth();
@@ -95,31 +156,37 @@ export const EmailVerificationBanner: React.FC = () => {
   };
 
   return (
-    <EmailVerificationBar role="status">
-      <EmailVerificationInner>
-        <Mail className="lead" />
-        <EmailVerificationText>
-          <strong>Verify your email.</strong>{' '}
-          {sentAt ? (
-            <>
-              <CheckCircle2 style={{ width: 14, height: 14, verticalAlign: -2, marginRight: 2, color: theme.colors.success.fg }} />
-              Verification email sent to {user?.email}. Check your inbox.
-            </>
-          ) : error ? (
-            <span style={{ color: theme.colors.danger.strong }}>{error}</span>
-          ) : (
-            <>Click the link we sent to <strong>{user?.email}</strong> to confirm your address.</>
+    <EmailVerificationWrap>
+      <EmailVerificationBar role="status" aria-live="polite">
+        <EmailVerificationIcon><ShieldCheck /></EmailVerificationIcon>
+        <EmailVerificationBody>
+          <EmailVerificationTitle>
+            {sentAt ? 'Verification email sent' : 'Verify your email'}
+          </EmailVerificationTitle>
+          <EmailVerificationSub>
+            {sentAt ? (
+              <>
+                <CheckCircle2 style={{ width: 13, height: 13, verticalAlign: -2, marginRight: 4, color: theme.colors.success.fg }} />
+                Sent to <strong>{user?.email}</strong>. Check your inbox.
+              </>
+            ) : error ? (
+              <span style={{ color: theme.colors.danger.strong }}>{error}</span>
+            ) : (
+              <>Needed to save widgets and publish embeds.</>
+            )}
+          </EmailVerificationSub>
+        </EmailVerificationBody>
+        <EmailVerificationActions>
+          {!sentAt && (
+            <EmailVerificationResendBtn onClick={handleResend} disabled={sending}>
+              {sending ? 'Sending…' : 'Resend link'}
+            </EmailVerificationResendBtn>
           )}
-        </EmailVerificationText>
-        {!sentAt && (
-          <EmailVerificationResendBtn onClick={handleResend} disabled={sending}>
-            {sending ? 'Sending…' : 'Resend'}
-          </EmailVerificationResendBtn>
-        )}
-        <EmailVerificationCloseBtn onClick={() => setDismissed(true)} aria-label="Dismiss">
-          <X />
-        </EmailVerificationCloseBtn>
-      </EmailVerificationInner>
-    </EmailVerificationBar>
+          <EmailVerificationCloseBtn onClick={() => setDismissed(true)} aria-label="Dismiss">
+            <X />
+          </EmailVerificationCloseBtn>
+        </EmailVerificationActions>
+      </EmailVerificationBar>
+    </EmailVerificationWrap>
   );
 };

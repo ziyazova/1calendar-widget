@@ -1,18 +1,21 @@
 import styled, { css } from 'styled-components';
 
 /**
- * GradientBanner — soft gradient info/upsell strips.
- * Used for: Pro upgrade nudges, "New" announcements, onboarding tips.
+ * GradientBanner — upsell + hero CTA strip with two emphasis levels.
  *
  * Tones:
- *   indigo  — brand accent (default) — Pro upsell
- *   blue    — informational / copy embed ready
- *   soft    — white→cream wash — neutral info
+ *   indigo  — brand accent (default) · Pro upsell, annual-billing CTA
+ *   blue    — informational
+ *   soft    — neutral / warm (cream)
  *   sage    — success / published
  *
  * Emphasis:
- *   subtle  — low-opacity gradient (default, for inline banners)
- *   strong  — full-color gradient + white text (for hero CTAs)
+ *   subtle  — low-opacity tint (sits inline inside a page section)
+ *   strong  — filled hero gradient + white text (standalone CTA row)
+ *
+ * Visuals follow the `06-banners` mock: flatter, calmer — no pink
+ * shift on indigo, no extra inner glow. Keeps the indigo look aligned
+ * with the brand accent in the rest of the app.
  */
 
 type BannerTone = 'indigo' | 'blue' | 'soft' | 'sage';
@@ -24,25 +27,18 @@ interface BannerTransientProps {
   $inline?: boolean;
 }
 
-/* 3-stop gradients with a subtle color shift give each tone depth and
-   a bit of warmth — feels more modern than a single-hue fade. */
+/* Subtle — flat low-opacity tint + thin matching border. Keeps body
+ * text at theme text colour so content stays readable. Indigo is now
+ * a solid `indigo-50` wash (not a 3-stop gradient) to match the mock. */
 const subtleMap: Record<BannerTone, ReturnType<typeof css>> = {
   indigo: css`
-    background:
-      linear-gradient(135deg,
-        rgba(139, 92, 246, 0.10) 0%,
-        rgba(99, 102, 241, 0.07) 50%,
-        rgba(236, 72, 153, 0.05) 100%);
+    background: #EEF0FF;
     border: 1px solid rgba(99, 102, 241, 0.18);
     color: ${({ theme }) => theme.colors.text.primary};
   `,
   blue: css`
-    background:
-      linear-gradient(135deg,
-        rgba(51, 132, 244, 0.10) 0%,
-        rgba(91, 160, 247, 0.06) 55%,
-        rgba(34, 211, 238, 0.05) 100%);
-    border: 1px solid rgba(51, 132, 244, 0.18);
+    background: #EFF4FF;
+    border: 1px solid rgba(37, 99, 235, 0.18);
     color: ${({ theme }) => theme.colors.text.primary};
   `,
   soft: css`
@@ -55,38 +51,31 @@ const subtleMap: Record<BannerTone, ReturnType<typeof css>> = {
     color: ${({ theme }) => theme.colors.text.primary};
   `,
   sage: css`
-    background:
-      linear-gradient(135deg,
-        rgba(102, 168, 92, 0.10) 0%,
-        rgba(134, 239, 172, 0.06) 50%,
-        rgba(52, 211, 153, 0.05) 100%);
-    border: 1px solid rgba(102, 168, 92, 0.22);
+    background: #ECFDF3;
+    border: 1px solid rgba(5, 150, 105, 0.22);
     color: ${({ theme }) => theme.colors.text.primary};
   `,
 };
 
-/* Strong = filled hero CTA. Add radial highlight + inset top-light to
-   give the banner a soft "3D" feel rather than flat linear gradient. */
+/* Strong — filled gradient + white text, hero CTA feel. Indigo uses
+ * the same 2-stop `#5B5FE8 → #7A6DF0` gradient as the mock so the hero
+ * matches the subtle variant's family colour exactly. */
 const strongMap: Record<BannerTone, ReturnType<typeof css>> = {
   indigo: css`
-    background:
-      radial-gradient(ellipse at top left, rgba(167, 139, 250, 0.45), transparent 60%),
-      linear-gradient(135deg, #5B4EF2 0%, #7C3AED 50%, #C026D3 100%);
+    background: linear-gradient(100deg, #5B5FE8 0%, #7A6DF0 100%);
     border: none;
     color: ${({ theme }) => theme.colors.text.inverse};
     box-shadow:
-      0 10px 28px rgba(99, 102, 241, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      0 14px 36px -14px rgba(79, 70, 229, 0.5),
+      0 2px 6px rgba(79, 70, 229, 0.14);
   `,
   blue: css`
-    background:
-      radial-gradient(ellipse at top left, rgba(125, 211, 252, 0.4), transparent 60%),
-      linear-gradient(135deg, #2563EB 0%, #3B82F6 55%, #06B6D4 100%);
+    background: linear-gradient(100deg, #2563EB 0%, #3B82F6 100%);
     border: none;
     color: ${({ theme }) => theme.colors.text.inverse};
     box-shadow:
-      0 10px 28px rgba(37, 99, 235, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      0 14px 36px -14px rgba(37, 99, 235, 0.5),
+      0 2px 6px rgba(37, 99, 235, 0.14);
   `,
   soft: css`
     background:
@@ -95,14 +84,12 @@ const strongMap: Record<BannerTone, ReturnType<typeof css>> = {
     color: ${({ theme }) => theme.colors.text.primary};
   `,
   sage: css`
-    background:
-      radial-gradient(ellipse at top left, rgba(167, 243, 208, 0.4), transparent 60%),
-      linear-gradient(135deg, #059669 0%, #10B981 50%, #34D399 100%);
+    background: linear-gradient(100deg, #059669 0%, #10B981 100%);
     border: none;
     color: ${({ theme }) => theme.colors.text.inverse};
     box-shadow:
-      0 10px 28px rgba(16, 185, 129, 0.26),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      0 14px 36px -14px rgba(16, 185, 129, 0.5),
+      0 2px 6px rgba(16, 185, 129, 0.14);
   `,
 };
 
@@ -110,80 +97,83 @@ export const GradientBanner = styled.div<BannerTransientProps>`
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: ${({ $inline }) => ($inline ? '12px 14px' : '16px 20px')};
-  border-radius: ${({ $inline }) => ($inline ? '14px' : '16px')};
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  line-height: 1.5;
+  padding: ${({ $emphasis }) => ($emphasis === 'strong' ? '18px 18px 18px 20px' : '14px 14px 14px 16px')};
+  border-radius: ${({ $emphasis }) => ($emphasis === 'strong' ? '16px' : '14px')};
 
   ${({ $tone = 'indigo', $emphasis = 'subtle' }) =>
     $emphasis === 'strong' ? strongMap[$tone] : subtleMap[$tone]}
 `;
 
-/* Icon chip — subtle internal gradient + inner highlight + soft outer glow
-   in the tone's colour. Bigger (40px) with a rounded 14px radius. */
-export const BannerIcon = styled.div<{ $tone?: BannerTone }>`
+/* Icon chip — two looks depending on where the banner sits.
+ *
+ *   subtle  → filled gradient chip with white icon + soft shadow
+ *             (matches spec's `.upsell .icon` indigo gradient)
+ *   strong  → semi-transparent white chip on the hero gradient
+ *             (matches spec's `.hero .icon` with backdrop-blur)
+ */
+export const BannerIcon = styled.div<{ $tone?: BannerTone; $emphasis?: BannerEmphasis }>`
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: ${({ theme }) => theme.radii.lg};
+  width: ${({ $emphasis }) => ($emphasis === 'strong' ? '40px' : '38px')};
+  height: ${({ $emphasis }) => ($emphasis === 'strong' ? '40px' : '38px')};
+  border-radius: 11px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: ${({ $emphasis }) => ($emphasis === 'strong' ? '19px' : '18px')};
+    height: ${({ $emphasis }) => ($emphasis === 'strong' ? '19px' : '18px')};
     stroke-width: 2;
   }
 
-  ${({ $tone = 'indigo' }) =>
-    $tone === 'indigo'
-      ? css`
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.28), rgba(99, 102, 241, 0.16));
-          color: #5B4EF2;
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.55),
-            0 2px 8px rgba(99, 102, 241, 0.15);
-        `
-      : $tone === 'blue'
-      ? css`
-          background: linear-gradient(135deg, rgba(91, 160, 247, 0.28), rgba(51, 132, 244, 0.16));
-          color: #2563EB;
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.55),
-            0 2px 8px rgba(51, 132, 244, 0.15);
-        `
-      : $tone === 'sage'
-      ? css`
-          background: linear-gradient(135deg, rgba(134, 239, 172, 0.32), rgba(102, 168, 92, 0.16));
-          color: #059669;
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.55),
-            0 2px 8px rgba(16, 185, 129, 0.15);
-        `
-      : css`
-          background: linear-gradient(135deg, rgba(255, 214, 196, 0.55), rgba(255, 230, 220, 0.32));
-          color: #C2410C;
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.7),
-            0 2px 8px rgba(230, 170, 140, 0.15);
-        `}
+  ${({ $emphasis = 'subtle', $tone = 'indigo' }) => {
+    if ($emphasis === 'strong') {
+      /* semi-transparent white pill sitting on the gradient hero */
+      return css`
+        background: rgba(255, 255, 255, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      `;
+    }
+    /* subtle — filled gradient chip, white icon */
+    if ($tone === 'indigo') return css`
+      background: linear-gradient(135deg, #818CF8 0%, #6366F1 50%, #4F46E5 100%);
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.22);
+    `;
+    if ($tone === 'blue') return css`
+      background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.22);
+    `;
+    if ($tone === 'sage') return css`
+      background: linear-gradient(135deg, #34D399 0%, #059669 100%);
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.22);
+    `;
+    /* soft — warm peach gradient */
+    return css`
+      background: linear-gradient(135deg, #FFD9B8 0%, #F4A672 100%);
+      color: #5A3402;
+      box-shadow: 0 2px 6px rgba(244, 166, 114, 0.3);
+    `;
+  }}
 `;
 
 export const BannerBody = styled.div`
   flex: 1;
   min-width: 0;
+  line-height: 1.38;
 `;
 
 export const BannerTitle = styled.div`
   font-weight: 600;
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  letter-spacing: -0.01em;
+  font-size: 14px;
+  letter-spacing: -0.008em;
 `;
 
 export const BannerText = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  opacity: 0.75;
+  font-size: 12.5px;
+  opacity: 0.82;
   margin-top: 2px;
 `;
 

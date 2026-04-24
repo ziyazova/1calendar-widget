@@ -24,7 +24,7 @@ const SectionTitle = styled.h2`
 const SectionSubtitle = styled.p`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.peach.muted};
-  margin: 8px 0 16px;
+  margin: 8px 0 24px;
 `;
 
 const Grid = styled.div`
