@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Sparkle, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge, Label } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
@@ -575,11 +575,13 @@ const PricingPlanRow = styled.div`
   margin-bottom: 4px;
 `;
 
-const PricingPlan = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: ${({ theme }) => theme.colors.text.primary};
+const PricingPlan = styled.div<{ $highlighted?: boolean }>`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: ${({ $highlighted, theme }) =>
+    $highlighted ? theme.colors.accent : theme.colors.text.tertiary};
 `;
 
 const PricingPlanDesc = styled.div`
@@ -596,7 +598,7 @@ const PricingPriceRow = styled.div`
 `;
 
 const PricingPrice = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
+  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -604,7 +606,7 @@ const PricingPrice = styled.span`
 `;
 
 const PricingPeriod = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.md};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
@@ -614,8 +616,8 @@ const PricingFeatures = styled.ul`
   margin: 0 0 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-size: ${({ theme }) => theme.typography.sizes.base};
+  gap: 8px;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.text.body};
 
   li {
@@ -970,9 +972,9 @@ export const WidgetStudioPage: React.FC = () => {
                 <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch}>Get started</SharedButton>
               </PricingCard>
               <PricingCard $highlighted>
+                <Label $variant="pro" $size="xs" style={{ position: 'absolute', top: 16, right: 16 }}>Popular</Label>
                 <PricingPlanRow>
-                  <PricingPlan>Pro</PricingPlan>
-                  <PlanBadge $pro $size="xs">Popular</PlanBadge>
+                  <PricingPlan $highlighted>Pro</PricingPlan>
                 </PricingPlanRow>
                 <PricingPlanDesc>For serious Notion builders</PricingPlanDesc>
                 <PricingPriceRow>

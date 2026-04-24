@@ -40,13 +40,13 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — shrink vertical footprint, pull content up tight to TopNav.
-   * min-height:auto lets the section size to its content instead of
-   * 620px empty. */
+  /* Phone — shrink vertical footprint. min-height:auto lets the section
+   * size to its content instead of 620px empty. Content offset 16-20px
+   * below TopNav for breathing room. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
-    margin-top: -16px;
-    padding: 16px 20px 8px;
+    margin-top: 0;
+    padding: 32px 20px 8px;
   }
 `;
 
