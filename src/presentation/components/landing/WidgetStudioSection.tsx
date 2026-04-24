@@ -19,7 +19,7 @@ const Header = styled.div`
   gap: 16px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
 `;
 

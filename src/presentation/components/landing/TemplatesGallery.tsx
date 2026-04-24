@@ -41,7 +41,7 @@ const TemplatesMarqueeWrap = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 16px;
+    padding: 8px 16px 0;
   }
 `;
 

@@ -541,7 +541,8 @@ const PricingTitle = styled.h2`
 
 const PricingSubtitle = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.xl};
-  color: ${({ theme }) => theme.colors.text.body};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.peach.muted};
   margin: 0 0 40px;
 `;
 
@@ -571,8 +572,9 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
 const PricingPlanRow = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 `;
 
 const PricingPlan = styled.div<{ $highlighted?: boolean }>`
@@ -582,12 +584,6 @@ const PricingPlan = styled.div<{ $highlighted?: boolean }>`
   text-transform: uppercase;
   color: ${({ $highlighted, theme }) =>
     $highlighted ? theme.colors.accent : theme.colors.text.tertiary};
-`;
-
-const PricingPlanDesc = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin-bottom: 20px;
 `;
 
 const PricingPriceRow = styled.div`
@@ -616,9 +612,9 @@ const PricingFeatures = styled.ul`
   margin: 0 0 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.text.body};
+  gap: 10px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.primary};
 
   li {
     display: flex;
@@ -630,32 +626,6 @@ const PricingFeatures = styled.ul`
     width: 16px;
     height: 16px;
     color: ${({ theme }) => theme.colors.accent};
-    flex-shrink: 0;
-  }
-`;
-
-const PricingReassure = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px 32px;
-  margin-top: 32px;
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.tertiary};
-
-  span {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  span::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: ${({ theme }) => theme.colors.peach.deepWarm};
     flex-shrink: 0;
   }
 `;
@@ -984,7 +954,6 @@ export const WidgetStudioPage: React.FC = () => {
                 <PricingPlanRow>
                   <PricingPlan>Free</PricingPlan>
                 </PricingPlanRow>
-                <PricingPlanDesc>To try things out</PricingPlanDesc>
                 <PricingPriceRow>
                   <PricingPrice>$0</PricingPrice>
                   <PricingPeriod>forever</PricingPeriod>
@@ -998,14 +967,13 @@ export const WidgetStudioPage: React.FC = () => {
                 <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch}>Get started</SharedButton>
               </PricingCard>
               <PricingCard $highlighted>
-                <PlanBadge $pro $size="xs" style={{ position: 'absolute', top: 16, right: 16 }}>Popular</PlanBadge>
                 <PricingPlanRow>
                   <PricingPlan $highlighted>Pro</PricingPlan>
+                  <PlanBadge $pro $size="xs">Popular</PlanBadge>
                 </PricingPlanRow>
-                <PricingPlanDesc>For serious Notion builders</PricingPlanDesc>
                 <PricingPriceRow>
                   <PricingPrice>$4</PricingPrice>
-                  <PricingPeriod>/ month</PricingPeriod>
+                  <PricingPeriod>monthly</PricingPeriod>
                 </PricingPriceRow>
                 <PricingFeatures>
                   <li><Check /> Unlimited widgets</li>
@@ -1016,11 +984,6 @@ export const WidgetStudioPage: React.FC = () => {
                 <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch}>Get Pro</SharedButton>
               </PricingCard>
             </PricingGrid>
-            <PricingReassure>
-              <span>Works instantly in Notion</span>
-              <span>No sign-up required</span>
-              <span>Easy to customize</span>
-            </PricingReassure>
           </PricingSection>
           </Section>
 

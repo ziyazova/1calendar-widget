@@ -33,6 +33,7 @@ const SectionSubtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
+    margin-bottom: 8px;
   }
 `;
 
