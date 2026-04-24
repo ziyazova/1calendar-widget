@@ -126,29 +126,6 @@ export const Tag = styled.span`
   white-space: nowrap;
 `;
 
-/* OverlayBadge — glass chip pinned top-left of card art (e.g., "New"
-   on a template card, widget type label on studio preview).
-   Absolute-positioned, glass bg + backdrop blur. Tone switches text
-   color: `neutral` (default, dark) or `accent` (indigo for studio
-   widget type tags). */
-export const OverlayBadge = styled.span<{ $tone?: 'neutral' | 'accent' }>`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 10px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: ${({ $tone = 'neutral', theme }) =>
-    $tone === 'accent' ? theme.colors.accent : theme.colors.text.primary};
-  border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  font-weight: ${({ $tone = 'neutral', theme }) =>
-    $tone === 'accent' ? theme.typography.weights.semibold : theme.typography.weights.medium};
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-`;
-
 /* ── Legacy constants — re-exported for call-sites that still reference them. ── */
 
 export const BADGE_ACCENT = '#6366F1';

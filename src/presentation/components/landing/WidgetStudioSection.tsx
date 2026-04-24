@@ -37,6 +37,10 @@ const Title = styled.h2`
   letter-spacing: -0.03em;
   margin: 0;
   text-align: center;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 28px;
+  }
 `;
 
 const Subtitle = styled.p`

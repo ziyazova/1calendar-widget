@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, OverlayBadge, Toast } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, Tag, Toast } from '@/presentation/components/shared';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -1093,7 +1093,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 {widgets.map((w, i) => (
                   <WidgetCard key={w.id} $i={i}>
                     <WidgetPreviewWrap onClick={() => handleEdit(w)}>
-                      <OverlayBadge $tone="accent">{w.type === 'calendar' ? 'Calendar' : w.type === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
+                      <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{w.type === 'calendar' ? 'calendar' : w.type === 'clock' ? 'clock' : 'board'}</Tag>
                       <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                     </WidgetPreviewWrap>
                     <WidgetBottom>

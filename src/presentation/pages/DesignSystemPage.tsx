@@ -23,7 +23,6 @@ import {
   UpgradeInner,
   UpgradePrice,
   Tag,
-  OverlayBadge,
   PlanBadge,
   PopularPill,
   Footer,
@@ -135,7 +134,7 @@ const TYPOGRAPHY_SIZES: Record<string, string> = {
    inline comments in `theme.ts`. */
 const TYPOGRAPHY_USAGE: Record<string, string> = {
   '2xs': 'CardBadge · MobileSectionTab',
-  xs: 'Pro pill · OverlayBadge',
+  xs: 'PlanBadge xs · Tag',
   sm: 'captions · muted labels',
   md: 'small body · buttons · filter chips',
   base: 'default body · CTA label',
@@ -1077,7 +1076,7 @@ export const DesignSystemPage: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
           <WidgetCard $i={0}>
             <WidgetPreviewWrap style={{ background: 'linear-gradient(135deg, #E8EDFF, #EEF1F5)' }}>
-              <OverlayBadge $tone="accent">Calendar</OverlayBadge>
+              <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>calendar</Tag>
               <span style={{ color: '#8E8E93', fontSize: 13 }}>widget preview</span>
             </WidgetPreviewWrap>
             <WidgetBottom>
@@ -1091,7 +1090,7 @@ export const DesignSystemPage: React.FC = () => {
           </WidgetCard>
           <WidgetCard $i={1}>
             <WidgetPreviewWrap style={{ background: 'linear-gradient(135deg, #FFE8DE, #FFF1EA)' }}>
-              <OverlayBadge $tone="accent">Clock</OverlayBadge>
+              <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>clock</Tag>
               <span style={{ color: '#8E8E93', fontSize: 13 }}>widget preview</span>
             </WidgetPreviewWrap>
             <WidgetBottom>
@@ -1182,19 +1181,6 @@ export const DesignSystemPage: React.FC = () => {
             <PopularPill>Popular</PopularPill>
           </Row>
 
-          <VariantLabel style={{ marginTop: 24 }}>OverlayBadge — glass chip on card art</VariantLabel>
-          <SectionMeta style={{ marginBottom: 12, fontSize: 13 }}>
-            Used on <code>/studio</code> saved-widget thumbnails for widget type.
-            Neutral tone only — the accent (indigo) variant was retired in favor of <code>Tag</code>.
-          </SectionMeta>
-          <Row>
-            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: 'linear-gradient(135deg, #E8D5FF, #FFD0E8)' }}>
-              <OverlayBadge>New</OverlayBadge>
-            </div>
-            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: '#FAFAF9' }}>
-              <OverlayBadge>Calendar</OverlayBadge>
-            </div>
-          </Row>
         </SurfaceCard>
       </Section>
 

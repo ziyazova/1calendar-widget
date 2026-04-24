@@ -19,6 +19,10 @@ const SectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 28px;
+  }
 `;
 
 const SectionSubtitle = styled.p`
