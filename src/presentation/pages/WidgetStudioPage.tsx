@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Sparkle } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Sparkle, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, PopularPill, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
@@ -563,27 +563,49 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
   padding: 32px 28px;
   text-align: left;
   position: relative;
+  display: flex;
+  flex-direction: column;
   ${({ $highlighted }) => $highlighted && 'box-shadow: 0 6px 32px rgba(100, 80, 200, 0.08);'}
 `;
 
-const PricingPlan = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: 500;
-  opacity: 0.6;
+const PricingPlanRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 4px;
 `;
 
-const PricingPrice = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes['8xl']};
+const PricingPlan = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const PricingPlanDesc = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin-bottom: 20px;
+`;
+
+const PricingPriceRow = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 24px;
+`;
+
+const PricingPrice = styled.span`
+  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-const PricingPeriod = styled.div`
+const PricingPeriod = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.md};
-  opacity: 0.5;
-  margin-bottom: 24px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
 const PricingFeatures = styled.ul`
@@ -594,11 +616,19 @@ const PricingFeatures = styled.ul`
   flex-direction: column;
   gap: 10px;
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  opacity: 0.8;
+  color: ${({ theme }) => theme.colors.text.body};
 
-  li::before {
-    content: '✓ ';
-    margin-right: 4px;
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  li svg {
+    width: 16px;
+    height: 16px;
+    color: ${({ theme }) => theme.colors.accent};
+    flex-shrink: 0;
   }
 `;
 
@@ -923,27 +953,37 @@ export const WidgetStudioPage: React.FC = () => {
             <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
             <PricingGrid>
               <PricingCard>
-                <PricingPlan>Free</PricingPlan>
-                <PricingPrice>$0</PricingPrice>
-                <PricingPeriod>forever</PricingPeriod>
+                <PricingPlanRow>
+                  <PricingPlan>Free</PricingPlan>
+                </PricingPlanRow>
+                <PricingPlanDesc>To try things out</PricingPlanDesc>
+                <PricingPriceRow>
+                  <PricingPrice>$0</PricingPrice>
+                  <PricingPeriod>forever</PricingPeriod>
+                </PricingPriceRow>
                 <PricingFeatures>
-                  <li>Up to 3 widgets</li>
-                  <li>Calendar &amp; Clock only</li>
-                  <li>Basic colors &amp; layout</li>
-                  <li>Embed in Notion</li>
+                  <li><Check /> Up to 3 widgets</li>
+                  <li><Check /> Calendar &amp; Clock only</li>
+                  <li><Check /> Basic colors &amp; layout</li>
+                  <li><Check /> Embed in Notion</li>
                 </PricingFeatures>
                 <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch}>Get started</SharedButton>
               </PricingCard>
               <PricingCard $highlighted>
-                <PopularPill>Popular</PopularPill>
-                <PricingPlan>Pro</PricingPlan>
-                <PricingPrice>$4</PricingPrice>
-                <PricingPeriod>monthly</PricingPeriod>
+                <PricingPlanRow>
+                  <PricingPlan>Pro</PricingPlan>
+                  <PlanBadge $pro $size="xs">Popular</PlanBadge>
+                </PricingPlanRow>
+                <PricingPlanDesc>For serious Notion builders</PricingPlanDesc>
+                <PricingPriceRow>
+                  <PricingPrice>$4</PricingPrice>
+                  <PricingPeriod>/ month</PricingPeriod>
+                </PricingPriceRow>
                 <PricingFeatures>
-                  <li>Unlimited widgets</li>
-                  <li>All widget types</li>
-                  <li>Full customization</li>
-                  <li>Exclusive widget styles</li>
+                  <li><Check /> Unlimited widgets</li>
+                  <li><Check /> All widget types</li>
+                  <li><Check /> Full customization</li>
+                  <li><Check /> Exclusive widget styles</li>
                 </PricingFeatures>
                 <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch}>Get Pro</SharedButton>
               </PricingCard>

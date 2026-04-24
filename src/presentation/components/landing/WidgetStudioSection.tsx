@@ -46,8 +46,9 @@ const Title = styled.h2`
 const Subtitle = styled.p`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.peach.muted};
-  margin: 0;
+  margin: 8px 0 0;
   text-align: center;
+  letter-spacing: -0.01em;
 `;
 
 const FilterRow = styled.div`

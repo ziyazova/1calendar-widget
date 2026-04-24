@@ -60,7 +60,7 @@ const Subtitle = styled.p`
   letter-spacing: -0.01em;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin: -20px 0 36px;
+    margin: 8px 0 36px;
     padding: 0 24px;
   }
 `;

@@ -38,7 +38,7 @@ const CTATitle = styled.h2`
 const CTASubtitle = styled.p`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.peach.muted};
-  margin: 0 0 32px;
+  margin: 8px 0 32px;
   letter-spacing: -0.01em;
 `;
 
