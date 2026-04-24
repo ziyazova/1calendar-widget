@@ -40,6 +40,10 @@ const CTASubtitle = styled.p`
   color: ${({ theme }) => theme.colors.peach.muted};
   margin: 8px 0 32px;
   letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 14px;
+  }
 `;
 
 const ButtonRow = styled.div`

@@ -87,6 +87,10 @@ const GallerySubtitle = styled.p`
   color: ${({ theme }) => theme.colors.peach.muted};
   margin: 8px 0 0;
   letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 14px;
+  }
 `;
 
 /* ExploreBtn replaced by shared <Button $variant="primary" $size="md"> */

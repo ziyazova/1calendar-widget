@@ -49,6 +49,10 @@ const Subtitle = styled.p`
   margin: 8px 0 0;
   text-align: center;
   letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 14px;
+  }
 `;
 
 const FilterRow = styled.div`

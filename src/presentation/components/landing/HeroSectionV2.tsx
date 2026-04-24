@@ -41,12 +41,12 @@ const Hero = styled.section`
   }
 
   /* Phone — shrink vertical footprint. min-height:auto lets the section
-   * size to its content instead of 620px empty. Content offset 16-20px
-   * below TopNav for breathing room. */
+   * size to its content instead of 620px empty. Content offset from
+   * TopNav so the headline isn't flush against the nav. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 32px 20px 8px;
+    padding: 56px 20px 8px;
   }
 `;
 
@@ -170,6 +170,11 @@ const Sub = styled.p`
   color: ${({ theme }) => theme.colors.peach.muted};
   max-width: 440px;
   font-weight: 400;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 14px;
+    margin-top: 14px;
+  }
 `;
 
 /* ── CTAs ── */

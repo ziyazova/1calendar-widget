@@ -771,7 +771,7 @@ export const WidgetStudioPage: React.FC = () => {
               <WidgetGalleryMeta>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                   <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
-                  {item.pro && <PlanBadge $pro $size="xs">Pro</PlanBadge>}
+                  {item.pro && <Label $variant="pro" $size="xs">Pro</Label>}
                 </div>
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
                   <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
@@ -929,7 +929,7 @@ export const WidgetStudioPage: React.FC = () => {
               <WidgetGalleryMeta>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                   <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
-                  {item.pro && <PlanBadge $pro $size="xs">Pro</PlanBadge>}
+                  {item.pro && <Label $variant="pro" $size="xs">Pro</Label>}
                 </div>
                 {/* Not-logged-in users see Customize on pro widgets too — the
                      upgrade wall only appears once they have an account. The
@@ -972,7 +972,7 @@ export const WidgetStudioPage: React.FC = () => {
                 <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch}>Get started</SharedButton>
               </PricingCard>
               <PricingCard $highlighted>
-                <Label $variant="pro" $size="xs" style={{ position: 'absolute', top: 16, right: 16 }}>Popular</Label>
+                <PlanBadge $pro $size="xs" style={{ position: 'absolute', top: 16, right: 16 }}>Popular</PlanBadge>
                 <PricingPlanRow>
                   <PricingPlan $highlighted>Pro</PricingPlan>
                 </PricingPlanRow>
