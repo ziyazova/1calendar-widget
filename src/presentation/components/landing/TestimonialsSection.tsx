@@ -47,7 +47,7 @@ const Title = styled.h2`
   line-height: 1.2;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
+    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
     padding: 0 24px;
   }
 `;

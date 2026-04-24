@@ -31,7 +31,7 @@ const CTATitle = styled.h2`
   margin: 0 0 8px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
+    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
   }
 `;
 

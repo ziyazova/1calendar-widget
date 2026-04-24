@@ -39,7 +39,7 @@ const Title = styled.h2`
   text-align: center;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
+    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
   }
 `;
 

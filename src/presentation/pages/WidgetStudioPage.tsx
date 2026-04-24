@@ -540,10 +540,10 @@ const PricingTitle = styled.h2`
 `;
 
 const PricingSubtitle = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.xl};
-  font-weight: 600;
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.peach.muted};
-  margin: 0 0 40px;
+  margin: 8px 0 40px;
+  letter-spacing: -0.01em;
 `;
 
 const PricingGrid = styled.div`
@@ -561,7 +561,7 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
   color: inherit;
   border: 1px solid ${({ $highlighted, theme }) => $highlighted ? 'rgba(130, 120, 200, 0.2)' : theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 32px 28px;
+  padding: 40px 36px 28px;
   text-align: left;
   position: relative;
   display: flex;
@@ -574,11 +574,11 @@ const PricingPlanRow = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 `;
 
 const PricingPlan = styled.div<{ $highlighted?: boolean }>`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -606,13 +606,13 @@ const PricingPeriod = styled.span`
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
-const PricingFeatures = styled.ul`
+const PricingFeatures = styled.ul<{ $highlighted?: boolean }>`
   list-style: none;
   padding: 0;
-  margin: 0 0 24px;
+  margin: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.primary};
 
@@ -625,7 +625,7 @@ const PricingFeatures = styled.ul`
   li svg {
     width: 16px;
     height: 16px;
-    color: ${({ theme }) => theme.colors.accent};
+    color: ${({ $highlighted, theme }) => $highlighted ? theme.colors.accent : theme.colors.text.muted};
     flex-shrink: 0;
   }
 `;
@@ -667,9 +667,10 @@ const CTATitle = styled.h2`
 `;
 
 const CTADesc = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.xl};
-  color: ${({ theme }) => theme.colors.text.body};
-  margin: 0 0 28px;
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.peach.muted};
+  margin: 8px 0 28px;
+  letter-spacing: -0.01em;
 `;
 
 type WidgetCategory = 'all' | 'calendar' | 'clock' | 'boards' | 'buttons';
@@ -930,7 +931,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {/* Not-logged-in users see Customize on pro widgets too — the
                      upgrade wall only appears once they have an account. The
                      PRO badge sets the expectation without blocking try-outs. */}
-                <SharedButton $variant="primary" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
+                <SharedButton $variant="outline" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
           ))}
@@ -964,7 +965,7 @@ export const WidgetStudioPage: React.FC = () => {
                   <li><Check /> Basic colors &amp; layout</li>
                   <li><Check /> Embed in Notion</li>
                 </PricingFeatures>
-                <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch}>Get started</SharedButton>
+                <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch} style={{ marginTop: 24 }}>Get started</SharedButton>
               </PricingCard>
               <PricingCard $highlighted>
                 <PricingPlanRow>
@@ -975,13 +976,13 @@ export const WidgetStudioPage: React.FC = () => {
                   <PricingPrice>$4</PricingPrice>
                   <PricingPeriod>monthly</PricingPeriod>
                 </PricingPriceRow>
-                <PricingFeatures>
+                <PricingFeatures $highlighted>
                   <li><Check /> Unlimited widgets</li>
                   <li><Check /> All widget types</li>
                   <li><Check /> Full customization</li>
                   <li><Check /> Exclusive widget styles</li>
                 </PricingFeatures>
-                <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch}>Get Pro</SharedButton>
+                <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch} style={{ marginTop: 24 }}>Get Pro</SharedButton>
               </PricingCard>
             </PricingGrid>
           </PricingSection>

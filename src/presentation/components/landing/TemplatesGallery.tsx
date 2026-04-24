@@ -78,7 +78,7 @@ const GalleryTitle = styled.h2`
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
+    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
   }
 `;
 
