@@ -39,6 +39,15 @@ const Hero = styled.section`
     margin-top: -44px;
     padding: 36px 20px 0;
   }
+
+  /* Phone — shrink vertical footprint, pull content up tight to TopNav.
+   * min-height:auto lets the section size to its content instead of
+   * 620px empty. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    min-height: auto;
+    margin-top: -16px;
+    padding: 16px 20px 8px;
+  }
 `;
 
 /* Keep text/CTA group above the tilted template cards */

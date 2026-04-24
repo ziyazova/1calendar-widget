@@ -151,10 +151,10 @@ const EmailRow = styled.div`
 
 const EmailInput = styled.input`
   width: 100%;
-  height: 52px;
+  height: 48px;
   padding: 0 18px;
   border: 1px solid rgba(26, 22, 19, 0.14);
-  border-radius: ${({ theme }) => theme.radii.lg};
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.typography.sizes.base};
   font-family: inherit;
   color: ${({ theme }) => theme.colors.peach.deep};
@@ -927,9 +927,9 @@ export const WidgetStudioPage: React.FC = () => {
                 <PricingPrice>$0</PricingPrice>
                 <PricingPeriod>forever</PricingPeriod>
                 <PricingFeatures>
-                  <li>3 widgets</li>
-                  <li>Basic widget types</li>
-                  <li>Limited customization</li>
+                  <li>Up to 3 widgets</li>
+                  <li>Calendar &amp; Clock only</li>
+                  <li>Basic colors &amp; layout</li>
                   <li>Embed in Notion</li>
                 </PricingFeatures>
                 <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch}>Get started</SharedButton>

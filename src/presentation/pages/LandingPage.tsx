@@ -85,8 +85,8 @@ const Hero = styled.section<{ $v2?: boolean }>`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 72px 0 120px;
-    gap: 24px;
+    padding: 32px 0 48px;
+    gap: 16px;
   }
 `;
 
