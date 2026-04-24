@@ -575,12 +575,13 @@ const PricingPlanRow = styled.div`
   margin-bottom: 4px;
 `;
 
-const PricingPlan = styled.div`
-  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
+const PricingPlan = styled.div<{ $highlighted?: boolean }>`
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ $highlighted, theme }) =>
+    $highlighted ? theme.colors.accent : theme.colors.text.tertiary};
 `;
 
 const PricingPlanDesc = styled.div`

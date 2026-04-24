@@ -100,6 +100,49 @@ const FilterRow = styled.div`
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+
+  /* Phone — don't wrap chips, horizontal scroll instead. The inline
+   * "Explore all" button is hidden on mobile (moved below gallery). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 24px;
+    margin: 0 -24px;
+
+    &::-webkit-scrollbar { display: none; }
+
+    & > *:last-child { flex-shrink: 0; }
+  }
+`;
+
+/* Wraps the inline "Explore all" button inside FilterRow on desktop.
+ * On mobile the button hides here and re-appears below the marquee
+ * as its own centered row (MobileExploreRow). */
+const DesktopExploreSlot = styled.div`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+/* Mobile-only CTA row that sits under the marquee. Centered full-width
+ * button, natural reading order: user scrolls through the preview then
+ * taps "Explore all" to see the whole catalog. */
+const MobileExploreRow = styled.div`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    justify-content: center;
+    padding: 16px 24px 0;
+
+    & > * { width: 100%; max-width: 320px; }
+  }
 `;
 
 
@@ -288,9 +331,11 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
               {c.label}
             </FilterChip>
           ))}
-          <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')} style={{ marginLeft: 'auto' }}>
-            Explore all <ArrowRight />
-          </SharedButton>
+          <DesktopExploreSlot>
+            <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')}>
+              Explore all <ArrowRight />
+            </SharedButton>
+          </DesktopExploreSlot>
         </FilterRow>
       </GalleryHeader>
       <TemplatesMarqueeWrap
@@ -323,6 +368,11 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
       }}>
         <ArrowRight />
       </TemplatesScrollHint>
+      <MobileExploreRow>
+        <SharedButton $variant="primary" $size="lg" onClick={() => onNavigate('/templates')}>
+          Explore all <ArrowRight />
+        </SharedButton>
+      </MobileExploreRow>
     </TemplatesGallerySection>
   );
 };
