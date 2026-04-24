@@ -83,9 +83,10 @@ const GalleryTitle = styled.h2`
 `;
 
 const GallerySubtitle = styled.p`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.text.body};
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.peach.muted};
   margin: 0;
+  letter-spacing: -0.01em;
 `;
 
 /* ExploreBtn replaced by shared <Button $variant="primary" $size="md"> */

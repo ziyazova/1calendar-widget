@@ -744,7 +744,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
                   <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
                 ) : (
-                  <SharedButton $variant="primary" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
+                  <SharedButton $variant="outline" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
