@@ -576,9 +576,9 @@ const PricingPlanRow = styled.div`
 `;
 
 const PricingPlan = styled.div<{ $highlighted?: boolean }>`
-  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: ${({ $highlighted, theme }) =>
     $highlighted ? theme.colors.accent : theme.colors.text.tertiary};

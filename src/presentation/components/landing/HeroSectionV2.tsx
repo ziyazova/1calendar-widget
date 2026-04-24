@@ -41,12 +41,13 @@ const Hero = styled.section`
   }
 
   /* Phone — shrink vertical footprint. min-height:auto lets the section
-   * size to its content instead of 620px empty. Content offset from
-   * TopNav so the headline isn't flush against the nav. */
+   * size to its content instead of 620px empty. Vertical padding is
+   * balanced (equal top + bottom) so flex centering lands the content
+   * in the visual middle of the filled hero card. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 56px 20px 8px;
+    padding: 24px 20px 24px;
   }
 `;
 
@@ -78,6 +79,11 @@ const Eyebrow = styled.div`
   color: ${({ theme }) => theme.colors.peach.inkSoft};
   font-weight: 500;
   margin-top: -32px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 0;
+    font-size: 12px;
+  }
 `;
 
 const Avatars = styled.div`
@@ -131,6 +137,10 @@ const Headline = styled.h1`
   margin: 22px 0 0;
   color: ${({ theme }) => theme.colors.peach.deep};
   max-width: 920px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 14px;
+  }
 
   em {
     font-style: normal;
@@ -187,13 +197,13 @@ const CTAs = styled.div`
   justify-content: center;
 
   /* Phone — stack CTAs vertically so each is full-width and tappable.
-   * Cap the row width so they don't stretch edge-to-edge on landscape. */
+   * Cap the row width so they don't stretch edge-to-edge on landscape.
+   * Tighter top margin so the button row sits close to the subtitle. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
     max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 18px auto 0;
     gap: 10px;
 
     & > * {
@@ -213,6 +223,12 @@ const Meta = styled.div`
   justify-content: center;
   font-size: 13px;
   color: ${({ theme }) => theme.colors.peach.hint};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 18px;
+    gap: 12px 18px;
+    font-size: 12px;
+  }
 `;
 
 const MetaItem = styled.span`
