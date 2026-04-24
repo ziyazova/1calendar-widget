@@ -6,7 +6,7 @@ export type LabelVariant =
   | 'popular'
   | 'neutral';
 
-export type LabelSize = 'sm' | 'md';
+export type LabelSize = 'xs' | 'sm' | 'md';
 
 export interface LabelStateTokens {
   bg: string;
@@ -55,6 +55,16 @@ export const labelSizeTokens: Record<LabelSize, {
   dotSize: string;
   gap: string;
 }> = {
+  xs: {
+    height: '18px',
+    padding: '0 8px',
+    fontSize: '10px',
+    fontWeight: 700,
+    radius: '999px',
+    iconSize: '10px',
+    dotSize: '3px',
+    gap: '4px',
+  },
   sm: {
     height: '22px',
     padding: '0 10px',

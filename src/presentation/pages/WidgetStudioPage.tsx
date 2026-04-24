@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Star, Sparkle } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Sparkle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, ProPill, PopularPill, Button as SharedButton, GoogleIcon, Modal, ModalFooter, OverlayBadge } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, PopularPill, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
@@ -343,7 +343,7 @@ const WidgetGalleryHeader = styled.div`
   padding: 0 48px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
@@ -377,7 +377,7 @@ const WidgetGalleryFilterRow = styled(FilterRow)`
 const WidgetGalleryGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 48px;
+  padding: 16px 48px 24px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
@@ -733,12 +733,14 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                <OverlayBadge $tone="accent">{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
-                {item.pro && <GalleryProBadgeSlot><ProPill><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill></GalleryProBadgeSlot>}
+                <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{item.category === 'calendar' ? 'calendar' : item.category === 'clock' ? 'clock' : 'board'}</Tag>
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>
-                <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
+                  {item.pro && <PlanBadge $pro $size="xs">Pro</PlanBadge>}
+                </div>
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
                   <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
                 ) : (
@@ -846,7 +848,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {codeError && <CodeError>{codeError}</CodeError>}
                 <AuthDivider>or</AuthDivider>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                  <SharedButton $variant="secondary" $size="md" onClick={() => loginWithGoogle()}>
+                  <SharedButton $variant="secondary" $size="lg" onClick={() => loginWithGoogle()} style={{ minWidth: 260 }}>
                     <GoogleIcon />
                     Continue with Google
                   </SharedButton>
@@ -889,12 +891,14 @@ export const WidgetStudioPage: React.FC = () => {
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                <OverlayBadge $tone="accent">{item.category === 'calendar' ? 'Calendar' : item.category === 'clock' ? 'Clock' : 'Board'}</OverlayBadge>
-                {item.pro && <GalleryProBadgeSlot><ProPill><Star fill="currentColor" strokeWidth={0} /><span>Pro</span></ProPill></GalleryProBadgeSlot>}
+                <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{item.category === 'calendar' ? 'calendar' : item.category === 'clock' ? 'clock' : 'board'}</Tag>
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>
-                <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
+                  {item.pro && <PlanBadge $pro $size="xs">Pro</PlanBadge>}
+                </div>
                 {/* Not-logged-in users see Customize on pro widgets too — the
                      upgrade wall only appears once they have an account. The
                      PRO badge sets the expectation without blocking try-outs. */}

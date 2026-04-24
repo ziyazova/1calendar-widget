@@ -212,6 +212,13 @@ const TemplateCardTitle = styled.span`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
+    /* On phone the card is 200px wide — long titles like "Dark Academia
+     * Study" were ellipsis-clipped. Allow 2-line wrap instead. */
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 `;
 

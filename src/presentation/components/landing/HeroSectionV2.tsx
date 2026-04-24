@@ -171,6 +171,21 @@ const CTAs = styled.div`
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
+
+  /* Phone — stack CTAs vertically so each is full-width and tappable.
+   * Cap the row width so they don't stretch edge-to-edge on landscape. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 10px;
+
+    & > * {
+      width: 100%;
+    }
+  }
 `;
 
 /* Hero CTAs now use shared <Button $size="xl"> — see buttons-polish PR. */
@@ -237,6 +252,12 @@ const TplFloat = styled.div<{ $pos: 'left' | 'right' }>`
       $pos === 'left'
         ? `top: 20px; left: calc(-10% + 74px);`
         : `bottom: 20px; right: calc(-10% + 74px);`}
+  }
+
+  /* Phone — hide decorative template floats entirely. They overlap the
+   * headline + CTAs on narrow viewports and aren't worth the conflict. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
   }
 `;
 

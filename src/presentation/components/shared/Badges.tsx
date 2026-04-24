@@ -85,15 +85,16 @@ export const PlanPill = styled.span<{ $pro?: boolean }>`
   ${({ $pro }) => variantCss($pro ? 'pro' : 'free')}
 `;
 
-/* Compact plan badge — smaller (22px), gradient Pro fill, neutral Free. */
-export const PlanBadge = styled.span<{ $pro?: boolean }>`
+/* Compact plan badge — gradient Pro fill, neutral Free.
+   $size: 'xs' (inline next to titles) | 'sm' (default, standalone). */
+export const PlanBadge = styled.span<{ $pro?: boolean; $size?: 'xs' | 'sm' }>`
   display: inline-flex;
   align-items: center;
-  height: ${labelSizeTokens.sm.height};
-  padding: ${labelSizeTokens.sm.padding};
-  border-radius: ${labelSizeTokens.sm.radius};
-  font-size: ${labelSizeTokens.sm.fontSize};
-  font-weight: ${labelSizeTokens.sm.fontWeight};
+  height: ${({ $size = 'sm' }) => labelSizeTokens[$size].height};
+  padding: ${({ $size = 'sm' }) => labelSizeTokens[$size].padding};
+  border-radius: ${({ $size = 'sm' }) => labelSizeTokens[$size].radius};
+  font-size: ${({ $size = 'sm' }) => labelSizeTokens[$size].fontSize};
+  font-weight: ${({ $size = 'sm' }) => labelSizeTokens[$size].fontWeight};
   letter-spacing: ${labelLetterSpacing};
   text-transform: uppercase;
 
@@ -114,12 +115,13 @@ export const PlanBadge = styled.span<{ $pro?: boolean }>`
 export const Tag = styled.span`
   display: inline-flex;
   align-items: center;
-  padding: 2px 10px;
-  background: ${({ theme }) => theme.colors.background.surface};
-  border-radius: ${({ theme }) => theme.radii.sm};
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid ${({ theme }) => theme.colors.border.medium};
+  border-radius: ${({ theme }) => theme.radii.full};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.text.body};
   letter-spacing: -0.01em;
   white-space: nowrap;
 `;

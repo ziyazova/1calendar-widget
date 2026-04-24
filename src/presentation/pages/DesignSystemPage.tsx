@@ -22,10 +22,10 @@ import {
   ProManageLink,
   UpgradeInner,
   UpgradePrice,
-  Label,
   Tag,
   OverlayBadge,
   PlanBadge,
+  PopularPill,
   Footer,
   TemplateMockupCard,
   TemplateMockupImage,
@@ -43,8 +43,6 @@ import {
   BannerBody,
   BannerText,
 } from '../components/shared';
-import { labelVariantTokens } from '../themes/labelTokens';
-import type { LabelVariant } from '../components/shared';
 import {
   BannerIcon, BannerTitle, BannerActions,
   ToastShell, ToastIconBubble, ToastMessage,
@@ -1148,56 +1146,53 @@ export const DesignSystemPage: React.FC = () => {
         <SectionHeader>
           <SectionTitle>Labels &amp; badges</SectionTitle>
           <SectionMeta>
-            Tier / state tags — Pro, Free, New, Limited, Popular, Neutral · <code>labelTokens.ts</code>.
+            Production-used chips. Token source: <code>labelTokens.ts</code>.
           </SectionMeta>
         </SectionHeader>
 
         <SurfaceCard>
-          <VariantLabel>$variant — 6 tier tints</VariantLabel>
+          <VariantLabel>Tag — outline pill, transparent bg (category / taxonomy on card art)</VariantLabel>
+          <SectionMeta style={{ marginBottom: 12, fontSize: 13 }}>
+            Used on <code>/widgets</code> gallery cards (top-left overlay).
+            Lowercase, subtle — sits over artwork without shouting.
+          </SectionMeta>
           <Row>
-            {(Object.keys(labelVariantTokens) as LabelVariant[]).map((v) => (
-              <Label key={v} $variant={v} style={v === 'popular' ? { position: 'static' } : undefined}>
-                {v}
-              </Label>
-            ))}
+            <Tag>calendar</Tag>
+            <Tag>clock</Tag>
+            <Tag>board</Tag>
           </Row>
 
-          <VariantLabel style={{ marginTop: 24 }}>PlanBadge — compact gradient chip (Pro / Free)</VariantLabel>
+          <VariantLabel style={{ marginTop: 24 }}>PlanBadge — compact gradient (Pro / Free)</VariantLabel>
+          <SectionMeta style={{ marginBottom: 12, fontSize: 13 }}>
+            <code>$size="xs"</code> — inline next to widget / template titles (18px).
+            <code>$size="sm"</code> — standalone, default (22px).
+          </SectionMeta>
           <Row>
+            <PlanBadge $pro $size="xs">Pro</PlanBadge>
+            <PlanBadge $size="xs">Free</PlanBadge>
             <PlanBadge $pro>Pro</PlanBadge>
             <PlanBadge>Free</PlanBadge>
           </Row>
 
-          <VariantLabel style={{ marginTop: 24 }}>Tag — inline metadata chip (subtle, lowercase)</VariantLabel>
+          <VariantLabel style={{ marginTop: 24 }}>PopularPill — legacy "Popular" marker</VariantLabel>
+          <SectionMeta style={{ marginBottom: 12, fontSize: 13 }}>
+            Still used on <code>/widgets</code> near featured items. Prefer <code>PlanBadge</code> for new work.
+          </SectionMeta>
           <Row>
-            <Tag>Productivity</Tag>
-            <Tag>Notion</Tag>
-            <Tag>Planners</Tag>
-            <Tag>Student</Tag>
+            <PopularPill>Popular</PopularPill>
           </Row>
 
-          <VariantLabel style={{ marginTop: 24 }}>OverlayBadge — glass chip on card art (top-left)</VariantLabel>
+          <VariantLabel style={{ marginTop: 24 }}>OverlayBadge — glass chip on card art</VariantLabel>
           <SectionMeta style={{ marginBottom: 12, fontSize: 13 }}>
-            Two tones: <code>neutral</code> (dark text, used for template "New" /
-            "Popular" markers) and <code>accent</code> (indigo + semibold, used
-            for widget-type tags on <code>/studio</code> and <code>/widgets</code>
-            — "Calendar", "Clock", "Board").
+            Used on <code>/studio</code> saved-widget thumbnails for widget type.
+            Neutral tone only — the accent (indigo) variant was retired in favor of <code>Tag</code>.
           </SectionMeta>
           <Row>
             <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: 'linear-gradient(135deg, #E8D5FF, #FFD0E8)' }}>
               <OverlayBadge>New</OverlayBadge>
             </div>
-            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: 'linear-gradient(135deg, #D5E5FF, #E8FFE8)' }}>
-              <OverlayBadge>Popular</OverlayBadge>
-            </div>
             <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: '#FAFAF9' }}>
-              <OverlayBadge $tone="accent">Calendar</OverlayBadge>
-            </div>
-            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: '#FAFAF9' }}>
-              <OverlayBadge $tone="accent">Clock</OverlayBadge>
-            </div>
-            <div style={{ position: 'relative', width: 180, height: 100, borderRadius: 12, background: '#FAFAF9' }}>
-              <OverlayBadge $tone="accent">Board</OverlayBadge>
+              <OverlayBadge>Calendar</OverlayBadge>
             </div>
           </Row>
         </SurfaceCard>
