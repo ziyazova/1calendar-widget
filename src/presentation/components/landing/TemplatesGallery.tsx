@@ -101,19 +101,11 @@ const FilterRow = styled.div`
   gap: 8px;
   flex-wrap: wrap;
 
-  /* Phone — don't wrap chips, horizontal scroll instead. The inline
-   * "Explore all" button is hidden on mobile (moved below gallery). */
+  /* Phone — hide the whole filter row. Mobile users get a clean "here
+   * is a preview → tap Explore all to see everything" flow, and they
+   * can filter on the real /templates page. Less decision fatigue. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 0 24px;
-    margin: 0 -24px;
-
-    &::-webkit-scrollbar { display: none; }
-
-    & > *:last-child { flex-shrink: 0; }
+    display: none;
   }
 `;
 
