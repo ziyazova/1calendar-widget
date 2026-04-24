@@ -92,13 +92,13 @@ const StyleBadge = styled.span`
   font-weight: 600;
   background: linear-gradient(135deg, #3384F4, #5BA0F7);
   color: #fff;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   letter-spacing: 0;
 `;
 
 const Subtitle = styled.p`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   margin: 0 0 16px 0;
   letter-spacing: -0.01em;
 `;
@@ -128,14 +128,14 @@ const ControlGroup = styled.div`
 const ControlLabel = styled.label`
   font-size: 12px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   letter-spacing: -0.01em;
 `;
 
 const ControlSlider = styled.input`
   width: 120px;
   height: 4px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   background: rgba(0, 0, 0, 0.06);
   outline: none;
   -webkit-appearance: none;
@@ -149,7 +149,7 @@ const ControlSlider = styled.input`
     border: 2px solid #3384F4;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(51, 132, 244, 0.25);
-    transition: all 0.15s ease;
+    transition: all ${({ theme }) => theme.transitions.fast};
   }
 
   &::-webkit-slider-thumb:hover {
@@ -160,7 +160,7 @@ const ControlSlider = styled.input`
 
 const ControlValue = styled.span`
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   min-width: 36px;
@@ -170,14 +170,14 @@ const ControlSelect = styled.select`
   padding: 8px 24px 8px 12px;
   font-size: 12px;
   font-weight: 400;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   background: rgba(255, 255, 255, 0.8);
   color: ${({ theme }) => theme.colors.text.primary};
   font-family: inherit;
   cursor: pointer;
   appearance: none;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 8px center;
   background-repeat: no-repeat;
@@ -190,7 +190,7 @@ const ControlSelect = styled.select`
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
+    box-shadow: ${({ theme }) => theme.shadows.focusBlue};
   }
 `;
 
@@ -198,7 +198,7 @@ const ControlSelect = styled.select`
 
 const ThemeToggle = styled.div`
   display: flex;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(0, 0, 0, 0.04);
   padding: 2px;
   gap: 2px;
@@ -214,8 +214,8 @@ const ThemeToggleButton = styled.button<{ $active: boolean }>`
   font-family: inherit;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 8px;
+  transition: all ${({ theme }) => theme.transitions.medium};
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: ${({ $active }) => $active ? '#fff' : 'transparent'};
   color: ${({ $active }) => $active ? '#1F1F1F' : '#6B6B6B'};
   box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'};
@@ -236,10 +236,10 @@ const DebugButton = styled.button<{ $active: boolean }>`
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   background: ${({ $active }) => $active ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.04)'};
   color: ${({ $active }) => $active ? '#ef4444' : '#6B6B6B'};
 
@@ -261,10 +261,10 @@ const DebugLegend = styled.div<{ $visible: boolean }>`
   margin: 16px 0 0;
   padding: 12px 16px;
   background: ${({ theme }) => theme.colors.text.primary};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 11px;
   font-family: monospace;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   flex-wrap: wrap;
 `;
 
@@ -293,13 +293,13 @@ const PresetButton = styled.button`
   padding: 4px 12px;
   font-size: 11px;
   font-weight: 500;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   background: rgba(255, 255, 255, 0.8);
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   letter-spacing: -0.01em;
 
   &:hover {
@@ -322,7 +322,7 @@ const EmbedArea = styled.div<{ $dark?: boolean }>`
   overflow: hidden;
   min-height: 0;
   background: ${({ $dark }) => $dark ? '#191919' : '#F8F8F7'};
-  border-radius: 28px;
+  border-radius: ${({ theme }) => theme.radii['3xl']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   margin: 12px 0 20px 0;
   transition: background 0.3s ease;
@@ -358,7 +358,7 @@ const lightContainerStyles = css`
 const EmbedContainer = styled.div<{ $dark?: boolean }>`
   ${({ $dark }) => $dark ? darkContainerStyles : lightContainerStyles};
   border: 1px solid ${({ $dark, theme }) => $dark ? '#333' : theme.colors.border.light};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   overflow: hidden;
   resize: both;
   position: relative;
@@ -383,7 +383,7 @@ const SizeLabel = styled.span<{ $dark?: boolean }>`
   pointer-events: none;
   background: ${({ $dark }) => $dark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.9)'};
   padding: 2px 8px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-variant-numeric: tabular-nums;
   backdrop-filter: blur(8px);
   letter-spacing: -0.01em;
@@ -394,7 +394,7 @@ const SizeLabel = styled.span<{ $dark?: boolean }>`
 const EmptyState = styled.div`
   text-align: center;
   padding: 80px 24px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   font-size: 14px;
   font-weight: 500;
 `;

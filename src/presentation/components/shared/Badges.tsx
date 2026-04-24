@@ -139,7 +139,7 @@ export const OverlayBadge = styled.span<{ $tone?: 'neutral' | 'accent' }>`
   -webkit-backdrop-filter: blur(8px);
   color: ${({ $tone = 'neutral', theme }) =>
     $tone === 'accent' ? theme.colors.accent : theme.colors.text.primary};
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: ${({ $tone = 'neutral', theme }) =>
     $tone === 'accent' ? theme.typography.weights.semibold : theme.typography.weights.medium};

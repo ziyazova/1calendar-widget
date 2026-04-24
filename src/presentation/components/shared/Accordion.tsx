@@ -25,7 +25,7 @@ interface AccordionProps {
 const Wrap = styled.div<{ $variant: 'default' | 'subtle' }>`
   border: ${({ $variant, theme }) =>
     $variant === 'default' ? `1px solid ${theme.colors.border.light}` : 'none'};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ $variant, theme }) =>
     $variant === 'default' ? theme.colors.background.elevated : 'transparent'};
   overflow: hidden;
@@ -46,7 +46,7 @@ const Trigger = styled.button<{ $open: boolean }>`
   font-size: 14px;
   font-weight: 500;
   text-align: left;
-  transition: background 0.15s ease;
+  transition: background ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: ${({ theme }) => theme.colors.interactive.hover};
@@ -54,7 +54,7 @@ const Trigger = styled.button<{ $open: boolean }>`
 
   svg.chevron {
     flex-shrink: 0;
-    transition: transform 0.2s ease;
+    transition: transform ${({ theme }) => theme.transitions.medium};
     transform: rotate(${({ $open }) => ($open ? '180deg' : '0deg')});
     color: ${({ theme }) => theme.colors.text.body};
   }
@@ -72,7 +72,7 @@ const Right = styled.span`
 
 const Content = styled.div<{ $h: number }>`
   overflow: hidden;
-  transition: max-height 0.25s ease;
+  transition: max-height ${({ theme }) => theme.transitions.base};
   max-height: ${({ $h }) => $h}px;
 `;
 

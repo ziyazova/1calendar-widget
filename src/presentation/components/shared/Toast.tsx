@@ -61,7 +61,7 @@ const toneMap: Record<ToastTone, { bg: string; fg: string; border: string; iconB
   },
 };
 
-const Shell = styled.div<{ $tone: ToastTone }>`
+export const ToastShell = styled.div<{ $tone: ToastTone }>`
   position: fixed;
   left: 50%;
   bottom: calc(32px + env(safe-area-inset-bottom));
@@ -72,7 +72,7 @@ const Shell = styled.div<{ $tone: ToastTone }>`
   gap: 10px;
   min-height: 44px;
   padding: 8px 16px 8px 8px;
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   background: ${({ $tone }) => toneMap[$tone].bg};
   color: ${({ $tone }) => toneMap[$tone].fg};
   border: 1px solid ${({ $tone }) => toneMap[$tone].border};
@@ -87,7 +87,7 @@ const Shell = styled.div<{ $tone: ToastTone }>`
   animation: ${slideIn} 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
-const IconBubble = styled.div<{ $tone: ToastTone }>`
+export const ToastIconBubble = styled.div<{ $tone: ToastTone }>`
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -101,7 +101,7 @@ const IconBubble = styled.div<{ $tone: ToastTone }>`
   svg { width: 14px; height: 14px; }
 `;
 
-const Message = styled.span`
+export const ToastMessage = styled.span`
   line-height: 1.3;
 `;
 
@@ -122,10 +122,10 @@ export function Toast({ open, onClose, tone = 'success', duration = 2000, icon, 
   if (!open) return null;
 
   return (
-    <Shell $tone={tone} role="status" aria-live="polite">
-      <IconBubble $tone={tone}>{icon ?? defaultIcon[tone]}</IconBubble>
-      <Message>{children}</Message>
-    </Shell>
+    <ToastShell $tone={tone} role="status" aria-live="polite">
+      <ToastIconBubble $tone={tone}>{icon ?? defaultIcon[tone]}</ToastIconBubble>
+      <ToastMessage>{children}</ToastMessage>
+    </ToastShell>
   );
 }
 

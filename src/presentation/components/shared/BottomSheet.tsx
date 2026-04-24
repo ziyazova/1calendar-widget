@@ -38,7 +38,7 @@ const Backdrop = styled.div<{ $open: boolean }>`
   z-index: 39;
   opacity: ${({ $open }) => ($open ? 1 : 0)};
   pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
-  transition: opacity 0.25s ease;
+  transition: opacity ${({ theme }) => theme.transitions.base};
 `;
 
 const Sheet = styled.div<{ $open: boolean; $maxHeight: string }>`
@@ -70,7 +70,7 @@ const Handle = styled.div`
     content: '';
     width: 40px;
     height: 5px;
-    border-radius: 4px;
+    border-radius: ${({ theme }) => theme.radii.xs};
     background: rgba(0, 0, 0, 0.15);
   }
 `;
@@ -99,7 +99,7 @@ const CloseBtn = styled.button`
   width: 28px;
   height: 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: ${({ theme }) => theme.colors.interactive.hover};
   color: ${({ theme }) => theme.colors.text.hint};
   cursor: pointer;

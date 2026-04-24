@@ -2,16 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Button as SharedButton } from '../shared';
 
-/* ── Design tokens (local to V2) ── */
-const COLORS = {
-  ink: '#2B2320',
-  inkSoft: '#4A433D',
-  muted: '#8B8278',
-  line: 'rgba(43, 35, 32, 0.08)',
-  peach: '#FFD9B8',
-  peachDeep: '#F4A672',
-  rose: '#F3C6C6',
-};
+/* Brand palette lives in `theme.colors.peach.*`. Animation values that
+ * can't access theme (keyframes) use the raw hex `#F4A672` — kept in sync
+ * with `theme.colors.peach.deepWarm` via code review. */
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(24px); }
@@ -63,7 +56,7 @@ const Eyebrow = styled.div`
   align-items: center;
   gap: 10px;
   padding: 6px 14px 6px 8px;
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   background: rgba(255, 255, 255, 0.44);
   border: 0.5px solid rgba(26, 22, 19, 0.06);
   backdrop-filter: blur(14px) saturate(140%);
@@ -73,7 +66,7 @@ const Eyebrow = styled.div`
     0 1px 2px rgba(20, 20, 40, 0.03),
     0 4px 12px -4px rgba(20, 20, 40, 0.05);
   font-size: 13px;
-  color: ${COLORS.inkSoft};
+  color: ${({ theme }) => theme.colors.peach.inkSoft};
   font-weight: 500;
   margin-top: -32px;
 `;
@@ -92,14 +85,16 @@ const Avatar = styled.i<{ $bg: string; $i: number }>`
   background: ${({ $bg }) => $bg};
 `;
 
+/* keyframes can't access theme — brand peach deep-warm hardcoded here.
+ * Kept in sync with `theme.colors.peach.deepWarm` via code review. */
 const starPop = keyframes`
   0%   { transform: scale(1); color: rgba(150, 145, 135, 0.35); }
-  50%  { transform: scale(1.4); color: ${COLORS.peachDeep}; }
-  100% { transform: scale(1); color: ${COLORS.peachDeep}; }
+  50%  { transform: scale(1.4); color: #F4A672; }
+  100% { transform: scale(1); color: #F4A672; }
 `;
 
 const Stars = styled.span`
-  color: ${COLORS.peachDeep};
+  color: ${({ theme }) => theme.colors.peach.deepWarm};
   letter-spacing: 0;
   font-size: 12px;
   display: inline-flex;
@@ -125,7 +120,7 @@ const Headline = styled.h1`
   line-height: 1.2;
   letter-spacing: -0.03em;
   margin: 22px 0 0;
-  color: ${COLORS.ink};
+  color: ${({ theme }) => theme.colors.peach.deep};
   max-width: 920px;
 
   em {
@@ -134,7 +129,7 @@ const Headline = styled.h1`
     position: relative;
     display: inline-block;
     isolation: isolate;
-    color: ${COLORS.ink};
+    color: ${({ theme }) => theme.colors.peach.deep};
 
     &::before {
       content: '';
@@ -163,7 +158,7 @@ const Sub = styled.p`
   margin: 22px auto 0;
   font-size: 16px;
   line-height: 1.65;
-  color: #9B9790;
+  color: ${({ theme }) => theme.colors.peach.muted};
   max-width: 440px;
   font-weight: 400;
 `;
@@ -188,7 +183,7 @@ const Meta = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   font-size: 13px;
-  color: #B5B1A9;
+  color: ${({ theme }) => theme.colors.peach.hint};
 `;
 
 const MetaItem = styled.span`
@@ -201,7 +196,7 @@ const MetaDot = styled.i`
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: ${COLORS.peachDeep};
+  background: ${({ theme }) => theme.colors.peach.deepWarm};
   display: inline-block;
 `;
 
@@ -247,7 +242,7 @@ const TplFloat = styled.div<{ $pos: 'left' | 'right' }>`
 
 const TplCard = styled.div<{ $variant: 'planner' | 'habits' }>`
   background: #fff;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
   text-align: left;
   border: 1px solid ${({ $variant }) => {
@@ -357,14 +352,14 @@ const CardTitle = styled.div`
 
 const CardDesc = styled.div`
   font-size: 10px;
-  color: #9B9790;
+  color: ${({ theme }) => theme.colors.peach.muted};
   margin-top: 4px;
   line-height: 1.5;
 `;
 
 const SectionLabel = styled.div`
   font-size: 9.5px;
-  color: #9B9790;
+  color: ${({ theme }) => theme.colors.peach.muted};
   font-weight: 500;
   margin: 18px 0 4px;
   letter-spacing: -0.005em;
@@ -387,7 +382,7 @@ const TaskRow = styled.div<{ $done?: boolean }>`
   color: #37352F;
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.2s ease;
+  transition: opacity ${({ theme }) => theme.transitions.medium};
 
   &:hover {
     opacity: 0.7;
@@ -396,14 +391,14 @@ const TaskRow = styled.div<{ $done?: boolean }>`
   span {
     color: ${({ $done }) => ($done ? '#B5B1A9' : '#37352F')};
     text-decoration: ${({ $done }) => ($done ? 'line-through' : 'none')};
-    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    transition: color ${({ theme }) => theme.transitions.medium}, text-decoration-color ${({ theme }) => theme.transitions.medium};
   }
 `;
 
 const Checkbox = styled.div<{ $on?: boolean }>`
   width: 14px;
   height: 14px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   border: 1.2px solid ${({ $on }) => ($on ? '#7B9FD1' : '#E2DED5')};
   background: ${({ $on }) => ($on ? '#7B9FD1' : '#fff')};
   flex-shrink: 0;
@@ -454,7 +449,7 @@ const HabitName = styled.div`
   .ic {
     width: 12px;
     height: 12px;
-    border-radius: 4px;
+    border-radius: ${({ theme }) => theme.radii.xs};
     background: #F7F2EC;
     display: flex;
     align-items: center;
@@ -464,7 +459,7 @@ const HabitName = styled.div`
   .ic.plus {
     background: transparent;
     border: 1px dashed #D8D2C6;
-    color: #B5B1A9;
+    color: ${({ theme }) => theme.colors.peach.hint};
     font-size: 11px;
     line-height: 1;
   }
@@ -481,7 +476,7 @@ const Ticks = styled.div`
   i {
     width: 14px;
     height: 14px;
-    border-radius: 4px;
+    border-radius: ${({ theme }) => theme.radii.xs};
     background: #F1ECE4;
     display: block;
     position: relative;
@@ -526,7 +521,7 @@ const DayHeader = styled.div`
   gap: 8px;
   margin: 18px 0 4px;
   font-size: 9.5px;
-  color: #9B9790;
+  color: ${({ theme }) => theme.colors.peach.muted};
   font-weight: 500;
   letter-spacing: -0.005em;
 
@@ -554,7 +549,7 @@ const SectionSplit = styled.div`
   justify-content: space-between;
   gap: 10px;
   font-size: 9.5px;
-  color: #9B9790;
+  color: ${({ theme }) => theme.colors.peach.muted};
   font-weight: 500;
   margin: 18px 0 4px;
   letter-spacing: -0.005em;
@@ -565,7 +560,7 @@ const SectionSplit = styled.div`
     gap: 5px;
   }
   & > .date {
-    color: #B5B1A9;
+    color: ${({ theme }) => theme.colors.peach.hint};
     font-weight: 500;
     font-size: 9px;
     letter-spacing: 0.02em;

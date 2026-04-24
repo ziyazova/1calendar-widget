@@ -19,7 +19,6 @@ import { ClaudeFeedback } from './presentation/components/dev/ClaudeFeedback';
 import { BranchSwitcher } from './presentation/components/dev/BranchSwitcher';
 import { DevPanelsToggle } from './presentation/components/dev/DevPanelsToggle';
 import { DesignSystemPage } from './presentation/pages/DesignSystemPage';
-import { DesignSystemV2Page } from './presentation/pages/DesignSystemV2Page';
 import { PrivacyPage } from './presentation/pages/PrivacyPage';
 import { TermsPage } from './presentation/pages/TermsPage';
 import { RefundPage } from './presentation/pages/RefundPage';
@@ -99,7 +98,7 @@ function App() {
                   <Route path="/embed/clock" element={<ClockEmbedPage />} />
                   <Route path="/embed/board" element={<BoardEmbedPage />} />
                   <Route path="/dev" element={<DesignSystemPage />} />
-                  <Route path="/dev/v2" element={<DesignSystemV2Page />} />
+                  <Route path="/dev/v2" element={<DesignSystemPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/refund" element={<RefundPage />} />

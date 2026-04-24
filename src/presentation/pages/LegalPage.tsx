@@ -21,7 +21,7 @@ const Page = styled.div`
 
 const Hero = styled.section`
   padding: 120px 32px 56px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
   background:
     radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.06) 0%, transparent 55%),
     radial-gradient(ellipse at 80% 70%, rgba(236,72,153,0.04) 0%, transparent 55%),
@@ -43,9 +43,9 @@ const Kicker = styled.div`
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   background: rgba(99,102,241,0.08);
   margin-bottom: 20px;
 
@@ -56,7 +56,7 @@ const Title = styled.h1`
   font-size: 56px;
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 16px;
   line-height: 1;
 
@@ -115,21 +115,21 @@ const SectionHead = styled.div`
 const SectionIcon = styled.div`
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.5));
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
-  svg { width: 18px; height: 18px; color: #6366F1; }
+  svg { width: 18px; height: 18px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const H2 = styled.h2`
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
 `;
 
@@ -141,7 +141,7 @@ const P = styled.p`
 
   &:last-child { margin-bottom: 0; }
 
-  strong { color: #1F1F1F; font-weight: 600; }
+  strong { color: ${({ theme }) => theme.colors.text.primary}; font-weight: 600; }
 `;
 
 const Row = styled.div`
@@ -163,7 +163,7 @@ const Row = styled.div`
 const RowLabel = styled.div`
   font-size: 13px;
   font-weight: 500;
-  color: #8E8E93;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: 0.02em;
   text-transform: uppercase;
 `;
@@ -171,24 +171,24 @@ const RowLabel = styled.div`
 const RowValue = styled.div`
   font-size: 14px;
   line-height: 1.5;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
 
   em {
     color: #B4623A;
     font-style: normal;
     background: rgba(255, 160, 110, 0.1);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: ${({ theme }) => theme.radii.xs};
     font-size: 13px;
   }
 `;
 
 const ContactLink = styled.a`
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   text-decoration: none;
   border-bottom: 1px solid rgba(99,102,241,0.25);
-  transition: border-color 0.15s;
-  &:hover { border-bottom-color: #6366F1; }
+  transition: border-color ${({ theme }) => theme.transitions.fast};
+  &:hover { border-bottom-color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 export const LegalPage: React.FC = () => (

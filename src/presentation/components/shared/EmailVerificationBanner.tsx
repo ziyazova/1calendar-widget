@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Mail, X, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/presentation/context/AuthContext';
 
-const Bar = styled.div`
+export const EmailVerificationBar = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -18,7 +18,7 @@ const Bar = styled.div`
   svg.lead { width: 16px; height: 16px; color: #B4623A; flex-shrink: 0; }
 `;
 
-const Inner = styled.div`
+export const EmailVerificationInner = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -27,31 +27,31 @@ const Inner = styled.div`
   gap: 12px;
 `;
 
-const Text = styled.div`
+export const EmailVerificationText = styled.div`
   flex: 1;
   min-width: 0;
   strong { color: #4A2712; font-weight: 600; }
 `;
 
-const ResendBtn = styled.button`
+export const EmailVerificationResendBtn = styled.button`
   height: 30px;
   padding: 0 14px;
   background: #fff;
   border: 1px solid rgba(180, 98, 58, 0.28);
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   color: #6B3A1F;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background ${({ theme }) => theme.transitions.fast}, border-color ${({ theme }) => theme.transitions.fast};
   white-space: nowrap;
 
   &:hover:not(:disabled) { background: #FFF9F2; border-color: rgba(180, 98, 58, 0.42); }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
-const CloseBtn = styled.button`
+export const EmailVerificationCloseBtn = styled.button`
   background: none;
   border: none;
   padding: 4px;
@@ -71,6 +71,7 @@ const CloseBtn = styled.button`
  * by design, since an unverified email is a real security gap.
  */
 export const EmailVerificationBanner: React.FC = () => {
+  const theme = useTheme();
   const { isRegistered, isEmailVerified, user, resendVerificationForCurrent } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const [sending, setSending] = useState(false);
@@ -94,31 +95,31 @@ export const EmailVerificationBanner: React.FC = () => {
   };
 
   return (
-    <Bar role="status">
-      <Inner>
+    <EmailVerificationBar role="status">
+      <EmailVerificationInner>
         <Mail className="lead" />
-        <Text>
+        <EmailVerificationText>
           <strong>Verify your email.</strong>{' '}
           {sentAt ? (
             <>
-              <CheckCircle2 style={{ width: 14, height: 14, verticalAlign: -2, marginRight: 2, color: '#16A34A' }} />
+              <CheckCircle2 style={{ width: 14, height: 14, verticalAlign: -2, marginRight: 2, color: theme.colors.success.fg }} />
               Verification email sent to {user?.email}. Check your inbox.
             </>
           ) : error ? (
-            <span style={{ color: '#B91C1C' }}>{error}</span>
+            <span style={{ color: theme.colors.danger.strong }}>{error}</span>
           ) : (
             <>Click the link we sent to <strong>{user?.email}</strong> to confirm your address.</>
           )}
-        </Text>
+        </EmailVerificationText>
         {!sentAt && (
-          <ResendBtn onClick={handleResend} disabled={sending}>
+          <EmailVerificationResendBtn onClick={handleResend} disabled={sending}>
             {sending ? 'Sending…' : 'Resend'}
-          </ResendBtn>
+          </EmailVerificationResendBtn>
         )}
-        <CloseBtn onClick={() => setDismissed(true)} aria-label="Dismiss">
+        <EmailVerificationCloseBtn onClick={() => setDismissed(true)} aria-label="Dismiss">
           <X />
-        </CloseBtn>
-      </Inner>
-    </Bar>
+        </EmailVerificationCloseBtn>
+      </EmailVerificationInner>
+    </EmailVerificationBar>
   );
 };

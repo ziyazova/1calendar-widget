@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
 import {
@@ -9,10 +9,6 @@ import {
   Card,
   Modal,
   ModalFooter,
-  GradientBanner,
-  BannerIcon,
-  BannerBody,
-  BannerText,
   GoogleIcon,
 } from '@/presentation/components/shared';
 import { Mail, Lock, Eye, EyeOff, Check, CheckCircle2, MailCheck, LogOut, ArrowRight, KeyRound } from 'lucide-react';
@@ -95,7 +91,7 @@ const PasswordToggle = styled.button`
   padding: 0;
   svg { width: 16px; height: 16px; }
 
-  &:hover { color: ${({ theme }) => theme.colors.text.secondary}; }
+  &:hover { color: ${({ theme }) => theme.colors.text.body}; }
 `;
 
 const Divider = styled.div`
@@ -130,7 +126,7 @@ const LegalNotice = styled.p`
   letter-spacing: -0.005em;
 
   a {
-    color: ${({ theme }) => theme.colors.text.dim};
+    color: ${({ theme }) => theme.colors.text.hint};
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
@@ -158,9 +154,9 @@ const ForgotLink = styled.button`
 
 const ErrorText = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.md};
-  color: ${({ theme }) => theme.colors.destructiveText};
-  background: ${({ theme }) => theme.colors.destructiveBg};
-  border: 1px solid ${({ theme }) => theme.colors.destructiveBorder};
+  color: ${({ theme }) => theme.colors.danger.strong};
+  background: ${({ theme }) => theme.colors.danger.bg};
+  border: 1px solid ${({ theme }) => theme.colors.danger.border};
   padding: 10px 12px;
   border-radius: ${({ theme }) => theme.radii.sm};
   margin-bottom: ${({ theme }) => theme.spacing['2']};
@@ -173,7 +169,7 @@ const RequirementsList = styled.div`
   gap: 4px;
   padding: 10px 12px;
   background: rgba(0,0,0,0.02);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   margin-top: -4px;
 `;
 
@@ -182,8 +178,8 @@ const Requirement = styled.div<{ $met: boolean }>`
   align-items: center;
   gap: 8px;
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ $met, theme }) => ($met ? theme.colors.successFg : theme.colors.text.hint)};
-  transition: color 0.15s;
+  color: ${({ $met, theme }) => ($met ? theme.colors.success.fg : theme.colors.text.hint)};
+  transition: color ${({ theme }) => theme.transitions.fast};
 
   svg { width: 12px; height: 12px; flex-shrink: 0; }
 `;
@@ -201,13 +197,13 @@ const ConfirmCard = styled.div`
 const ConfirmIcon = styled.div`
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.08));
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  svg { width: 28px; height: 28px; color: ${({ theme }) => theme.colors.brand.indigo}; }
+  svg { width: 28px; height: 28px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const ConfirmEmail = styled.div`
@@ -235,7 +231,7 @@ const SignedInAvatar = styled.div`
   justify-content: center;
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: ${({ theme }) => theme.colors.brand.indigo};
+  color: ${({ theme }) => theme.colors.accent};
   overflow: hidden;
 
   img {
@@ -258,7 +254,7 @@ const ForgotInput = styled.input`
   width: 100%;
   height: 46px;
   padding: 0 14px;
-  margin-bottom: ${({ theme }) => theme.spacing['4']};
+  margin-bottom: ${({ theme }) => theme.spacing['3']};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.typography.sizes.base};
@@ -269,6 +265,13 @@ const ForgotInput = styled.input`
   box-sizing: border-box;
 
   &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
+`;
+
+const ForgotHint = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.body};
+  line-height: 1.5;
+  margin: 0;
 `;
 
 const SignedInTitle = styled.div`
@@ -322,6 +325,7 @@ const getPasswordChecks = (pw: string): PasswordCheck[] => [
 ];
 
 export const LoginPage: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -428,14 +432,14 @@ export const LoginPage: React.FC = () => {
         <Container>
           <ConfirmCard>
             <ConfirmIcon><MailCheck /></ConfirmIcon>
-            <div style={{ fontSize: 22, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 22, fontWeight: 600, color: theme.colors.text.primary, letterSpacing: '-0.02em' }}>
               Check your email
             </div>
-            <div style={{ fontSize: 14, color: '#666', marginTop: 8, lineHeight: 1.5, maxWidth: 340 }}>
+            <div style={{ fontSize: 14, color: theme.colors.text.hint, marginTop: 8, lineHeight: 1.5, maxWidth: 340 }}>
               We sent a confirmation link to:
             </div>
             <ConfirmEmail>{confirmationSentTo}</ConfirmEmail>
-            <div style={{ fontSize: 13, color: '#999', maxWidth: 320, lineHeight: 1.55 }}>
+            <div style={{ fontSize: 13, color: theme.colors.text.tertiary, maxWidth: 320, lineHeight: 1.55 }}>
               Click the link in the email to activate your account. You can close this page.
             </div>
 
@@ -444,13 +448,13 @@ export const LoginPage: React.FC = () => {
                 {resendCountdown > 0 ? `Resend email in ${resendCountdown}s` : 'Resend email'}
               </Button>
               {resendMessage && (
-                <div style={{ fontSize: 12, color: '#16A34A' }}>{resendMessage}</div>
+                <div style={{ fontSize: 12, color: theme.colors.success.fg }}>{resendMessage}</div>
               )}
               <button
                 type="button"
                 onClick={() => { setConfirmationSentTo(null); setResendMessage(null); setResendCountdown(0); }}
                 style={{
-                  background: 'none', border: 'none', color: '#999',
+                  background: 'none', border: 'none', color: theme.colors.text.tertiary,
                   fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', marginTop: 8,
                 }}
               >
@@ -523,7 +527,7 @@ export const LoginPage: React.FC = () => {
         {!hasSupabaseEnv && (
           <div style={{
             fontSize: 13,
-            color: '#92400E',
+            color: theme.colors.warning.text,
             background: 'rgba(253,186,116,0.18)',
             border: '1px solid rgba(194,120,3,0.35)',
             padding: '12px 14px',
@@ -540,7 +544,7 @@ export const LoginPage: React.FC = () => {
         {deletedNotice && (
           <div style={{
             fontSize: 13,
-            color: '#166534',
+            color: theme.colors.success.fg,
             background: 'rgba(34,197,94,0.08)',
             border: '1px solid rgba(34,197,94,0.2)',
             padding: '12px 14px',
@@ -551,7 +555,7 @@ export const LoginPage: React.FC = () => {
             alignItems: 'flex-start',
             gap: 10,
           }}>
-            <CheckCircle2 style={{ width: 16, height: 16, flexShrink: 0, color: '#16A34A', marginTop: 1 }} />
+            <CheckCircle2 style={{ width: 16, height: 16, flexShrink: 0, color: theme.colors.success.fg, marginTop: 1 }} />
             <div>
               <strong style={{ color: '#14532D' }}>Your account has been deleted.</strong>{' '}
               Your profile, widgets and all local data have been removed from this device.
@@ -561,7 +565,7 @@ export const LoginPage: React.FC = () => {
                 onClick={() => setDeletedNotice(false)}
                 style={{
                   marginLeft: 8, background: 'none', border: 'none',
-                  color: '#166534', fontSize: 12, fontFamily: 'inherit',
+                  color: theme.colors.success.fg, fontSize: 12, fontFamily: 'inherit',
                   cursor: 'pointer', textDecoration: 'underline', padding: 0,
                 }}
               >
@@ -574,7 +578,7 @@ export const LoginPage: React.FC = () => {
         {error && <ErrorText>{error}</ErrorText>}
         {showGoogleHint && !isSignUp && (
           <div style={{
-            fontSize: 12, color: '#555',
+            fontSize: 12, color: theme.colors.text.body,
             background: 'rgba(99,102,241,0.06)',
             border: '1px solid rgba(99,102,241,0.15)',
             padding: '10px 12px', borderRadius: 12, marginBottom: 8, lineHeight: 1.5,
@@ -713,9 +717,10 @@ export const LoginPage: React.FC = () => {
       <Modal
         open={forgotOpen}
         onClose={() => !forgotSubmitting && setForgotOpen(false)}
+        eyebrow="Account recovery"
         title={forgotSentTo ? 'Check your email' : 'Reset your password'}
-        subtitle={forgotSentTo ? undefined : "Enter the email associated with your account and we'll send you a link to set a new password."}
         size="sm"
+        hideClose
       >
         {forgotSentTo ? (
           <>
@@ -735,75 +740,67 @@ export const LoginPage: React.FC = () => {
             </ModalFooter>
           </>
         ) : (
-          <>
-            <GradientBanner $tone="indigo" $inline style={{ marginBottom: 14 }}>
-              <BannerBody>
-                <BannerText>
-                  Signed up with Google? You don't have a password — just click{' '}
-                  <Button
-                    type="button"
-                    $variant="link"
-                    $size="sm"
-                    onClick={() => { setForgotOpen(false); auth.loginWithGoogle(); }}
-                  >
-                    Continue with Google
-                  </Button>{' '}
-                  on the login page.
-                </BannerText>
-              </BannerBody>
-            </GradientBanner>
-            {forgotError && <ErrorText>{forgotError}</ErrorText>}
-            <form onSubmit={async e => {
-              e.preventDefault();
-              setForgotError('');
-              const trimmed = forgotEmail.trim();
-              if (!trimmed || !trimmed.includes('@')) {
-                setForgotError('Please enter a valid email address.');
+          <form onSubmit={async e => {
+            e.preventDefault();
+            setForgotError('');
+            const trimmed = forgotEmail.trim();
+            if (!trimmed || !trimmed.includes('@')) {
+              setForgotError('Please enter a valid email address.');
+              return;
+            }
+            setForgotSubmitting(true);
+            try {
+              const err = await auth.sendPasswordReset(trimmed);
+              if (err) {
+                setForgotError(humaniseError(err, 'login'));
                 return;
               }
-              setForgotSubmitting(true);
-              try {
-                const err = await auth.sendPasswordReset(trimmed);
-                if (err) {
-                  setForgotError(humaniseError(err, 'login'));
-                  return;
-                }
-                setForgotSentTo(trimmed);
-              } finally {
-                setForgotSubmitting(false);
-              }
-            }}>
-              <ForgotInput
-                type="email"
-                autoFocus
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={forgotEmail}
-                onChange={e => setForgotEmail(e.target.value)}
-              />
-              <div style={{ display: 'flex', gap: 8 }}>
-                <Button
-                  type="button"
-                  $variant="secondary"
-                  $size="lg"
-                  onClick={() => setForgotOpen(false)}
-                  disabled={forgotSubmitting}
-                  style={{ flex: 1 }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  $variant="primary"
-                  $size="lg"
-                  disabled={forgotSubmitting}
-                  style={{ flex: 1 }}
-                >
-                  {forgotSubmitting ? 'Sending…' : 'Send reset link'}
-                </Button>
-              </div>
-            </form>
-          </>
+              setForgotSentTo(trimmed);
+            } finally {
+              setForgotSubmitting(false);
+            }
+          }}>
+            <ForgotInput
+              type="email"
+              autoFocus
+              autoComplete="email"
+              placeholder="you@peachy.studio"
+              value={forgotEmail}
+              onChange={e => setForgotEmail(e.target.value)}
+            />
+            <ForgotHint>
+              Signed up with Google? Use{' '}
+              <Button
+                type="button"
+                $variant="link"
+                $size="sm"
+                onClick={() => { setForgotOpen(false); auth.loginWithGoogle(); }}
+              >
+                Continue with Google
+              </Button>{' '}
+              on the login page.
+            </ForgotHint>
+            {forgotError && <ErrorText>{forgotError}</ErrorText>}
+            <ModalFooter>
+              <Button
+                type="button"
+                $variant="outline"
+                $size="lg"
+                onClick={() => setForgotOpen(false)}
+                disabled={forgotSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                $variant="primary"
+                $size="lg"
+                disabled={forgotSubmitting}
+              >
+                {forgotSubmitting ? 'Sending…' : 'Send reset link'}
+              </Button>
+            </ModalFooter>
+          </form>
         )}
       </Modal>
       <Footer />

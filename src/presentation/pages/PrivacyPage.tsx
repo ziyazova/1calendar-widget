@@ -14,7 +14,7 @@ const Page = styled.div`
 
 const Hero = styled.section`
   padding: 120px 32px 56px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
   background:
     radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.06) 0%, transparent 55%),
     radial-gradient(ellipse at 80% 70%, rgba(236,72,153,0.04) 0%, transparent 55%),
@@ -36,9 +36,9 @@ const Kicker = styled.div`
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   background: rgba(99,102,241,0.08);
   margin-bottom: 20px;
 
@@ -49,7 +49,7 @@ const Title = styled.h1`
   font-size: 56px;
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 16px;
   line-height: 1;
 
@@ -110,21 +110,21 @@ const SectionHead = styled.div`
 const SectionIcon = styled.div`
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: linear-gradient(135deg, rgba(237,228,255,0.7), rgba(232,237,255,0.5));
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
-  svg { width: 18px; height: 18px; color: #6366F1; }
+  svg { width: 18px; height: 18px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const H2 = styled.h2`
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
 `;
 
@@ -136,7 +136,7 @@ const P = styled.p`
 
   &:last-child { margin-bottom: 0; }
 
-  strong { color: #1F1F1F; font-weight: 600; }
+  strong { color: ${({ theme }) => theme.colors.text.primary}; font-weight: 600; }
 `;
 
 const List = styled.ul`
@@ -149,7 +149,7 @@ const List = styled.ul`
     color: #444;
     margin-bottom: 8px;
   }
-  strong { color: #1F1F1F; font-weight: 600; }
+  strong { color: ${({ theme }) => theme.colors.text.primary}; font-weight: 600; }
 `;
 
 /* ── Fact cards ── */
@@ -157,7 +157,7 @@ const List = styled.ul`
 const FactCard = styled.div<{ $accent?: 'purple' | 'green' | 'blue' }>`
   margin: 16px 0 4px;
   padding: 18px 20px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   border: 1px solid ${({ $accent }) =>
     $accent === 'green' ? 'rgba(34,197,94,0.18)' :
     $accent === 'blue' ? 'rgba(51,132,244,0.18)' :
@@ -175,23 +175,23 @@ const FactCard = styled.div<{ $accent?: 'purple' | 'green' | 'blue' }>`
 const FactIcon = styled.div<{ $accent?: 'purple' | 'green' | 'blue' }>`
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
-  svg { width: 16px; height: 16px; color: ${({ $accent }) =>
+  svg { width: 16px; height: 16px; color: ${({ $accent, theme }) =>
     $accent === 'green' ? '#16A34A' :
-    $accent === 'blue' ? '#3384F4' :
-    '#6366F1'}; }
+    $accent === 'blue' ? theme.colors.state.active :
+    theme.colors.accent}; }
 `;
 
 const FactTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: 4px;
   letter-spacing: -0.01em;
 `;
@@ -215,14 +215,14 @@ const ProcessorGrid = styled.div`
 
 const ProcessorCard = styled.div`
   padding: 14px 16px;
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   border: 1px solid rgba(0,0,0,0.05);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
 
   div:first-child {
     font-size: 13px;
     font-weight: 600;
-    color: #1F1F1F;
+    color: ${({ theme }) => theme.colors.text.primary};
     margin-bottom: 2px;
   }
   div:last-child {
@@ -235,11 +235,11 @@ const ProcessorCard = styled.div`
 /* ── Links ── */
 
 const ContactLink = styled.a`
-  color: #6366F1;
+  color: ${({ theme }) => theme.colors.accent};
   text-decoration: none;
   border-bottom: 1px solid rgba(99,102,241,0.25);
-  transition: border-color 0.15s;
-  &:hover { border-bottom-color: #6366F1; }
+  transition: border-color ${({ theme }) => theme.transitions.fast};
+  &:hover { border-bottom-color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 export const PrivacyPage: React.FC = () => (

@@ -11,7 +11,7 @@ const slideUp = keyframes`
   to { opacity: 1; transform: translate(-50%, 0); }
 `;
 
-const Wrap = styled.div`
+export const ConsentBannerWrap = styled.div`
   position: fixed;
   left: 50%;
   bottom: 20px;
@@ -37,7 +37,7 @@ const Wrap = styled.div`
   }
 `;
 
-const IconWrap = styled.div`
+export const ConsentBannerIcon = styled.div`
   width: 38px;
   height: 38px;
   flex-shrink: 0;
@@ -50,11 +50,11 @@ const IconWrap = styled.div`
   svg {
     width: 18px;
     height: 18px;
-    color: ${({ theme }) => theme.colors.brand.indigo};
+    color: ${({ theme }) => theme.colors.accent};
   }
 `;
 
-const Message = styled.div`
+export const ConsentBannerMessage = styled.div`
   flex: 1;
   font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.text.body};
@@ -64,14 +64,14 @@ const Message = styled.div`
   strong { color: ${({ theme }) => theme.colors.text.primary}; font-weight: 600; }
 `;
 
-const PrivacyLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.brand.indigo};
+export const ConsentBannerPrivacyLink = styled(Link)`
+  color: ${({ theme }) => theme.colors.accent};
   text-decoration: none;
   border-bottom: 1px solid rgba(99, 102, 241, 0.25);
-  &:hover { border-bottom-color: ${({ theme }) => theme.colors.brand.indigo}; }
+  &:hover { border-bottom-color: ${({ theme }) => theme.colors.accent}; }
 `;
 
-const Actions = styled.div`
+export const ConsentBannerActions = styled.div`
   display: flex;
   gap: 8px;
   flex-shrink: 0;
@@ -104,15 +104,15 @@ export const ConsentBanner: React.FC = () => {
   };
 
   return (
-    <Wrap role="dialog" aria-live="polite" aria-label="Storage notice">
-      <IconWrap><Cookie /></IconWrap>
-      <Message>
+    <ConsentBannerWrap role="dialog" aria-live="polite" aria-label="Storage notice">
+      <ConsentBannerIcon><Cookie /></ConsentBannerIcon>
+      <ConsentBannerMessage>
         We use cookies to keep you signed in and save your preferences. By continuing,
-        you agree to our <PrivacyLink to="/privacy">Privacy Policy</PrivacyLink>.
-      </Message>
-      <Actions>
+        you agree to our <ConsentBannerPrivacyLink to="/privacy">Privacy Policy</ConsentBannerPrivacyLink>.
+      </ConsentBannerMessage>
+      <ConsentBannerActions>
         <Button $variant="primary" $size="sm" onClick={handleAccept}>Accept</Button>
-      </Actions>
-    </Wrap>
+      </ConsentBannerActions>
+    </ConsentBannerWrap>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, useTheme } from 'styled-components';
 import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, FileText, Palette, LayoutGrid, Sparkles, ChevronLeft } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
@@ -70,7 +70,7 @@ const SectionRow = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
@@ -79,9 +79,9 @@ const SectionTitle = styled.h2`
 
 const SectionCount = styled.span`
   font-weight: 400;
-  color: #999;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin-left: 6px;
-  font-size: 16px;
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
 `;
 
 /* Widget cards */
@@ -94,21 +94,21 @@ const WidgetGrid = styled.div`
   @media (max-width: 768px) { grid-template-columns: 1fr; }
 `;
 
-const WidgetCard = styled.div<{ $i: number }>`
+export const WidgetCard = styled.div<{ $i: number }>`
   background: #fff;
-  border: 1.5px solid rgba(0,0,0,0.06);
-  border-radius: 16px;
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
   animation: ${cardAppear} 0.35s ease ${({ $i }) => 0.04 + $i * 0.03}s both;
-  transition: all 0.2s;
+  transition: all ${({ theme }) => theme.transitions.medium};
 
   &:hover {
-    border-color: rgba(0,0,0,0.1);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
+    box-shadow: ${({ theme }) => theme.shadows.cardHover};
   }
 `;
 
-const WidgetPreviewWrap = styled.div`
+export const WidgetPreviewWrap = styled.div`
   aspect-ratio: 4 / 3;
   display: flex;
   align-items: center;
@@ -119,7 +119,7 @@ const WidgetPreviewWrap = styled.div`
   position: relative;
 `;
 
-const WidgetBottom = styled.div`
+export const WidgetBottom = styled.div`
   padding: 14px 16px;
   display: flex;
   align-items: center;
@@ -127,13 +127,13 @@ const WidgetBottom = styled.div`
   border-top: 1px solid rgba(0,0,0,0.04);
 `;
 
-const WidgetName = styled.div`
-  font-size: 13px;
+export const WidgetName = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-const WidgetActions = styled.div`
+export const WidgetActions = styled.div`
   display: flex;
   gap: 6px;
 `;
@@ -141,7 +141,7 @@ const WidgetActions = styled.div`
 /* Body copy for the Delete confirmation Modal. Mirrors the pattern used
    in SettingsPage so both confirmation dialogs read identically. */
 const DeleteModalText = styled.p`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.body};
   line-height: 1.5;
   margin: 0;
@@ -154,27 +154,90 @@ const DeleteModalText = styled.p`
 
 /* Empty state */
 const EmptyCard = styled.div`
-  border: 1.5px solid rgba(0,0,0,0.06);
-  border-radius: 16px;
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   padding: 56px 24px;
   text-align: center;
   background: #fff;
   box-shadow: 0 2px 12px rgba(0,0,0,0.02);
   cursor: pointer;
-  transition: all 0.2s;
-  &:hover { border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+  transition: all ${({ theme }) => theme.transitions.medium};
+  &:hover { border-color: ${({ theme }) => theme.colors.border.hairlineHover}; box-shadow: ${({ theme }) => theme.shadows.cardHover}; }
 `;
 
 const EmptyCircle = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gradients.avatar};
+  background: ${({ theme }) => theme.colors.gradients.avatarPeach};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 14px;
   svg { width: 24px; height: 24px; color: ${({ theme }) => theme.colors.accent}; }
+`;
+
+/* ── Welcome + banner typography (replaces inline styles below) ── */
+const WelcomeH1 = styled.h1`
+  font-size: ${({ theme }) => theme.typography.sizes['6xl']};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.03em;
+  margin: 0 0 6px;
+`;
+
+const WelcomeSub = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0;
+`;
+
+const BannerTitle = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.02em;
+`;
+
+const BannerSub = styled.div`
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  color: ${({ theme }) => theme.colors.text.hint};
+  margin-top: 6px;
+`;
+
+const BannerCta = styled.button<{ $fullWidth?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 24px;
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.text.inverse};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all ${({ theme }) => theme.transitions.fast};
+  width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
+
+  svg { width: 16px; height: 16px; }
+`;
+
+const EmptyStateTitle = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0 0 4px;
+`;
+
+const EmptyStateSub = styled.p`
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  margin: 0;
 `;
 
 /* Purchase cards */
@@ -184,16 +247,16 @@ const PurchaseCard = styled.div`
   gap: 16px;
   padding: 16px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 16px;
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   cursor: pointer;
-  transition: all 0.15s;
-  &:hover { border-color: rgba(0,0,0,0.1); box-shadow: 0 2px 12px rgba(0,0,0,0.03); }
+  transition: all ${({ theme }) => theme.transitions.fast};
+  &:hover { border-color: ${({ theme }) => theme.colors.border.hairlineHover}; box-shadow: ${({ theme }) => theme.shadows.card}; }
   & + & { margin-top: 8px; }
 `;
 
 const PurchaseImg = styled.div`
-  width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: ${({ theme }) => theme.colors.background.surfaceMuted}; flex-shrink: 0;
+  width: 56px; height: 56px; border-radius: ${({ theme }) => theme.radii.md}; overflow: hidden; background: ${({ theme }) => theme.colors.background.surfaceMuted}; flex-shrink: 0;
   img { width: 100%; height: 100%; object-fit: cover; }
 `;
 
@@ -220,7 +283,7 @@ const MobileBackBtn = styled.button`
   display: flex; align-items: center; justify-content: center;
   width: 36px; height: 36px;
   border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.background.elevated};
   color: ${({ theme }) => theme.colors.text.body};
   cursor: pointer;
@@ -232,7 +295,7 @@ const MobileBackBtn = styled.button`
 const MobileWidgetName = styled.div`
   flex: 1;
   min-width: 0;
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.accent};
   letter-spacing: -0.01em;
@@ -247,36 +310,36 @@ const MobileCopyBtn = styled.button<{ $copied: boolean }>`
   height: 36px;
   padding: 0 14px;
   border: none;
-  border-radius: 12px;
-  background: ${({ $copied, theme }) => $copied ? theme.colors.success : theme.colors.gradients.blue};
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ $copied, theme }) => $copied ? theme.colors.success.base : theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.text.inverse};
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background ${({ theme }) => theme.transitions.fast};
   svg { width: 14px; height: 14px; }
 `;
 
-const MobileArtboard = styled.div`
+export const MobileArtboard = styled.div`
   flex: 1;
   position: relative;
   overflow: hidden;
   margin: 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
   background:
     radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
-    ${({ theme }) => theme.colors.background.surfaceCool};
+    ${({ theme }) => theme.colors.background.surfaceAlt};
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-const MobileDotGrid = styled.div`
+export const MobileDotGrid = styled.div`
   position: absolute; inset: 0;
   background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
   background-size: 20px 20px;
@@ -284,40 +347,40 @@ const MobileDotGrid = styled.div`
   opacity: 0.5;
 `;
 
-const MobileWidgetScale = styled.div`
+export const MobileWidgetScale = styled.div`
   transform: scale(0.7);
   transform-origin: center center;
   filter: drop-shadow(0 6px 18px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04));
 `;
 
-const MobileSectionTabs = styled.div`
+export const MobileSectionTabs = styled.div`
   display: flex;
   gap: 4px;
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
   background: ${({ theme }) => theme.colors.background.elevated};
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.hairline};
   flex-shrink: 0;
 `;
 
-const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }>`
+export const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }>`
   flex: 1;
   min-width: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px;
   height: 48px;
   border: none;
-  background: ${({ $active, $disabled }) =>
-    $disabled ? 'transparent' : $active ? 'rgba(51,132,244,0.08)' : 'transparent'};
+  background: ${({ $active, $disabled, theme }) =>
+    $disabled ? 'transparent' : $active ? theme.colors.state.activeWash : 'transparent'};
   color: ${({ $active, $disabled, theme }) =>
-    $disabled ? theme.colors.text.muted : $active ? theme.colors.brand.blue : theme.colors.text.hint};
+    $disabled ? theme.colors.text.muted : $active ? theme.colors.state.active : theme.colors.text.hint};
   opacity: ${({ $disabled }) => $disabled ? 0.55 : 1};
-  border-radius: 12px;
-  font-size: 11px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: 600;
   font-family: inherit;
   letter-spacing: -0.01em;
   cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
-  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  transition: background ${({ theme }) => theme.transitions.fast}, color ${({ theme }) => theme.transitions.fast}, opacity ${({ theme }) => theme.transitions.fast};
   padding: 0;
   svg { width: 18px; height: 18px; }
 `;
@@ -383,11 +446,11 @@ const DowngradeBannerInner = styled.div`
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  background: ${({ theme }) => theme.colors.warningBg};
-  border: 1px solid ${({ theme }) => theme.colors.warningBorder};
-  border-radius: 12px;
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.warningText};
+  background: ${({ theme }) => theme.colors.warning.bg};
+  border: 1px solid ${({ theme }) => theme.colors.warning.border};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.warning.text};
   letter-spacing: -0.005em;
   flex-wrap: wrap;
 `;
@@ -427,6 +490,7 @@ const DowngradeBanner: React.FC<{
 type StudioTab = 'widgets' | 'templates';
 
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -696,16 +760,17 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </MobileWidgetName>
             {/* Save status dot — non-intrusive */}
-            {saveStatus === 'saving' && <Loader2 style={{ width: 14, height: 14, color: '#888', animation: 'spin 1s linear infinite' }} />}
-            {saveStatus === 'saved' && <Check style={{ width: 14, height: 14, color: '#16A34A' }} />}
+            {saveStatus === 'saving' && <Loader2 style={{ width: 14, height: 14, color: theme.colors.text.tertiary, animation: 'spin 1s linear infinite' }} />}
+            {saveStatus === 'saved' && <Check style={{ width: 14, height: 14, color: theme.colors.success.fg }} />}
             <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
             <MobileCopyBtn
               $copied={copied}
               onClick={() => {
-                navigator.clipboard.writeText(embedUrl).then(() => {
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                });
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(embedUrl).catch(() => {});
+                }
               }}
             >
               {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
@@ -761,22 +826,22 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: '#fff' }}>
+      <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: theme.colors.background.elevated }}>
         {/* Editor top bar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 24px 0 48px', paddingRight: 310, height: 68, paddingTop: 15, background: '#fff', flexShrink: 0, zIndex: 10,
+          padding: '0 24px 0 48px', paddingRight: 310, height: 68, paddingTop: 15, background: theme.colors.background.elevated, flexShrink: 0, zIndex: 10,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button onClick={handleEditorBack} style={{
               display: 'flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
-              border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, background: '#fff',
-              fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: '#555', cursor: 'pointer',
+              border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, background: theme.colors.background.elevated,
+              fontSize: 13, fontWeight: 500, fontFamily: 'inherit', color: theme.colors.text.body, cursor: 'pointer',
               transition: 'all 0.15s',
             }}>
               <ArrowRight style={{ width: 14, height: 14, transform: 'rotate(180deg)' }} /> Back
             </button>
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#6366F1', letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: theme.colors.accent, letterSpacing: '-0.02em' }}>
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
             {/* Save status — mirrors Figma/Notion auto-save indicator */}
@@ -787,7 +852,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               color: saveStatus === 'error' ? '#F49B8B' : saveStatus === 'saved' ? '#16A34A' : '#888',
               fontSize: 12, fontWeight: 500, letterSpacing: '-0.01em',
               opacity: saveStatus === 'idle' ? 0 : 1,
-              transition: 'opacity 0.2s ease, color 0.2s ease, background 0.2s ease',
+              transition: 'opacity ${({ theme }) => theme.transitions.medium}, color ${({ theme }) => theme.transitions.medium}, background ${({ theme }) => theme.transitions.medium}',
               minWidth: 84, justifyContent: 'center',
             }}>
               {saveStatus === 'saving' && (<><Loader2 style={{ width: 12, height: 12, animation: 'spin 1s linear infinite' }} /> Saving…</>)}
@@ -824,7 +889,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               #F8F8F7`,
             margin: '12px 12px 24px 48px',
             borderRadius: 20,
-            border: '1px solid rgba(0,0,0,0.06)',
+            border: `1px solid ${theme.colors.border.hairline}`,
           }}>
             {/* Dot grid */}
             <div style={{
@@ -838,7 +903,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             {/* Widget */}
             <div style={{
               transform: `scale(${studioZoom}) translateY(-32px)`, transformOrigin: 'center center',
-              transition: 'transform 0.15s ease',
+              transition: 'transform ${({ theme }) => theme.transitions.fast}',
               filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04))',
             }}>
               <WidgetDisplay widget={editingWidget} />
@@ -850,18 +915,24 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               display: 'flex', alignItems: 'center', gap: 10,
               background: 'rgba(255,255,255,0.94)', backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(0,0,0,0.06)', borderRadius: 16,
+              border: `1px solid ${theme.colors.border.hairline}`, borderRadius: 16,
               padding: '10px 16px', boxShadow: '0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
             }}>
               <input readOnly value={embedUrl} style={{
                 width: 240, height: 34, padding: '0 12px', border: 'none', borderRadius: 8,
-                background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: '#777',
+                background: 'rgba(0,0,0,0.04)', fontSize: 11, fontFamily: 'monospace', color: theme.colors.text.hint,
                 outline: 'none',
               }} onClick={e => (e.target as HTMLInputElement).select()} />
               <SharedButton
                 $variant={copied ? 'successSoft' : 'slate'}
                 $size="md"
-                onClick={() => { navigator.clipboard.writeText(embedUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }); }}
+                onClick={() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(embedUrl).catch(() => {});
+                  }
+                }}
               >
                 {copied ? <><Check /> Copied!</> : <><Copy /> Copy</>}
               </SharedButton>
@@ -871,7 +942,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           {/* Customization panel */}
           <div style={{
             width: 300, flexShrink: 0, overflow: 'auto',
-            background: '#fff',
+            background: theme.colors.background.elevated,
           }}>
             <CustomizationPanel
               widget={editingWidget}
@@ -903,7 +974,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           borderRadius: 12,
           border: '1px solid rgba(34, 197, 94, 0.25)',
           background: 'linear-gradient(135deg, #F0FDF4 0%, #E8F7EE 100%)',
-          color: '#15803D',
+          color: theme.colors.success.dark,
           fontSize: 14,
           display: 'flex',
           alignItems: 'center',
@@ -913,13 +984,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           <span style={{ flex: 1, minWidth: 220 }}>
             <strong>✓ Purchase confirmed.</strong> A download link was emailed to you
             {user?.email ? <> at <strong>{user.email}</strong></> : null}.
-            {!isRegistered && <> Wrong email? <a href="mailto:support@peachyplanner.com" style={{ color: '#15803D', fontWeight: 600 }}>Contact support</a>.</>}
+            {!isRegistered && <> Wrong email? <a href="mailto:support@peachyplanner.com" style={{ color: theme.colors.success.dark, fontWeight: 600 }}>Contact support</a>.</>}
           </span>
           {!isRegistered && (
             <button
               onClick={() => navigate(`/login?returnTo=${encodeURIComponent('/studio?view=purchases')}`)}
               style={{
-                background: '#15803D', color: '#fff', border: 'none', borderRadius: 8,
+                background: theme.colors.success.dark, color: theme.colors.text.inverse, border: 'none', borderRadius: 8,
                 padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
               }}
             >
@@ -935,7 +1006,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             }}
             style={{
               background: 'transparent', border: 'none', fontSize: 18, cursor: 'pointer',
-              color: '#15803D', lineHeight: 1, padding: 4,
+              color: theme.colors.success.dark, lineHeight: 1, padding: 4,
             }}
             aria-label="Dismiss"
           >
@@ -956,10 +1027,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           marginTop: 8,
         }}>
           <div>
-            <h1 style={{ fontSize: 28, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 6px' }}>
-              Welcome 👋
-            </h1>
-            <p style={{ fontSize: 15, color: '#999', margin: 0 }}>Manage your widgets and templates</p>
+            <WelcomeH1>Welcome 👋</WelcomeH1>
+            <WelcomeSub>Manage your widgets and templates</WelcomeSub>
           </div>
           {planLoading ? null : (
             <PlanUsageCard
@@ -1000,18 +1069,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               }}
             >
               <div>
-                <div style={{ fontSize: 18, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Create new widget</div>
-                <div style={{ fontSize: 14, color: '#666', marginTop: 6 }}>Browse styles, customize and embed in Notion</div>
+                <BannerTitle>Create new widget</BannerTitle>
+                <BannerSub>Browse styles, customize and embed in Notion</BannerSub>
               </div>
-              <button onClick={() => navigate('/widgets')} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, padding: '0 24px',
-                border: 'none', borderRadius: 12,
-                background: '#1F1F1F', color: '#fff', fontSize: 14, fontWeight: 600,
-                fontFamily: 'inherit', cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-                transition: 'all 0.15s',
-                width: isMobile ? '100%' : 'auto',
-              }}><Plus style={{ width: 16, height: 16 }} /> Browse widgets</button>
+              <BannerCta $fullWidth={isMobile} onClick={() => navigate('/widgets')}>
+                <Plus /> Browse widgets
+              </BannerCta>
             </div>
 
             {/* Your widgets */}
@@ -1022,8 +1085,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             {!loading && widgets.length === 0 ? (
               <EmptyCard onClick={() => navigate('/widgets')}>
                 <EmptyCircle><Plus /></EmptyCircle>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', margin: '0 0 4px' }}>No widgets yet</p>
-                <p style={{ fontSize: 13, color: '#999', margin: 0 }}>Create your first widget from the gallery above</p>
+                <EmptyStateTitle>No widgets yet</EmptyStateTitle>
+                <EmptyStateSub>Create your first widget from the gallery above</EmptyStateSub>
               </EmptyCard>
             ) : (
               <WidgetGrid>
@@ -1044,11 +1107,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                           aria-label={copiedWidgetId === w.id ? 'Copied' : 'Copy embed URL'}
                           title={copiedWidgetId === w.id ? 'Copied!' : 'Copy embed URL'}
                           onClick={() => {
-                            if (w.embed_url) {
-                              navigator.clipboard.writeText(w.embed_url).then(() => {
-                                setCopiedWidgetId(w.id);
-                                setTimeout(() => setCopiedWidgetId(null), 2000);
-                              });
+                            if (!w.embed_url) return;
+                            setCopiedWidgetId(w.id);
+                            setTimeout(() => setCopiedWidgetId(null), 2000);
+                            if (navigator.clipboard) {
+                              navigator.clipboard.writeText(w.embed_url).catch(() => {});
                             }
                           }}
                         >
@@ -1089,17 +1152,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               marginBottom: 32,
             }}>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em' }}>Browse template shop</div>
-                <div style={{ fontSize: 14, color: '#666', marginTop: 6 }}>Notion planners, trackers & productivity systems</div>
+                <BannerTitle>Browse template shop</BannerTitle>
+                <BannerSub>Notion planners, trackers & productivity systems</BannerSub>
               </div>
-              <button onClick={() => navigate('/templates')} style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 44, padding: '0 24px',
-                border: 'none', borderRadius: 12,
-                background: '#1F1F1F', color: '#fff', fontSize: 14, fontWeight: 600,
-                fontFamily: 'inherit', cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-                width: isMobile ? '100%' : 'auto',
-              }}><ArrowRight style={{ width: 16, height: 16 }} /> Browse</button>
+              <BannerCta $fullWidth={isMobile} onClick={() => navigate('/templates')}>
+                <ArrowRight /> Browse
+              </BannerCta>
             </div>
 
             {/* Purchases — below */}
@@ -1110,8 +1168,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             {PURCHASES.length === 0 ? (
               <EmptyCard onClick={() => navigate('/templates')}>
                 <EmptyCircle><Download /></EmptyCircle>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#1F1F1F', margin: '0 0 4px' }}>No purchases yet</p>
-                <p style={{ fontSize: 13, color: '#999', margin: 0 }}>Browse the shop to find planners for Notion</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: theme.colors.text.primary, margin: '0 0 4px' }}>No purchases yet</p>
+                <p style={{ fontSize: 13, color: theme.colors.text.tertiary, margin: 0 }}>Browse the shop to find planners for Notion</p>
               </EmptyCard>
             ) : (
               <>
@@ -1119,10 +1177,10 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                   <PurchaseCard key={p.id} onClick={() => navigate(`/templates/${p.slug}`)}>
                     <PurchaseImg><img src={p.image} alt={p.name} /></PurchaseImg>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F' }}>{p.name}</div>
-                      <div style={{ fontSize: 12, color: '#999', marginTop: 2 }}>{p.order} · {p.date}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary }}>{p.name}</div>
+                      <div style={{ fontSize: 12, color: theme.colors.text.tertiary, marginTop: 2 }}>{p.order} · {p.date}</div>
                     </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1F1F1F', marginRight: 8 }}>{p.price}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary, marginRight: 8 }}>{p.price}</div>
                     <SharedButton $variant="secondary" $size="sm" onClick={(e) => { e.stopPropagation(); }}><Download /> Download</SharedButton>
                   </PurchaseCard>
                 ))}
@@ -1135,17 +1193,19 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       <Modal
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete widget?"
+        eyebrow="Delete widget"
+        eyebrowTone="danger"
+        title={deleteTarget ? `Delete "${deleteTarget.name}"?` : 'Delete widget?'}
         size="sm"
+        hideClose
       >
         <DeleteModalText>
-          <strong>{deleteTarget?.name}</strong> will be permanently removed.
-          Any embeds using this widget will stop working.
+          The embed URL will stop working immediately. This can&apos;t be undone.
         </DeleteModalText>
-        <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -20, marginTop: 16 }}>
+        <ModalFooter>
           <SharedButton
             type="button"
-            $variant="secondary"
+            $variant="outline"
             $size="lg"
             onClick={() => setDeleteTarget(null)}
           >
@@ -1153,7 +1213,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </SharedButton>
           <SharedButton
             type="button"
-            $variant="danger"
+            $variant="dangerStrong"
             $size="lg"
             onClick={() => {
               if (deleteTarget) {
@@ -1162,7 +1222,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               }
             }}
           >
-            <Trash2 /> Delete widget
+            Delete
           </SharedButton>
         </ModalFooter>
       </Modal>

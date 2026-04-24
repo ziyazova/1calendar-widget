@@ -47,15 +47,14 @@ const TemplatesMarqueeWrap = styled.div`
 
 const GalleryHeader = styled.div`
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 0 auto 4px;
   padding: 0 48px;
-  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 
   @media (max-width: 768px) {
-    padding: 0 24px 16px;
+    padding: 0 24px;
   }
 `;
 
@@ -85,7 +84,7 @@ const GalleryTitle = styled.h2`
 
 const GallerySubtitle = styled.p`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   margin: 0;
 `;
 
@@ -144,12 +143,12 @@ const TemplatesScrollHint = styled.div`
   justify-content: center;
   cursor: pointer;
   z-index: 3;
-  transition: all 0.2s;
+  transition: all ${({ theme }) => theme.transitions.medium};
 
   svg {
     width: 14px;
     height: 14px;
-    color: ${({ theme }) => theme.colors.text.secondary};
+    color: ${({ theme }) => theme.colors.text.body};
   }
 
   &:hover {
@@ -219,7 +218,7 @@ const TemplateCardTitle = styled.span`
 const TemplateCardPrice = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   letter-spacing: -0.01em;
   line-height: 1.3;
   flex-shrink: 0;

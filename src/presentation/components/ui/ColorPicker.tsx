@@ -55,23 +55,23 @@ const ColorPickerContainer = styled.div`
   position: relative;
 `;
 
-const FigmaColorRow = styled.div`
+export const FigmaColorRow = styled.div`
   display: flex;
   align-items: center;
   height: 30px;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(0, 0, 0, 0.03);
   box-shadow: ${({ theme }) => theme.shadows.form};
   padding: 0 10px 0 5px;
 
   @media (max-width: 768px) {
     height: 34px;
-    border-radius: ${({ theme }) => theme.radii.button};
+    border-radius: ${({ theme }) => theme.radii.md};
     padding: 0 10px 0 4px;
   }
 `;
 
-const ColorSwatch = styled.div<{ $color: string }>`
+export const ColorSwatch = styled.div<{ $color: string }>`
   width: 20px;
   height: 20px;
   border-radius: 30%;
@@ -79,8 +79,8 @@ const ColorSwatch = styled.div<{ $color: string }>`
   cursor: pointer;
   flex-shrink: 0;
   margin: 4px 6px 4px 0;
-  border: 1px solid rgba(0,0,0,0.06);
-  transition: all 0.15s ease;
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  transition: all ${({ theme }) => theme.transitions.fast};
   position: relative;
 
   &:hover {
@@ -106,7 +106,7 @@ const SwatchIcon = styled.div<{ $light: boolean }>`
   background: none;
   border-radius: 30%;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
 
   @media (max-width: 768px) {
     opacity: 0.6;
@@ -116,11 +116,11 @@ const SwatchIcon = styled.div<{ $light: boolean }>`
   svg {
     width: 11px;
     height: 11px;
-    color: ${({ $light }) => $light ? '#1F1F1F' : '#F9F9F8'};
+    color: ${({ $light }) => $light ? '${({ theme }) => theme.colors.text.primary}' : '#F9F9F8'};
   }
 `;
 
-const HexInput = styled.input`
+export const HexInput = styled.input`
   width: 70px;
   height: 20px;
   border: none;
@@ -129,14 +129,14 @@ const HexInput = styled.input`
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   background: transparent;
   outline: none;
   flex-shrink: 0;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   line-height: 20px;
-  transition: color 0.15s ease;
+  transition: color ${({ theme }) => theme.transitions.fast};
 
   &:focus {
     color: ${({ theme }) => theme.colors.text.primary};
@@ -149,7 +149,7 @@ const HexInput = styled.input`
   }
 `;
 
-const PresetGroup = styled.div`
+export const PresetGroup = styled.div`
   display: flex;
   gap: 8px;
   margin-left: auto;
@@ -159,7 +159,7 @@ const PresetGroup = styled.div`
   }
 `;
 
-const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
+export const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
   width: 20px;
   height: 20px;
   border-radius: 30%;
@@ -172,7 +172,7 @@ const ColorOption = styled.button<{ $color: string; $selected: boolean }>`
   }};
   background-color: ${({ $color }) => $color};
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   flex-shrink: 0;
   padding: 0;
 
@@ -235,12 +235,12 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 0;
 
   &:hover {
     background: rgba(0, 0, 0, 0.05);
-    color: ${({ theme }) => theme.colors.text.secondary};
+    color: ${({ theme }) => theme.colors.text.body};
   }
 
   svg {
@@ -266,7 +266,7 @@ const SaturationCanvas = styled.canvas`
 const HueSliderTrack = styled.div`
   width: 216px;
   height: 12px;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   background: linear-gradient(to right,
     #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000
   );
@@ -321,16 +321,16 @@ const EyedropperButton = styled.button`
   width: 28px;
   height: 28px;
   border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.background.surface};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   padding: 0;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: #f0f0f0;
@@ -357,7 +357,7 @@ const PickerHexInput = styled.input`
   min-width: 0;
   height: 28px;
   border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 0 8px;
   font-family: ${({ theme }) => theme.typography.fonts.mono};
   font-size: 12px;
@@ -392,7 +392,7 @@ const MobilePickerHandleArea = styled.div`
 const MobilePickerHandle = styled.div`
   width: 40px;
   height: 5px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   background: rgba(0, 0, 0, 0.15);
 `;
 
@@ -401,7 +401,7 @@ const MobilePickerWrap = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12);
   z-index: 60;

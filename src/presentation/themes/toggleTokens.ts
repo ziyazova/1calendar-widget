@@ -5,7 +5,7 @@ export const switchTokens = {
   thumbSize: '16px',
   thumbOffset: '3px',
   thumbShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
-  transition: 'background 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+  transition: 'background ${({ theme }) => theme.transitions.base}, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
 };
 
 export const switchVariantTokens = {

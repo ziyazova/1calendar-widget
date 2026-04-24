@@ -58,20 +58,20 @@ const CategoryChip = styled.div<{ $color: string }>`
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 13px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   letter-spacing: -0.01em;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all ${({ theme }) => theme.transitions.base};
 
   &::before {
     content: '';
     width: 8px;
     height: 8px;
-    border-radius: 4px;
+    border-radius: ${({ theme }) => theme.radii.xs};
     background: ${({ $color }) => $color};
     flex-shrink: 0;
-    transition: transform 0.25s ease;
+    transition: transform ${({ theme }) => theme.transitions.base};
   }
 
   &:hover {

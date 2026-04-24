@@ -27,7 +27,7 @@ const IconWrap = styled.div`
   justify-content: center;
   margin: 0 auto 20px;
 
-  svg { width: 26px; height: 26px; color: ${({ theme }) => theme.colors.brand.indigo}; }
+  svg { width: 26px; height: 26px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const Title = styled.h1`
@@ -78,7 +78,7 @@ const Input = styled.input`
   color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.elevated};
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color ${({ theme }) => theme.transitions.fast};
 
   &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
 `;
@@ -112,16 +112,16 @@ const Requirement = styled.div<{ $met: boolean }>`
   align-items: center;
   gap: 8px;
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ $met, theme }) => ($met ? theme.colors.successFg : theme.colors.text.hint)};
-  transition: color 0.15s;
+  color: ${({ $met, theme }) => ($met ? theme.colors.success.fg : theme.colors.text.hint)};
+  transition: color ${({ theme }) => theme.transitions.fast};
   svg { width: 12px; height: 12px; flex-shrink: 0; }
 `;
 
 const ErrorText = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.md};
-  color: ${({ theme }) => theme.colors.destructiveText};
-  background: ${({ theme }) => theme.colors.destructiveBg};
-  border: 1px solid ${({ theme }) => theme.colors.destructiveBorder};
+  color: ${({ theme }) => theme.colors.danger.strong};
+  background: ${({ theme }) => theme.colors.danger.bg};
+  border: 1px solid ${({ theme }) => theme.colors.danger.border};
   padding: 10px 12px;
   border-radius: ${({ theme }) => theme.radii.md};
   margin-bottom: ${({ theme }) => theme.spacing['2']};
@@ -131,19 +131,19 @@ const SuccessCard = styled.div`
   text-align: center;
   padding: 8px 0;
 
-  svg { color: ${({ theme }) => theme.colors.successFg}; }
+  svg { color: ${({ theme }) => theme.colors.success.fg}; }
 `;
 
 const SuccessIcon = styled.div`
   width: 56px;
   height: 56px;
   border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ theme }) => theme.colors.successBg};
+  background: ${({ theme }) => theme.colors.success.bg};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  svg { width: 28px; height: 28px; color: ${({ theme }) => theme.colors.successFg}; }
+  svg { width: 28px; height: 28px; color: ${({ theme }) => theme.colors.success.fg}; }
 `;
 
 const getChecks = (pw: string) => [

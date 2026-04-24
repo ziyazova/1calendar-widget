@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   User as UserIcon,
@@ -65,7 +65,7 @@ const humanisePasswordError = (raw: string, isFirstTimeSet: boolean): string => 
 
 const Page = styled.div`
   min-height: 100vh;
-  background: ${({ theme }) => theme.colors.background.surfaceWarm};
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   font-family: ${({ theme }) => theme.typography.fonts.primary};
   color: ${({ theme }) => theme.colors.text.primary};
 `;
@@ -94,7 +94,7 @@ const Shell = styled.main`
 `;
 
 const PageTitle = styled.h1`
-  font-size: 28px;
+  font-size: ${({ theme }) => theme.typography.sizes['6xl']};
   font-weight: 600;
   letter-spacing: -0.03em;
   margin: 0 0 4px;
@@ -102,7 +102,7 @@ const PageTitle = styled.h1`
 `;
 
 const PageSubtitle = styled.p`
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 24px;
   letter-spacing: -0.01em;
@@ -117,8 +117,8 @@ const ProfileCard = styled.section`
   padding: 18px 20px;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  border-radius: ${({ theme }) => theme.radii.lg};
+  box-shadow: ${({ theme }) => theme.shadows.cardFlat};
   margin-bottom: 16px;
 
   @media (max-width: 520px) {
@@ -170,7 +170,7 @@ const ProfileEmail = styled.div`
 const Section = styled.section`
   background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   padding: 18px 20px;
   margin-bottom: 12px;
   box-shadow: ${({ theme }) => theme.shadows.cardFlat};
@@ -186,7 +186,7 @@ const SectionHeader = styled.div`
 const SectionIcon = styled.div`
   width: 34px;
   height: 34px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.background.surfaceMuted};
   display: flex;
   align-items: center;
@@ -236,13 +236,13 @@ const Input = styled.input`
   height: 38px;
   padding: 0 12px;
   border: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   font-size: 13px;
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
   outline: none;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color ${({ theme }) => theme.transitions.fast}, background ${({ theme }) => theme.transitions.fast};
 
   &:focus {
     border-color: rgba(0, 0, 0, 0.18);
@@ -353,22 +353,22 @@ const ModalInput = styled.input`
   width: 100%;
   height: 46px;
   padding: 0 44px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.border.hairlineHover};
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color ${({ theme }) => theme.transitions.fast}, background ${({ theme }) => theme.transitions.fast};
 
   &:focus { border-color: rgba(0, 0, 0, 0.18); background: #fff; }
 `;
 
 const PwChecks = styled.div`
   background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 10px 12px;
   margin-bottom: 16px;
   display: flex;
@@ -381,18 +381,18 @@ const PwCheck = styled.div<{ $met: boolean }>`
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: ${({ $met }) => ($met ? '#16A34A' : '#8E8E93')};
+  color: ${({ $met }) => ($met ? '#16A34A' : '${({ theme }) => theme.colors.text.tertiary}')};
 
   svg { width: 12px; height: 12px; opacity: ${({ $met }) => ($met ? 1 : 0.35)}; }
 `;
 
 const ErrorText = styled.div`
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.destructiveText};
+  color: ${({ theme }) => theme.colors.danger.strong};
   background: rgba(220, 40, 40, 0.06);
   border: 1px solid rgba(220, 40, 40, 0.15);
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   margin-bottom: 12px;
 `;
 
@@ -407,6 +407,7 @@ const ModalActions = styled.div`
 /* ────────────────── Component ────────────────── */
 
 export const SettingsPage: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const {
     user, isRegistered, loading, logout, supabaseUser, updatePassword, updateProfile,
@@ -608,14 +609,14 @@ export const SettingsPage: React.FC = () => {
             marginBottom: 16, padding: '12px 14px',
             background: 'rgba(99, 102, 241, 0.08)',
             border: '1px solid rgba(99, 102, 241, 0.22)',
-            borderRadius: 12, color: '#4F46E5',
+            borderRadius: 12, color: theme.colors.brand.indigoDark,
             fontSize: 13, letterSpacing: '-0.005em',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           }}>
             <span><strong>Welcome to Pro.</strong> Your subscription is active — enjoy unlimited widgets and all styles.</span>
             <button
               onClick={() => setJustUpgraded(false)}
-              style={{ background: 'none', border: 'none', color: '#4F46E5', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}
+              style={{ background: 'none', border: 'none', color: theme.colors.brand.indigoDark, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}
             >
               Dismiss
             </button>
@@ -661,12 +662,12 @@ export const SettingsPage: React.FC = () => {
           </Field>
           <SectionActions>
             {profileError && (
-              <span style={{ alignSelf: 'center', fontSize: 12, color: '#DC2828', marginRight: 4 }}>
+              <span style={{ alignSelf: 'center', fontSize: 12, color: theme.colors.danger.strong, marginRight: 4 }}>
                 {profileError}
               </span>
             )}
             {!profileError && profileSavedAt && !nameDirty && (
-              <span style={{ alignSelf: 'center', fontSize: 12, color: '#16A34A', marginRight: 4 }}>
+              <span style={{ alignSelf: 'center', fontSize: 12, color: theme.colors.success.fg, marginRight: 4 }}>
                 <Check style={{ width: 12, height: 12, verticalAlign: -1, marginRight: 2 }} />
                 Saved
               </span>
@@ -719,7 +720,7 @@ export const SettingsPage: React.FC = () => {
                   ? 'Signed-in with Google is connected to this account.'
                   : 'Connect your Google account for faster sign-in next time.'}
                 {googleError && (
-                  <div style={{ color: '#DC2828', marginTop: 4 }}>{googleError}</div>
+                  <div style={{ color: theme.colors.danger.strong, marginTop: 4 }}>{googleError}</div>
                 )}
               </RowDesc>
             </RowLabel>
@@ -744,13 +745,13 @@ export const SettingsPage: React.FC = () => {
               <RowDesc>
                 Sign out of every other device where you're logged in. You'll stay signed in on this one.
                 {otherSignOutState === 'done' && (
-                  <div style={{ color: '#16A34A', marginTop: 4 }}>
+                  <div style={{ color: theme.colors.success.fg, marginTop: 4 }}>
                     <Check style={{ width: 12, height: 12, verticalAlign: -1, marginRight: 2 }} />
                     All other sessions signed out.
                   </div>
                 )}
                 {otherSignOutState === 'error' && otherSignOutError && (
-                  <div style={{ color: '#DC2828', marginTop: 4 }}>{otherSignOutError}</div>
+                  <div style={{ color: theme.colors.danger.strong, marginTop: 4 }}>{otherSignOutError}</div>
                 )}
               </RowDesc>
             </RowLabel>
@@ -863,10 +864,10 @@ export const SettingsPage: React.FC = () => {
         <Section>
           <SectionHeader>
             <SectionIcon style={{ background: 'rgba(220, 40, 40, 0.08)' }}>
-              <Trash2 style={{ color: '#B91C1C' }} />
+              <Trash2 style={{ color: theme.colors.danger.strong }} />
             </SectionIcon>
             <div>
-              <SectionTitle style={{ color: '#B91C1C' }}>Danger zone</SectionTitle>
+              <SectionTitle style={{ color: theme.colors.danger.strong }}>Danger zone</SectionTitle>
               <SectionSub>Actions here cannot be undone. Proceed carefully.</SectionSub>
             </div>
           </SectionHeader>
@@ -901,9 +902,10 @@ export const SettingsPage: React.FC = () => {
       <SharedModal
         open={showPwModal}
         onClose={() => !pwSubmitting && setShowPwModal(false)}
+        eyebrow="Account security"
         title={pwSuccess ? 'Password updated' : (hasPasswordLogin ? 'Change password' : 'Set a password')}
         size="sm"
-        hideClose={pwSubmitting}
+        hideClose
       >
         {pwSuccess ? (
           <>
@@ -1021,7 +1023,7 @@ export const SettingsPage: React.FC = () => {
                 </PwChecks>
               )}
 
-              <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -24, marginTop: 16 }}>
+              <ModalFooter>
                 <SharedButton
                   type="button"
                   $variant="secondary"
@@ -1049,6 +1051,7 @@ export const SettingsPage: React.FC = () => {
       <SharedModal
         open={showEmailModal}
         onClose={() => !emailSubmitting && setShowEmailModal(false)}
+        eyebrow="Account"
         title={
           emailStep === 'sent'
             ? 'Confirm your new email'
@@ -1057,7 +1060,7 @@ export const SettingsPage: React.FC = () => {
               : 'New email address'
         }
         size="sm"
-        hideClose={emailSubmitting}
+        hideClose
       >
         {emailStep === 'sent' ? (
           <>
@@ -1119,7 +1122,7 @@ export const SettingsPage: React.FC = () => {
                   {emailShowPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
                 </button>
               </ModalInputWrap>
-              <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -24, marginTop: 16 }}>
+              <ModalFooter>
                 <SharedButton
                   type="button"
                   $variant="secondary"
@@ -1187,7 +1190,7 @@ export const SettingsPage: React.FC = () => {
                   autoComplete="email"
                 />
               </ModalInputWrap>
-              <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -24, marginTop: 16 }}>
+              <ModalFooter>
                 <SharedButton
                   type="button"
                   $variant="secondary"
@@ -1215,8 +1218,11 @@ export const SettingsPage: React.FC = () => {
       <SharedModal
         open={showDeleteConfirm}
         onClose={() => !deleting && setShowDeleteConfirm(false)}
+        eyebrow="Danger zone"
+        eyebrowTone="danger"
         title="Delete account?"
         size="sm"
+        hideClose
       >
         <ModalText>
           We'll permanently remove your profile and all saved widgets from our servers. You can always sign up again later with the same email. To confirm, please type <strong>delete</strong> below.
@@ -1232,10 +1238,10 @@ export const SettingsPage: React.FC = () => {
           />
         </ModalInputWrap>
         {deleteError && <ErrorText style={{ marginBottom: 16 }}>{deleteError}</ErrorText>}
-        <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -20, marginTop: 16 }}>
+        <ModalFooter>
           <SharedButton
             type="button"
-            $variant="secondary"
+            $variant="outline"
             $size="lg"
             onClick={() => setShowDeleteConfirm(false)}
             disabled={deleting}
@@ -1244,12 +1250,12 @@ export const SettingsPage: React.FC = () => {
           </SharedButton>
           <SharedButton
             type="button"
-            $variant="danger"
+            $variant="dangerStrong"
             $size="lg"
             onClick={handleDelete}
             disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
           >
-            <Trash2 /> {deleting ? 'Deleting…' : 'Delete forever'}
+            {deleting ? 'Deleting…' : 'Delete forever'}
           </SharedButton>
         </ModalFooter>
       </SharedModal>

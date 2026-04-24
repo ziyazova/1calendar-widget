@@ -32,13 +32,13 @@ const SidebarContainer = styled.aside<{ $mobileOpen?: boolean; $collapsed?: bool
   top: 0;
   width: ${({ $collapsed }) => $collapsed ? '64px' : '270px'};
   height: 100vh;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   backdrop-filter: blur(20px);
   border-right: none;
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndex.sticky};
-  transition: width 0.25s ease;
+  transition: width ${({ theme }) => theme.transitions.base};
   overflow: visible;
 
   @media (max-width: 1024px) {
@@ -66,12 +66,12 @@ const SidebarHeader = styled.div<{ $collapsed?: boolean }>`
 `;
 
 const LogoText = styled.span<{ $collapsed?: boolean }>`
-  font-size: 16px;
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
   white-space: nowrap;
   overflow: hidden;
   width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
@@ -94,7 +94,7 @@ const BackButton = styled.button`
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text.tertiary};
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: rgba(0, 0, 0, 0.04);
@@ -115,15 +115,15 @@ const CollapseHeaderBtn = styled.button`
   justify-content: center;
   border: none;
   background: rgba(0, 0, 0, 0.04);
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   margin-left: auto;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
-    background: rgba(51, 132, 244, 0.08);
+    background: ${({ theme }) => theme.colors.state.activeWash};
     color: ${({ theme }) => theme.colors.accent};
   }
 
@@ -155,7 +155,7 @@ const NavSection = styled.nav<{ $collapsed?: boolean }>`
 `;
 
 const SectionLabel = styled.h2<{ $collapsed?: boolean }>`
-  font-size: 11px;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
@@ -166,7 +166,7 @@ const SectionLabel = styled.h2<{ $collapsed?: boolean }>`
   height: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
   margin-bottom: ${({ $collapsed }) => $collapsed ? '0' : '18px'};
   overflow: hidden;
-  transition: opacity 0.15s ease, height 0.25s ease, margin 0.25s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast}, height ${({ theme }) => theme.transitions.base}, margin ${({ theme }) => theme.transitions.base};
 
   &:nth-of-type(n+2) {
     margin-top: ${({ $collapsed }) => $collapsed ? '0' : '24px'};
@@ -194,24 +194,24 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $co
   background: ${({ $expanded }) => $expanded ? 'rgba(51, 132, 244, 0.04)' : 'transparent'};
   border: none;
   border-radius: ${({ $collapsed }) => $collapsed ? '10px' : '8px'};
-  color: ${({ $expanded, $muted, theme }) => $expanded ? '#3384F4' : $muted ? theme.colors.text.secondary : '#1F1F1F'};
-  font-size: 14px;
+  color: ${({ $expanded, $muted, theme }) => $expanded ? theme.colors.state.active : $muted ? theme.colors.text.body : theme.colors.text.primary};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-weight: 500;
   line-height: 22px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   font-family: inherit;
   letter-spacing: -0.01em;
   position: relative;
 
   &:hover {
     background: rgba(51, 132, 244, 0.04);
-    color: ${({ $muted }) => $muted ? '#1F1F1F' : '#1F1F1F'};
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 
   .chevron {
     margin-left: auto;
-    transition: transform 0.2s ease;
+    transition: transform ${({ theme }) => theme.transitions.medium};
     transform: rotate(${({ $expanded }) => $expanded ? '90deg' : '0deg'});
     opacity: 0.25;
     width: 12px;
@@ -221,7 +221,7 @@ const CategoryHeader = styled.button<{ $expanded: boolean; $muted?: boolean; $co
 
 const CategoryText = styled.span<{ $collapsed?: boolean }>`
   opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
   white-space: nowrap;
   overflow: hidden;
   width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
@@ -242,7 +242,7 @@ const CollapsedIconWrapper = styled.div<{ $hasActive?: boolean }>`
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #3384F4;
+      background: ${({ theme }) => theme.colors.state.active};
     }
   `}
 `;
@@ -254,17 +254,17 @@ const CategoryIcon = styled.div<{ $muted?: boolean; $active?: boolean }>`
   align-items: center;
   justify-content: center;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ $muted, $active }) =>
+  background: ${({ $muted, $active, theme }) =>
     $active
-      ? 'rgba(51, 132, 244, 0.08)'
+      ? theme.colors.state.activeWash
       : $muted
         ? 'rgba(0, 0, 0, 0.04)'
         : 'linear-gradient(135deg, rgba(51, 132, 244, 0.08), rgba(91, 160, 247, 0.08))'};
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.medium};
 
   svg {
-    color: ${({ $muted, theme }) => $muted ? theme.colors.text.tertiary : '#3384F4'};
+    color: ${({ $muted, theme }) => $muted ? theme.colors.text.tertiary : theme.colors.state.active};
     width: 16px;
     height: 16px;
   }
@@ -282,15 +282,15 @@ const Tooltip = styled.div`
   top: 50%;
   transform: translateY(-50%);
   background: ${({ theme }) => theme.colors.text.primary};
-  color: #ffffff;
-  font-size: 12px;
+  color: ${({ theme }) => theme.colors.background.elevated};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: 500;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
   z-index: 1000;
 
   ${CategoryHeader}:hover & {
@@ -309,16 +309,16 @@ const AccountItem = styled.button<{ $active?: boolean; $collapsed?: boolean }>`
   gap: 10px;
   padding: ${({ $collapsed }) => $collapsed ? '0' : '0 12px'};
   justify-content: ${({ $collapsed }) => $collapsed ? 'center' : 'flex-start'};
-  background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'transparent'};
+  background: ${({ $active, theme }) => $active ? theme.colors.state.activeWash : 'transparent'};
   border: none;
   border-radius: ${({ theme }) => theme.radii.sm};
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: ${({ $active }) => $active ? '500' : '400'};
-  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.secondary};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.body};
   letter-spacing: -0.01em;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   position: relative;
   margin-bottom: 2px;
 
@@ -329,7 +329,7 @@ const AccountItem = styled.button<{ $active?: boolean; $collapsed?: boolean }>`
   }
 
   &:hover {
-    background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'rgba(0, 0, 0, 0.03)'};
+    background: ${({ $active, theme }) => $active ? theme.colors.state.activeWash : 'rgba(0, 0, 0, 0.03)'};
     color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.primary};
   }
 `;
@@ -339,7 +339,7 @@ const AccountItemLabel = styled.span<{ $collapsed?: boolean }>`
   width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};
   overflow: hidden;
   white-space: nowrap;
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
 `;
 
 /* ─── Profile Footer ─── */
@@ -358,16 +358,16 @@ const ProfileAvatar = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.accent}, #8B5CF6);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 12px;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: 600;
   cursor: pointer;
   flex-shrink: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
 
   &:hover { opacity: 0.85; }
 `;
@@ -379,7 +379,7 @@ const ProfileInfo = styled.div`
 `;
 
 const ProfileName = styled.div`
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
   white-space: nowrap;
@@ -388,7 +388,7 @@ const ProfileName = styled.div`
 `;
 
 const ProfileEmail = styled.div`
-  font-size: 11px;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
   color: ${({ theme }) => theme.colors.text.muted};
   white-space: nowrap;
   overflow: hidden;
@@ -402,7 +402,7 @@ const ProfilePopup = styled.div`
   right: 12px;
   background: #fff;
   border-radius: ${({ theme }) => theme.radii.md};
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.popover};
   padding: 6px;
   z-index: 100;
 `;
@@ -415,12 +415,12 @@ const ProfilePopupItem = styled.button`
   padding: 10px 12px;
   background: none;
   border: none;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   transition: all 0.1s ease;
 
   svg { width: 15px; height: 15px; }
@@ -457,9 +457,9 @@ const PopoverContainer = styled.div<{ $top: number }>`
   position: fixed;
   left: 68px;
   top: ${({ $top }) => $top}px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border-radius: ${({ theme }) => theme.radii.md};
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadows.popover};
   padding: 8px;
   min-width: 180px;
   z-index: 1000;
@@ -467,7 +467,7 @@ const PopoverContainer = styled.div<{ $top: number }>`
 `;
 
 const PopoverTitle = styled.div`
-  font-size: 11px;
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-transform: uppercase;
@@ -482,13 +482,13 @@ const PopoverItem = styled.button<{ $active: boolean }>`
   gap: 8px;
   padding: 8px 10px;
   background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.06)' : 'transparent'};
-  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+  color: ${({ $active, theme }) => $active ? theme.colors.state.active : theme.colors.text.primary};
   border: none;
   border-radius: ${({ theme }) => theme.radii.sm};
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: ${({ $active }) => $active ? 500 : 400};
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   text-align: left;
   font-family: inherit;
   letter-spacing: -0.01em;
@@ -519,12 +519,12 @@ const CollapseToggle = styled.button<{ $collapsed?: boolean }>`
   height: 36px;
   background: transparent;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   color: ${({ theme }) => theme.colors.text.tertiary};
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: 400;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   font-family: inherit;
 
   &:hover {
@@ -536,14 +536,14 @@ const CollapseToggle = styled.button<{ $collapsed?: boolean }>`
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    transition: transform 0.25s ease;
+    transition: transform ${({ theme }) => theme.transitions.base};
     transform: rotate(${({ $collapsed }) => $collapsed ? '180deg' : '0deg'});
   }
 `;
 
 const CollapseText = styled.span<{ $collapsed?: boolean }>`
   opacity: ${({ $collapsed }) => $collapsed ? 0 : 1};
-  transition: opacity 0.15s ease;
+  transition: opacity ${({ theme }) => theme.transitions.fast};
   white-space: nowrap;
   overflow: hidden;
   width: ${({ $collapsed }) => $collapsed ? '0' : 'auto'};

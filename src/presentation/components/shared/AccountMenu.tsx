@@ -11,10 +11,10 @@ export const AccountPill = styled.button<{ $open: boolean }>`
   gap: 10px;
   height: 40px;
   padding: 4px 14px 4px 4px;
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   background: ${({ theme }) => theme.colors.background.surfaceMuted};
   border: 1px solid transparent;
-  color: ${({ $open, theme }) => $open ? theme.colors.text.primary : theme.colors.text.secondary};
+  color: ${({ $open, theme }) => $open ? theme.colors.text.primary : theme.colors.text.body};
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
@@ -29,7 +29,7 @@ export const AccountPill = styled.button<{ $open: boolean }>`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.background.page},
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.background.elevated},
                 0 0 0 4px rgba(99, 102, 241, 0.5);
   }
 
@@ -59,7 +59,7 @@ export const PillChevron = styled(ChevronDown)<{ $open: boolean }>`
   width: 14px;
   height: 14px;
   color: ${({ $open, theme }) => $open ? theme.colors.text.hint : theme.colors.text.muted};
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), color ${({ theme }) => theme.transitions.medium};
   transform: ${({ $open }) => $open ? 'rotate(180deg)' : 'rotate(0)'};
   stroke-width: ${({ $open }) => $open ? 2.2 : 2};
 `;
@@ -78,7 +78,7 @@ export const AccountDropdown = styled.div`
   padding: 10px;
   background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   box-shadow: ${({ theme }) => theme.shadows.floating};
   display: flex;
   flex-direction: column;
@@ -111,7 +111,7 @@ export const DropdownName = styled.div`
 
 export const DropdownEmail = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
-  color: ${({ theme }) => theme.colors.text.subtle};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -140,9 +140,9 @@ export const ProPlanRow = styled.div`
   width: 100%;
   height: 48px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(99, 102, 241, 0.05);
-  border: 1px solid ${({ theme }) => theme.colors.brand.indigo};
+  border: 1px solid ${({ theme }) => theme.colors.accent};
   box-shadow: 0 1px 2px rgba(99, 102, 241, 0.08);
 `;
 
@@ -157,8 +157,8 @@ export const ProPlanLabel = styled.span`
   svg {
     width: 16px;
     height: 16px;
-    color: ${({ theme }) => theme.colors.brand.indigo};
-    fill: ${({ theme }) => theme.colors.brand.indigo};
+    color: ${({ theme }) => theme.colors.accent};
+    fill: ${({ theme }) => theme.colors.accent};
   }
 `;
 

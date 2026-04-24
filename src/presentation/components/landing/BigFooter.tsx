@@ -1,9 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 const FooterOuter = styled.div`
   margin-top: 120px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid ${({ theme }) => theme.colors.border.hairline};
   padding-top: 48px;
 `;
 
@@ -75,7 +75,7 @@ const NavLink = styled.span`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color ${({ theme }) => theme.transitions.fast};
   letter-spacing: -0.01em;
 
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
@@ -92,7 +92,9 @@ interface BigFooterProps {
   noDivider?: boolean;
 }
 
-export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) => (
+export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) => {
+  const theme = useTheme();
+  return (
   <FooterOuter style={noDivider ? { marginTop: 0, borderTop: 'none', paddingTop: 0 } : undefined}>
   <FooterWrapper>
     <FooterTop>
@@ -119,7 +121,7 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
       </FooterNav>
     </FooterTop>
     <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 32 }}>
-      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 20, textAlign: 'center', width: 360 }}>
+      <div style={{ borderTop: `1px solid ${theme.colors.border.hairline}`, paddingTop: 20, textAlign: 'center', width: 360 }}>
         <FooterBottom>
           © {new Date().getFullYear()} Peachy Studio. All rights reserved.
         </FooterBottom>
@@ -127,4 +129,5 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
     </div>
   </FooterWrapper>
   </FooterOuter>
-);
+  );
+};

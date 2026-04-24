@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, useTheme } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Download, ExternalLink, Pencil, Trash2, LogOut, Search, FileDown, AlertTriangle, KeyRound, Lock, Eye, EyeOff, CheckCircle2, Check, UserCircle, Sparkles as SparkIcon, Shield as ShieldIcon, ShieldAlert } from 'lucide-react';
 import { CALENDAR_STYLES, CLOCK_STYLES, BOARD_STYLES } from '../ui/widgetConfig';
@@ -75,10 +75,10 @@ const FilterSpacer = styled.div`
 const SortSelect = styled.select`
   height: 32px;
   padding: 0 28px 0 12px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 20px;
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.xl};
   background: rgba(0, 0, 0, 0.03);
-  color: #999;
+  color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -89,11 +89,11 @@ const SortSelect = styled.select`
   background-position: right 10px center;
   outline: none;
   letter-spacing: -0.01em;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     border-color: rgba(0, 0, 0, 0.12);
-    color: #666;
+    color: ${({ theme }) => theme.colors.text.hint};
   }
 
   &:focus {
@@ -198,18 +198,18 @@ const SearchInput = styled.input`
   width: 100%;
   height: 44px;
   padding: 0 16px 0 42px;
-  border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 12px;
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.md};
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   font-size: 14px;
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
   outline: none;
-  transition: all 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.medium};
   letter-spacing: -0.01em;
 
   &::placeholder { color: rgba(0, 0, 0, 0.3); }
-  &:focus { border-color: rgba(51, 132, 244, 0.3); background: #fff; }
+  &:focus { border-color: rgba(51, 132, 244, 0.3); background: ${({ theme }) => theme.colors.background.elevated}; }
 `;
 
 const SearchIcon = styled.div`
@@ -233,7 +233,7 @@ const SectionHeading = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
@@ -241,7 +241,7 @@ const SectionTitle = styled.h2`
 `;
 
 const SectionCount = styled.span`
-  font-size: 12px;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: rgba(0, 0, 0, 0.3);
   font-weight: 400;
   text-transform: none;
@@ -317,7 +317,7 @@ const AvatarCircle = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gradients.avatar};
+  background: ${({ theme }) => theme.colors.gradients.avatarPeach};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -328,7 +328,7 @@ const AvatarCircle = styled.div`
 `;
 
 const WelcomeTitle = styled.h1`
-  font-size: 28px;
+  font-size: ${({ theme }) => theme.typography.sizes['6xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -336,7 +336,7 @@ const WelcomeTitle = styled.h1`
 `;
 
 const WelcomeSub = styled.p`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0 0 32px;
 `;
@@ -349,14 +349,14 @@ const CreateRow = styled.div`
   @media (max-width: 768px) { gap: 8px; }
 `;
 
-const CreateCard = styled.button<{ $bg: string }>`
+export const CreateCard = styled.button<{ $bg: string }>`
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 20px;
   background: ${({ $bg }) => $bg};
   border: 1.5px solid rgba(0,0,0,0.04);
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   cursor: pointer;
   font-family: inherit;
   text-align: left;
@@ -377,10 +377,10 @@ const CreateCard = styled.button<{ $bg: string }>`
   }
 `;
 
-const CreateIconWrap = styled.div<{ $color: string }>`
+export const CreateIconWrap = styled.div<{ $color: string }>`
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(255,255,255,0.8);
   display: flex;
   align-items: center;
@@ -389,18 +389,18 @@ const CreateIconWrap = styled.div<{ $color: string }>`
   svg { width: 20px; height: 20px; color: ${({ $color }) => $color}; stroke-width: 1.6; }
 `;
 
-const CreateCardText = styled.div``;
+export const CreateCardText = styled.div``;
 
-const CreateCardTitle = styled.div`
+export const CreateCardTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
-const CreateCardHint = styled.div`
+export const CreateCardHint = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.subtle};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin-top: 1px;
   @media (max-width: 768px) { display: none; }
 `;
@@ -416,21 +416,21 @@ const BigGrid = styled.div`
   @media (max-width: 768px) { grid-template-columns: 1fr; }
 `;
 
-const BigCard = styled.div<{ $index: number }>`
-  background: #fff;
-  border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
+export const BigCard = styled.div<{ $index: number }>`
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
   animation: ${cardAppear} 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${({ $index }) => 0.05 + $index * 0.04}s both;
-  transition: all 0.2s;
+  transition: all ${({ theme }) => theme.transitions.medium};
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.1);
+    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
   }
 `;
 
-const BigCardPreview = styled.div`
+export const BigCardPreview = styled.div`
   aspect-ratio: 3 / 2;
   display: flex;
   align-items: center;
@@ -441,7 +441,7 @@ const BigCardPreview = styled.div`
   position: relative;
 `;
 
-const BigCardLabel = styled.span`
+export const BigCardLabel = styled.span`
   position: absolute;
   top: 10px;
   left: 10px;
@@ -451,11 +451,11 @@ const BigCardLabel = styled.span`
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(8px);
   padding: 3px 10px;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   z-index: 1;
 `;
 
-const BigCardBottom = styled.div`
+export const BigCardBottom = styled.div`
   padding: 16px 18px;
   display: flex;
   align-items: center;
@@ -463,7 +463,7 @@ const BigCardBottom = styled.div`
   border-top: 1px solid rgba(0, 0, 0, 0.04);
 `;
 
-const BigCardName = styled.div`
+export const BigCardName = styled.div`
   font-size: 13px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
@@ -477,33 +477,33 @@ const BigCardMeta = styled.span`
   margin-left: 6px;
 `;
 
-const BigCardActions = styled.div`
+export const BigCardActions = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
 `;
 
-const EmptyBox = styled.div`
-  border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
+export const EmptyBox = styled.div`
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   padding: 56px 24px;
   text-align: center;
   cursor: pointer;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  box-shadow: ${({ theme }) => theme.shadows.card};
+  transition: all ${({ theme }) => theme.transitions.medium};
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.1);
+    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   }
 `;
 
-const EmptyCircle = styled.div`
+export const EmptyCircle = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gradients.avatar};
+  background: ${({ theme }) => theme.colors.gradients.avatarPeach};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,14 +511,14 @@ const EmptyCircle = styled.div`
   svg { width: 24px; height: 24px; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
-const EmptyTitle = styled.p`
+export const EmptyTitle = styled.p`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 4px;
 `;
 
-const EmptyHint = styled.p`
+export const EmptyHint = styled.p`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
@@ -531,14 +531,14 @@ const PurchaseCard = styled.div`
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 16px;
-  transition: all 0.15s;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
-    border-color: rgba(0,0,0,0.1);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
+    box-shadow: ${({ theme }) => theme.shadows.card};
   }
 
   & + & { margin-top: 8px; }
@@ -547,7 +547,7 @@ const PurchaseCard = styled.div`
 const PurchaseImg = styled.div`
   width: 56px;
   height: 56px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   overflow: hidden;
   background: ${({ theme }) => theme.colors.background.surfaceMuted};
   flex-shrink: 0;
@@ -581,9 +581,9 @@ const PurchasePriceTag = styled.div`
 /* Settings */
 
 const SettingsGroup = styled.div`
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   padding: 28px;
   margin-bottom: 16px;
 `;
@@ -600,7 +600,7 @@ const SettingsGroupTitle = styled.h3`
 
 const SectionBlock = styled.div<{ $danger?: boolean }>`
   padding: 48px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
 
   &:first-of-type { padding-top: 24px; }
   &:last-of-type { border-bottom: none; padding-bottom: 24px; }
@@ -620,7 +620,7 @@ const SectionBlockTitle = styled.h3`
 
 const SectionBlockSub = styled.p`
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.text.subtle};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
   letter-spacing: -0.005em;
   line-height: 1.5;
@@ -654,7 +654,7 @@ const SettingsRow = styled.div`
 const SettingsLabel = styled.label`
   font-size: 13px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   width: 80px;
   flex-shrink: 0;
 `;
@@ -664,13 +664,13 @@ const SettingsInput = styled.input`
   height: 40px;
   padding: 0 14px;
   border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 14px;
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color ${({ theme }) => theme.transitions.medium};
 
   &:focus { border-color: rgba(0,0,0,0.2); background: ${({ theme }) => theme.colors.background.elevated}; }
   &:read-only { opacity: 0.5; cursor: not-allowed; }
@@ -881,7 +881,7 @@ const BrowseShopBtn = styled.button`
   background: ${({ theme }) => `linear-gradient(135deg, ${theme.colors.text.primary} 0%, #333 100%)`};
   color: ${({ theme }) => theme.colors.text.inverse};
   border: none;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
@@ -992,6 +992,7 @@ const PurchasesView: React.FC = () => {
 /* ── 4. SETTINGS ── */
 
 const ProfileView: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const { user, logout, supabaseUser, updatePassword, isPro, plan } = useAuth();
   const { open: openUpgrade } = useUpgradeModal();
@@ -1092,8 +1093,8 @@ const ProfileView: React.FC = () => {
         <SectionBlockBody>
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Password</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: theme.colors.text.primary }}>Password</div>
+              <div style={{ fontSize: 13, color: theme.colors.text.tertiary, marginTop: 4, lineHeight: 1.5 }}>
                 {hasPasswordLogin
                   ? 'Change the password you use to sign in with email.'
                   : "You signed up with Google, so there's no password on this account yet. Set one to also sign in with email."}
@@ -1115,8 +1116,8 @@ const ProfileView: React.FC = () => {
         <SectionBlockBody>
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>{isPro ? 'Pro plan · $4 / month' : 'Free plan'}</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: theme.colors.text.primary }}>{isPro ? 'Pro plan · $4 / month' : 'Free plan'}</div>
+              <div style={{ fontSize: 13, color: theme.colors.text.tertiary, marginTop: 4 }}>
                 {isPro
                   ? (plan.currentPeriodEnd
                       ? `Next billing on ${new Date(plan.currentPeriodEnd).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}. Unlimited widgets, all styles.`
@@ -1145,8 +1146,8 @@ const ProfileView: React.FC = () => {
         <SectionBlockBody>
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Download my data</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Export your profile and saved widgets as a JSON file.</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: theme.colors.text.primary }}>Download my data</div>
+              <div style={{ fontSize: 13, color: theme.colors.text.tertiary, marginTop: 4 }}>Export your profile and saved widgets as a JSON file.</div>
             </div>
             <SharedButton $variant="secondary" $size="sm" onClick={handleExport} disabled={exporting}>
               {exporting ? 'Preparing…' : 'Download JSON'}
@@ -1155,8 +1156,8 @@ const ProfileView: React.FC = () => {
           <SectionDivider />
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Privacy policy</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Read how we handle your data.</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: theme.colors.text.primary }}>Privacy policy</div>
+              <div style={{ fontSize: 13, color: theme.colors.text.tertiary, marginTop: 4 }}>Read how we handle your data.</div>
             </div>
             <SharedButton $variant="secondary" $size="sm" onClick={() => navigate('/privacy')}>
               Read policy
@@ -1168,14 +1169,14 @@ const ProfileView: React.FC = () => {
       {/* Danger zone */}
       <SectionBlock>
         <SectionBlockHead>
-          <SectionBlockTitle style={{ color: '#B91C1C' }}>Danger zone</SectionBlockTitle>
+          <SectionBlockTitle style={{ color: theme.colors.danger.strong }}>Danger zone</SectionBlockTitle>
           <SectionBlockSub>Actions here cannot be undone. Proceed carefully.</SectionBlockSub>
         </SectionBlockHead>
         <SectionBlockBody>
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Log out</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>End your session on this device.</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: theme.colors.text.primary }}>Log out</div>
+              <div style={{ fontSize: 13, color: theme.colors.text.tertiary, marginTop: 4 }}>End your session on this device.</div>
             </div>
             <SharedButton $variant="dangerStrong" $size="sm" onClick={async () => { await logout(); navigate('/'); }}>
               Log out
@@ -1184,8 +1185,8 @@ const ProfileView: React.FC = () => {
           <SectionDivider />
           <SettingsRowSplit>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#1F1F1F' }}>Delete account</div>
-              <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>Permanently remove your profile and all widgets. This cannot be undone.</div>
+              <div style={{ fontSize: 14, fontWeight: 500, color: theme.colors.text.primary }}>Delete account</div>
+              <div style={{ fontSize: 13, color: theme.colors.text.tertiary, marginTop: 4 }}>Permanently remove your profile and all widgets. This cannot be undone.</div>
             </div>
             <SharedButton $variant="dangerStrong" $size="sm" onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(''); setDeleteError(null); }}>
               Delete account
@@ -1201,22 +1202,22 @@ const ProfileView: React.FC = () => {
             style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           />
           <div style={{
-            position: 'relative', background: '#fff', borderRadius: 24, padding: '32px 28px 28px',
+            position: 'relative', background: theme.colors.background.elevated, borderRadius: 24, padding: '32px 28px 28px',
             width: 440, maxWidth: '92vw',
             boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
           }}>
             {pwSuccess ? (
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em', marginBottom: 8 }}>
+                <div style={{ fontSize: 20, fontWeight: 600, color: theme.colors.text.primary, letterSpacing: '-0.02em', marginBottom: 8 }}>
                   Password updated
                 </div>
-                <div style={{ fontSize: 14, color: '#666', lineHeight: 1.5, marginBottom: 20 }}>
+                <div style={{ fontSize: 14, color: theme.colors.text.hint, lineHeight: 1.5, marginBottom: 20 }}>
                   You can use your new password the next time you sign in with email.
                 </div>
                 <button
                   onClick={() => setShowPwModal(false)}
                   style={{
-                    width: '100%', height: 44, background: '#1F1F1F', color: '#fff',
+                    width: '100%', height: 44, background: theme.colors.text.primary, color: theme.colors.text.inverse,
                     border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 600,
                     fontFamily: 'inherit', cursor: 'pointer',
                   }}
@@ -1224,15 +1225,15 @@ const ProfileView: React.FC = () => {
               </div>
             ) : (
               <>
-                <div style={{ fontSize: 20, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.02em', marginBottom: 6 }}>
+                <div style={{ fontSize: 20, fontWeight: 600, color: theme.colors.text.primary, letterSpacing: '-0.02em', marginBottom: 6 }}>
                   {hasPasswordLogin ? 'Change password' : 'Set a password'}
                 </div>
-                <div style={{ fontSize: 14, color: '#777', lineHeight: 1.5, marginBottom: 18 }}>
+                <div style={{ fontSize: 14, color: theme.colors.text.hint, lineHeight: 1.5, marginBottom: 18 }}>
                   Choose a strong password you haven't used before.
                 </div>
                 {pwError && (
                   <div style={{
-                    fontSize: 13, color: '#DC2828',
+                    fontSize: 13, color: theme.colors.danger.strong,
                     background: 'rgba(220,40,40,0.06)',
                     border: '1px solid rgba(220,40,40,0.15)',
                     padding: '10px 12px', borderRadius: 12, marginBottom: 12,
@@ -1258,7 +1259,7 @@ const ProfileView: React.FC = () => {
                   }
                 }}>
                   <div style={{ position: 'relative', marginBottom: 10 }}>
-                    <Lock style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#999' }} />
+                    <Lock style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: theme.colors.text.tertiary }} />
                     <input
                       type={showPw ? 'text' : 'password'}
                       autoFocus
@@ -1269,21 +1270,21 @@ const ProfileView: React.FC = () => {
                       minLength={8}
                       style={{
                         width: '100%', height: 46, padding: '0 44px',
-                        border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
-                        fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
-                        background: '#FAFAFA', outline: 'none', boxSizing: 'border-box',
+                        border: `1px solid ${theme.colors.border.hairlineHover}`, borderRadius: 12,
+                        fontSize: 14, fontFamily: 'inherit', color: theme.colors.text.primary,
+                        background: theme.colors.background.surfaceAlt, outline: 'none', boxSizing: 'border-box',
                       }}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPw(!showPw)}
-                      style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: 0, display: 'flex' }}
+                      style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.text.tertiary, padding: 0, display: 'flex' }}
                     >
                       {showPw ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
                     </button>
                   </div>
                   <div style={{ position: 'relative', marginBottom: 12 }}>
-                    <Lock style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: '#999' }} />
+                    <Lock style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: theme.colors.text.tertiary }} />
                     <input
                       type={showPw ? 'text' : 'password'}
                       placeholder="Confirm new password"
@@ -1293,9 +1294,9 @@ const ProfileView: React.FC = () => {
                       minLength={8}
                       style={{
                         width: '100%', height: 46, padding: '0 44px',
-                        border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
-                        fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
-                        background: '#FAFAFA', outline: 'none', boxSizing: 'border-box',
+                        border: `1px solid ${theme.colors.border.hairlineHover}`, borderRadius: 12,
+                        fontSize: 14, fontFamily: 'inherit', color: theme.colors.text.primary,
+                        background: theme.colors.background.surfaceAlt, outline: 'none', boxSizing: 'border-box',
                       }}
                     />
                   </div>
@@ -1326,8 +1327,8 @@ const ProfileView: React.FC = () => {
                       onClick={() => setShowPwModal(false)}
                       disabled={pwSubmitting}
                       style={{
-                        flex: 1, height: 44, background: '#fff', color: '#555',
-                        border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
+                        flex: 1, height: 44, background: theme.colors.background.elevated, color: theme.colors.text.body,
+                        border: `1px solid ${theme.colors.border.hairlineHover}`, borderRadius: 12,
                         fontSize: 14, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer',
                       }}
                     >Cancel</button>
@@ -1335,7 +1336,7 @@ const ProfileView: React.FC = () => {
                       type="submit"
                       disabled={pwSubmitting || !pwValid}
                       style={{
-                        flex: 1, height: 44, background: '#1F1F1F', color: '#fff',
+                        flex: 1, height: 44, background: theme.colors.text.primary, color: theme.colors.text.inverse,
                         border: 'none', borderRadius: 12,
                         fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
                         opacity: (pwSubmitting || !pwValid) ? 0.5 : 1,
@@ -1358,14 +1359,14 @@ const ProfileView: React.FC = () => {
             style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
           />
           <div style={{
-            position: 'relative', background: '#fff', borderRadius: 24, padding: '36px 32px 28px',
+            position: 'relative', background: theme.colors.background.elevated, borderRadius: 24, padding: '36px 32px 28px',
             width: 460, maxWidth: '92vw',
             boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
           }}>
-            <div style={{ fontSize: 20, fontWeight: 600, color: '#B91C1C', letterSpacing: '-0.02em', marginBottom: 10 }}>
+            <div style={{ fontSize: 20, fontWeight: 600, color: theme.colors.danger.strong, letterSpacing: '-0.02em', marginBottom: 10 }}>
               Delete account?
             </div>
-            <div style={{ fontSize: 14, color: '#555', lineHeight: 1.5, marginBottom: 20 }}>
+            <div style={{ fontSize: 14, color: theme.colors.text.body, lineHeight: 1.5, marginBottom: 20 }}>
               We'll permanently remove your profile and all saved widgets from our servers. You can always sign up again later with the same email.
               To confirm, please type <strong>delete</strong> below.
             </div>
@@ -1377,14 +1378,14 @@ const ProfileView: React.FC = () => {
               placeholder='Type "delete" to confirm'
               style={{
                 width: '100%', height: 42, padding: '0 14px',
-                border: '1px solid rgba(0,0,0,0.1)', borderRadius: 12,
-                fontSize: 14, fontFamily: 'inherit', color: '#1F1F1F',
-                background: '#FAFAFA', outline: 'none', marginBottom: deleteError ? 8 : 20,
+                border: `1px solid ${theme.colors.border.hairlineHover}`, borderRadius: 12,
+                fontSize: 14, fontFamily: 'inherit', color: theme.colors.text.primary,
+                background: theme.colors.background.surfaceAlt, outline: 'none', marginBottom: deleteError ? 8 : 20,
                 boxSizing: 'border-box',
               }}
             />
             {deleteError && (
-              <div style={{ fontSize: 12, color: '#DC2828', marginBottom: 16 }}>{deleteError}</div>
+              <div style={{ fontSize: 12, color: theme.colors.danger.strong, marginBottom: 16 }}>{deleteError}</div>
             )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <SharedButton $variant="secondary" $size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
@@ -1396,7 +1397,7 @@ const ProfileView: React.FC = () => {
                 onClick={handleDelete}
                 disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
                 style={{
-                  background: '#DC2828', color: '#fff', borderColor: '#DC2828',
+                  background: theme.colors.danger.strong, color: theme.colors.text.inverse, borderColor: theme.colors.danger.strong,
                   opacity: (deleting || deleteConfirmText.trim().toLowerCase() !== 'delete') ? 0.5 : 1,
                 }}
               >

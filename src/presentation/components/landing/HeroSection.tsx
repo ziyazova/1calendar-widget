@@ -116,7 +116,7 @@ const SocialBadge = styled.div`
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   margin: -40px auto 40px;
 
   @media (max-width: 768px) {
@@ -155,7 +155,7 @@ const Avatar = styled.div<{ $bg: string; $i: number }>`
 const BadgeDivider = styled.span`
   width: 1px;
   height: 12px;
-  background: rgba(0, 0, 0, 0.1);
+  background: ${({ theme }) => theme.colors.border.hairlineHover};
 `;
 
 const BadgeStars = styled.span`
@@ -171,7 +171,7 @@ const BadgeStars = styled.span`
 const BadgeText = styled.span`
   font-size: 12px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   letter-spacing: -0.005em;
   white-space: nowrap;
 

@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { X, Pencil, Lock } from 'lucide-react';
-import { Button } from '@/presentation/components/shared';
+import { Button, Modal, ModalFooter } from '@/presentation/components/shared';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { BoardSettings } from '@/domain/value-objects/BoardSettings';
@@ -108,7 +107,7 @@ const PanelContainer = styled.div`
   top: 0;
   width: 280px;
   height: 100vh;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border-left: 1px solid ${({ theme }) => theme.colors.border.light};
   z-index: ${({ theme }) => theme.zIndex.sticky - 1};
   display: flex;
@@ -154,7 +153,7 @@ const CloseButton = styled.button`
   border-radius: ${({ theme }) => theme.radii.sm};
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: rgba(0, 0, 0, 0.08);
@@ -180,23 +179,23 @@ const CardList = styled.div`
 
 const CardOuter = styled.div<{ $active: boolean; $index: number }>`
   position: relative;
-  border: 1.5px solid ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.06)'};
-  border-radius: 16px;
-  background: #ffffff;
+  border: 1.5px solid ${({ $active, theme }) => $active ? theme.colors.state.active : theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  background: ${({ theme }) => theme.colors.background.elevated};
   overflow: hidden;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color ${({ theme }) => theme.transitions.medium}, box-shadow ${({ theme }) => theme.transitions.medium};
   cursor: pointer;
   opacity: 0;
   animation: ${cardAppear} 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: ${({ $index }) => 0.06 + $index * 0.06}s;
 
   &:hover {
-    border-color: ${({ $active }) => $active ? '#3384F4' : 'rgba(0, 0, 0, 0.12)'};
+    border-color: ${({ $active, theme }) => $active ? theme.colors.state.active : 'rgba(0, 0, 0, 0.12)'};
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   }
 
   ${({ $active }) => $active && css`
-    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
+    box-shadow: ${({ theme }) => theme.shadows.focusBlue};
   `}
 `;
 
@@ -208,7 +207,7 @@ const PreviewOverlay = styled.div`
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity ${({ theme }) => theme.transitions.medium};
   z-index: 2;
   pointer-events: auto;
 `;
@@ -218,7 +217,7 @@ const PreviewWrap = styled.div`
   aspect-ratio: 16 / 10;
   overflow: hidden;
   position: relative;
-  background: #FAFAFA;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,7 +257,7 @@ const CardBottom = styled.div`
 const CardLabel = styled.span<{ $active: boolean }>`
   font-size: 13px;
   font-weight: ${({ $active }) => $active ? 500 : 400};
-  color: ${({ $active }) => $active ? '#3384F4' : '#1F1F1F'};
+  color: ${({ $active, theme }) => $active ? theme.colors.state.active : theme.colors.text.primary};
   letter-spacing: -0.01em;
 `;
 
@@ -269,20 +268,20 @@ const EditButton = styled.button`
   height: 34px;
   padding: 0 18px;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(255, 255, 255, 0.95);
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   letter-spacing: -0.01em;
 
   svg { width: 14px; height: 14px; }
 
   &:hover {
-    background: #ffffff;
+    background: ${({ theme }) => theme.colors.background.elevated};
     transform: scale(1.04);
   }
 
@@ -298,146 +297,47 @@ const LockedButton = styled.button`
   height: 34px;
   padding: 0 18px;
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(255, 255, 255, 0.95);
   color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   letter-spacing: -0.01em;
 
   svg { width: 13px; height: 13px; }
 
   &:hover {
-    background: #ffffff;
-    color: ${({ theme }) => theme.colors.text.secondary};
+    background: ${({ theme }) => theme.colors.background.elevated};
+    color: ${({ theme }) => theme.colors.text.body};
   }
 `;
 
 /* ── Name Modal ── */
 
-const modalFadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`;
-
-const modalSlideUp = keyframes`
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: ${modalFadeIn} 0.2s ease both;
-`;
-
-const ModalCard = styled.div`
-  width: 380px;
-  max-width: 90vw;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 28px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
-  animation: ${modalSlideUp} 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 0.05s;
-`;
-
-const ModalTitle = styled.h3`
-  font-size: 16px;
-  font-weight: 600;
-  color: #1F1F1F;
-  letter-spacing: -0.02em;
-  margin: 0 0 4px;
-`;
-
-const ModalSubtitle = styled.p`
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.4);
-  margin: 0 0 20px;
-  letter-spacing: -0.01em;
-`;
-
-const ModalPreviewRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
-  padding: 12px;
-  background: #FAFAFA;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-`;
-
-const ModalPreviewThumb = styled.div`
-  width: 56px;
-  height: 42px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-`;
-
-const ModalPreviewScale = styled.div`
-  transform: scale(0.1);
-  transform-origin: center center;
-  width: 420px;
-  min-height: 380px;
-  pointer-events: none;
-`;
-
-const ModalPreviewInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`;
-
-const ModalPreviewLabel = styled.span`
-  font-size: 14px;
-  font-weight: 500;
-  color: #1F1F1F;
-  letter-spacing: -0.01em;
-`;
-
-const ModalPreviewMeta = styled.span`
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.35);
-`;
-
+/* Input for the "Name your widget" form inside the shared <Modal>.
+ * Kept local (not shared) because this is the only "Name" modal that
+ * exists post-migration — WidgetStudioPage has its own NameModalInput
+ * with the same styling. */
 const ModalInput = styled.input`
   width: 100%;
   height: 44px;
   padding: 0 14px;
   border: 1.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  background: #FAFAFA;
-  font-size: 14px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-family: inherit;
-  color: #1F1F1F;
+  color: ${({ theme }) => theme.colors.text.primary};
   outline: none;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   letter-spacing: -0.01em;
   margin-bottom: 20px;
 
   &::placeholder { color: rgba(0, 0, 0, 0.25); }
-  &:focus { border-color: rgba(51, 132, 244, 0.4); background: #fff; }
-`;
-
-const ModalActions = styled.div`
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
+  &:focus { border-color: rgba(51, 132, 244, 0.4); background: ${({ theme }) => theme.colors.background.elevated}; }
 `;
 
 
@@ -545,37 +445,26 @@ export const StylePickerPanel: React.FC<StylePickerPanelProps> = ({
         </CardList>
       </PanelBody>
 
-      {nameModal && createPortal(
-        <ModalOverlay onClick={() => setNameModal(null)}>
-          <ModalCard onClick={(e) => e.stopPropagation()}>
-            <ModalTitle>Name your widget</ModalTitle>
-            <ModalSubtitle>You can always rename it later</ModalSubtitle>
-            <ModalPreviewRow>
-              <ModalPreviewThumb>
-                <ModalPreviewScale>
-                  {renderPreview(nameModal.style)}
-                </ModalPreviewScale>
-              </ModalPreviewThumb>
-              <ModalPreviewInfo>
-                <ModalPreviewLabel>{nameModal.label}</ModalPreviewLabel>
-                <ModalPreviewMeta>{categoryLabel} widget</ModalPreviewMeta>
-              </ModalPreviewInfo>
-            </ModalPreviewRow>
-            <ModalInput
-              autoFocus
-              placeholder="My awesome widget..."
-              value={widgetName}
-              onChange={(e) => setWidgetName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmEdit(); }}
-            />
-            <ModalActions>
-              <Button $variant="secondary" $size="md" onClick={() => setNameModal(null)}>Cancel</Button>
-              <Button $variant="primary" $size="md" onClick={handleConfirmEdit}>Create & Edit</Button>
-            </ModalActions>
-          </ModalCard>
-        </ModalOverlay>,
-        document.body
-      )}
+      <Modal
+        open={!!nameModal}
+        onClose={() => setNameModal(null)}
+        eyebrow={nameModal ? `New ${categoryLabel.toLowerCase()}` : undefined}
+        title="Name your widget"
+        size="sm"
+        hideClose
+      >
+        <ModalInput
+          autoFocus
+          placeholder="My awesome widget..."
+          value={widgetName}
+          onChange={(e) => setWidgetName(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmEdit(); }}
+        />
+        <ModalFooter>
+          <Button type="button" $variant="outline" $size="lg" onClick={() => setNameModal(null)}>Cancel</Button>
+          <Button type="button" $variant="primary" $size="lg" onClick={handleConfirmEdit}>Create &amp; Edit</Button>
+        </ModalFooter>
+      </Modal>
     </PanelContainer>
   );
 };

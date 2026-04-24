@@ -52,11 +52,11 @@ const ActionButton = styled.button`
   color: #fff;
   background: ${({ theme }) => theme.colors.text.primary};
   border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: all ${({ theme }) => theme.transitions.medium};
 
   &:hover { background: #333; }
   svg { width: 14px; height: 14px; }

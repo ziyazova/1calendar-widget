@@ -28,7 +28,7 @@ const Wrap = styled.div`
   padding: 10px 12px;
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
 `;
 
 const Meta = styled.div`
@@ -61,7 +61,7 @@ const CTA = styled.button`
   gap: 4px;
   height: 30px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: ${({ theme }) => theme.colors.gradients.indigo};
   color: ${({ theme }) => theme.colors.text.inverse};
   border: none;
@@ -69,7 +69,7 @@ const CTA = styled.button`
   font-weight: 600;
   cursor: pointer;
   box-shadow: ${({ theme }) => theme.colors.accentShadow.sm};
-  transition: filter 0.15s ease, transform 0.15s ease;
+  transition: filter ${({ theme }) => theme.transitions.fast}, transform ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     filter: brightness(1.05);
@@ -88,8 +88,8 @@ const GhostLink = styled.button`
   font-weight: 500;
   cursor: pointer;
   padding: 6px 10px;
-  border-radius: 8px;
-  transition: background 0.15s ease, color 0.15s ease;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  transition: background ${({ theme }) => theme.transitions.fast}, color ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: ${({ theme }) => theme.colors.interactive.hover};

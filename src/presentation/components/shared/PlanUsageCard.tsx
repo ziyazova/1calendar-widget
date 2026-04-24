@@ -31,7 +31,7 @@ const Count = styled.div<{ $size: PlanUsageSize }>`
   gap: 8px;
   font-size: ${({ $size }) => ($size === 'wide' ? '13px' : '12px')};
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.subtle};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   white-space: nowrap;
   letter-spacing: -0.01em;
 `;
@@ -48,8 +48,8 @@ const ProRow = styled.div<{ $size: PlanUsageSize }>`
   svg {
     width: 14px;
     height: 14px;
-    color: ${({ theme }) => theme.colors.brand.indigo};
-    fill: ${({ theme }) => theme.colors.brand.indigo};
+    color: ${({ theme }) => theme.colors.accent};
+    fill: ${({ theme }) => theme.colors.accent};
   }
 `;
 

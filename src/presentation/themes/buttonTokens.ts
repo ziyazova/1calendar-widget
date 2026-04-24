@@ -46,7 +46,7 @@
  * - Soften danger red:                        `danger.base.fg` / `dangerStrong.base.fg`
  * - Add a tiny lift on ghost:                 `ghost.hover.transform`
  *
- * Scope: 10 variants × 4 sizes. Live preview at `/dev/v2`.
+ * Scope: 10 variants × 4 sizes. Live preview at `/dev`.
  * See original spec: `01-buttons.standalone.html` (Before/After) + HANDOFF-buttons.md.
  */
 

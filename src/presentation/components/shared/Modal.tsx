@@ -22,6 +22,11 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   subtitle?: string;
+  /** UPPERCASE kicker shown ABOVE the title. Sets the modal's tone. */
+  eyebrow?: string;
+  /** Color of the eyebrow. `accent` = indigo (default, informational) ·
+   *  `danger` = red (destructive, irreversible). */
+  eyebrowTone?: 'accent' | 'danger';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
   /** Hide the X close button */
@@ -58,7 +63,7 @@ const Overlay = styled.div`
 
 const Dialog = styled.div<{ $size: 'sm' | 'md' | 'lg' | 'xl' }>`
   background: ${({ theme }) => theme.colors.background.elevated};
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   box-shadow: ${({ theme }) => theme.shadows.modal};
   width: 100%;
   max-width: ${({ $size }) => sizeMap[$size]}px;
@@ -82,8 +87,19 @@ const TitleWrap = styled.div`
   min-width: 0;
 `;
 
+const Eyebrow = styled.div<{ $tone: 'accent' | 'danger' }>`
+  font-size: ${({ theme }) => theme.typography.sizes.xs};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  text-transform: uppercase;
+  letter-spacing: ${({ theme }) => theme.typography.letterSpacing.widest};
+  color: ${({ $tone, theme }) =>
+    $tone === 'danger' ? theme.colors.danger.strong : theme.colors.accent};
+  margin: 0 0 16px;
+  line-height: 1.3;
+`;
+
 const Title = styled.h2`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
@@ -91,7 +107,7 @@ const Title = styled.h2`
 `;
 
 const Subtitle = styled.p`
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.text.body};
   margin: 4px 0 0;
   line-height: 1.5;
@@ -101,7 +117,7 @@ const CloseBtn = styled.button`
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: none;
   background: transparent;
   color: ${({ theme }) => theme.colors.text.body};
@@ -109,7 +125,7 @@ const CloseBtn = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background ${({ theme }) => theme.transitions.fast}, color ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: ${({ theme }) => theme.colors.interactive.hover};
@@ -117,10 +133,20 @@ const CloseBtn = styled.button`
   }
 `;
 
+/* Body lays out its direct children as a flex column with a fixed gap,
+   so the spacing from the last body atom to the action buttons is
+   IDENTICAL across every modal — regardless of which helpers (text,
+   input, error, hint, footer) it contains. Direct children get their
+   own margins reset so the gap is the only source of spacing. */
 const Body = styled.div`
   padding: 20px 24px 24px;
   overflow-y: auto;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  > * { margin: 0; }
 `;
 
 export const ModalFooter = styled.div`
@@ -128,9 +154,7 @@ export const ModalFooter = styled.div`
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  padding: 16px 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
-  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  padding: 0;
 `;
 
 export function Modal({
@@ -138,6 +162,8 @@ export function Modal({
   onClose,
   title,
   subtitle,
+  eyebrow,
+  eyebrowTone = 'accent',
   size = 'md',
   children,
   hideClose = false,
@@ -169,9 +195,10 @@ export function Modal({
   return (
     <Overlay onClick={handleOverlayClick}>
       <Dialog $size={size} role="dialog" aria-modal="true" aria-label={title}>
-        {(title || !hideClose) && (
+        {(title || eyebrow || !hideClose) && (
           <Header>
             <TitleWrap>
+              {eyebrow && <Eyebrow $tone={eyebrowTone}>{eyebrow}</Eyebrow>}
               {title && <Title>{title}</Title>}
               {subtitle && <Subtitle>{subtitle}</Subtitle>}
             </TitleWrap>

@@ -140,7 +140,7 @@ const Title = styled.h1`
 
 const Description = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   margin: 0 0 ${({ theme }) => theme.spacing['3']};
   word-break: break-word;
@@ -181,7 +181,7 @@ const CarouselBtn = styled.button<{ $side: 'left' | 'right' }>`
   justify-content: center;
   cursor: pointer;
   transition: all ${({ theme }) => theme.transitions.fast};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
 
   svg { width: 16px; height: 16px; }
 
@@ -252,7 +252,7 @@ const SectionTitle = styled.h2`
 
 const OverviewText = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   margin: 0 0 ${({ theme }) => theme.spacing['8']};
   word-break: break-word;
@@ -273,7 +273,7 @@ const FeatureList = styled.ul`
 
 const FeatureItem = styled.li`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.normal};
   padding-left: 20px;
   position: relative;
@@ -344,7 +344,7 @@ const AddedBtn = styled(Button).attrs({ $variant: 'success' as const, $size: 'lg
   .remove-label { display: none; align-items: center; gap: 8px; }
 
   &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.destructive};
+    background: ${({ theme }) => theme.colors.danger.strong};
     filter: none;
     .added-label { display: none; }
     .remove-label { display: inline-flex; }
@@ -363,7 +363,7 @@ const ErrorDisclosure = styled.p`
   margin: 10px 0 0;
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   line-height: 1.5;
-  color: ${({ theme }) => theme.colors.destructiveText};
+  color: ${({ theme }) => theme.colors.danger.strong};
   text-align: center;
 `;
 
@@ -379,7 +379,7 @@ const PagesList = styled.ol`
 const PagesItem = styled.li`
   counter-increment: pages;
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   padding: 6px 0;
   display: flex;
   gap: 8px;
@@ -482,7 +482,7 @@ const RelatedPreview = styled.div`
   z-index: 20;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity ${({ theme }) => theme.transitions.medium}, transform ${({ theme }) => theme.transitions.medium};
 
   ${RelatedCard}:hover & {
     opacity: 1;
@@ -517,7 +517,7 @@ const RelatedTitle = styled.span`
 
 const RelatedPrice = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
 `;
 
 /* ── FAQ (uses shared <Accordion>; just a vertical stack) ── */
@@ -532,7 +532,7 @@ const FaqList = styled.div`
 // it matches the old size/color instead of inheriting body defaults.
 const FaqAnswerText = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   margin: 0;
   word-break: break-word;

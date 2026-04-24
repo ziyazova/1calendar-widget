@@ -31,7 +31,7 @@ const IconWrap = styled.div<{ $ok: boolean }>`
   svg {
     width: 28px;
     height: 28px;
-    color: ${({ $ok, theme }) => ($ok ? theme.colors.success : theme.colors.destructive)};
+    color: ${({ $ok, theme }) => ($ok ? theme.colors.success.base : theme.colors.danger.strong)};
   }
 `;
 
@@ -46,7 +46,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.subtle};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   text-align: center;
   margin: 0 0 ${({ theme }) => theme.spacing['6']};
   line-height: ${({ theme }) => theme.typography.lineHeights.normal};

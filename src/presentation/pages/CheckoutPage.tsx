@@ -28,7 +28,7 @@ const Title = styled.h1`
   margin: 0 0 ${({ theme }) => theme.spacing['8']};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: 22px;
+    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
   }
 `;
 
@@ -88,7 +88,7 @@ const Label = styled.label`
   display: block;
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   margin-bottom: ${({ theme }) => theme.spacing['1']};
 `;
 
@@ -154,7 +154,7 @@ const SummaryItem = styled.div`
 const SummaryThumb = styled.div`
   width: 48px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   overflow: hidden;
   background: linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%);
   border: 1px solid ${({ theme }) => theme.colors.border.light};
@@ -188,13 +188,13 @@ const SummaryRemove = styled.button`
   color: ${({ theme }) => theme.colors.text.muted};
   display: flex;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   transition: all ${({ theme }) => theme.transitions.fast};
 
   svg { width: 14px; height: 14px; }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.destructive};
+    color: ${({ theme }) => theme.colors.danger.strong};
     background: rgba(220, 40, 40, 0.06);
   }
 `;
@@ -215,7 +215,7 @@ const PromoInput = styled.input`
   font-size: ${({ theme }) => theme.typography.sizes.md};
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
-  background: ${({ theme }) => theme.colors.background.page};
+  background: ${({ theme }) => theme.colors.background.elevated};
   outline: none;
 
   &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }

@@ -25,14 +25,14 @@ const NameModalInput = styled.input`
   height: 46px;
   padding: 0 14px;
   border: 1px solid ${({ theme }) => theme.colors.border.medium};
-  border-radius: 12px;
-  font-size: 14px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-family: inherit;
   color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color ${({ theme }) => theme.transitions.fast}, background ${({ theme }) => theme.transitions.fast};
 
   &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }
   &:focus {
@@ -93,7 +93,7 @@ const HeroIcons = styled.div`
 const HeroIcon = styled.div<{ $delay: string }>`
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
 
   @media (max-width: 768px) {
     width: 40px;
@@ -109,14 +109,14 @@ const HeroIcon = styled.div<{ $delay: string }>`
   justify-content: center;
   animation: ${fadeUp} 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${({ $delay }) => $delay} both;
 
-  svg { width: 22px; height: 22px; color: ${({ theme }) => theme.colors.text.secondary}; }
+  svg { width: 22px; height: 22px; color: ${({ theme }) => theme.colors.text.body}; }
 `;
 
 const HeroTitle = styled.h1`
   font-family: 'Inter', sans-serif;
   font-size: clamp(42px, 5.6vw, 74px);
   font-weight: 600;
-  color: #2B2320;
+  color: ${({ theme }) => theme.colors.peach.deep};
   letter-spacing: -0.03em;
   margin: 0;
   line-height: 1.2;
@@ -124,15 +124,15 @@ const HeroTitle = styled.h1`
   em {
     font-style: normal;
     font-weight: 600;
-    color: #2B2320;
+    color: ${({ theme }) => theme.colors.peach.deep};
   }
 `;
 
 const HeroDesc = styled.p`
   margin: 22px auto 32px;
-  font-size: 16px;
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
   font-weight: 400;
-  color: #9B9790;
+  color: ${({ theme }) => theme.colors.peach.muted};
   line-height: 1.65;
   max-width: 440px;
   letter-spacing: -0.005em;
@@ -154,18 +154,18 @@ const EmailInput = styled.input`
   height: 52px;
   padding: 0 18px;
   border: 1px solid rgba(26, 22, 19, 0.14);
-  border-radius: 16px;
-  font-size: 14px;
+  border-radius: ${({ theme }) => theme.radii.lg};
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-family: inherit;
-  color: #2B2320;
+  color: ${({ theme }) => theme.colors.peach.deep};
   background: #fff;
   outline: none;
   letter-spacing: -0.005em;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 4px 12px rgba(26, 22, 19, 0.04);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color ${({ theme }) => theme.transitions.medium}, box-shadow ${({ theme }) => theme.transitions.medium};
 
   &::placeholder {
-    color: #B5B1A9;
+    color: ${({ theme }) => theme.colors.peach.hint};
   }
 
   &:focus {
@@ -181,8 +181,8 @@ const AuthDivider = styled.div`
   width: 100%;
   max-width: 380px;
   margin: 20px auto;
-  color: #B5B1A9;
-  font-size: 12px;
+  color: ${({ theme }) => theme.colors.peach.hint};
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
   letter-spacing: 0.02em;
 
   &::before, &::after {
@@ -194,12 +194,22 @@ const AuthDivider = styled.div`
 `;
 
 const CodeError = styled.div`
-  font-size: 13px;
-  color: #E07060;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.danger.soft};
   text-align: center;
   margin-top: 8px;
   font-weight: 500;
   letter-spacing: -0.01em;
+`;
+
+const AuthLoginHint = styled.div`
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  letter-spacing: -0.005em;
+  margin-top: 4px;
 `;
 
 
@@ -347,14 +357,14 @@ const WidgetGalleryTitleRow = styled.div`
 `;
 
 const WidgetGalleryTitle = styled.h2`
-  font-size: 40px;
+  font-size: ${({ theme }) => theme.typography.sizes['8xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0;
 
   @media (max-width: 768px) {
-    font-size: 28px;
+    font-size: ${({ theme }) => theme.typography.sizes['6xl']};
   }
 `;
 
@@ -386,15 +396,15 @@ const widgetCardAppear = keyframes`
 
 const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
   background: #fff;
-  border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
-  transition: all 0.2s;
+  transition: all ${({ theme }) => theme.transitions.medium};
   animation: ${widgetCardAppear} 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${({ $i }) => 0.05 + ($i || 0) * 0.04}s both;
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
+    box-shadow: ${({ theme }) => theme.shadows.cardHover};
   }
 `;
 
@@ -408,7 +418,7 @@ const WidgetGalleryMeta = styled.div`
 `;
 
 const WidgetGalleryCardTitle = styled.span`
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
@@ -426,7 +436,7 @@ const GalleryProBadgeSlot = styled.span`
 `;
 
 const GalleryCard = styled.div`
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   overflow: hidden;
   background: linear-gradient(150deg, rgba(237,228,255,0.45) 0%, rgba(232,237,255,0.35) 30%, rgba(245,235,250,0.3) 60%, rgba(255,240,245,0.4) 100%);
   backdrop-filter: blur(16px) saturate(140%);
@@ -434,7 +444,7 @@ const GalleryCard = styled.div`
   border: 1px solid rgba(200, 195, 230, 0.2);
 
   @media (max-width: 768px) {
-    border-radius: 16px;
+    border-radius: ${({ theme }) => theme.radii.lg};
   }
   position: relative;
   aspect-ratio: 4 / 3;
@@ -489,15 +499,15 @@ const FeatureItem = styled.div`
 const FeatureIcon = styled.div`
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: ${({ theme }) => theme.typography.sizes['4xl']};
 `;
 
 const FeatureTitle = styled.h3`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   margin: 0;
@@ -505,7 +515,7 @@ const FeatureTitle = styled.h3`
 `;
 
 const FeatureDesc = styled.p`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
   line-height: 1.5;
@@ -522,7 +532,7 @@ const PricingSection = styled.section`
 `;
 
 const PricingTitle = styled.h2`
-  font-size: 40px;
+  font-size: ${({ theme }) => theme.typography.sizes['8xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -530,8 +540,8 @@ const PricingTitle = styled.h2`
 `;
 
 const PricingSubtitle = styled.p`
-  font-size: 16px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
+  color: ${({ theme }) => theme.colors.text.body};
   margin: 0 0 40px;
 `;
 
@@ -549,7 +559,7 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
   background: ${({ $highlighted }) => $highlighted ? 'linear-gradient(150deg, #F8F6FF 0%, #F0F4FF 50%, #FFF6F8 100%)' : '#fff'};
   color: inherit;
   border: 1px solid ${({ $highlighted, theme }) => $highlighted ? 'rgba(130, 120, 200, 0.2)' : theme.colors.border.light};
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   padding: 32px 28px;
   text-align: left;
   position: relative;
@@ -557,21 +567,21 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
 `;
 
 const PricingPlan = styled.div`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   font-weight: 500;
   opacity: 0.6;
   margin-bottom: 4px;
 `;
 
 const PricingPrice = styled.div`
-  font-size: 40px;
+  font-size: ${({ theme }) => theme.typography.sizes['8xl']};
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
 `;
 
 const PricingPeriod = styled.div`
-  font-size: 13px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
   opacity: 0.5;
   margin-bottom: 24px;
 `;
@@ -583,7 +593,7 @@ const PricingFeatures = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
   opacity: 0.8;
 
   li::before {
@@ -621,7 +631,7 @@ const BottomCTA = styled.section`
 `;
 
 const CTATitle = styled.h2`
-  font-size: 40px;
+  font-size: ${({ theme }) => theme.typography.sizes['8xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
@@ -629,8 +639,8 @@ const CTATitle = styled.h2`
 `;
 
 const CTADesc = styled.p`
-  font-size: 16px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
+  color: ${({ theme }) => theme.colors.text.body};
   margin: 0 0 28px;
 `;
 
@@ -744,15 +754,16 @@ export const WidgetStudioPage: React.FC = () => {
         <Modal
           open={!!nameModal}
           onClose={() => setNameModal(null)}
+          eyebrow={nameModal ? `New ${nameModal.category}` : undefined}
           title="Name your widget"
-          subtitle={nameModal ? `New ${nameModal.category === 'calendar' ? 'Calendar' : nameModal.category === 'clock' ? 'Clock' : 'Board'}` : undefined}
           size="sm"
+          hideClose
         >
           <NameModalInput
             autoFocus
             value={widgetName}
             onChange={e => setWidgetName(e.target.value)}
-            placeholder="My awesome widget..."
+            placeholder="Classic Calendar"
             onKeyDown={e => {
               if (e.key === 'Enter' && widgetName.trim() && nameModal) {
                 const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
@@ -761,8 +772,8 @@ export const WidgetStudioPage: React.FC = () => {
               }
             }}
           />
-          <ModalFooter style={{ marginLeft: -24, marginRight: -24, marginBottom: -20, marginTop: 16 }}>
-            <SharedButton type="button" $variant="secondary" $size="lg" onClick={() => setNameModal(null)}>
+          <ModalFooter>
+            <SharedButton type="button" $variant="outline" $size="lg" onClick={() => setNameModal(null)}>
               Cancel
             </SharedButton>
             <SharedButton
@@ -835,13 +846,16 @@ export const WidgetStudioPage: React.FC = () => {
                 {codeError && <CodeError>{codeError}</CodeError>}
                 <AuthDivider>or</AuthDivider>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                  <SharedButton type="button" $variant="primary" $size="md" onClick={() => navigate('/login')}>
-                    Already have an account? Log in
-                  </SharedButton>
                   <SharedButton $variant="secondary" $size="md" onClick={() => loginWithGoogle()}>
                     <GoogleIcon />
                     Continue with Google
                   </SharedButton>
+                  <AuthLoginHint>
+                    Already have an account?{' '}
+                    <SharedButton type="button" $variant="link" $size="sm" onClick={() => navigate('/login')}>
+                      Log in
+                    </SharedButton>
+                  </AuthLoginHint>
                 </div>
               </>
             )}

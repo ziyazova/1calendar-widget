@@ -54,7 +54,7 @@ const Title = styled.h2`
 
 const Subtitle = styled.p`
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.peach.muted};
   text-align: center;
   margin: 8px 0 100px;
   letter-spacing: -0.01em;
@@ -121,7 +121,7 @@ const Card = styled.div`
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   padding: 24px;
   flex-shrink: 0;
   border: 1px solid rgba(43, 35, 32, 0.06);
@@ -141,7 +141,7 @@ const Stars = styled.div`
 
 const Text = styled.p`
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: 1.65;
   margin: 0 0 20px;
   letter-spacing: -0.01em;

@@ -36,7 +36,7 @@ const FeatureStack = styled.div`
 const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: number; $activeIdx: number; $color: string }>`
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   border-radius: ${({ theme }) => theme.radii['2xl']};
   overflow: hidden;
   border: 1px solid ${({ $color }) => {
@@ -166,9 +166,9 @@ const FeatureTabActions = styled.div`
 
 const FeatureCardBody = styled.div`
   display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 24px 0 0 36px;
+  align-items: stretch;
+  gap: 48px;
+  padding: 0 0 0 36px;
   flex: 1;
 
   @media (max-width: 768px) {
@@ -179,7 +179,7 @@ const FeatureCardBody = styled.div`
 `;
 
 const FeatureCardText = styled.div`
-  flex: 0 0 calc(30% - 24px);
+  flex: 0 0 calc(36% - 48px);
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -209,11 +209,12 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 20px 0 0 0;
+  margin: 40px 0 40px 0;
   overflow: hidden;
   border: none;
   background: transparent;
   position: relative;
+  border-radius: ${({ theme }) => theme.radii['2xl']} 0 0 0;
 
   img {
     width: 100%;
@@ -226,6 +227,7 @@ const FeatureCardImage = styled.div`
   @media (max-width: 768px) {
     margin: 0 20px 20px;
     min-height: 180px;
+    border-radius: ${({ theme }) => theme.radii.lg};
   }
 `;
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Search, CreditCard, Copy, Palette, SlidersHorizontal, Code } from 'lucide-react';
+import { theme as peachyTheme } from '@/presentation/themes/theme';
 
 const Section = styled.section`
   max-width: 1200px;
@@ -17,13 +18,13 @@ const SectionTitle = styled.h2`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
-  margin: 0 0 24px;
+  margin: 0;
 `;
 
 const SectionSubtitle = styled.p`
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 8px 0 24px;
+  color: ${({ theme }) => theme.colors.peach.muted};
+  margin: 8px 0 16px;
 `;
 
 const Grid = styled.div`
@@ -45,7 +46,7 @@ const Card = styled.div<{ $bg: string }>`
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   border: 1px solid rgba(150, 145, 175, 0.28);
-  border-radius: 20px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
@@ -77,7 +78,7 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
   z-index: 1;
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: ${({ theme }) => theme.radii.lg};
   background: ${({ $bg }) => $bg};
   display: flex;
   align-items: center;
@@ -102,13 +103,13 @@ const CardTitle = styled.h3`
 
 const CardDesc = styled.p`
   font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   margin: 0;
   max-width: 240px;
 `;
 
-const CTA_GRADIENT = 'linear-gradient(150deg, rgba(237, 228, 255, 0.7) 0%, rgba(232, 237, 255, 0.65) 25%, rgba(238, 234, 255, 0.6) 50%, rgba(245, 235, 250, 0.65) 75%, rgba(255, 240, 245, 0.7) 100%)';
+const CTA_GRADIENT = peachyTheme.colors.gradients.softBannerLarge;
 const GRADIENTS = [CTA_GRADIENT, CTA_GRADIENT, CTA_GRADIENT];
 
 const TEMPLATE_STEPS = [
@@ -135,7 +136,7 @@ export const HowItWorksSection: React.FC<HowItWorksProps> = ({ showTitle = true,
     {showTitle && (
       <>
         <SectionTitle>How it works</SectionTitle>
-        {/* subtitle removed */}
+        <SectionSubtitle>Easy as that.</SectionSubtitle>
       </>
     )}
     <Grid>

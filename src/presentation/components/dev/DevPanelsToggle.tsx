@@ -30,7 +30,7 @@ const Toggle = styled.button`
   align-items: center;
   justify-content: center;
   padding: 0;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: rgba(22, 22, 24, 0.68);
   @supports not (backdrop-filter: blur(0)) {
     background: rgba(22, 22, 24, 0.96);

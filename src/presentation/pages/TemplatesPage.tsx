@@ -67,7 +67,7 @@ const SearchInput = styled.input`
   color: ${({ theme }) => theme.colors.text.primary};
   background: ${({ theme }) => theme.colors.background.surface};
   outline: none;
-  transition: all 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.medium};
   letter-spacing: -0.01em;
 
   &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }
@@ -89,19 +89,19 @@ const SubChip = styled.button<{ $active: boolean }>`
   height: 28px;
   padding: 0 14px;
   border: none;
-  background: ${({ $active, theme }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'transparent'};
-  color: ${({ $active, theme }) => $active ? theme.colors.brand.blue : theme.colors.text.tertiary};
+  background: ${({ $active, theme }) => $active ? theme.colors.state.activeWash : 'transparent'};
+  color: ${({ $active, theme }) => $active ? theme.colors.state.active : theme.colors.text.tertiary};
   border-radius: ${({ theme }) => theme.radii.sm};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ $active, theme }) => $active ? theme.typography.weights.medium : theme.typography.weights.normal};
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
-    color: ${({ $active, theme }) => $active ? theme.colors.brand.blue : theme.colors.text.primary};
-    background: ${({ $active }) => $active ? 'rgba(51, 132, 244, 0.08)' : 'rgba(0, 0, 0, 0.02)'};
+    color: ${({ $active, theme }) => $active ? theme.colors.state.active : theme.colors.text.primary};
+    background: ${({ $active, theme }) => $active ? theme.colors.state.activeWash : 'rgba(0, 0, 0, 0.02)'};
   }
 `;
 
@@ -162,7 +162,7 @@ const CardTitle = styled.span`
 const Price = styled.span<{ $free: boolean }>`
   font-size: ${({ theme }) => theme.typography.sizes.md};
   font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ $free, theme }) => $free ? theme.colors.success : theme.colors.text.tertiary};
+  color: ${({ $free, theme }) => $free ? theme.colors.success.base : theme.colors.text.tertiary};
 `;
 
 const EmptyState = styled.div`

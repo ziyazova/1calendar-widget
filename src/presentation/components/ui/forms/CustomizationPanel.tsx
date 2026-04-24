@@ -34,7 +34,7 @@ const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
   position: fixed;
   right: 0;
   top: 0;
-  background: #ffffff;
+  background: ${({ theme }) => theme.colors.background.elevated};
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
@@ -56,7 +56,7 @@ const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
     right: 0;
     border-radius: 20px 20px 0 0;
     border-top: 1px solid ${({ theme }) => theme.colors.border.light};
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.shadows.sheet};
     transform: ${({ $mobileOpen }) => $mobileOpen ? 'translateY(0)' : 'translateY(100%)'};
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -178,7 +178,7 @@ const Select = styled.select`
   height: 36px;
   padding: 0 12px;
   border: none;
-  border-radius: ${({ theme }) => theme.radii.button};
+  border-radius: ${({ theme }) => theme.radii.md};
   background: rgba(0, 0, 0, 0.03);
   box-shadow: ${({ theme }) => theme.shadows.form};
   color: ${({ theme }) => theme.colors.text.primary};
@@ -187,7 +187,7 @@ const Select = styled.select`
   font-size: 13px;
   font-weight: 400;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 10px center;
@@ -202,7 +202,7 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.accent};
-    box-shadow: 0 0 0 3px rgba(51, 132, 244, 0.1);
+    box-shadow: ${({ theme }) => theme.shadows.focusBlue};
   }
 `;
 
@@ -215,7 +215,7 @@ const SliderRow = styled.div`
 const Slider = styled.input`
   flex: 1;
   height: 4px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   background: rgba(0, 0, 0, 0.03);
   box-shadow: ${({ theme }) => theme.shadows.form};
   outline: none;
@@ -228,11 +228,11 @@ const Slider = styled.input`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid ${({ theme }) => theme.colors.brand.indigo};
+    background: ${({ theme }) => theme.colors.background.elevated};
+    border: 2px solid ${({ theme }) => theme.colors.accent};
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
-    transition: all 0.15s ease;
+    transition: all ${({ theme }) => theme.transitions.fast};
   }
 
   &::-webkit-slider-thumb:hover {
@@ -257,7 +257,7 @@ const Slider = styled.input`
 
 const SliderValue = styled.span`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   min-width: 32px;
@@ -274,7 +274,7 @@ const EmptyState = styled.div`
     font-size: 14px;
     font-weight: 500;
     margin: 0 0 4px 0;
-    color: ${({ theme }) => theme.colors.text.secondary};
+    color: ${({ theme }) => theme.colors.text.body};
   }
 
   p {
@@ -305,7 +305,7 @@ const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
       : darkBorder;
   }};
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   flex-shrink: 0;
   padding: 0;
 
@@ -351,7 +351,7 @@ const TYPEWRITER_COLORS = [
 
 const ImageHint = styled.p`
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   margin: 0 0 12px 0;
   line-height: 1.5;
   letter-spacing: -0.01em;
@@ -368,20 +368,20 @@ const AddButton = styled.button`
   padding: 0 16px;
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: linear-gradient(135deg, #3384F4, #5BA0F7);
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.state.active}, #5BA0F7);
   color: #fff;
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
   flex-shrink: 0;
   white-space: nowrap;
 
   &:hover {
     opacity: 0.9;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(51, 132, 244, 0.3);
+    box-shadow: ${({ theme }) => theme.colors.blueShadow.md};
   }
 
   &:active {
@@ -398,7 +398,7 @@ const AddButton = styled.button`
 
 const ImageCounter = styled.span`
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   font-weight: 500;
   margin-top: 8px;
   display: block;
@@ -423,7 +423,7 @@ const ImageItem = styled.div<{ $dragging?: boolean; $dragOver?: boolean }>`
     'rgba(0, 0, 0, 0.02)'};
   border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   transition: background 0.12s ease, opacity 0.12s ease, border-color 0.12s ease;
   opacity: ${({ $dragging }) => $dragging ? 0.5 : 1};
   border: 1px solid ${({ $dragOver }) => $dragOver ? 'rgba(51, 132, 244, 0.2)' : 'transparent'};
@@ -448,7 +448,7 @@ const DragHandle = styled.div`
   }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.text.secondary};
+    color: ${({ theme }) => theme.colors.text.body};
   }
 
   svg {
@@ -479,7 +479,7 @@ const RemoveButton = styled.button`
   height: 24px;
   border: none;
   background: transparent;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.body};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -487,7 +487,7 @@ const RemoveButton = styled.button`
   border-radius: ${({ theme }) => theme.radii.sm};
   flex-shrink: 0;
   padding: 0;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: rgba(239, 68, 68, 0.08);
@@ -505,20 +505,20 @@ const LayoutOption = styled.button<{ $active: boolean }>`
   height: 36px;
   border: none;
   background: ${({ $active, theme }) => $active ? theme.colors.interactive.accentHover : theme.colors.interactive.hover};
-  box-shadow: ${({ $active, theme }) => $active ? `0 0 0 1px ${theme.colors.brand.indigo}` : theme.shadows.form};
-  color: ${({ $active, theme }) => $active ? theme.colors.brand.indigo : theme.colors.text.secondary};
-  border-radius: ${({ theme }) => theme.radii.button};
+  box-shadow: ${({ $active, theme }) => $active ? `0 0 0 1px ${theme.colors.accent}` : theme.shadows.form};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.body};
+  border-radius: ${({ theme }) => theme.radii.md};
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.brand.indigo};
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.accent};
     background: ${({ theme }) => theme.colors.interactive.accentHover};
-    color: ${({ $active, theme }) => $active ? theme.colors.brand.indigo : theme.colors.text.primary};
+    color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.primary};
   }
 
   @media (max-width: 768px) { height: 40px; font-size: 13px; }

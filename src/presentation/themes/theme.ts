@@ -5,45 +5,46 @@ export const theme = {
     // Brand — real accent used across the app (indigo, not iOS blue).
     // `accent` kept as #6366F1 (indigo-500) — matches Studio/Badges/Login.
     accent: '#6366F1',
-    accentLight: '#818CF8',         // indigo-400 (gradient partner)
-    accentDark: '#4F46E5',          // indigo-600 (pressed state)
-    accentHover: '#5457EE',
 
-    // Semantic brand set — consolidates scattered #6366F1 / #818CF8 / #4F46E5
+    // Darker indigo shade (hover / pressed state partner for `accent`).
     brand: {
-      indigo: '#6366F1',
-      indigoLight: '#818CF8',
       indigoDark: '#4F46E5',
-      blue: '#3384F4',              // secondary CTA (mobile copy btn)
-      blueLight: '#5BA0F7',
     },
 
-    // Semantic status — each gets bg/border/text for banners/buttons/pills
-    success: '#22C55E',
-    successFg: '#16A34A',           // text-on-light
-    successDark: '#15803D',
-    successBg: 'rgba(34, 197, 94, 0.08)',
-    successBorder: 'rgba(34, 197, 94, 0.25)',
-    successText: '#166534',
+    // State indicators — "active" / "selected" etc. `state.active` is the
+    // blue used on active filter chips, mobile tabs, ready-to-copy buttons.
+    // Semantically NOT brand — it's a signal of UI state.
+    state: {
+      active: '#3384F4',
+      // 8% tint of `state.active` — used as "selected/active" wash on
+      // filter chips, mobile tabs, ready-to-copy buttons.
+      activeWash: 'rgba(51, 132, 244, 0.08)',
+    },
 
-    warning: '#F59E0B',
-    warningBg: 'rgba(245, 158, 11, 0.08)',
-    warningBorder: 'rgba(245, 158, 11, 0.25)',
-    warningText: '#92400E',
+    // Semantic status — nested objects so the shape matches `danger.*`.
+    //   success.base  — the vivid 500-hue for filled pills / icons on dark bg
+    //   success.fg    — the 600-hue for "text on light" (check icons, helper)
+    //   success.dark  — the 700-hue for emphasised dark-green headlines
+    //   success.bg    — 8% tinted background for inline banners
+    success: {
+      base: '#22C55E',
+      fg: '#16A34A',
+      dark: '#15803D',
+      bg: 'rgba(34, 197, 94, 0.08)',
+    },
 
-    destructive: '#DC2626',
-    destructiveSoft: '#F49B8B',     // muted danger used in studio delete btn
-    destructiveBg: 'rgba(220, 38, 38, 0.06)',
-    destructiveBorder: 'rgba(220, 38, 38, 0.15)',
-    destructiveText: '#DC2828',
+    warning: {
+      bg: 'rgba(245, 158, 11, 0.08)',
+      border: 'rgba(245, 158, 11, 0.25)',
+      text: '#92400E',
+    },
 
-    // Unified danger palette — source of truth going forward.
-    // `soft` = reversible destructive (cancel subscription, remove from cart).
-    // `strong` = irreversible destructive (delete account, delete widget, logout).
-    // Existing `destructive*` keys are aliased to these — see SIMPLIFICATION_PLAN.md.
+    // Unified danger palette — source of truth.
+    //   soft   = reversible destructive (cancel subscription, remove from cart)
+    //   strong = irreversible destructive (delete account/widget, logout)
     danger: {
-      soft: '#F49B8B',              // = destructiveSoft
-      strong: '#DC2828',            // = destructiveText (was hardcoded in DashboardViews ActionButton)
+      soft: '#F49B8B',
+      strong: '#DC2828',
       bg: 'rgba(220, 38, 38, 0.06)',
       border: 'rgba(220, 38, 38, 0.15)',
     },
@@ -51,67 +52,70 @@ export const theme = {
     // Widget colors
     widgets: widgetColors,
 
-    // Background system
+    // Background system. `surfaceCool/Warm` were merged into `surfaceAlt`
+    // (they differed by 1-3 value points — indistinguishable on a monitor).
+    // If you need a clearly warm/cool surface later, pick a bolder tint.
     background: {
-      page: '#FFFFFF',
       surface: '#F2F2F7',           // iOS systemGroupedBackground
-      surfaceAlt: '#FAFAFA',        // the lightest neutral used in Login/Studio
+      surfaceAlt: '#FAFAFA',        // lightest neutral (Login, Studio artboard, Settings page)
       surfaceMuted: '#F5F5F5',      // TabBar, pills, ConfirmEmail bg
-      surfaceCool: '#F8F8F7',       // artboard bg
-      surfaceWarm: '#FBFAF7',       // warm cream — Settings page (intentional aesthetic)
       elevated: '#FFFFFF',
-      glass: 'rgba(255, 255, 255, 0.72)',
-      glassBright: 'rgba(255, 255, 255, 0.94)', // floating toolbar
-      dark: '#1c1c1e',
-      darkSecondary: '#2c2c2e',
-      mesh: 'linear-gradient(135deg, #a8c0ff 0%, #c4a8ff 25%, #f0a8d0 50%, #ffb8c6 75%, #ffd4a8 100%)',
+      glassBright: 'rgba(255, 255, 255, 0.94)', // floating toolbar, cookie banner
     },
 
-    // Text system — iOS hierarchy, expanded with mid-tones used across pages
+    // Text system — 6-shade hierarchy. Merges done during 2026-04-24 audit:
+    //   `subtle` (#999) → `tertiary` (#8E8E93) — 11pt diff, invisible.
+    //   `dim` (#666)    → `hint` (#777)        — 17pt diff, invisible.
+    //   `secondary` (#3C3C43) → `body` (#555)  — 25pt diff, "mid" shade now
+    //     unified across paragraphs + sidebar labels + landing subtitles.
     text: {
       primary: '#1F1F1F',           // soft black (real primary)
-      secondary: '#3C3C43',
-      tertiary: '#8E8E93',
-      muted: '#C7C7CC',
-      subtle: '#999999',            // light grey labels (Studio counts)
-      hint: '#777777',               // placeholder-ish
-      body: '#555555',               // long-form text
-      dim: '#666666',                // card meta, subtitles
+      body: '#555555',               // paragraphs, sidebar labels, subtitles
+      hint: '#777777',               // placeholder, card meta, helper
+      tertiary: '#8E8E93',          // iOS tertiaryLabel (muted label role)
+      muted: '#C7C7CC',             // most-faded / disabled
       inverse: '#ffffff',
-      accent: '#6366F1',
-      link: '#6366F1',
     },
 
-    // Border system
+    // Peach / warm palette — used on /widgets landing (WidgetStudioPage).
+    // Warmer, beige-tinted alternative to the cool grey `text.*` set.
+    // Do NOT use these in the app-internal UI (Studio / Dashboard / Settings).
+    peach: {
+      deep: '#2B2320',              // warm near-black — HeroTitle, EmailInput text
+      inkSoft: '#4A433D',           // warm mid-brown — secondary headings on warm bg
+      muted: '#9B9790',             // warm body grey — HeroDesc
+      hint: '#B5B1A9',              // warm placeholder — EmailInput placeholder, AuthDivider
+      light: '#FFD9B8',             // soft peach accent — hero blob / card bg
+      deepWarm: '#F4A672',          // orange-peach — hero CTA / template tag
+      rose: '#F3C6C6',              // dusty rose — secondary hero accent
+    },
+
+    // Border system. `hairline` is the ubiquitous 6% black line used for
+    // cards / dividers (ex `rgba(0,0,0,0.06)`). `hairlineHover` is the
+    // 10% version used on card hover.
     border: {
       light: 'rgba(60, 60, 67, 0.08)',
       medium: 'rgba(60, 60, 67, 0.15)',
       subtle: 'rgba(0, 0, 0, 0.06)',
-      focus: '#6366F1',
+      hairline: 'rgba(0, 0, 0, 0.06)',
+      hairlineHover: 'rgba(0, 0, 0, 0.1)',
     },
 
-    // Interactive states
+    // Interactive states — hover/active overlays
     interactive: {
       hover: 'rgba(0, 0, 0, 0.04)',
       active: 'rgba(0, 0, 0, 0.06)',
       accentHover: 'rgba(99, 102, 241, 0.08)',
-      accentActive: 'rgba(99, 102, 241, 0.12)',
-      disabled: 'rgba(60, 60, 67, 0.18)',
     },
 
-    // Gradients — covers every scattered linear-gradient in the codebase
+    // Gradients — only what's actually used in the codebase.
+    // Orphans removed 2026-04-24 (primary/indigoDeep/hero/card/glass/
+    // softBannerHover/templateCard). Re-add if a new use-case needs them.
     gradients: {
-      primary: 'linear-gradient(135deg, #6366F1 0%, #818CF8 100%)',
       indigo: 'linear-gradient(135deg, #6366F1, #818CF8)',
-      indigoDeep: 'linear-gradient(135deg, #4F46E5, #6366F1)',
       blue: 'linear-gradient(135deg, #3384F4, #5BA0F7)',
-      hero: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-      card: 'linear-gradient(145deg, #ffffff 0%, #faf9f7 100%)',
       softBanner: 'linear-gradient(135deg, rgba(237,228,255,0.6) 0%, rgba(232,237,255,0.5) 40%, rgba(245,235,250,0.55) 100%)',
-      softBannerHover: 'linear-gradient(135deg, rgba(237,228,255,0.75) 0%, rgba(232,237,255,0.65) 40%, rgba(245,235,250,0.7) 100%)',
-      templateCard: 'linear-gradient(180deg, #FAFAFC 0%, #F6F6FA 50%, #F0F0F8 100%)',
-      glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)',
-      avatar: 'linear-gradient(135deg, #EDE4FF, #E0E8FF)',
+      softBannerLarge: 'linear-gradient(150deg, rgba(237, 228, 255, 0.7) 0%, rgba(232, 237, 255, 0.65) 25%, rgba(238, 234, 255, 0.6) 50%, rgba(245, 235, 250, 0.65) 75%, rgba(255, 240, 245, 0.7) 100%)',
       avatarPeach: 'linear-gradient(135deg, #FFD4BE 0%, #FDB8AE 45%, #F8A2B0 100%)',
     },
 
@@ -230,6 +234,10 @@ export const theme = {
     floating: '0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
     modal: '0 32px 80px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.06)',
     sheet: '0 -8px 40px rgba(0, 0, 0, 0.1)',
+    // Dropdown / popover — sidebar account menu, style picker popover.
+    popover: '0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04)',
+    // Focus ring on blue inputs/tabs (secondary state).
+    focusBlue: '0 0 0 3px rgba(51, 132, 244, 0.1)',
   },
 
   // Breakpoints
@@ -255,10 +263,11 @@ export const theme = {
 
   // Transitions
   transitions: {
-    fast: '0.15s ease',
-    base: '0.25s ease',
-    smooth: '0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    spring: '0.28s cubic-bezier(0.22, 1, 0.36, 1)',
+    fast: '0.15s ease',      // micro-interactions: hover, color fade
+    medium: '0.2s ease',     // mid-speed hover, padding shift
+    base: '0.25s ease',      // default — card hover, panel open
+    smooth: '0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',  // gentle slide
+    spring: '0.28s cubic-bezier(0.22, 1, 0.36, 1)',        // punchy pop
   },
 
   // Blur

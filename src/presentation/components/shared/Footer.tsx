@@ -43,8 +43,8 @@ const FooterLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text.muted};
   letter-spacing: -0.01em;
   text-decoration: none;
-  transition: color 0.15s;
-  &:hover { color: ${({ theme }) => theme.colors.text.secondary}; }
+  transition: color ${({ theme }) => theme.transitions.fast};
+  &:hover { color: ${({ theme }) => theme.colors.text.body}; }
 `;
 
 interface FooterProps {

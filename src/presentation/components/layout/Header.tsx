@@ -21,7 +21,7 @@ const HeaderContainer = styled.header`
   padding: 0 24px;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
   height: 64px;
   position: relative;
   z-index: ${({ theme }) => theme.zIndex.sticky};
@@ -42,7 +42,7 @@ const TabGroup = styled.div`
   display: flex;
   align-items: center;
   background: rgba(0, 0, 0, 0.04);
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 4px;
   gap: 2px;
 `;
@@ -54,18 +54,18 @@ const Tab = styled.button<{ $active: boolean }>`
   font-weight: ${({ $active }) => $active ? 500 : 400};
   font-family: inherit;
   letter-spacing: -0.01em;
-  color: ${({ $active }) => $active ? '#1F1F1F' : '#6B6B6B'};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : '#6B6B6B'};
   background: ${({ $active }) => $active ? 'rgba(255, 255, 255, 0.9)' : 'transparent'};
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.medium};
   box-shadow: ${({ $active }) => $active
     ? '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)'
     : 'none'};
 
   &:hover {
-    color: ${({ $active }) => $active ? '#1F1F1F' : '#1F1F1F'};
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
@@ -86,17 +86,17 @@ const CopyButton = styled.button<{ $copied?: boolean }>`
   gap: 8px;
   padding: 0 20px;
   height: 36px;
-  background: ${({ $copied }) => $copied
+  background: ${({ $copied, theme }) => $copied
     ? 'linear-gradient(135deg, #22c55e, #16a34a)'
-    : 'linear-gradient(135deg, #6366f1, #8b5cf6)'};
-  color: #ffffff;
+    : `linear-gradient(135deg, ${theme.colors.accent}, #8b5cf6)`};
+  color: ${({ theme }) => theme.colors.text.inverse};
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.medium};
   letter-spacing: -0.01em;
   box-shadow: 0 2px 8px ${({ $copied }) => $copied
     ? 'rgba(34, 197, 94, 0.3)'
@@ -131,16 +131,16 @@ const SaveButton = styled.button<{ $saving?: boolean; $saved?: boolean }>`
   gap: 8px;
   padding: 0 16px;
   height: 36px;
-  background: ${({ $saved }) => $saved ? '#22c55e' : '#1F1F1F'};
-  color: #ffffff;
+  background: ${({ $saved, theme }) => $saved ? '#22c55e' : theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.text.inverse};
   border: none;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: all 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.medium};
   opacity: ${({ $saving }) => $saving ? 0.7 : 1};
 
   svg { width: 14px; height: 14px; }

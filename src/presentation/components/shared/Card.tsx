@@ -65,7 +65,7 @@ const interactiveStyles = css`
   background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform ${({ theme }) => theme.transitions.medium}, box-shadow ${({ theme }) => theme.transitions.medium}, border-color ${({ theme }) => theme.transitions.medium};
 
   &:hover {
     transform: translateY(-2px);

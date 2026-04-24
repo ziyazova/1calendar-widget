@@ -381,11 +381,11 @@ export function ClaudeFeedback() {
             </DevText>
           </DevRow>
 
-          <DevRowLink href="/dev/v2">
+          <DevRowLink href="/dev">
             <DevIcon><Sparkles /></DevIcon>
             <DevText>
-              <DevTitle>Design system v2</DevTitle>
-              <DevSub>token-driven · /dev/v2</DevSub>
+              <DevTitle>Design system</DevTitle>
+              <DevSub>token-driven · mirrors prod · /dev</DevSub>
             </DevText>
           </DevRowLink>
 
@@ -488,7 +488,7 @@ const DevPanel = styled.div`
     0 20px 40px -12px rgba(0, 0, 0, 0.45),
     0 2px 8px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   border: 1px solid rgba(255, 255, 255, 0.08);
   animation: ${slideInPanel} 0.28s ease-out;
 `;
@@ -506,12 +506,13 @@ const DevBrand = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 `;
 
+// Plain string — no theme context. Keep literals (this is dev tooling only).
 const devRowBase = `
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid transparent;
   background: transparent;
   color: #fff;
@@ -588,7 +589,7 @@ const DevBadge = styled.span<{ $green: boolean }>`
   min-width: 18px;
   height: 16px;
   padding: 0 5px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: ${({ $green }) => ($green ? '#10b981' : '#f59e0b')};
   color: #fff;
   font-size: 11px;
@@ -602,7 +603,7 @@ const HoverBox = styled.div`
   pointer-events: none;
   border: 2px solid #6366F1;
   background: rgba(110, 127, 242, 0.12);
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   z-index: 2147483500;
   opacity: 0;
   transition: opacity 0.1s ease;
@@ -622,7 +623,7 @@ const HintBar = styled.div`
   -webkit-backdrop-filter: blur(22px) saturate(180%);
   color: #fff;
   padding: 9px 18px;
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   font-size: 13px;
   font-family: system-ui, sans-serif;
   z-index: 2147483600;
@@ -646,7 +647,7 @@ const Backdrop = styled.div`
 
 const Panel = styled.div<{ $wide?: boolean }>`
   background: #fff;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 16px;
   width: ${({ $wide }) => ($wide ? '440px' : '380px')};
   max-width: calc(100vw - 48px);
@@ -678,7 +679,7 @@ const CloseBtn = styled.button`
 
 const TargetInfo = styled.div`
   background: #f5f5f5;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   padding: 8px 10px;
   margin-bottom: 12px;
   font-size: 12px;
@@ -701,7 +702,7 @@ const DataUx = styled.div`
   padding: 2px 8px;
   background: #111;
   color: #fff;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   font-size: 11px;
   font-family: ui-monospace, monospace;
 `;
@@ -712,7 +713,7 @@ const DataUxSmall = styled.span`
   padding: 1px 6px;
   background: #111;
   color: #fff;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   font-size: 11px;
   font-family: ui-monospace, monospace;
 `;
@@ -729,7 +730,7 @@ const Chip = styled.button<{ $active: boolean }>`
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radii.full};
   border: 1px solid ${({ $active }) => ($active ? '#6366F1' : '#ddd')};
   background: ${({ $active }) => ($active ? 'rgba(110,127,242,0.12)' : '#fff')};
   color: ${({ $active }) => ($active ? '#6366F1' : '#666')};
@@ -749,7 +750,7 @@ const Textarea = styled.textarea`
   min-height: 80px;
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-family: inherit;
   font-size: 14px;
   resize: vertical;
@@ -775,7 +776,7 @@ const SendBtn = styled.button`
   color: #fff;
   border: none;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 14px;
   cursor: pointer;
   &:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -789,7 +790,7 @@ const Toast = styled.div`
   background: #111;
   color: #fff;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 13px;
   font-family: system-ui, sans-serif;
   z-index: 2147483600;
@@ -812,7 +813,7 @@ const CommentList = styled.div`
 const CommentRow = styled.div<{ $status: Status }>`
   border: 1px solid ${({ $status }) => ($status === 'fixed' ? '#10b981' : '#eee')};
   background: ${({ $status }) => ($status === 'fixed' ? 'rgba(16, 185, 129, 0.05)' : '#fff')};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   padding: 10px 12px;
   font-size: 13px;
 `;
@@ -865,7 +866,7 @@ const GhostBtn = styled.button<{ $danger?: boolean }>`
   border: 1px solid #ddd;
   color: ${({ $danger }) => ($danger ? '#ef4444' : '#333')};
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
@@ -880,7 +881,7 @@ const PrimaryBtn = styled.button`
   color: #fff;
   border: none;
   padding: 5px 12px;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;

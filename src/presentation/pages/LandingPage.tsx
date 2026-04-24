@@ -26,7 +26,7 @@ const SECTION_Y = {
 } as const;
 
 const Page = styled.div`
-  background: ${({ theme }) => theme.colors.background.page};
+  background: ${({ theme }) => theme.colors.background.elevated};
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
 `;

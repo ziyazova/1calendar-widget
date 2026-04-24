@@ -24,7 +24,7 @@ const DebugTooltip = styled.div<{ $locked?: boolean }>`
   font-size: 11px;
   font-family: 'SF Mono', 'Fira Code', monospace;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   z-index: 99999;
   pointer-events: ${({ $locked }) => $locked ? 'auto' : 'none'};
   max-width: 600px;
@@ -47,7 +47,7 @@ const DebugCopyBtn = styled.button`
   color: #fff;
   font-size: 11px;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   cursor: pointer;
   font-family: 'SF Mono', monospace;
   flex-shrink: 0;
@@ -60,7 +60,7 @@ const DebugUnlockBtn = styled.button`
   color: #fff;
   font-size: 11px;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   cursor: pointer;
   font-family: 'SF Mono', monospace;
   flex-shrink: 0;
@@ -76,7 +76,7 @@ const DebugBadge = styled.button`
   font-size: 11px;
   font-weight: 600;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   border: none;
   z-index: 99999;
   font-family: 'SF Mono', monospace;
@@ -90,7 +90,7 @@ const DebugToggle = styled.button<{ $on: boolean }>`
   right: 16px;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: none;
   background: ${({ $on }) => $on ? '#FF3B30' : 'rgba(0,0,0,0.06)'};
   color: ${({ $on }) => $on ? '#fff' : '#999'};
@@ -100,7 +100,7 @@ const DebugToggle = styled.button<{ $on: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all ${({ theme }) => theme.transitions.medium};
   &:hover { background: ${({ $on }) => $on ? '#cc2a22' : 'rgba(0,0,0,0.1)'}; }
 `;
 
@@ -156,7 +156,7 @@ const RedlineLabel = styled.span<{ $color?: string }>`
   font-weight: 600;
   font-family: 'SF Mono', monospace;
   padding: 1px 4px;
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   white-space: nowrap;
   line-height: 14px;
 `;

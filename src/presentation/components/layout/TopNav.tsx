@@ -42,7 +42,7 @@ const Nav = styled.nav`
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
   height: 72px;
   padding-top: env(safe-area-inset-top, 0px);
 `;
@@ -115,13 +115,13 @@ const NavLinks = styled.div`
 const NavLink = styled.button<{ $active?: boolean }>`
   font-size: 13px;
   font-weight: ${({ $active }) => $active ? '500' : '400'};
-  color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.body};
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: color 0.15s ease;
+  transition: color ${({ theme }) => theme.transitions.fast};
   white-space: nowrap;
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
@@ -174,14 +174,14 @@ const MobileLink = styled.button<{ $active?: boolean }>`
   padding: 14px 16px;
   font-size: 14px;
   font-weight: ${({ $active }) => $active ? '600' : '400'};
-  color: ${({ $active, theme }) => $active ? '#1F1F1F' : theme.colors.text.secondary};
+  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.body};
   background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.03)' : 'none'};
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-family: inherit;
   letter-spacing: -0.01em;
-  transition: all 0.15s ease;
+  transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
     background: rgba(0, 0, 0, 0.03);
@@ -353,7 +353,7 @@ const CartRemoveBtn = styled.button`
   svg { width: 14px; height: 14px; }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.destructive};
+    color: ${({ theme }) => theme.colors.danger.strong};
     background: rgba(220, 40, 40, 0.06);
   }
 `;

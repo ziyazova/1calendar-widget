@@ -150,7 +150,7 @@ const Bar = styled.div`
     0 20px 40px -12px rgba(0, 0, 0, 0.45),
     0 2px 8px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  border-radius: ${({ theme }) => theme.radii.xl};
   border: 1px solid rgba(255, 255, 255, 0.08);
   width: 220px;
   animation: ${slideIn} 0.25s ease-out;
@@ -180,13 +180,13 @@ const Tab = styled.button<{ $active: boolean }>`
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: ${({ theme }) => theme.radii.md};
   border: 1px solid ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.14)' : 'transparent')};
   background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'transparent')};
   color: #fff;
   cursor: ${({ $active, disabled }) => ($active || disabled ? 'default' : 'pointer')};
   font-family: inherit;
-  transition: background 0.18s ease, border-color 0.18s ease, opacity 0.15s ease;
+  transition: background 0.18s ease, border-color 0.18s ease, opacity ${({ theme }) => theme.transitions.fast};
   flex: 1;
   min-width: 0;
   text-align: left;
@@ -250,7 +250,7 @@ const ErrorChip = styled.button`
   background: rgba(220, 60, 60, 0.18);
   border: 1px solid rgba(220, 60, 60, 0.3);
   color: #FFB3B3;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   font-family: inherit;
   font-size: 10.5px;
   line-height: 1.3;

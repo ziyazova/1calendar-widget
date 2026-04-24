@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTheme } from 'styled-components';
 import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +15,7 @@ interface UpgradeModalProps {
  * to what `WidgetStudioPage` and `StudioPage` used to ship inline.
  */
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => {
+  const theme = useTheme();
   const { isRegistered } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
@@ -80,7 +82,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
           <div style={{ fontSize: 15, color: '#999', marginTop: 8 }}>Unlock all styles and unlimited widgets</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '5fr 6fr', gap: 16, alignItems: 'stretch' }}>
-          <div style={{ border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ border: `1.5px solid ${theme.colors.border.hairline}`, borderRadius: 20, padding: '28px 24px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#bbb', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em', minHeight: 27, display: 'flex', alignItems: 'center' }}>Free</div>
             <div style={{ fontSize: 44, fontWeight: 700, color: '#1F1F1F', letterSpacing: '-0.03em', lineHeight: 1 }}>$0</div>
             <div style={{ fontSize: 13, color: '#ccc', marginTop: 6, marginBottom: 28 }}>forever</div>

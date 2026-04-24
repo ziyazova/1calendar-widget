@@ -28,7 +28,7 @@ const CTATitle = styled.h2`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
-  margin: 0 0 16px;
+  margin: 0 0 8px;
 
   @media (max-width: 768px) {
     font-size: 28px;
@@ -37,7 +37,7 @@ const CTATitle = styled.h2`
 
 const CTASubtitle = styled.p`
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.peach.muted};
   margin: 0 0 32px;
   letter-spacing: -0.01em;
 `;

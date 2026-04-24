@@ -41,7 +41,7 @@ const Title = styled.h2`
 
 const Subtitle = styled.p`
   font-size: 16px;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.peach.muted};
   margin: 0;
   text-align: center;
 `;

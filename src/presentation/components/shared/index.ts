@@ -59,8 +59,16 @@ export {
 export type { LabelVariant, LabelSize } from './Badges';
 export { Card, CardHeader, CardTitle, CardSubtitle, CardSection } from './Card';
 export { Modal, ModalFooter } from './Modal';
-export { Toast } from './Toast';
+export { Toast, ToastShell, ToastIconBubble, ToastMessage } from './Toast';
 export type { ToastTone } from './Toast';
+export {
+  ConsentBanner,
+  ConsentBannerWrap,
+  ConsentBannerIcon,
+  ConsentBannerMessage,
+  ConsentBannerPrivacyLink,
+  ConsentBannerActions,
+} from './ConsentBanner';
 export { TemplateMockupCard, TemplateMockupImage } from './TemplateMockupCard';
 export { BottomSheet } from './BottomSheet';
 export { Accordion, AccordionGroup } from './Accordion';
@@ -74,3 +82,9 @@ export {
   BannerActions,
 } from './GradientBanner';
 export { PlanUpgradeBar } from './PlanUpgradeBar';
+export { Text } from './Text';
+export type { TextStyle } from './Text';
+export { StudioText } from './StudioText';
+export type { StudioTextStyle } from './StudioText';
+export { CopyButton } from './CopyButton';
+export type { CopyButtonProps } from './CopyButton';

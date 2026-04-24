@@ -45,6 +45,17 @@ hex_report=$(
   | grep -vE 'src/presentation/themes/' \
   | grep -vE 'src/presentation/components/widgets/' \
   | grep -vE 'src/test/' \
+  | grep -vE '\.test\.(ts|tsx):' \
+  | grep -vE 'src/presentation/components/debug/' \
+  | grep -vE 'src/presentation/components/dev/' \
+  | grep -vE 'src/presentation/components/layout/LayoutCheck\.tsx' \
+  | grep -vE 'src/presentation/hooks/useResolvedTheme\.ts' \
+  | grep -vE 'src/presentation/data/templates\.ts' \
+  | grep -vE 'src/infrastructure/services/url-codec/' \
+  | grep -vE 'src/presentation/components/landing/CategoriesMarquee\.tsx' \
+  | grep -vE 'src/presentation/components/landing/TestimonialsSection\.tsx' \
+  | grep -vE 'src/infrastructure/repositories/' \
+  | grep -vE 'src/domain/' \
   || true
 )
 

@@ -73,7 +73,7 @@ const ErrorState = styled.div`
   color: #ef4444;
   text-align: center;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: #fef2f2;
   border: 1px solid #fecaca;
   max-width: 400px;

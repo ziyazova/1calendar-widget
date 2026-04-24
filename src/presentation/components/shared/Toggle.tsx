@@ -13,7 +13,7 @@ export const ToggleRow = styled.label`
   justify-content: space-between;
   cursor: pointer;
   padding: ${toggleRowTokens.padding};
-  border-radius: 4px;
+  border-radius: ${({ theme }) => theme.radii.xs};
   transition: ${toggleRowTokens.transition};
 
   @media (max-width: 768px) {

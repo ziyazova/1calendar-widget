@@ -115,7 +115,7 @@ export const Button = styled.button<ButtonTransientProps>`
 
   /* Modifiers */
   ${({ $fullWidth }) => $fullWidth && css`width: 100%;`}
-  ${({ $pill }) => $pill && css`border-radius: 9999px;`}
+  ${({ $pill }) => $pill && css`border-radius: ${({ theme }) => theme.radii.full};`}
   ${({ $iconOnly, $size = 'md' }) => $iconOnly && css`
     width: ${sizePxMap[$size]}px;
     padding: 0;
