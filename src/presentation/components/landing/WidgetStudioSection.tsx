@@ -7,7 +7,7 @@ const Section = styled.section`
   margin: 0 auto;
   padding: 0 48px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
 `;
@@ -18,7 +18,7 @@ const Header = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-bottom: 20px;
   }
 `;

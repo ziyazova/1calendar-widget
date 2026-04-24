@@ -133,7 +133,7 @@ const Title = styled.h1`
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 6px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   }
 `;

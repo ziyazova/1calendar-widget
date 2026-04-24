@@ -114,12 +114,12 @@ const PanelContainer = styled.div`
   flex-direction: column;
   animation: ${slideIn} 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     left: 220px;
     width: 260px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     left: 270px;
     width: 280px;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);

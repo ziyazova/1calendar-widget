@@ -23,7 +23,7 @@ export const EmailVerificationWrap = styled.div`
   display: flex;
   justify-content: center;
 
-  @media (max-width: 768px) { padding: 12px 16px 0; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 12px 16px 0; }
 `;
 
 /* Amber card — exact colours from the 06-banners mock. Kept local

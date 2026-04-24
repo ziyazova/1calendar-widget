@@ -14,7 +14,7 @@ const TemplatesGallerySection = styled.section`
   padding: 0;
   position: relative;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0;
   }
 `;
@@ -40,7 +40,7 @@ const TemplatesMarqueeWrap = styled.div`
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 16px;
   }
 `;
@@ -53,7 +53,7 @@ const GalleryHeader = styled.div`
   flex-direction: column;
   gap: 20px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
 `;
@@ -77,7 +77,7 @@ const GalleryTitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 28px;
   }
 `;
@@ -124,7 +124,7 @@ const TemplateMarqueeTrack = styled.div<{ $duration: number; $reverse?: boolean 
     margin-bottom: 0;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     gap: 12px;
   }
 `;
@@ -161,7 +161,7 @@ const TemplatesScrollHint = styled.div`
     transform: scale(0.95);
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     display: none;
   }
 `;
@@ -178,7 +178,7 @@ const TemplateCardWrap = styled.div`
     z-index: 2;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 200px;
   }
 `;
@@ -188,7 +188,7 @@ const TemplateCardWrap = styled.div`
    from templateCardTokens. */
 const TemplateCardSlot = styled.div`
   margin-bottom: 12px;
-  @media (max-width: 768px) { margin-bottom: 8px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { margin-bottom: 8px; }
 `;
 
 const TemplateCardMeta = styled.div`
@@ -210,7 +210,7 @@ const TemplateCardTitle = styled.span`
   text-overflow: ellipsis;
   min-width: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
   }
 `;
@@ -223,7 +223,7 @@ const TemplateCardPrice = styled.span`
   line-height: 1.3;
   flex-shrink: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
   }
 `;

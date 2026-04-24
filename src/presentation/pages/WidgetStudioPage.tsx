@@ -76,7 +76,7 @@ const HeroInner = styled.div<{ $expanding?: boolean }>`
     border-color: rgba(200, 195, 230, 0.45);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 36px 24px;
     border-radius: ${({ theme }) => theme.radii.xl};
   }
@@ -95,7 +95,7 @@ const HeroIcon = styled.div<{ $delay: string }>`
   height: 48px;
   border-radius: ${({ theme }) => theme.radii.lg};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 40px;
     height: 40px;
     border-radius: ${({ theme }) => theme.radii.md};
@@ -257,7 +257,7 @@ const Section = styled.section<{
   padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
   ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding-top: ${({ $size = 'md', $bleedTop }) =>
       $bleedTop ? '0' : $size === 'flush' ? '0' : '48px'};
     padding-bottom: ${({ $size = 'md', $bleedBottom }) =>
@@ -278,7 +278,7 @@ const HeroScene = styled.div`
   padding: 88px 48px 49px;
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: 0;
     padding: 64px 24px 49px;
   }
@@ -322,11 +322,11 @@ const FloatingWidget = styled.div<{ $left?: string; $right?: string; $top: strin
   animation-delay: ${({ $delay }) => $delay};
   will-change: transform;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     width: 140px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: none;
   }
 `;
@@ -345,7 +345,7 @@ const WidgetGalleryHeader = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
 `;
@@ -363,7 +363,7 @@ const WidgetGalleryTitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.sizes['6xl']};
   }
 `;
@@ -382,7 +382,7 @@ const WidgetGalleryGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: repeat(2, 1fr);
     padding: 16px 24px;
     gap: 16px;
@@ -443,7 +443,7 @@ const GalleryCard = styled.div`
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   border: 1px solid rgba(200, 195, 230, 0.2);
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     border-radius: ${({ theme }) => theme.radii.lg};
   }
   position: relative;
@@ -468,7 +468,7 @@ const GallerySection = styled.section`
   margin: 0 auto;
   padding: 80px 48px 80px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 48px 24px 48px;
   }
 `;
@@ -479,7 +479,7 @@ const FeaturesSection = styled.section`
   margin: 0 auto;
   padding: 80px 48px;
 
-  @media (max-width: 768px) { padding: 48px 24px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 48px 24px; }
 `;
 
 const FeatureRow = styled.div`
@@ -487,7 +487,7 @@ const FeatureRow = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 
-  @media (max-width: 768px) { grid-template-columns: 1fr; gap: 16px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; gap: 16px; }
 `;
 
 const FeatureItem = styled.div`
@@ -528,7 +528,7 @@ const PricingSection = styled.section`
   padding: 0 48px;
   text-align: center;
 
-  @media (max-width: 768px) { padding: 0 24px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 0 24px; }
 `;
 
 const PricingTitle = styled.h2`
@@ -552,7 +552,7 @@ const PricingGrid = styled.div`
   max-width: 680px;
   margin: 0 auto;
 
-  @media (max-width: 768px) { grid-template-columns: 1fr; max-width: 360px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; max-width: 360px; }
 `;
 
 const PricingCard = styled.div<{ $highlighted?: boolean }>`
@@ -624,7 +624,7 @@ const BottomCTA = styled.section`
   padding: 96px 48px;
   text-align: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: 440px;
     padding: 72px 24px;
   }

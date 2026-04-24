@@ -5,24 +5,24 @@ import { scrollUp } from '@/presentation/themes/animations';
 /* ── Testimonials data ── */
 const testimonials = {
   col1: [
-    { name: 'Amber', initials: 'A', color: '#E5DCF3', text: 'This one.... THIS one is incredible. If you are someone that likes everything to have a place and home in a very organized way, where every block is even and nestled perfectly, this will be perfect for you. This shop always produces the best templates with the prettiest vibes and aesthetic. I am SOO SO SO SO SO happy.' },
-    { name: 'Audrey', initials: 'A', color: '#F2D8E2', text: 'Amazing, somehow manages to do everything I\'ve been using 12 different planners for all in one. GET IT!!! Cannot recommend enough. It\'s well worth the price. I wish I\'d have saved myself some time and bought it ages ago! Easily the best I have ever come across.' },
-    { name: 'Alyssa', initials: 'A', color: '#F2E4C4', text: 'An absolute game changer in my daily life.' },
-    { name: 'Donna', initials: 'D', color: '#D4E0EF', text: 'This is so fantastically comprehensive and detailed, I honestly think it should cost three times as much! The amount of work that has gone into this is incredible. Also, the customer service is top notch!' },
-    { name: 'Rana', initials: 'R', color: '#D4E8DB', text: 'I highly recommend this.. its sooo pretty.. fun to use.. the seller was very helpful and friendly. Most templates are boring or ugly lol hers are soo cute that it makes you want to use them. Keep up the great work!' },
+    { name: 'Amber', initials: 'A', color: '#FFD9B8', text: 'This one.... THIS one is incredible. If you are someone that likes everything to have a place and home in a very organized way, where every block is even and nestled perfectly, this will be perfect for you. This shop always produces the best templates with the prettiest vibes and aesthetic. I am SOO SO SO SO SO happy.' },
+    { name: 'Audrey', initials: 'A', color: '#EDE4FF', text: 'Amazing, somehow manages to do everything I\'ve been using 12 different planners for all in one. GET IT!!! Cannot recommend enough. It\'s well worth the price. I wish I\'d have saved myself some time and bought it ages ago! Easily the best I have ever come across.' },
+    { name: 'Alyssa', initials: 'A', color: '#FBE9E1', text: 'An absolute game changer in my daily life.' },
+    { name: 'Donna', initials: 'D', color: '#E8EDFF', text: 'This is so fantastically comprehensive and detailed, I honestly think it should cost three times as much! The amount of work that has gone into this is incredible. Also, the customer service is top notch!' },
+    { name: 'Rana', initials: 'R', color: '#F3C6C6', text: 'I highly recommend this.. its sooo pretty.. fun to use.. the seller was very helpful and friendly. Most templates are boring or ugly lol hers are soo cute that it makes you want to use them. Keep up the great work!' },
   ],
   col2: [
-    { name: 'Misty', initials: 'M', color: '#E2DBEF', text: 'This is everything and more! This is actually my second time purchasing from this shop. It helps me stay organized with raging ADHD. I looove how there\'s options for phone or tablet layouts. 10/10 worth every penny.' },
-    { name: 'Hedge', initials: 'H', color: '#D5E5E9', text: 'This is THE BEST All in One I\'ve purchased! The pages are super detailed and the integration is mind blowing! I simply love it!! Thank you so very much for making this available for us!' },
-    { name: 'Lorraine', initials: 'L', color: '#F2CFCF', text: 'SUPER CUTE!! Absolutely love it!' },
-    { name: 'Evan', initials: 'E', color: '#D6E6DD', text: 'I\'ve been looking for an aesthetically pleasing and comprehensive all-in-one planner for so long, and this one is absolutely perfect for my needs! It\'s detailed without being cluttered. I would absolutely recommend this, thank you for making my life just a little bit easier!' },
-    { name: 'Abby', initials: 'A', color: '#E8DCF2', text: 'I\'m obsessed with this. It is absolutely perfect. I will be using this to organize multiple aspects of my life. It is great value for the price as well!' },
+    { name: 'Misty', initials: 'M', color: '#DDEBD4', text: 'This is everything and more! This is actually my second time purchasing from this shop. It helps me stay organized with raging ADHD. I looove how there\'s options for phone or tablet layouts. 10/10 worth every penny.' },
+    { name: 'Hedge', initials: 'H', color: '#FCE3DE', text: 'This is THE BEST All in One I\'ve purchased! The pages are super detailed and the integration is mind blowing! I simply love it!! Thank you so very much for making this available for us!' },
+    { name: 'Lorraine', initials: 'L', color: '#EEE4F7', text: 'SUPER CUTE!! Absolutely love it!' },
+    { name: 'Evan', initials: 'E', color: '#FFE5D4', text: 'I\'ve been looking for an aesthetically pleasing and comprehensive all-in-one planner for so long, and this one is absolutely perfect for my needs! It\'s detailed without being cluttered. I would absolutely recommend this, thank you for making my life just a little bit easier!' },
+    { name: 'Abby', initials: 'A', color: '#D8E6F5', text: 'I\'m obsessed with this. It is absolutely perfect. I will be using this to organize multiple aspects of my life. It is great value for the price as well!' },
   ],
   col3: [
-    { name: 'jessdufour', initials: 'J', color: '#D8E4EF', text: 'The amount of time and effort that has gone into this product is blowing my mind. Every time I click somewhere and discover a new detail I am floored. It feels like no stone has been left unturned. I\'ll be buying one for my daughter for college!' },
-    { name: 'Grace', initials: 'G', color: '#ECDCEE', text: 'This ticks ALL the boxes for what I was looking for. It\'s better than I could\'ve asked for to build on my own. Absolutely recommend for the organizational girlies. :)' },
-    { name: 'Natasha', initials: 'N', color: '#F2DFC7', text: 'Very cute! Will def come back for more!' },
-    { name: 'Alexandra', initials: 'A', color: '#DCE6D3', text: 'After 3 months of using this, I love it! It is so aesthetically pleasing, and the creator has added so many details to help the user. Thank you so much!!' },
+    { name: 'jessdufour', initials: 'J', color: '#E6DDFF', text: 'The amount of time and effort that has gone into this product is blowing my mind. Every time I click somewhere and discover a new detail I am floored. It feels like no stone has been left unturned. I\'ll be buying one for my daughter for college!' },
+    { name: 'Grace', initials: 'G', color: '#F8D4D4', text: 'This ticks ALL the boxes for what I was looking for. It\'s better than I could\'ve asked for to build on my own. Absolutely recommend for the organizational girlies. :)' },
+    { name: 'Natasha', initials: 'N', color: '#FFEDD8', text: 'Very cute! Will def come back for more!' },
+    { name: 'Alexandra', initials: 'A', color: '#E5F0D4', text: 'After 3 months of using this, I love it! It is so aesthetically pleasing, and the creator has added so many details to help the user. Thank you so much!!' },
   ],
 };
 
@@ -46,7 +46,7 @@ const Title = styled.h2`
   margin: 0;
   line-height: 1.2;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 28px;
     padding: 0 24px;
   }
@@ -59,7 +59,7 @@ const Subtitle = styled.p`
   margin: 8px 0 100px;
   letter-spacing: -0.01em;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin: -20px 0 36px;
     padding: 0 24px;
   }
@@ -73,12 +73,12 @@ const MarqueeContainer = styled.div`
   margin: 0 auto;
   padding: 0 80px;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     grid-template-columns: repeat(2, 1fr);
     padding: 0 36px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
     padding: 0 24px;
   }
@@ -90,13 +90,13 @@ const MarqueeColumn = styled.div`
   mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     &:nth-child(3) {
       display: none;
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 400px;
 
     &:nth-child(n+2) {

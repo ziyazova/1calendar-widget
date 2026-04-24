@@ -2941,7 +2941,7 @@ const Tip = styled.div`
 
   & + & { margin-top: 10px; }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
     gap: 6px;
   }

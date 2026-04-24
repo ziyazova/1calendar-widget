@@ -37,7 +37,7 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 48px 48px 64px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 32px 16px 24px;
   }
 `;
@@ -346,7 +346,7 @@ const CreateRow = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 
-  @media (max-width: 768px) { gap: 8px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { gap: 8px; }
 `;
 
 export const CreateCard = styled.button<{ $bg: string }>`
@@ -368,7 +368,7 @@ export const CreateCard = styled.button<{ $bg: string }>`
     border-color: rgba(0, 0, 0, 0.08);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     align-items: center;
     text-align: center;
@@ -402,7 +402,7 @@ export const CreateCardHint = styled.div`
   font-size: 12px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin-top: 1px;
-  @media (max-width: 768px) { display: none; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { display: none; }
 `;
 
 /* Big widget cards (Nodi-style) */
@@ -412,8 +412,8 @@ const BigGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 
-  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; }
 `;
 
 export const BigCard = styled.div<{ $index: number }>`

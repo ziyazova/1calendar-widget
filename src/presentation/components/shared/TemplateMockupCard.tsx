@@ -44,7 +44,7 @@ export const TemplateMockupCard = styled.div<TemplateMockupCardProps>`
   border-radius: ${({ $size = 'grid', theme }) =>
     theme.radii[templateCardSizeTokens[$size].radius]};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     aspect-ratio: ${({ $size = 'grid' }) =>
       templateCardSizeTokens[$size].aspectMobile ??
       templateCardSizeTokens[$size].aspect};

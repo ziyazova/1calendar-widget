@@ -8,12 +8,12 @@ const HeaderWrap = styled.div<{ $marginBottom?: string; $mobileMarginBottom?: st
   justify-content: space-between;
   margin-bottom: ${({ $marginBottom }) => $marginBottom || '24px'};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-bottom: ${({ $mobileMarginBottom, $marginBottom }) =>
       $mobileMarginBottom || ($marginBottom ? $marginBottom : '20px')};
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.xs}) {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
@@ -61,7 +61,7 @@ const ActionButton = styled.button`
   &:hover { background: #333; }
   svg { width: 14px; height: 14px; }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 34px;
     padding: 0 14px;
     font-size: 12px;

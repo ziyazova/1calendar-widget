@@ -8,12 +8,12 @@ const PinterestGrid = styled.div<{ $rows?: number; $cols?: number }>`
   gap: 16px;
   height: ${({ $rows }) => $rows === 2 ? '420px' : $rows === 3 ? '560px' : '530px'};
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     grid-template-columns: repeat(${({ $cols }) => Math.min($cols || 3, 3)}, 1fr);
     height: ${({ $rows }) => $rows === 2 ? '360px' : $rows === 3 ? '480px' : '450px'};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(${({ $rows }) => $rows || 4}, 1fr);
     height: ${({ $rows }) => $rows === 2 ? '340px' : $rows === 3 ? '440px' : '480px'};
@@ -31,11 +31,11 @@ const PinCard = styled.div<{ $col?: string; $row?: string; $mobileCol?: string; 
   position: relative;
   min-height: 0;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     display: ${({ $hideOnTablet }) => $hideOnTablet ? 'none' : 'block'};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: ${({ $hideOnMobile }) => $hideOnMobile ? 'none' : 'block'};
     grid-column: ${({ $mobileCol, $col }) => $mobileCol || $col || 'auto'};
     grid-row: ${({ $mobileRow, $row }) => $mobileRow || $row || 'auto'};
@@ -75,7 +75,7 @@ const PinText = styled.div<{ $bg: string; $color?: string }>`
   justify-content: center;
   overflow: hidden;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 16px 14px;
   }
 `;
@@ -86,7 +86,7 @@ const PinTextTitle = styled.div`
   letter-spacing: -0.02em;
   margin-bottom: 6px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
     margin-bottom: 4px;
   }
@@ -99,7 +99,7 @@ const PinTextDesc = styled.div`
   line-height: 1.5;
   letter-spacing: -0.01em;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 11px;
     line-height: 1.3;
   }

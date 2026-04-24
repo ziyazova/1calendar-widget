@@ -20,7 +20,7 @@ const Hero = styled.section`
     radial-gradient(ellipse at 80% 70%, rgba(236,72,153,0.04) 0%, transparent 55%),
     #fff;
 
-  @media (max-width: 768px) { padding: 88px 20px 40px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 88px 20px 40px; }
 `;
 
 const HeroInner = styled.div`
@@ -53,7 +53,7 @@ const Title = styled.h1`
   margin: 0 0 16px;
   line-height: 1;
 
-  @media (max-width: 768px) { font-size: 40px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { font-size: 40px; }
 `;
 
 const Lead = styled.p`
@@ -84,7 +84,7 @@ const MetaRow = styled.div`
 const Body = styled.section`
   padding: 48px 32px 96px;
 
-  @media (max-width: 768px) { padding: 32px 20px 64px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 32px 20px 64px; }
 `;
 
 const BodyInner = styled.article`

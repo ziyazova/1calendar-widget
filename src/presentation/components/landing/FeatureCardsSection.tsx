@@ -7,7 +7,7 @@ const FeatureCardsSectionWrap = styled.section`
   margin: 0 auto;
   padding: 0 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
 `;
@@ -16,7 +16,7 @@ const FeatureStack = styled.div`
   position: relative;
   height: 624px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: auto;
     display: flex;
     gap: 16px;
@@ -104,7 +104,7 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     }};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     position: static;
     flex-direction: column;
     flex-shrink: 0;
@@ -167,11 +167,11 @@ const FeatureTabActions = styled.div`
 const FeatureCardBody = styled.div`
   display: flex;
   align-items: stretch;
-  gap: 48px;
+  gap: 68px;
   padding: 0 0 0 36px;
   flex: 1;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     padding: 24px 28px;
     gap: 24px;
@@ -185,7 +185,6 @@ const FeatureCardText = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: center;
-  margin-top: -130px;
 `;
 
 const FeatureCardTitle = styled.h3`
@@ -209,24 +208,22 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 40px 0 40px 0;
+  margin: 40px 0 0 0;
   overflow: hidden;
   border: none;
-  background: transparent;
+  background: ${({ theme }) => theme.colors.background.surfaceMuted};
   position: relative;
-  border-radius: 0;
+  border-radius: ${({ theme }) => theme.radii['2xl']} 0 0 0;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transform: scale(1.35);
-    transform-origin: center;
     display: block;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin: 0 20px 20px;
     min-height: 180px;
     border-radius: ${({ theme }) => theme.radii.lg};
@@ -240,7 +237,7 @@ const WhyTitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0 0 32px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 28px;
     margin: 0 0 24px;
   }
@@ -250,21 +247,21 @@ const FEATURE_CARDS = [
   {
     tab: 'Functionality',
     color: '#3B82F6',
-    title: 'Works like it was built for you.',
+    title: 'Built just for you.',
     desc: 'Automations, dashboards, pre-filled sections. Ready the moment you open it.',
     image: '/feature-functionality.png',
   },
   {
     tab: 'Design',
     color: '#7FA96B',
-    title: 'Looks exactly how you\'d want it.',
+    title: 'Looks just right.',
     desc: 'Clean, aesthetic, thoughtful. Open it and it just feels right.',
     image: '/feature-design.png',
   },
   {
     tab: 'Payment',
     color: '#F4A672',
-    title: 'Pay once, yours forever.',
+    title: 'Pay once. Yours forever.',
     desc: 'One payment. It lives in your Notion for as long as you need.',
     image: '/feature-pricing.png',
   },
@@ -300,9 +297,7 @@ export const FeatureCardsSection: React.FC = () => {
                 <FeatureCardTitle>{f.title}</FeatureCardTitle>
                 <FeatureCardDesc>{f.desc}</FeatureCardDesc>
               </FeatureCardText>
-              <FeatureCardImage>
-                <img src={f.image} alt={f.title} />
-              </FeatureCardImage>
+              <FeatureCardImage />
             </FeatureCardBody>
           </FeatureCard>
         ))}

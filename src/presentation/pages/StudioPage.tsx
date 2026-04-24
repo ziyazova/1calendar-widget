@@ -49,7 +49,7 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 48px 48px 64px;
 
-  @media (max-width: 768px) { padding: 32px 24px 32px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 32px 24px 32px; }
 `;
 
 const cardAppear = keyframes`
@@ -90,8 +90,8 @@ const WidgetGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 
-  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; }
 `;
 
 export const WidgetCard = styled.div<{ $i: number }>`
@@ -437,7 +437,7 @@ const DowngradeBannerWrap = styled.div`
   max-width: 1200px;
   margin: 12px auto 0;
   padding: 0 48px;
-  @media (max-width: 768px) { padding: 0 24px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 0 24px; }
 `;
 
 const DowngradeBannerInner = styled.div`

@@ -13,7 +13,7 @@ const FooterWrap = styled.footer`
   flex-wrap: wrap;
   gap: 12px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 24px;
     flex-direction: column;
     gap: 8px;

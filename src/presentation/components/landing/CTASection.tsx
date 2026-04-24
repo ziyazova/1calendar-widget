@@ -18,7 +18,7 @@ const CTACard = styled.div`
   justify-content: center;
   text-align: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 80px 24px;
   }
 `;
@@ -30,7 +30,7 @@ const CTATitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0 0 8px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 28px;
   }
 `;
@@ -47,7 +47,7 @@ const ButtonRow = styled.div`
   gap: 12px;
   justify-content: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
     max-width: 320px;
@@ -66,7 +66,7 @@ export const CTASection: React.FC<CTASectionProps> = ({ onBrowseTemplates, onExp
     <CTASectionWrap data-ux="CTA Section">
       <CTACard>
         <CTATitle>Your Notion is waiting.</CTATitle>
-        <CTASubtitle>50+ templates, ready to use. Starting from $8.</CTASubtitle>
+        <CTASubtitle>20+ planners, ready to use. Starting from $8.</CTASubtitle>
         <ButtonRow>
           <PrimaryButton onClick={onBrowseTemplates}>
             Shop Templates

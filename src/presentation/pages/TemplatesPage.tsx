@@ -16,7 +16,7 @@ const Header = styled.div`
   padding: 48px 48px 0;
   animation: ${fadeUp} 0.25s ease both;
 
-  @media (max-width: 768px) { padding: 24px 24px 0; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 24px 24px 0; }
 `;
 
 
@@ -27,7 +27,7 @@ const PageTitle = styled.h1`
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 10px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   }
 `;
@@ -114,18 +114,18 @@ const Grid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 32px;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px 20px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 24px 24px 60px;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px 16px;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
     gap: 32px;
   }
@@ -143,7 +143,7 @@ const CardMeta = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 8px 4px 0;
   }
 `;
@@ -154,7 +154,7 @@ const CardTitle = styled.span`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.sizes.md};
   }
 `;

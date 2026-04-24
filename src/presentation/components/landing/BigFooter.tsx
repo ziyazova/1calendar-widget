@@ -12,7 +12,7 @@ const FooterWrapper = styled.footer`
   margin: 0 auto;
   padding: 68px 48px 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 52px 24px 0;
   }
 `;
@@ -24,7 +24,7 @@ const FooterTop = styled.div`
   gap: 48px;
   margin-bottom: 40px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     gap: 28px;
     margin-bottom: 28px;
@@ -49,7 +49,7 @@ const FooterNav = styled.div`
   display: flex;
   gap: 40px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     gap: 24px;
     flex-wrap: wrap;
   }

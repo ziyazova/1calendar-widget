@@ -64,7 +64,7 @@ export const FigmaColorRow = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.form};
   padding: 0 10px 0 5px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 34px;
     border-radius: ${({ theme }) => theme.radii.md};
     padding: 0 10px 0 4px;
@@ -91,7 +91,7 @@ export const ColorSwatch = styled.div<{ $color: string }>`
     opacity: 1;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 26px;
     height: 26px;
   }
@@ -108,7 +108,7 @@ const SwatchIcon = styled.div<{ $light: boolean }>`
   opacity: 0;
   transition: opacity ${({ theme }) => theme.transitions.fast};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     opacity: 0.6;
   }
   pointer-events: none;
@@ -142,7 +142,7 @@ export const HexInput = styled.input`
     color: ${({ theme }) => theme.colors.text.primary};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
     height: 26px;
     line-height: 26px;
@@ -154,7 +154,7 @@ export const PresetGroup = styled.div`
   gap: 8px;
   margin-left: auto;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     gap: 8px;
   }
 `;
@@ -184,7 +184,7 @@ export const ColorOption = styled.button<{ $color: string; $selected: boolean }>
     outline: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 26px;
     height: 26px;
   }
@@ -257,7 +257,7 @@ const SaturationCanvas = styled.canvas`
   display: block;
   touch-action: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 100%;
     height: 200px;
   }
@@ -274,7 +274,7 @@ const HueSliderTrack = styled.div`
   cursor: pointer;
   touch-action: none;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 100%;
     height: 16px;
   }

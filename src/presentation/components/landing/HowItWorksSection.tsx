@@ -8,7 +8,7 @@ const Section = styled.section`
   margin: 0 auto;
   padding: 0 48px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
 `;
@@ -32,7 +32,7 @@ const Grid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
     gap: 14px;
   }
@@ -67,7 +67,7 @@ const Card = styled.div<{ $bg: string }>`
     pointer-events: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 22px 18px;
     min-height: 150px;
   }

@@ -43,11 +43,11 @@ const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
   border-left: none;
   z-index: ${({ theme }) => theme.zIndex.sticky};
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     width: 240px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 100%;
     height: 60vh;
     top: auto;
@@ -170,7 +170,7 @@ const Label = styled.label`
   margin-bottom: 8px;
   letter-spacing: -0.01em;
 
-  @media (max-width: 768px) { font-size: 13px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { font-size: 13px; }
 `;
 
 const Select = styled.select`
@@ -183,7 +183,7 @@ const Select = styled.select`
   box-shadow: ${({ theme }) => theme.shadows.form};
   color: ${({ theme }) => theme.colors.text.primary};
 
-  @media (max-width: 768px) { height: 40px; font-size: 13px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { height: 40px; font-size: 13px; }
   font-size: 13px;
   font-weight: 400;
   font-family: inherit;
@@ -244,7 +244,7 @@ const Slider = styled.input`
     transform: scale(0.95);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     touch-action: none;
     height: 6px;
 
@@ -317,7 +317,7 @@ const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
     outline: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 26px;
     height: 26px;
   }
@@ -521,7 +521,7 @@ const LayoutOption = styled.button<{ $active: boolean }>`
     color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.primary};
   }
 
-  @media (max-width: 768px) { height: 40px; font-size: 13px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { height: 40px; font-size: 13px; }
 `;
 
 const LayoutOptions = styled.div`

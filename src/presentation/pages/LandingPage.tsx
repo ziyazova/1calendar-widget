@@ -43,7 +43,7 @@ const Section = styled.section<{
   padding-right: 0;
   ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding-top: ${({ $size = 'md', $bleedTop }) =>
       $bleedTop ? '0' : $size === 'flush' ? '0' : '48px'};
     padding-bottom: ${({ $size = 'md', $bleedBottom }) =>
@@ -84,7 +84,7 @@ const Hero = styled.section<{ $v2?: boolean }>`
     z-index: 1;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 72px 0 120px;
     gap: 24px;
   }

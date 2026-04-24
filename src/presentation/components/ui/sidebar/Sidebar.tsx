@@ -41,11 +41,11 @@ const SidebarContainer = styled.aside<{ $mobileOpen?: boolean; $collapsed?: bool
   transition: width ${({ theme }) => theme.transitions.base};
   overflow: visible;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     width: ${({ $collapsed }) => $collapsed ? '56px' : '220px'};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 270px;
     transform: ${({ $mobileOpen }) => $mobileOpen ? 'translateX(0)' : 'translateX(-100%)'};
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -133,7 +133,7 @@ const CollapseHeaderBtn = styled.button`
     display: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: none;
   }
 `;

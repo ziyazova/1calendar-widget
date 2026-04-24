@@ -33,7 +33,7 @@ export const AccountPill = styled.button<{ $open: boolean }>`
                 0 0 0 4px rgba(99, 102, 241, 0.5);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 3px 12px 3px 3px;
     height: 36px;
   }

@@ -102,7 +102,7 @@ const Hero = styled.section`
   text-align: center;
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
 `;
@@ -119,7 +119,7 @@ const SocialBadge = styled.div`
   border-radius: ${({ theme }) => theme.radii.full};
   margin: -40px auto 40px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-top: -16px;
   }
   box-shadow:
@@ -127,7 +127,7 @@ const SocialBadge = styled.div`
     0 1px 2px rgba(20, 20, 40, 0.03),
     0 4px 12px -4px rgba(20, 20, 40, 0.05);
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-bottom: 20px;
   }
 `;
@@ -190,11 +190,11 @@ const Title = styled.h1`
   margin: 0 auto 24px;
   max-width: 760px;
 
-  @media (max-width: 1024px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     font-size: 56px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 40px;
     line-height: 1.2;
   }
@@ -209,7 +209,7 @@ const HeroSubtitle = styled.p`
   max-width: 540px;
   letter-spacing: -0.01em;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 16px;
     margin-bottom: 24px;
   }
@@ -253,7 +253,7 @@ const ButtonRow = styled.div`
   justify-content: center;
   margin-top: 8px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
     max-width: 320px;

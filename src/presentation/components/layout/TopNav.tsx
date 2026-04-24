@@ -60,7 +60,7 @@ const NavInner = styled.div`
   height: 100%;
   margin: 0 auto;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 16px 24px;
   }
 `;
@@ -107,7 +107,7 @@ const NavLinks = styled.div`
   gap: 28px;
   flex-shrink: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: none;
   }
 `;
@@ -392,7 +392,7 @@ const MobileRight = styled.div`
   align-items: center;
   gap: 4px;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
   }
 `;

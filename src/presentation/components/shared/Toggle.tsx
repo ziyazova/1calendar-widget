@@ -16,7 +16,7 @@ export const ToggleRow = styled.label`
   border-radius: ${({ theme }) => theme.radii.xs};
   transition: ${toggleRowTokens.transition};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: ${toggleRowTokens.paddingMobile};
   }
 
@@ -31,7 +31,7 @@ export const ToggleLabel = styled.span`
   color: ${toggleRowTokens.textColor};
   letter-spacing: ${toggleRowTokens.textLetterSpacing};
 
-  @media (max-width: 768px) { font-size: 13px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { font-size: 13px; }
 `;
 
 const SwitchTrack = styled.div<{ $checked: boolean }>`
@@ -95,7 +95,7 @@ const ToggleTabsContainer = styled.div`
   align-items: center;
   flex-shrink: 0;
 
-  @media (max-width: 768px) { width: 108px; height: 32px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { width: 108px; height: 32px; }
 `;
 
 const ToggleTabsSlider = styled.div<{ $activeIndex: number }>`
@@ -109,7 +109,7 @@ const ToggleTabsSlider = styled.div<{ $activeIndex: number }>`
   box-shadow: ${toggleTabsTokens.sliderShadow};
   transition: ${toggleTabsTokens.sliderTransition};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 52px;
     left: ${({ $activeIndex }) => $activeIndex === 0 ? '2px' : 'calc(100% - 52px - 2px)'};
   }
@@ -132,7 +132,7 @@ const ToggleTabsOption = styled.button<{ $active: boolean }>`
   padding: 0;
   line-height: 21px;
 
-  @media (max-width: 768px) { font-size: 13px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { font-size: 13px; }
 `;
 
 interface ToggleTabsProps<T extends string> {
