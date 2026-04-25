@@ -28,12 +28,22 @@ interface BottomSheetProps {
   maxHeight?: string;
   /** Capitalize the title (matches current Studio mobile-section usage). */
   capitalizeTitle?: boolean;
+  /** Offset from the viewport bottom — useful when the page has a sticky
+   *  bottom nav (e.g. Studio MobileSectionTabs) and the sheet should sit
+   *  above it instead of covering it. Pass the tab bar height. */
+  bottomOffset?: string;
   children: React.ReactNode;
 }
 
-const Backdrop = styled.div<{ $open: boolean }>`
+const Backdrop = styled.div<{ $open: boolean; $bottomOffset: string }>`
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Stop the dim above any sticky bottom nav so tabs remain visible AND
+     tappable while the sheet is open (tap a different tab → switches the
+     sheet's content; tap the same tab → toggles closed). */
+  bottom: ${({ $bottomOffset }) => $bottomOffset};
   background: rgba(0, 0, 0, 0.3);
   z-index: 39;
   opacity: ${({ $open }) => ($open ? 1 : 0)};
@@ -41,23 +51,30 @@ const Backdrop = styled.div<{ $open: boolean }>`
   transition: opacity ${({ theme }) => theme.transitions.base};
 `;
 
-const Sheet = styled.div<{ $open: boolean; $maxHeight: string }>`
+const Sheet = styled.div<{ $open: boolean; $maxHeight: string; $bottomOffset: string }>`
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: ${({ $bottomOffset }) => $bottomOffset};
   max-height: ${({ $maxHeight }) => $maxHeight};
   background: ${({ theme }) => theme.colors.background.elevated};
   border-top: 1px solid ${({ theme }) => theme.colors.border.subtle};
   border-radius: 20px 20px 0 0;
   box-shadow: ${({ theme }) => theme.shadows.sheet};
-  transform: ${({ $open }) => ($open ? 'translateY(0)' : 'translateY(100%)')};
+  /* When closed we need to clear both the sheet's own height AND its
+     bottom offset (otherwise on a sheet anchored above a tab bar the
+     translation only hides the part above the tabs). */
+  transform: ${({ $open, $bottomOffset }) =>
+    $open ? 'translateY(0)' : `translateY(calc(100% + ${$bottomOffset}))`};
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 40;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-bottom: env(safe-area-inset-bottom);
+  /* When anchored to viewport bottom (offset === 0), reserve safe-area
+     padding ourselves. When sitting above a nav, the nav already handles
+     its own safe-area, so we skip it. */
+  padding-bottom: ${({ $bottomOffset }) => ($bottomOffset === '0px' ? 'env(safe-area-inset-bottom)' : '0')};
 `;
 
 const Handle = styled.div`
@@ -119,6 +136,7 @@ export function BottomSheet({
   title,
   maxHeight = '70vh',
   capitalizeTitle = false,
+  bottomOffset = '0px',
   children,
 }: BottomSheetProps) {
   useEffect(() => {
@@ -132,8 +150,8 @@ export function BottomSheet({
 
   return (
     <>
-      <Backdrop $open={open} onClick={onClose} />
-      <Sheet $open={open} $maxHeight={maxHeight} aria-hidden={!open} role="dialog">
+      <Backdrop $open={open} $bottomOffset={bottomOffset} onClick={onClose} />
+      <Sheet $open={open} $maxHeight={maxHeight} $bottomOffset={bottomOffset} aria-hidden={!open} role="dialog">
         <Handle />
         {title !== undefined && (
           <Header>

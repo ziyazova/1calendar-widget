@@ -22,15 +22,13 @@ import { css } from 'styled-components';
  */
 
 export type TextStyle =
-  | 'display'
   | 'h1'
   | 'h2'
   | 'h3'
-  | 'bodyL'
+  | 'subtitle'
   | 'body'
   | 'button'
-  | 'caption'
-  | 'micro';
+  | 'caption';
 
 export type TypographySize =
   | '2xs' | 'xs' | 'sm' | 'md' | 'base' | 'lg' | 'xl'
@@ -50,60 +48,54 @@ export interface TextStyleRecipe {
 }
 
 export const textStyleTokens: Record<TextStyle, TextStyleRecipe> = {
-  display: {
-    size: '8xl',
-    weight: 'bold',
-    lineHeight: 'tight',
-    letterSpacing: 'tightest',
-  },
+  /** Page H1 — Auth pages, login title — 32px · 600 · -0.03em */
   h1: {
     size: '7xl',
     weight: 'semibold',
     lineHeight: 'tight',
     letterSpacing: 'tightest',
   },
+  /** Section H2 — TemplateDetail headings, FAQ — 22px · 600 · -0.02em */
   h2: {
     size: '4xl',
     weight: 'semibold',
     lineHeight: 'snug',
     letterSpacing: 'tighter',
   },
+  /** Card H3 — Dashboard card titles, feature cards — 18px · 600 · -0.01em */
   h3: {
     size: '2xl',
     weight: 'semibold',
     lineHeight: 'snug',
     letterSpacing: 'tight',
   },
-  bodyL: {
-    size: 'lg',
+  /** Subtitle below H1 — Templates page sub, hero subtitles — 16px · 400 · -0.01em */
+  subtitle: {
+    size: 'xl',
     weight: 'normal',
-    lineHeight: 'relaxed',
-    letterSpacing: 'normal',
+    lineHeight: 'normal',
+    letterSpacing: 'tight',
   },
+  /** Body paragraphs, FAQ answers — 14px · 400 · -0.005em */
   body: {
     size: 'base',
     weight: 'normal',
     lineHeight: 'normal',
     letterSpacing: 'loose',
   },
+  /** Shared <Button> label — 14px · 600 · tight · -0.005em */
   button: {
     size: 'base',
     weight: 'semibold',
     lineHeight: 'tight',
     letterSpacing: 'loose',
   },
+  /** Footer copy, helper hints — 12px · 400 · 0 */
   caption: {
     size: 'sm',
     weight: 'normal',
     lineHeight: 'normal',
     letterSpacing: 'normal',
-  },
-  micro: {
-    size: 'xs',
-    weight: 'semibold',
-    lineHeight: 'tight',
-    letterSpacing: 'widest',
-    uppercase: true,
   },
 };
 

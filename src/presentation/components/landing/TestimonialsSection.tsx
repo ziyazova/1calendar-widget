@@ -61,7 +61,7 @@ const Subtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin: 8px 0 8px;
+    margin: 8px 0 24px;
     padding: 0 24px;
   }
 `;
@@ -98,7 +98,7 @@ const MarqueeColumn = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    height: 400px;
+    height: 340px;
 
     &:nth-child(n+2) {
       display: none;
@@ -130,6 +130,10 @@ const Card = styled.div`
     inset 0 1px 0 rgba(255, 255, 255, 0.7),
     0 2px 6px rgba(43, 35, 32, 0.04),
     0 12px 28px -16px rgba(43, 35, 32, 0.1);
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 16px;
+  }
 `;
 
 const Stars = styled.div`
@@ -147,6 +151,12 @@ const Text = styled.p`
   margin: 0 0 20px;
   letter-spacing: -0.01em;
   flex: 1;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 0 0 14px;
+  }
 `;
 
 const Divider = styled.div`

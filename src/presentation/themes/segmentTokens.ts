@@ -23,15 +23,15 @@ export const segmentTokens: SegmentTokens = {
   },
   active: {
     bg: '#FFFFFF',
-    fg: '#1F1F1F',
-    shadow: '0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05)',
+    fg: '#6366F1',
+    shadow: '0 1px 2px rgba(99, 102, 241, 0.10), 0 1px 3px rgba(0, 0, 0, 0.05)',
   },
 };
 
 
 export const segmentSize = {
   height: '40px',
-  padding: '0 28px',
+  padding: '0 36px',
   fontSize: '14px',
   innerRadius: '12px',
   gap: '4px',

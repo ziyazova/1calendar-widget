@@ -13,15 +13,17 @@ import { TEMPLATES, CATEGORIES, type Category } from '@/presentation/data/templa
 const Header = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 48px 0;
+  /* 24px bottom padding owns the chips → cards gap so it stays consistent
+     whether or not the conditional <SubRow> renders below the chips. */
+  padding: 48px 48px 24px;
   animation: ${fadeUp} 0.25s ease both;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 24px 24px 0; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 24px 24px 16px; }
 `;
 
 
 const PageTitle = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
+  font-size: 40px;
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
@@ -33,9 +35,10 @@ const PageTitle = styled.h1`
 `;
 
 const PageSubtitle = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.text.tertiary};
-  margin: 0 0 ${({ theme }) => theme.spacing['9']};
+  /* 40px gap between subtitle and the FilterRow chips below. */
+  margin: 0 0 40px;
   letter-spacing: -0.01em;
 `;
 
@@ -109,7 +112,9 @@ const SubChip = styled.button<{ $active: boolean }>`
 const Grid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 48px 80px;
+  /* Top padding is 0 — the Header's bottom padding owns the chips → cards
+     gap so it stays consistent regardless of the optional <SubRow>. */
+  padding: 0 48px 80px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 32px;
@@ -120,7 +125,7 @@ const Grid = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 24px 24px 60px;
+    padding: 0 24px 60px;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px 16px;
   }

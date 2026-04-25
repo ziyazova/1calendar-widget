@@ -503,12 +503,13 @@ export const EmptyCircle = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.gradients.avatarPeach};
+  /* Soft indigo fill, no border — matches Pro compact bubble. */
+  background: rgba(99, 102, 241, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 14px;
-  svg { width: 24px; height: 24px; color: ${({ theme }) => theme.colors.accent}; }
+  svg { width: 26px; height: 26px; color: ${({ theme }) => theme.colors.accent}; stroke-width: 2.5; }
 `;
 
 export const EmptyTitle = styled.p`

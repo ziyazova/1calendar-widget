@@ -43,20 +43,20 @@ const Nav = styled.nav`
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
-  height: 72px;
+  height: 78px;
   padding-top: env(safe-area-inset-top, 0px);
 `;
 
 const NavSpacer = styled.div`
-  height: calc(65px + env(safe-area-inset-top, 0px));
+  height: calc(71px + env(safe-area-inset-top, 0px));
 `;
 
 const NavInner = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 46px;
-  max-width: 1300px;
+  padding: 0 48px;
+  max-width: 1200px;
   height: 100%;
   margin: 0 auto;
 

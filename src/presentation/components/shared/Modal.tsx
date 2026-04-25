@@ -176,12 +176,31 @@ export function Modal({
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+
+    /* Refcount-based body scroll lock so several Modals (e.g. the DS page
+     * mounts six) don't trample each other's "previous overflow" snapshot.
+     * Only the FIRST opener locks; only the LAST closer unlocks. Without
+     * this, fast open/close cycles could leak `overflow: hidden` and break
+     * page scrolling. */
+    type LockState = { count: number; prev: string };
+    const w = window as unknown as { __peachyModalLock?: LockState };
+    if (!w.__peachyModalLock) {
+      w.__peachyModalLock = { count: 0, prev: document.body.style.overflow };
+    }
+    if (w.__peachyModalLock.count === 0) {
+      w.__peachyModalLock.prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+    w.__peachyModalLock.count += 1;
 
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      const state = w.__peachyModalLock;
+      if (!state) return;
+      state.count = Math.max(0, state.count - 1);
+      if (state.count === 0) {
+        document.body.style.overflow = state.prev;
+      }
     };
   }, [open, onClose]);
 

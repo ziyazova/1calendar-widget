@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 
 /* ── Feature Cards (stacked) ── */
@@ -7,8 +7,13 @@ const FeatureCardsSectionWrap = styled.section`
   margin: 0 auto;
   padding: 0 24px;
 
+  /* Phone — break out of the parent WidgetStudioSection's 24px padding
+   * so the card carousel runs edge-to-edge, matching the Top templates
+   * pattern. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px;
+    padding: 0;
+    margin: 0 -24px;
+    max-width: none;
   }
 `;
 
@@ -19,17 +24,26 @@ const FeatureStack = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: auto;
     display: flex;
-    gap: 16px;
+    gap: 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 8px;
+    padding: 4px 24px 8px;
 
     &::-webkit-scrollbar { display: none; }
     scrollbar-width: none;
 
-    mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
+    /* Mask mirrors Top templates (TemplatesGallery): one-sided fade at
+     * rest, two-sided once the user has scrolled past the first card. */
+    &[data-scrolled="false"] {
+      mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
+    }
+
+    &[data-scrolled="true"] {
+      mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+    }
   }
 `;
 
@@ -108,7 +122,10 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     position: static;
     flex-direction: column;
     flex-shrink: 0;
-    width: 85%;
+    /* Full-screen-width card: viewport minus the stack's 24px side
+     * padding on each side. Snap-aligns to the left edge so one card
+     * fills the visible area per swipe. */
+    width: calc(100vw - 48px);
     height: auto;
     padding: 0;
     gap: 0;
@@ -173,8 +190,8 @@ const FeatureCardBody = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
-    padding: 24px 28px;
-    gap: 24px;
+    padding: 20px 20px 16px;
+    gap: 16px;
   }
 `;
 
@@ -224,10 +241,39 @@ const FeatureCardImage = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin: 0 20px 20px;
-    min-height: 180px;
+    margin: 0;
+    flex: 0 0 auto;
+    height: 140px;
+    min-height: 0;
     border-radius: ${({ theme }) => theme.radii.lg};
   }
+`;
+
+/* Mobile-only pagination dots that sit below the card carousel.
+ * Active dot widens into a pill, matching common iOS carousel patterns. */
+const Dots = styled.div`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 0 4px;
+  }
+`;
+
+const Dot = styled.button<{ $active: boolean }>`
+  appearance: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  width: ${({ $active }) => ($active ? '20px' : '6px')};
+  height: 6px;
+  border-radius: 3px;
+  background: ${({ $active, theme }) =>
+    $active ? theme.colors.text.primary : theme.colors.border.medium};
+  transition: width 0.25s ease, background 0.25s ease;
 `;
 
 const WhyTitle = styled.h2`
@@ -269,10 +315,33 @@ const FEATURE_CARDS = [
 
 export const FeatureCardsSection: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState(0);
+  const [stackScrolled, setStackScrolled] = useState(false);
+  const [scrollIdx, setScrollIdx] = useState(0);
+  const stackRef = useRef<HTMLDivElement>(null);
+
+  const onStackScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    setStackScrolled(el.scrollLeft > 10);
+    const step = el.scrollWidth / FEATURE_CARDS.length;
+    const idx = Math.min(FEATURE_CARDS.length - 1, Math.max(0, Math.round(el.scrollLeft / step)));
+    setScrollIdx(idx);
+  };
+
+  const scrollToCard = (i: number) => {
+    const el = stackRef.current;
+    if (!el) return;
+    const step = el.scrollWidth / FEATURE_CARDS.length;
+    el.scrollTo({ left: i * step, behavior: 'smooth' });
+  };
 
   return (
     <FeatureCardsSectionWrap data-ux="Feature Cards Section">
-      <FeatureStack data-ux="Feature Stack">
+      <FeatureStack
+        data-ux="Feature Stack"
+        data-scrolled={stackScrolled ? 'true' : 'false'}
+        ref={stackRef}
+        onScroll={onStackScroll}
+      >
         {FEATURE_CARDS.map((f, i) => (
           <FeatureCard
             key={i}
@@ -302,6 +371,16 @@ export const FeatureCardsSection: React.FC = () => {
           </FeatureCard>
         ))}
       </FeatureStack>
+      <Dots aria-hidden="true">
+        {FEATURE_CARDS.map((_, i) => (
+          <Dot
+            key={i}
+            $active={i === scrollIdx}
+            onClick={() => scrollToCard(i)}
+            type="button"
+          />
+        ))}
+      </Dots>
     </FeatureCardsSectionWrap>
   );
 };

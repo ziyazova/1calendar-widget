@@ -112,16 +112,23 @@ export const PlanBadge = styled.span<{ $pro?: boolean; $size?: 'xs' | 'sm' }>`
 /* Tag — subtle inline category/metadata chip (lowercase, surface bg).
    Use for taxonomy markers like "planners", "student", "productivity" —
    NOT tier indicators (those use <Label $variant>). */
-export const Tag = styled.span`
+export const Tag = styled.span<{ $accent?: boolean }>`
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
+  /* $accent (logged-in studio cards) — airy translucent wash in deep
+     indigo (#4F57C9) + same indigo at higher opacity for text, giving a
+     muted-accent feel that harmonizes with the wash. No outline. Default
+     — hairline border with body text. */
+  background: ${({ $accent }) =>
+    $accent ? 'rgba(79, 87, 201, 0.10)' : 'transparent'};
+  border: 1px solid ${({ $accent, theme }) =>
+    $accent ? 'transparent' : theme.colors.border.hairline};
   border-radius: ${({ theme }) => theme.radii.full};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.body};
+  color: ${({ $accent, theme }) =>
+    $accent ? 'rgba(79, 87, 201, 0.85)' : theme.colors.text.body};
   letter-spacing: -0.01em;
   white-space: nowrap;
 `;

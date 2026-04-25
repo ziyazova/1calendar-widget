@@ -15,7 +15,11 @@ const BackButtonWrap = styled.button`
   padding: 6px 12px;
   cursor: pointer;
   font-family: inherit;
-  margin-bottom: 20px;
+  /* Pull the button -10px left so the icon aligns optically with the H1's
+     left edge below it (the H1 has no padding, so default placement looks
+     inset). */
+  margin-left: -10px;
+  margin-bottom: 28px;
   transition: all ${({ theme }) => theme.transitions.fast};
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; border-color: rgba(0, 0, 0, 0.15); }
   svg { width: 14px; height: 14px; }

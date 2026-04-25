@@ -68,7 +68,11 @@ const PanelHeader = styled.div`
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 32px 32px 16px 12px;
+  /* PanelContainer is position:fixed; top:0 — so padding-top counts from
+     the viewport top, not the editor body. To align with the artboard's
+     top edge we need: top bar height (68px) + artboard margin-top (12px)
+     = 80px. */
+  padding: 80px 32px 16px 6px;
   border-bottom: none;
 `;
 
@@ -106,7 +110,7 @@ const WidgetBadgeText = styled.span`
 const PanelContent = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 0 32px 32px 12px;
+  padding: 0 32px 32px 6px;
 
   &::-webkit-scrollbar {
     width: 0;

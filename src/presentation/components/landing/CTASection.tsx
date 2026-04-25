@@ -57,6 +57,16 @@ const ButtonRow = styled.div`
     width: 100%;
     max-width: 320px;
     margin: 0 auto;
+
+    /* Match the md button size used elsewhere on mobile landing
+     * (Explore all, Hero CTAs). Overrides lg from PrimaryButton/SecondaryButton. */
+    & > * {
+      width: 100%;
+      height: 36px;
+      padding: 0 16px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
   }
 `;
 

@@ -199,7 +199,9 @@ const CTAs = styled.div`
 
   /* Phone — stack CTAs vertically so each is full-width and tappable.
    * Cap the row width so they don't stretch edge-to-edge on landscape.
-   * Tighter top margin so the button row sits close to the subtitle. */
+   * Tighter top margin so the button row sits close to the subtitle.
+   * Shrink buttons from xl → md dimensions to match the rest of the
+   * landing's mobile button sizing (Explore all, etc). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
@@ -209,6 +211,10 @@ const CTAs = styled.div`
 
     & > * {
       width: 100%;
+      height: 36px;
+      padding: 0 16px;
+      font-size: 13px;
+      border-radius: 10px;
     }
   }
 `;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import styled, { keyframes, useTheme } from 'styled-components';
-import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, FileText, Palette, LayoutGrid, Sparkles, ChevronLeft } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, Type, Palette, LayoutDashboard, Wand2, ChevronLeft } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -10,7 +10,14 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, Tag, Toast } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, Tag, Toast, ToastShell, ToastIconBubble, ToastMessage } from '@/presentation/components/shared';
+import {
+  /* Single source of truth for empty-state visuals — see DS showcase. */
+  EmptyBox as DashEmptyBox,
+  EmptyCircle as DashEmptyCircle,
+  EmptyTitle as DashEmptyTitle,
+  EmptyHint as DashEmptyHint,
+} from '@/presentation/components/dashboard/DashboardViews';
 import { WidgetDisplay } from '../components/layout/WidgetDisplay';
 import { CustomizationPanel, type PanelSection } from '../components/ui/forms/CustomizationPanel';
 import { useAuth } from '../context/AuthContext';
@@ -70,7 +77,7 @@ const SectionRow = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
+  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
@@ -88,7 +95,7 @@ const SectionCount = styled.span`
 const WidgetGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 20px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; }
@@ -179,33 +186,57 @@ const EmptyCircle = styled.div`
 
 /* ── Welcome + banner typography (replaces inline styles below) ── */
 const WelcomeH1 = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['6xl']};
+  font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 6px;
+
+  /* Force Apple Color Emoji for the wave 👋 across platforms — keeps the
+     iOS-style glyph in Welcome regardless of OS emoji font. */
+  .emoji {
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+  }
 `;
 
 const WelcomeSub = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-size: 16px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
 `;
 
-const BannerTitle = styled.div`
+/* Big gradient hero banner used at the top of the Dashboard widgets tab.
+   Holds <BannerTitle>/<BannerSub> on the left and <BannerCta> on the right.
+   Single source — edit here, the DS showcase mirrors live. */
+export const BannerSurface = styled.div<{ $mobile?: boolean }>`
+  background: linear-gradient(135deg, rgba(237,228,255,0.6) 0%, rgba(232,237,255,0.5) 40%, rgba(245,235,250,0.55) 100%);
+  border: 1.5px solid rgba(200,195,230,0.3);
+  border-radius: 16px;
+  padding: ${({ $mobile }) => ($mobile ? '24px 20px' : '32px 32px')};
+  display: flex;
+  flex-direction: ${({ $mobile }) => ($mobile ? 'column' : 'row')};
+  align-items: ${({ $mobile }) => ($mobile ? 'stretch' : 'center')};
+  justify-content: space-between;
+  gap: ${({ $mobile }) => ($mobile ? '16px' : '0')};
+  margin-bottom: 56px;
+`;
+
+export const BannerTitle = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
 `;
 
-const BannerSub = styled.div`
+export const BannerSub = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.hint};
   margin-top: 6px;
 `;
 
-const BannerCta = styled.button<{ $fullWidth?: boolean }>`
+export const BannerCta = styled.button<{ $fullWidth?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,7 +272,7 @@ const EmptyStateSub = styled.p`
 `;
 
 /* Purchase cards */
-const PurchaseCard = styled.div`
+export const PurchaseCard = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
@@ -252,11 +283,17 @@ const PurchaseCard = styled.div`
   cursor: pointer;
   transition: all ${({ theme }) => theme.transitions.fast};
   &:hover { border-color: ${({ theme }) => theme.colors.border.hairlineHover}; box-shadow: ${({ theme }) => theme.shadows.card}; }
-  & + & { margin-top: 8px; }
+  & + & { margin-top: 20px; }
 `;
 
-const PurchaseImg = styled.div`
-  width: 56px; height: 56px; border-radius: ${({ theme }) => theme.radii.md}; overflow: hidden; background: ${({ theme }) => theme.colors.background.surfaceMuted}; flex-shrink: 0;
+export const PurchaseImg = styled.div`
+  width: 56px;
+  height: 56px;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  overflow: hidden;
+  background: ${({ theme }) => theme.colors.background.surfaceMuted};
+  flex-shrink: 0;
   img { width: 100%; height: 100%; object-fit: cover; }
 `;
 
@@ -360,6 +397,10 @@ export const MobileSectionTabs = styled.div`
   background: ${({ theme }) => theme.colors.background.elevated};
   border-top: 1px solid ${({ theme }) => theme.colors.border.hairline};
   flex-shrink: 0;
+  /* Sit ABOVE the BottomSheet (z-index 40) so the sheet's slide-in
+     animation passes BEHIND the nav instead of briefly covering it. */
+  position: relative;
+  z-index: 41;
 `;
 
 export const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: boolean }>`
@@ -369,11 +410,12 @@ export const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: bo
   gap: 4px;
   height: 48px;
   border: none;
-  background: ${({ $active, $disabled, theme }) =>
-    $disabled ? 'transparent' : $active ? theme.colors.state.activeWash : 'transparent'};
+  /* Active state is colour-only — icon + label flip to accent, no card
+     highlight behind. Disabled = muted text + opacity for "unavailable". */
+  background: transparent;
   color: ${({ $active, $disabled, theme }) =>
-    $disabled ? theme.colors.text.muted : $active ? theme.colors.state.active : theme.colors.text.hint};
-  opacity: ${({ $disabled }) => $disabled ? 0.55 : 1};
+    $disabled ? theme.colors.text.muted : $active ? theme.colors.accent : theme.colors.text.hint};
+  opacity: ${({ $disabled }) => $disabled ? 0.5 : 1};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.typography.sizes.xs};
   font-weight: 600;
@@ -382,7 +424,7 @@ export const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: bo
   cursor: ${({ $disabled }) => $disabled ? 'default' : 'pointer'};
   transition: background ${({ theme }) => theme.transitions.fast}, color ${({ theme }) => theme.transitions.fast}, opacity ${({ theme }) => theme.transitions.fast};
   padding: 0;
-  svg { width: 18px; height: 18px; }
+  svg { width: 18px; height: 18px; stroke-width: 1.75; }
 `;
 
 /* Preview helpers */
@@ -737,10 +779,10 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       // for visual consistency; tabs unavailable for this widget type are
       // rendered greyed-out and do not open the sheet on tap.
       const sections: { key: Exclude<PanelSection, null>; label: string; icon: React.ReactNode; disabled?: boolean }[] = [
-        { key: 'style', label: 'Style', icon: <Sparkles />, disabled: !(isFlowerW || isBoardW) },
-        { key: 'content', label: 'Content', icon: <FileText /> },
+        { key: 'style', label: 'Style', icon: <Wand2 />, disabled: !(isFlowerW || isBoardW) },
+        { key: 'content', label: 'Content', icon: <Type /> },
         { key: 'color', label: 'Color', icon: <Palette />, disabled: isBoardW },
-        { key: 'layout', label: 'Layout', icon: <LayoutGrid />, disabled: isCollageW || isBoardW },
+        { key: 'layout', label: 'Layout', icon: <LayoutDashboard />, disabled: isCollageW || isBoardW },
       ];
 
       const sheetOpen = mobileSection !== null;
@@ -805,6 +847,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             onClose={closeSheet}
             title={mobileSection ?? ''}
             capitalizeTitle
+            /* Sit ABOVE the persistent MobileSectionTabs (48px tab + 8px top
+               + 8px bottom padding + safe-area) so navigation stays visible. */
+            bottomOffset="calc(64px + env(safe-area-inset-bottom))"
           >
             {mobileSection && (
               <CustomizationPanel
@@ -841,7 +886,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             }}>
               <ArrowRight style={{ width: 14, height: 14, transform: 'rotate(180deg)' }} /> Back
             </button>
-            <span style={{ fontSize: 15, fontWeight: 600, color: theme.colors.accent, letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: theme.colors.state.active, letterSpacing: '-0.02em' }}>
               {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </span>
             {/* Save status — mirrors Figma/Notion auto-save indicator */}
@@ -900,10 +945,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
             {/* Zoom controls removed — fixed at 120% */}
 
-            {/* Widget */}
+            {/* Widget — flex parent centers horizontally; translateY(-32px)
+                lifts it slightly above the geometric center so the bottom
+                Copy toolbar doesn't crowd it. */}
             <div style={{
               transform: `scale(${studioZoom}) translateY(-32px)`, transformOrigin: 'center center',
-              transition: 'transform ${({ theme }) => theme.transitions.fast}',
+              transition: 'transform 0.15s ease',
               filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04))',
             }}>
               <WidgetDisplay widget={editingWidget} />
@@ -957,6 +1004,25 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             />
           </div>
         </div>
+        {/* Custom-positioned toast for editor mode — centered over the
+            artboard column (viewport center minus half the 300px sidebar).
+            Uses ToastShell/Icon/Message tokens so visuals stay in sync
+            with the shared <Toast>. */}
+        {copied && (
+          <ToastShell
+            $tone="success"
+            $position="top"
+            role="status"
+            aria-live="polite"
+            style={{
+              left: 'calc(50% - 150px)',
+              top: 22,
+            }}
+          >
+            <ToastIconBubble $tone="success"><Check /></ToastIconBubble>
+            <ToastMessage>Embed code copied</ToastMessage>
+          </ToastShell>
+        )}
       </div>
     );
   }
@@ -1016,30 +1082,30 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       )}
 
       <Container>
-        {/* Welcome */}
-        <div style={{
-          display: 'flex',
-          flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
-          alignItems: isMobile ? 'stretch' : 'flex-start',
-          justifyContent: 'space-between',
-          gap: isMobile ? 16 : 0,
-          marginBottom: 32,
-          marginTop: 8,
-        }}>
-          <div>
-            <WelcomeH1>Welcome 👋</WelcomeH1>
-            <WelcomeSub>Manage your widgets and templates</WelcomeSub>
+        {/* Welcome — H1 and plan pill share a row (Linear/Notion/Vercel
+            anchor pattern), subtitle hangs free below. On mobile the row
+            collapses to a column so the pill drops under the title. */}
+        <div style={{ marginBottom: 32, marginTop: 24 }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
+            alignItems: isMobile ? 'stretch' : 'center',
+            justifyContent: 'space-between',
+            gap: isMobile ? 12 : 0,
+          }}>
+            <WelcomeH1>Welcome <span className="emoji" aria-hidden="true">👋</span></WelcomeH1>
+            {planLoading ? null : (
+              <PlanUsageCard
+                mode={isPro ? 'pro' : 'free'}
+                $size="wide"
+                used={widgets.length}
+                limit={3}
+                onUpgrade={() => openUpgrade()}
+                onManage={() => navigate('/settings')}
+              />
+            )}
           </div>
-          {planLoading ? null : (
-            <PlanUsageCard
-              mode={isPro ? 'pro' : 'free'}
-              $size="wide"
-              used={widgets.length}
-              limit={3}
-              onUpgrade={() => openUpgrade()}
-              onManage={() => navigate('/settings')}
-            />
-          )}
+          <WelcomeSub>Manage your widgets and templates</WelcomeSub>
         </div>
 
         {/* Tab bar */}
@@ -1053,21 +1119,9 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {/* ── Widgets Tab ── */}
         {tab === 'widgets' && (
           <>
-            {/* Create new widget — gradient banner */}
-            <div
-              style={{
-                background: 'linear-gradient(135deg, rgba(237,228,255,0.6) 0%, rgba(232,237,255,0.5) 40%, rgba(245,235,250,0.55) 100%)',
-                border: '1.5px solid rgba(200,195,230,0.3)',
-                borderRadius: 16,
-                padding: isMobile ? '24px 20px' : '32px 32px',
-                display: 'flex',
-                flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
-                alignItems: isMobile ? 'stretch' : 'center',
-                justifyContent: 'space-between',
-                gap: isMobile ? 16 : 0,
-                marginBottom: 32,
-              }}
-            >
+            {/* Create new widget — gradient banner. Uses <BannerSurface>
+                token, single source of truth (also rendered live in DS). */}
+            <BannerSurface $mobile={isMobile}>
               <div>
                 <BannerTitle>Create new widget</BannerTitle>
                 <BannerSub>Browse styles, customize and embed in Notion</BannerSub>
@@ -1075,43 +1129,65 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               <BannerCta $fullWidth={isMobile} onClick={() => navigate('/widgets')}>
                 <Plus /> Browse widgets
               </BannerCta>
-            </div>
+            </BannerSurface>
 
             {/* Your widgets */}
-            <SectionRow style={{ marginTop: 18 }}>
+            <SectionRow>
               <SectionTitle>Your widgets <SectionCount>{widgets.length}</SectionCount></SectionTitle>
             </SectionRow>
 
             {!loading && widgets.length === 0 ? (
-              <EmptyCard onClick={() => navigate('/widgets')}>
-                <EmptyCircle><Plus /></EmptyCircle>
-                <EmptyStateTitle>No widgets yet</EmptyStateTitle>
-                <EmptyStateSub>Create your first widget from the gallery above</EmptyStateSub>
-              </EmptyCard>
+              <DashEmptyBox onClick={() => navigate('/widgets')}>
+                <DashEmptyCircle><Plus /></DashEmptyCircle>
+                <DashEmptyTitle>No widgets yet</DashEmptyTitle>
+                <DashEmptyHint>Create your first widget from the gallery above</DashEmptyHint>
+              </DashEmptyBox>
             ) : (
               <WidgetGrid>
                 {widgets.map((w, i) => (
                   <WidgetCard key={w.id} $i={i}>
                     <WidgetPreviewWrap onClick={() => handleEdit(w)}>
-                      <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{w.type === 'calendar' ? 'calendar' : w.type === 'clock' ? 'clock' : 'board'}</Tag>
+                      <Tag $accent style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{w.type === 'calendar' ? 'calendar' : w.type === 'clock' ? 'clock' : 'board'}</Tag>
                       <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                     </WidgetPreviewWrap>
                     <WidgetBottom>
                       <WidgetName>{w.name}</WidgetName>
                       <WidgetActions>
-                        <SharedButton $variant="primary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
+                        <SharedButton $variant="secondary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
                         <SharedButton
                           $variant={copiedWidgetId === w.id ? 'successSoft' : 'outline'}
                           $size="sm"
                           $iconOnly
                           aria-label={copiedWidgetId === w.id ? 'Copied' : 'Copy embed URL'}
                           title={copiedWidgetId === w.id ? 'Copied!' : 'Copy embed URL'}
-                          onClick={() => {
-                            if (!w.embed_url) return;
+                          onClick={async () => {
+                            // Prefer the persisted embed_url; fall back to
+                            // generating one on the fly from the saved
+                            // settings so newly-saved widgets (where the
+                            // DB column may not have flushed yet) still copy.
+                            let url = w.embed_url || '';
+                            if (!url) {
+                              try {
+                                const widget = await diContainer.createWidgetUseCase.execute(w.type);
+                                const s = (w.settings || {}) as Record<string, unknown>;
+                                let updated;
+                                if (w.type === 'calendar') {
+                                  updated = widget.updateSettings(new CalendarSettings({ ...s, style: w.style as CalendarSettings['style'] }));
+                                } else if (w.type === 'clock') {
+                                  updated = widget.updateSettings(new ClockSettings({ ...s, style: w.style as ClockSettings['style'] }));
+                                } else {
+                                  updated = widget.updateSettings(new BoardSettings({ ...s, layout: w.style as BoardSettings['layout'] }));
+                                }
+                                url = diContainer.getWidgetEmbedUrlUseCase.execute(updated);
+                              } catch (err) {
+                                Logger.error('StudioPage', 'Failed to generate embed URL', err);
+                                return;
+                              }
+                            }
                             setCopiedWidgetId(w.id);
                             setTimeout(() => setCopiedWidgetId(null), 2000);
                             if (navigator.clipboard) {
-                              navigator.clipboard.writeText(w.embed_url).catch(() => {});
+                              navigator.clipboard.writeText(url).catch(() => {});
                             }
                           }}
                         >
@@ -1149,7 +1225,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               alignItems: isMobile ? 'stretch' : 'center',
               justifyContent: 'space-between',
               gap: isMobile ? 16 : 0,
-              marginBottom: 32,
+              marginBottom: 56,
             }}>
               <div>
                 <BannerTitle>Browse template shop</BannerTitle>
@@ -1166,11 +1242,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             </SectionRow>
 
             {PURCHASES.length === 0 ? (
-              <EmptyCard onClick={() => navigate('/templates')}>
-                <EmptyCircle><Download /></EmptyCircle>
-                <p style={{ fontSize: 15, fontWeight: 600, color: theme.colors.text.primary, margin: '0 0 4px' }}>No purchases yet</p>
-                <p style={{ fontSize: 13, color: theme.colors.text.tertiary, margin: 0 }}>Browse the shop to find planners for Notion</p>
-              </EmptyCard>
+              <DashEmptyBox onClick={() => navigate('/templates')}>
+                <DashEmptyCircle><Download /></DashEmptyCircle>
+                <DashEmptyTitle>No purchases yet</DashEmptyTitle>
+                <DashEmptyHint>Browse the shop to find planners for Notion</DashEmptyHint>
+              </DashEmptyBox>
             ) : (
               <>
                 {PURCHASES.map(p => (
@@ -1227,7 +1303,14 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         </ModalFooter>
       </Modal>
 
-      <Toast open={copiedWidgetId !== null} onClose={() => setCopiedWidgetId(null)} tone="success">
+      {/* Single toast that fires for both flows: editor-header Copy button
+          (`copied` state) and the per-row copy button on widgets list
+          (`copiedWidgetId`). Whichever flips true wins. */}
+      <Toast
+        open={copiedWidgetId !== null || copied}
+        onClose={() => { setCopiedWidgetId(null); setCopied(false); }}
+        tone="success"
+      >
         Embed code copied
       </Toast>
 

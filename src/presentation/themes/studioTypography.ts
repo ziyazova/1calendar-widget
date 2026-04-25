@@ -35,13 +35,12 @@ import {
 
 export type StudioTextStyle =
   | 'pageTitle'
+  | 'subtitle'
   | 'sectionTitle'
   | 'cardTitle'
   | 'cardTitleSm'
-  | 'menuItem'
   | 'body'
-  | 'caption'
-  | 'micro';
+  | 'caption';
 
 interface StudioTextRecipe {
   size: TypographySize;
@@ -57,6 +56,14 @@ export const studioTypographyTokens: Record<StudioTextStyle, StudioTextRecipe> =
     weight: 'semibold',
     lineHeight: 'snug',
     letterSpacing: 'tightest',
+  },
+  /** Page subtitle below pageTitle — "Manage your widgets and templates",
+   *  TemplatesPage subtitle, etc — 16px · 400 · -0.01em */
+  subtitle: {
+    size: 'xl',
+    weight: 'normal',
+    lineHeight: 'normal',
+    letterSpacing: 'tight',
   },
   /** "Calendars" / "Clocks" block header in Studio, "Profile" in Settings — 18px · 600 · -0.02em */
   sectionTitle: {
@@ -79,13 +86,6 @@ export const studioTypographyTokens: Record<StudioTextStyle, StudioTextRecipe> =
     lineHeight: 'snug',
     letterSpacing: 'tight',
   },
-  /** Sidebar navigation entry — 13px · 500 · -0.01em */
-  menuItem: {
-    size: 'md',
-    weight: 'medium',
-    lineHeight: 'normal',
-    letterSpacing: 'tight',
-  },
   /** Modal body text, helper paragraphs — 14px · 400 · 1.5 · -0.005em */
   body: {
     size: 'base',
@@ -99,13 +99,6 @@ export const studioTypographyTokens: Record<StudioTextStyle, StudioTextRecipe> =
     weight: 'normal',
     lineHeight: 'normal',
     letterSpacing: 'normal',
-  },
-  /** Bottom-tab labels, compact chrome — 11px · 500 · -0.01em */
-  micro: {
-    size: 'xs',
-    weight: 'medium',
-    lineHeight: 'tight',
-    letterSpacing: 'tight',
   },
 };
 

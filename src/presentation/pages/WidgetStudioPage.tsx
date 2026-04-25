@@ -9,6 +9,7 @@ import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
 import { PinterestGallery } from '@/presentation/components/landing/PinterestGallery';
 import { useAuth } from '@/presentation/context/AuthContext';
+import { LoginModal } from '@/presentation/components/auth/LoginModal';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 import { useWidgetQuota } from '@/presentation/hooks/useWidgetQuota';
 
@@ -35,7 +36,9 @@ const NameModalInput = styled.input`
   transition: border-color ${({ theme }) => theme.transitions.fast}, background ${({ theme }) => theme.transitions.fast};
 
   &::placeholder { color: ${({ theme }) => theme.colors.text.muted}; }
-  &:focus {
+  &:focus,
+  &:focus-visible {
+    outline: none;
     border-color: ${({ theme }) => theme.colors.accent};
     background: ${({ theme }) => theme.colors.background.elevated};
   }
@@ -125,6 +128,13 @@ const HeroTitle = styled.h1`
     font-style: normal;
     font-weight: 600;
     color: ${({ theme }) => theme.colors.peach.deep};
+  }
+
+  /* Phone — 42px base wraps "The widgets your Notion is missing" onto
+   * 4 lines at 375px. Drop to 32px so it reads in 2 lines. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 32px;
+    line-height: 1.15;
   }
 `;
 
@@ -275,12 +285,16 @@ const HeroScene = styled.div`
   max-width: 1200px;
   min-height: 728px;
   margin: 0 auto;
-  padding: 88px 48px 49px;
+  /* Bottom padding trimmed (80 → 54) so the rendered hero block lands at
+     the requested 728px height — content was overshooting min-height by
+     ~26px. The shortfall to LandingPage's 80px is offset by the next
+     <Section $size="md">'s 80px top padding to keep the rhythm. */
+  padding: 88px 48px 54px;
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: 0;
-    padding: 64px 24px 49px;
+    padding: 64px 24px 48px;
   }
 `;
 
@@ -343,7 +357,7 @@ const WidgetGalleryHeader = styled.div`
   padding: 0 48px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
@@ -370,6 +384,14 @@ const WidgetGalleryTitle = styled.h2`
 
 const WidgetGalleryFilterRow = styled(FilterRow)`
   margin-bottom: 0;
+
+  /* Phone — "Try for free" duplicates the Hero CTA right above. Hide
+   * it so the filter chips have room to breathe. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    & > button {
+      display: none;
+    }
+  }
 `;
 
 /* WidgetGalleryBtn — replaced by shared <Button $variant="primary" $size="md"> */
@@ -377,7 +399,7 @@ const WidgetGalleryFilterRow = styled(FilterRow)`
 const WidgetGalleryGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 48px 24px;
+  padding: 20px 48px 24px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
@@ -415,6 +437,21 @@ const WidgetGalleryMeta = styled.div`
   justify-content: space-between;
   gap: 8px;
   border-top: 1px solid rgba(0, 0, 0, 0.04);
+
+  /* Phone — 2-col grid leaves ~155px per card, too narrow to fit title
+   * "+ Customize" in one row. Stack them: title on top, full-width
+   * button below. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 10px 10px;
+
+    & > button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 `;
 
 const WidgetGalleryCardTitle = styled.span`
@@ -424,7 +461,7 @@ const WidgetGalleryCardTitle = styled.span`
   letter-spacing: -0.01em;
 `;
 
-/* CustomizeBtn — replaced by shared <Button $variant="primary|outline" $size="sm"> */
+/* CustomizeBtn — use shared <Button $variant="secondary" $size="sm"> directly. */
 
 /* Overlay badge — glass white + accent text. Sits on card thumbnails.
    Matches the unified badge system defined in /dev → Labels & Badges. */
@@ -521,7 +558,9 @@ const FeatureDesc = styled.p`
   line-height: 1.5;
 `;
 
-/* ── Pricing ── */
+/* ── Pricing — exported so the UpgradeModal renders the same Free/Pro
+   cards 1:1 (single source of truth). The local PricingSection wrapper
+   stays page-only since the modal centers cards in its own layout. ── */
 const PricingSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
@@ -546,7 +585,7 @@ const PricingSubtitle = styled.p`
   letter-spacing: -0.01em;
 `;
 
-const PricingGrid = styled.div`
+export const PricingGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
@@ -556,12 +595,12 @@ const PricingGrid = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; max-width: 360px; }
 `;
 
-const PricingCard = styled.div<{ $highlighted?: boolean }>`
+export const PricingCard = styled.div<{ $highlighted?: boolean }>`
   background: ${({ $highlighted }) => $highlighted ? 'linear-gradient(150deg, #F8F6FF 0%, #F0F4FF 50%, #FFF6F8 100%)' : '#fff'};
   color: inherit;
   border: 1px solid ${({ $highlighted, theme }) => $highlighted ? 'rgba(130, 120, 200, 0.2)' : theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.xl};
-  padding: 40px 36px 28px;
+  padding: 28px 36px;
   text-align: left;
   position: relative;
   display: flex;
@@ -569,7 +608,7 @@ const PricingCard = styled.div<{ $highlighted?: boolean }>`
   ${({ $highlighted }) => $highlighted && 'box-shadow: 0 6px 32px rgba(100, 80, 200, 0.08);'}
 `;
 
-const PricingPlanRow = styled.div`
+export const PricingPlanRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -577,7 +616,7 @@ const PricingPlanRow = styled.div`
   margin-bottom: 20px;
 `;
 
-const PricingPlan = styled.div<{ $highlighted?: boolean }>`
+export const PricingPlan = styled.div<{ $highlighted?: boolean }>`
   font-size: ${({ theme }) => theme.typography.sizes.base};
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -586,14 +625,14 @@ const PricingPlan = styled.div<{ $highlighted?: boolean }>`
     $highlighted ? theme.colors.accent : theme.colors.text.tertiary};
 `;
 
-const PricingPriceRow = styled.div`
+export const PricingPriceRow = styled.div`
   display: flex;
   align-items: baseline;
   gap: 6px;
   margin-bottom: 24px;
 `;
 
-const PricingPrice = styled.span`
+export const PricingPrice = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes['7xl']};
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -601,12 +640,12 @@ const PricingPrice = styled.span`
   color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-const PricingPeriod = styled.span`
+export const PricingPeriod = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
-const PricingFeatures = styled.ul<{ $highlighted?: boolean }>`
+export const PricingFeatures = styled.ul<{ $highlighted?: boolean }>`
   list-style: none;
   padding: 0;
   margin: 0 0 auto;
@@ -713,6 +752,21 @@ export const WidgetStudioPage: React.FC = () => {
   const [nameModal, setNameModal] = useState<{ title: string; category: string; type: string; style: string } | null>(null);
   const [widgetName, setWidgetName] = useState('');
 
+  // Anonymous Customize → LoginModal first; we keep the picked item so we
+  // can resume into the name-your-widget step right after auth succeeds.
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [pendingCustomize, setPendingCustomize] = useState<{ title: string; category: string; type: string; style: string } | null>(null);
+
+  const startCustomize = (item: { title: string; category: string; type: string; style: string }) => {
+    if (isLoggedIn) {
+      setNameModal(item);
+      setWidgetName(item.title);
+    } else {
+      setPendingCustomize(item);
+      setLoginModalOpen(true);
+    }
+  };
+
   const handleLaunch = useCallback(() => {
     setExpanding(true);
     setTimeout(() => navigate('/studio'), 450);
@@ -746,10 +800,22 @@ export const WidgetStudioPage: React.FC = () => {
     return (
       <PageWrapper>
         <TopNav activeLink="studio" logoSub="Widgets" />
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 0' }}>
+        {/* Header owns the chips → cards gap (24px bottom padding) so it
+            matches /templates and stays consistent regardless of mobile. */}
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 24px' }}>
           <BackButton onClick={() => navigate(-1 as any)} label="Back" />
-          <h1 style={{ fontSize: 32, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 10px' }}>Notion Widgets</h1>
-          <p style={{ fontSize: 14, color: '#999', margin: '0 0 36px', letterSpacing: '-0.01em' }}>Browse styles, customize and embed in your Notion workspace</p>
+          {/* Headline swaps the leading word as the filter changes — same
+              pattern /templates uses, but only the qualifier shifts here:
+              "Notion" → category ("Calendar", "Clock", "Board"), while
+              "Widgets" stays anchored. */}
+          <h1 style={{ fontSize: 40, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 10px' }}>
+            {activeFilter === 'all' ? 'Notion' :
+             activeFilter === 'calendar' ? 'Calendar' :
+             activeFilter === 'clock' ? 'Clock' :
+             activeFilter === 'boards' ? 'Board' :
+             activeFilter === 'buttons' ? 'Button' : 'Notion'} Widgets
+          </h1>
+          <p style={{ fontSize: 16, color: '#999', margin: '0 0 40px', letterSpacing: '-0.01em' }}>Browse styles, customize and embed in your Notion workspace</p>
           <FilterRow>
             {GALLERY_FILTERS.map(f => (
               <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
@@ -758,7 +824,7 @@ export const WidgetStudioPage: React.FC = () => {
             ))}
           </FilterRow>
         </div>
-        <WidgetGalleryGrid>
+        <WidgetGalleryGrid style={{ paddingTop: 0 }}>
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
@@ -773,7 +839,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
                   <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
                 ) : (
-                  <SharedButton $variant="outline" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
+                  <SharedButton $variant="secondary" $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
@@ -896,8 +962,10 @@ export const WidgetStudioPage: React.FC = () => {
 
       <PageContent $hide={expanding}>
 
-      {/* Widget Gallery — horizontal scroll like Top Templates */}
-      <Section $size="gap" style={{ paddingTop: 80 }}>
+      {/* Widget Gallery — horizontal scroll like Top Templates.
+          $size="md" mirrors LandingPage so hero → gallery gap is the same
+          80+80=160px (mobile 48+48=96px) as / hero → "Top templates". */}
+      <Section $size="md">
       <WidgetGallerySection>
         <WidgetGalleryHeader>
           <WidgetGalleryTitleRow>
@@ -931,7 +999,7 @@ export const WidgetStudioPage: React.FC = () => {
                 {/* Not-logged-in users see Customize on pro widgets too — the
                      upgrade wall only appears once they have an account. The
                      PRO badge sets the expectation without blocking try-outs. */}
-                <SharedButton $variant="outline" $size="sm" onClick={() => { setNameModal({ title: item.title, category: item.category, type: item.type, style: item.style }); setWidgetName(item.title); }}><Pencil /> Customize</SharedButton>
+                <SharedButton $variant="secondary" $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
           ))}
@@ -1010,6 +1078,65 @@ export const WidgetStudioPage: React.FC = () => {
         </FooterFlush>
       </Section>
       </PageContent>
+
+      {/* Login gate — anonymous users hitting Customize land here first.
+          On success we resume their pending pick into the name step so
+          the click never "dies". */}
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => { setLoginModalOpen(false); setPendingCustomize(null); }}
+        onAuthenticated={() => {
+          if (pendingCustomize) {
+            setNameModal(pendingCustomize);
+            setWidgetName(pendingCustomize.title);
+            setPendingCustomize(null);
+          }
+        }}
+      />
+
+      {/* Name Modal — also needed in the anonymous tree so Customize on a
+          gallery card opens the naming step before we hand off to /studio. */}
+      <Modal
+        open={!!nameModal}
+        onClose={() => setNameModal(null)}
+        eyebrow={nameModal ? `New ${nameModal.category}` : undefined}
+        title="Name your widget"
+        size="sm"
+        hideClose
+      >
+        <NameModalInput
+          autoFocus
+          value={widgetName}
+          onChange={e => setWidgetName(e.target.value)}
+          placeholder="Classic Calendar"
+          onKeyDown={e => {
+            if (e.key === 'Enter' && widgetName.trim() && nameModal) {
+              const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
+              setNameModal(null);
+              navigate('/studio', { state: { newWidget: data } });
+            }
+          }}
+        />
+        <ModalFooter>
+          <SharedButton type="button" $variant="outline" $size="lg" onClick={() => setNameModal(null)}>
+            Cancel
+          </SharedButton>
+          <SharedButton
+            type="button"
+            $variant="primary"
+            $size="lg"
+            onClick={() => {
+              if (widgetName.trim() && nameModal) {
+                const data = { name: widgetName, type: nameModal.type, style: nameModal.style };
+                setNameModal(null);
+                navigate('/studio', { state: { newWidget: data } });
+              }
+            }}
+          >
+            Create &amp; Edit
+          </SharedButton>
+        </ModalFooter>
+      </Modal>
     </PageWrapper>
   );
 };

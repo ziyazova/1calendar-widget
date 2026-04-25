@@ -187,7 +187,7 @@ const CarouselBtn = styled.button<{ $side: 'left' | 'right' }>`
 
   &:hover {
     background: ${({ theme }) => theme.colors.background.elevated};
-    box-shadow: ${({ theme }) => theme.shadows.medium};
+    box-shadow: ${({ theme }) => theme.shadows.cardHover};
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {

@@ -228,7 +228,6 @@ const TemplateCardWrap = styled.div`
    from templateCardTokens. */
 const TemplateCardSlot = styled.div`
   margin-bottom: 12px;
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { margin-bottom: 8px; }
 `;
 
 const TemplateCardMeta = styled.div`
@@ -237,6 +236,16 @@ const TemplateCardMeta = styled.div`
   justify-content: space-between;
   gap: 12px;
   padding: 6px;
+
+  /* On phone the card is 200px wide — fitting title + price on one row
+   * with ellipsis clips long names. Stack them instead: title on top,
+   * price below, both fully readable. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 0 4px;
+  }
 `;
 
 const TemplateCardTitle = styled.span`
@@ -252,13 +261,6 @@ const TemplateCardTitle = styled.span`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
-    /* On phone the card is 200px wide — long titles like "Dark Academia
-     * Study" were ellipsis-clipped. Allow 2-line wrap instead. */
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 `;
 
@@ -361,7 +363,7 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
         <ArrowRight />
       </TemplatesScrollHint>
       <MobileExploreRow>
-        <SharedButton $variant="primary" $size="lg" onClick={() => onNavigate('/templates')}>
+        <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')}>
           Explore all <ArrowRight />
         </SharedButton>
       </MobileExploreRow>

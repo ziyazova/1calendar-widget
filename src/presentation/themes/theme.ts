@@ -122,14 +122,9 @@ export const theme = {
     // Shadows that reference brand color (for accent buttons)
     accentShadow: {
       sm: '0 1px 4px rgba(99, 102, 241, 0.25)',
-      md: '0 2px 8px rgba(99, 102, 241, 0.25)',
-      lg: '0 8px 24px rgba(99, 102, 241, 0.35)',
     },
     blueShadow: {
       md: '0 2px 8px rgba(51, 132, 244, 0.3)',
-    },
-    successShadow: {
-      md: '0 2px 8px rgba(34, 197, 94, 0.3)',
     },
     avatarPeachShadow:
       'inset 0 1px 0 rgba(255, 255, 255, 0.45), ' +
@@ -221,16 +216,17 @@ export const theme = {
     full: '9999px',
   },
 
-  // Shadows
+  // Shadows — 11 elevation tiers from form-field hairline to modal float.
+  // `medium` and `tab` removed: medium (0 4px 16px / 0.08) merged into
+  // cardHover (0 4px 20px / 0.05), tab was unused. Stay close to a preset
+  // when adding new — don't duplicate near-identical values.
   shadows: {
     form: '0 0.5px 1px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(0, 0, 0, 0.03)',
     subtle: '0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(0, 0, 0, 0.02)',
     cardFlat: '0 1px 2px rgba(0, 0, 0, 0.02)',  // near-invisible hairline — calm flat surfaces (Settings Section)
     card: '0 2px 12px rgba(0, 0, 0, 0.03)',
     cardHover: '0 4px 20px rgba(0, 0, 0, 0.05)',
-    medium: '0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.02)',
     heavy: '0 16px 48px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04)',
-    tab: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
     floating: '0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
     modal: '0 32px 80px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.06)',
     sheet: '0 -8px 40px rgba(0, 0, 0, 0.1)',
@@ -261,13 +257,14 @@ export const theme = {
     debug: 99999,
   },
 
-  // Transitions
+  // Transitions — 4 motion presets. `smooth` (0.35s gentle slide) was
+  // removed for being unused; pick the closest preset before writing
+  // a custom timing.
   transitions: {
     fast: '0.15s ease',      // micro-interactions: hover, color fade
     medium: '0.2s ease',     // mid-speed hover, padding shift
     base: '0.25s ease',      // default — card hover, panel open
-    smooth: '0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',  // gentle slide
-    spring: '0.28s cubic-bezier(0.22, 1, 0.36, 1)',        // punchy pop
+    spring: '0.28s cubic-bezier(0.22, 1, 0.36, 1)',  // punchy pop — popovers, dropdowns
   },
 
   // Blur

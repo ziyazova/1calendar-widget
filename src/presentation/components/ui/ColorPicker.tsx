@@ -59,14 +59,14 @@ export const FigmaColorRow = styled.div`
   display: flex;
   align-items: center;
   height: 30px;
-  border-radius: ${({ theme }) => theme.radii.md};
+  border-radius: ${({ theme }) => theme.radii.sm};
   background: rgba(0, 0, 0, 0.03);
   box-shadow: ${({ theme }) => theme.shadows.form};
   padding: 0 10px 0 5px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 34px;
-    border-radius: ${({ theme }) => theme.radii.md};
+    border-radius: ${({ theme }) => theme.radii.sm};
     padding: 0 10px 0 4px;
   }
 `;
@@ -74,11 +74,11 @@ export const FigmaColorRow = styled.div`
 export const ColorSwatch = styled.div<{ $color: string }>`
   width: 20px;
   height: 20px;
-  border-radius: 30%;
+  border-radius: 22%;
   background-color: ${({ $color }) => $color};
   cursor: pointer;
   flex-shrink: 0;
-  margin: 4px 6px 4px 0;
+  margin: 4px 8px 4px 0;
   border: 1px solid ${({ theme }) => theme.colors.border.hairline};
   transition: all ${({ theme }) => theme.transitions.fast};
   position: relative;

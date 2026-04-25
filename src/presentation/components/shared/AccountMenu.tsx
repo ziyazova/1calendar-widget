@@ -77,9 +77,11 @@ export const AccountDropdown = styled.div`
   width: 264px;
   padding: 10px;
   background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
   border-radius: ${({ theme }) => theme.radii.lg};
-  box-shadow: ${({ theme }) => theme.shadows.floating};
+  /* Cleaner two-layer popover shadow — soft ambient + tighter contact halo,
+     no muddy bottom-blur. Mirrors the popover token in theme.shadows. */
+  box-shadow: ${({ theme }) => theme.shadows.popover};
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -130,7 +132,7 @@ export const DropdownSpacer = styled.div`
 export const DropdownMenuGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
 `;
 
 export const ProPlanRow = styled.div`
@@ -164,7 +166,7 @@ export const ProPlanLabel = styled.span`
 
 export const ProManageLink = styled.a`
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: ${({ theme }) => theme.colors.brand.indigoDark};
   text-decoration: none;
   cursor: pointer;

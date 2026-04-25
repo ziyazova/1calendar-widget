@@ -23,7 +23,7 @@ import {
  * Variants: primary / accent / blue / secondary / outline / ghost /
  *           danger / dangerStrong / success / link
  * Sizes:    xs (28) / sm (32) / md (36) / lg (44) / xl (48)
- * Modifiers: $fullWidth, $pill, $iconOnly
+ * Modifiers: $fullWidth, $iconOnly
  */
 
 export type { ButtonVariant, ButtonSize };
@@ -32,7 +32,6 @@ interface ButtonTransientProps {
   $variant?: ButtonVariant;
   $size?: ButtonSize;
   $fullWidth?: boolean;
-  $pill?: boolean;
   $iconOnly?: boolean;
 }
 
@@ -115,7 +114,6 @@ export const Button = styled.button<ButtonTransientProps>`
 
   /* Modifiers */
   ${({ $fullWidth }) => $fullWidth && css`width: 100%;`}
-  ${({ $pill }) => $pill && css`border-radius: ${({ theme }) => theme.radii.full};`}
   ${({ $iconOnly, $size = 'md' }) => $iconOnly && css`
     width: ${sizePxMap[$size]}px;
     padding: 0;

@@ -2,11 +2,16 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
+/* Outer fill — full-bleed surfaceAlt, same tone as the BigFooter so the
+   minimal footer feels part of the same surface family. */
+const FooterOuter = styled.div`
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+`;
+
 const FooterWrap = styled.footer`
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 48px;
-  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,7 +27,9 @@ const FooterWrap = styled.footer`
 
 const FooterText = styled.span`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.muted};
+  /* Bumped up to text.tertiary so it stays legible against the
+     surfaceAlt fill — text.muted got eaten by the new background. */
+  color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.01em;
 `;
 
@@ -40,11 +47,11 @@ const FooterLinks = styled.div`
 
 const FooterLink = styled(Link)`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.muted};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.01em;
   text-decoration: none;
   transition: color ${({ theme }) => theme.transitions.fast};
-  &:hover { color: ${({ theme }) => theme.colors.text.body}; }
+  &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
 interface FooterProps {
@@ -54,15 +61,17 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ left = 'Peachy Studio', right }) => {
   return (
-    <FooterWrap>
-      <FooterText>{left}</FooterText>
-      <FooterLinks>
-        <FooterLink to="/privacy">Privacy</FooterLink>
-        <FooterLink to="/terms">Terms</FooterLink>
-        <FooterLink to="/refund">Refund</FooterLink>
-        <FooterLink to="/legal">Imprint</FooterLink>
-        {right && <FooterText>{right}</FooterText>}
-      </FooterLinks>
-    </FooterWrap>
+    <FooterOuter>
+      <FooterWrap>
+        <FooterText>{left}</FooterText>
+        <FooterLinks>
+          <FooterLink to="/privacy">Privacy</FooterLink>
+          <FooterLink to="/terms">Terms</FooterLink>
+          <FooterLink to="/refund">Refund</FooterLink>
+          <FooterLink to="/legal">Imprint</FooterLink>
+          {right && <FooterText>{right}</FooterText>}
+        </FooterLinks>
+      </FooterWrap>
+    </FooterOuter>
   );
 };

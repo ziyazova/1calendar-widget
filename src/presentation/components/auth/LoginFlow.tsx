@@ -1,44 +1,46 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
-import { TopNav } from '../components/layout/TopNav';
+import { useNavigate, Link } from 'react-router-dom';
 import {
-  PageWrapper,
-  Footer,
   Button,
   Card,
   Modal,
   ModalFooter,
   GoogleIcon,
 } from '@/presentation/components/shared';
-import { Mail, Lock, Eye, EyeOff, Check, CheckCircle2, MailCheck, LogOut, ArrowRight, KeyRound } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Check, CheckCircle2, MailCheck, LogOut, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { hasSupabaseEnv } from '@/infrastructure/services/supabase';
 
-const Container = styled.div`
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 80px 24px 120px;
+/**
+ * LoginFlow — full login/signup experience without page chrome.
+ * Used by <LoginPage> (with PageWrapper/TopNav) and <LoginModal> (inside Modal).
+ * onAuthenticated fires on success — caller resumes the interrupted flow.
+ */
+interface LoginFlowProps {
+  onAuthenticated?: () => void;
+  initialSignUp?: boolean;
+  prefillEmail?: string;
+  justDeleted?: boolean;
+  /** Tightens typography + spacing for use inside a modal. */
+  embedded?: boolean;
+}
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    padding: 48px 20px 80px;
-  }
-`;
-
-const Title = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes['7xl']};
+const Title = styled.h1<{ $embedded?: boolean }>`
+  font-size: ${({ $embedded, theme }) =>
+    $embedded ? theme.typography.sizes['5xl'] : theme.typography.sizes['7xl']};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tightest};
   text-align: center;
-  margin: 0 0 ${({ theme }) => theme.spacing['3']};
+  margin: 0 0 ${({ theme }) => theme.spacing['2']};
 `;
 
-const Subtitle = styled.p`
+const Subtitle = styled.p<{ $embedded?: boolean }>`
   font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-align: center;
-  margin: 0 0 ${({ theme }) => theme.spacing['8']};
+  margin: 0 0 ${({ $embedded, theme }) => $embedded ? theme.spacing['5'] : theme.spacing['8']};
 `;
 
 const Form = styled.form`
@@ -94,11 +96,11 @@ const PasswordToggle = styled.button`
   &:hover { color: ${({ theme }) => theme.colors.text.body}; }
 `;
 
-const Divider = styled.div`
+const Divider = styled.div<{ $embedded?: boolean }>`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing['4']};
-  margin: ${({ theme }) => theme.spacing['6']} 0;
+  margin: ${({ $embedded, theme }) => $embedded ? theme.spacing['4'] : theme.spacing['6']} 0;
   color: ${({ theme }) => theme.colors.text.muted};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
 
@@ -110,9 +112,9 @@ const Divider = styled.div`
   }
 `;
 
-const BottomText = styled.p`
+const BottomText = styled.p<{ $embedded?: boolean }>`
   text-align: center;
-  margin-top: ${({ theme }) => theme.spacing['8']};
+  margin-top: ${({ $embedded, theme }) => $embedded ? theme.spacing['5'] : theme.spacing['8']};
   font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.text.tertiary};
 `;
@@ -184,8 +186,6 @@ const Requirement = styled.div<{ $met: boolean }>`
   svg { width: 12px; height: 12px; flex-shrink: 0; }
 `;
 
-/* ── Check your email view ── */
-
 const ConfirmCard = styled.div`
   display: flex;
   flex-direction: column;
@@ -217,8 +217,6 @@ const ConfirmEmail = styled.div`
   letter-spacing: -0.01em;
   word-break: break-all;
 `;
-
-/* ── Already signed in card ── */
 
 const SignedInAvatar = styled.div`
   width: 64px;
@@ -289,8 +287,6 @@ const SignedInMeta = styled.div`
   strong { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
-/* ── Helpers ── */
-
 const humaniseError = (raw: string, mode: 'login' | 'signup'): string => {
   const m = raw.toLowerCase();
   if (m.includes('user already registered') || m.includes('already exists')) {
@@ -311,7 +307,6 @@ const humaniseError = (raw: string, mode: 'login' | 'signup'): string => {
   if (m.includes('network')) {
     return 'Network error. Check your connection and try again.';
   }
-  // Fallback
   return mode === 'signup'
     ? 'We could not create your account. Please try again.'
     : 'We could not sign you in. Please try again.';
@@ -324,49 +319,39 @@ const getPasswordChecks = (pw: string): PasswordCheck[] => [
   { label: 'Contains a number', met: /\d/.test(pw) },
 ];
 
-export const LoginPage: React.FC = () => {
+export const LoginFlow: React.FC<LoginFlowProps> = ({
+  onAuthenticated,
+  initialSignUp = false,
+  prefillEmail = '',
+  justDeleted = false,
+  embedded = false,
+}) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const auth = useAuth();
-  const prefill = location.state as { email?: string; signup?: boolean } | null;
-
-  const justDeleted = searchParams.get('deleted') === '1';
+  const handleSuccess = onAuthenticated ?? (() => navigate('/studio'));
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(Boolean(prefill?.signup));
+  const [isSignUp, setIsSignUp] = useState(initialSignUp);
   const [error, setError] = useState('');
   const [deletedNotice, setDeletedNotice] = useState(justDeleted);
 
-  useEffect(() => {
-    if (justDeleted) {
-      // Strip the query param so the notice doesn't come back on refresh.
-      const next = new URLSearchParams(searchParams);
-      next.delete('deleted');
-      setSearchParams(next, { replace: true });
-    }
-  }, [justDeleted, searchParams, setSearchParams]);
-
   const [name, setName] = useState('');
-  const [email, setEmail] = useState(prefill?.email || '');
+  const [email, setEmail] = useState(prefillEmail);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Check-your-email view state
   const [confirmationSentTo, setConfirmationSentTo] = useState<string | null>(null);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [resendMessage, setResendMessage] = useState<string | null>(null);
 
-  // Forgot password modal state
   const [forgotOpen, setForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSubmitting, setForgotSubmitting] = useState(false);
   const [forgotError, setForgotError] = useState('');
   const [forgotSentTo, setForgotSentTo] = useState<string | null>(null);
 
-  // Hint shown when login fails — the account may be Google-linked only.
   const [showGoogleHint, setShowGoogleHint] = useState(false);
 
   const passwordChecks = useMemo(() => getPasswordChecks(password), [password]);
@@ -375,46 +360,36 @@ export const LoginPage: React.FC = () => {
   const canSubmitSignup = name.trim().length > 0 && email.trim().length > 0 && passwordValid && passwordsMatch;
   const canSubmitLogin = email.trim().length > 0 && password.length > 0;
 
-  // Countdown tick for resend throttle.
   useEffect(() => {
     if (resendCountdown <= 0) return;
     const t = setTimeout(() => setResendCountdown(c => c - 1), 1000);
     return () => clearTimeout(t);
   }, [resendCountdown]);
 
-  // If the user is already signed in with a Supabase session and is NOT in the confirm-email flow,
-  // show the "already signed in" card instead of silently redirecting.
   if (auth.isRegistered && !confirmationSentTo) {
     const displayName = auth.user?.name || 'there';
     const initials = (auth.user?.name || '?').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
     return (
-      <PageWrapper>
-        <TopNav logoSub="Account" />
-        <Container>
-          <Card $variant="elevated" $padding="lg" $radius="lg" style={{ textAlign: 'center' }}>
-            <SignedInAvatar>
-              {auth.user?.avatarUrl ? (
-                <img src={auth.user.avatarUrl} alt="" referrerPolicy="no-referrer" />
-              ) : initials}
-            </SignedInAvatar>
-            <SignedInTitle>You're already signed in</SignedInTitle>
-            <SignedInMeta>
-              Signed in as <strong>{displayName}</strong> ({auth.user?.email})
-            </SignedInMeta>
-            <Button $variant="primary" $size="lg" $fullWidth onClick={() => navigate('/studio')} style={{ marginTop: 16 }}>
-              Go to Studio <ArrowRight />
-            </Button>
-            <Button $variant="secondary" $size="lg" $fullWidth onClick={async () => { await auth.logout(); }} style={{ marginTop: 8 }}>
-              <LogOut /> Log out
-            </Button>
-          </Card>
-        </Container>
-        <Footer />
-      </PageWrapper>
+      <Card $variant="elevated" $padding="lg" $radius="lg" style={{ textAlign: 'center' }}>
+        <SignedInAvatar>
+          {auth.user?.avatarUrl ? (
+            <img src={auth.user.avatarUrl} alt="" referrerPolicy="no-referrer" />
+          ) : initials}
+        </SignedInAvatar>
+        <SignedInTitle>You're already signed in</SignedInTitle>
+        <SignedInMeta>
+          Signed in as <strong>{displayName}</strong> ({auth.user?.email})
+        </SignedInMeta>
+        <Button $variant="primary" $size="lg" $fullWidth onClick={handleSuccess} style={{ marginTop: 16 }}>
+          Continue <ArrowRight />
+        </Button>
+        <Button $variant="secondary" $size="lg" $fullWidth onClick={async () => { await auth.logout(); }} style={{ marginTop: 8 }}>
+          <LogOut /> Log out
+        </Button>
+      </Card>
     );
   }
 
-  // Check-your-email view after a successful signup that requires email confirmation.
   if (confirmationSentTo) {
     const handleResend = async () => {
       setResendMessage(null);
@@ -427,44 +402,37 @@ export const LoginPage: React.FC = () => {
       }
     };
     return (
-      <PageWrapper>
-        <TopNav logoSub="Account" />
-        <Container>
-          <ConfirmCard>
-            <ConfirmIcon><MailCheck /></ConfirmIcon>
-            <div style={{ fontSize: 22, fontWeight: 600, color: theme.colors.text.primary, letterSpacing: '-0.02em' }}>
-              Check your email
-            </div>
-            <div style={{ fontSize: 14, color: theme.colors.text.hint, marginTop: 8, lineHeight: 1.5, maxWidth: 340 }}>
-              We sent a confirmation link to:
-            </div>
-            <ConfirmEmail>{confirmationSentTo}</ConfirmEmail>
-            <div style={{ fontSize: 13, color: theme.colors.text.tertiary, maxWidth: 320, lineHeight: 1.55 }}>
-              Click the link in the email to activate your account. You can close this page.
-            </div>
-
-            <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-              <Button $variant="secondary" $size="lg" onClick={handleResend} disabled={resendCountdown > 0}>
-                {resendCountdown > 0 ? `Resend email in ${resendCountdown}s` : 'Resend email'}
-              </Button>
-              {resendMessage && (
-                <div style={{ fontSize: 12, color: theme.colors.success.fg }}>{resendMessage}</div>
-              )}
-              <button
-                type="button"
-                onClick={() => { setConfirmationSentTo(null); setResendMessage(null); setResendCountdown(0); }}
-                style={{
-                  background: 'none', border: 'none', color: theme.colors.text.tertiary,
-                  fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', marginTop: 8,
-                }}
-              >
-                Use a different email
-              </button>
-            </div>
-          </ConfirmCard>
-        </Container>
-        <Footer />
-      </PageWrapper>
+      <ConfirmCard>
+        <ConfirmIcon><MailCheck /></ConfirmIcon>
+        <div style={{ fontSize: 22, fontWeight: 600, color: theme.colors.text.primary, letterSpacing: '-0.02em' }}>
+          Check your email
+        </div>
+        <div style={{ fontSize: 14, color: theme.colors.text.hint, marginTop: 8, lineHeight: 1.5, maxWidth: 340 }}>
+          We sent a confirmation link to:
+        </div>
+        <ConfirmEmail>{confirmationSentTo}</ConfirmEmail>
+        <div style={{ fontSize: 13, color: theme.colors.text.tertiary, maxWidth: 320, lineHeight: 1.55 }}>
+          Click the link in the email to activate your account. You can close this page.
+        </div>
+        <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+          <Button $variant="secondary" $size="lg" onClick={handleResend} disabled={resendCountdown > 0}>
+            {resendCountdown > 0 ? `Resend email in ${resendCountdown}s` : 'Resend email'}
+          </Button>
+          {resendMessage && (
+            <div style={{ fontSize: 12, color: theme.colors.success.fg }}>{resendMessage}</div>
+          )}
+          <button
+            type="button"
+            onClick={() => { setConfirmationSentTo(null); setResendMessage(null); setResendCountdown(0); }}
+            style={{
+              background: 'none', border: 'none', color: theme.colors.text.tertiary,
+              fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', marginTop: 8,
+            }}
+          >
+            Use a different email
+          </button>
+        </div>
+      </ConfirmCard>
     );
   }
 
@@ -472,7 +440,6 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
-
     try {
       if (isSignUp) {
         if (!canSubmitSignup) {
@@ -490,11 +457,10 @@ export const LoginPage: React.FC = () => {
         }
         if (result.needsConfirmation) {
           setConfirmationSentTo(email.trim());
-          setResendCountdown(60); // initial throttle — Supabase recently sent the email
+          setResendCountdown(60);
           return;
         }
-        // Session granted (e.g. auto-confirm enabled) → go to studio.
-        navigate('/studio');
+        handleSuccess();
       } else {
         if (!canSubmitLogin) {
           setError('Please enter your email and password.');
@@ -503,13 +469,12 @@ export const LoginPage: React.FC = () => {
         const err = await auth.login(email.trim(), password);
         if (err) {
           setError(humaniseError(err, 'login'));
-          // Hint users that their account might be linked only to Google.
           if (err.toLowerCase().includes('invalid login credentials')) {
             setShowGoogleHint(true);
           }
           return;
         }
-        navigate('/studio');
+        handleSuccess();
       }
     } finally {
       setSubmitting(false);
@@ -517,202 +482,198 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <PageWrapper>
-      <TopNav logoSub="Account" />
+    <>
+      <Title $embedded={embedded}>{isSignUp ? 'Create account' : 'Welcome back'}</Title>
+      <Subtitle $embedded={embedded}>{isSignUp ? 'Start your Peachy journey' : 'Log in to your Peachy account'}</Subtitle>
 
-      <Container>
-        <Title>{isSignUp ? 'Create account' : 'Welcome back'}</Title>
-        <Subtitle>{isSignUp ? 'Start your Peachy journey' : 'Log in to your Peachy account'}</Subtitle>
+      {!hasSupabaseEnv && (
+        <div style={{
+          fontSize: 13,
+          color: theme.colors.warning.text,
+          background: 'rgba(253,186,116,0.18)',
+          border: '1px solid rgba(194,120,3,0.35)',
+          padding: '12px 14px',
+          borderRadius: 12,
+          marginBottom: 12,
+          lineHeight: 1.5,
+        }}>
+          <strong>Auth is not configured.</strong>{' '}
+          Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in your
+          <code> .env.local</code>, then restart the dev server. Sign-in and sign-up won't work until then.
+        </div>
+      )}
 
-        {!hasSupabaseEnv && (
-          <div style={{
-            fontSize: 13,
-            color: theme.colors.warning.text,
-            background: 'rgba(253,186,116,0.18)',
-            border: '1px solid rgba(194,120,3,0.35)',
-            padding: '12px 14px',
-            borderRadius: 12,
-            marginBottom: 12,
-            lineHeight: 1.5,
-          }}>
-            <strong>Auth is not configured.</strong>{' '}
-            Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in your
-            <code> .env.local</code>, then restart the dev server. Sign-in and sign-up won't work until then.
-          </div>
-        )}
-
-        {deletedNotice && (
-          <div style={{
-            fontSize: 13,
-            color: theme.colors.success.fg,
-            background: 'rgba(34,197,94,0.08)',
-            border: '1px solid rgba(34,197,94,0.2)',
-            padding: '12px 14px',
-            borderRadius: 12,
-            marginBottom: 12,
-            lineHeight: 1.5,
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 10,
-          }}>
-            <CheckCircle2 style={{ width: 16, height: 16, flexShrink: 0, color: theme.colors.success.fg, marginTop: 1 }} />
-            <div>
-              <strong style={{ color: '#14532D' }}>Your account has been deleted.</strong>{' '}
-              Your profile, widgets and all local data have been removed from this device.
-              You can sign up again any time with the same email.
-              <button
-                type="button"
-                onClick={() => setDeletedNotice(false)}
-                style={{
-                  marginLeft: 8, background: 'none', border: 'none',
-                  color: theme.colors.success.fg, fontSize: 12, fontFamily: 'inherit',
-                  cursor: 'pointer', textDecoration: 'underline', padding: 0,
-                }}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
-
-        {error && <ErrorText>{error}</ErrorText>}
-        {showGoogleHint && !isSignUp && (
-          <div style={{
-            fontSize: 12, color: theme.colors.text.body,
-            background: 'rgba(99,102,241,0.06)',
-            border: '1px solid rgba(99,102,241,0.15)',
-            padding: '10px 12px', borderRadius: 12, marginBottom: 8, lineHeight: 1.5,
-          }}>
-            Did you sign up with Google? This email may not have a password set. Try{' '}
-            <Button
+      {deletedNotice && (
+        <div style={{
+          fontSize: 13,
+          color: theme.colors.success.fg,
+          background: 'rgba(34,197,94,0.08)',
+          border: '1px solid rgba(34,197,94,0.2)',
+          padding: '12px 14px',
+          borderRadius: 12,
+          marginBottom: 12,
+          lineHeight: 1.5,
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 10,
+        }}>
+          <CheckCircle2 style={{ width: 16, height: 16, flexShrink: 0, color: theme.colors.success.fg, marginTop: 1 }} />
+          <div>
+            <strong style={{ color: '#14532D' }}>Your account has been deleted.</strong>{' '}
+            Your profile, widgets and all local data have been removed from this device.
+            You can sign up again any time with the same email.
+            <button
               type="button"
-              $variant="link"
-              $size="sm"
-              onClick={() => auth.loginWithGoogle()}
+              onClick={() => setDeletedNotice(false)}
+              style={{
+                marginLeft: 8, background: 'none', border: 'none',
+                color: theme.colors.success.fg, fontSize: 12, fontFamily: 'inherit',
+                cursor: 'pointer', textDecoration: 'underline', padding: 0,
+              }}
             >
-              Continue with Google
-            </Button>
-            .
+              Dismiss
+            </button>
           </div>
-        )}
+        </div>
+      )}
 
-        <Form onSubmit={handleSubmit} noValidate>
-          {isSignUp && (
-            <InputWrap>
-              <InputIcon><Mail /></InputIcon>
-              <Input
-                type="text"
-                placeholder="Full name"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                autoComplete="name"
-              />
-            </InputWrap>
-          )}
+      {error && <ErrorText>{error}</ErrorText>}
+      {showGoogleHint && !isSignUp && (
+        <div style={{
+          fontSize: 12, color: theme.colors.text.body,
+          background: 'rgba(99,102,241,0.06)',
+          border: '1px solid rgba(99,102,241,0.15)',
+          padding: '10px 12px', borderRadius: 12, marginBottom: 8, lineHeight: 1.5,
+        }}>
+          Did you sign up with Google? This email may not have a password set. Try{' '}
+          <Button
+            type="button"
+            $variant="link"
+            $size="sm"
+            onClick={() => auth.loginWithGoogle()}
+          >
+            Continue with Google
+          </Button>
+          .
+        </div>
+      )}
+
+      <Form onSubmit={handleSubmit} noValidate>
+        {isSignUp && (
           <InputWrap>
             <InputIcon><Mail /></InputIcon>
             <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              autoComplete="email"
-              spellCheck={false}
-              autoCapitalize="off"
+              type="text"
+              placeholder="Full name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              autoComplete="name"
             />
           </InputWrap>
+        )}
+        <InputWrap>
+          <InputIcon><Mail /></InputIcon>
+          <Input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            autoComplete="email"
+            spellCheck={false}
+            autoCapitalize="off"
+          />
+        </InputWrap>
+        <InputWrap>
+          <InputIcon><Lock /></InputIcon>
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            autoComplete={isSignUp ? 'new-password' : 'current-password'}
+            minLength={isSignUp ? 8 : undefined}
+          />
+          <PasswordToggle type="button" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOff /> : <Eye />}
+          </PasswordToggle>
+        </InputWrap>
+
+        {isSignUp && (
           <InputWrap>
             <InputIcon><Lock /></InputIcon>
             <Input
               type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              autoComplete={isSignUp ? 'new-password' : 'current-password'}
-              minLength={isSignUp ? 8 : undefined}
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+              minLength={8}
             />
-            <PasswordToggle type="button" onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <EyeOff /> : <Eye />}
-            </PasswordToggle>
           </InputWrap>
+        )}
 
-          {isSignUp && (
-            <InputWrap>
-              <InputIcon><Lock /></InputIcon>
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Confirm password"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                minLength={8}
-              />
-            </InputWrap>
-          )}
-
-          {isSignUp && password.length > 0 && (
-            <RequirementsList>
-              {passwordChecks.map(c => (
-                <Requirement key={c.label} $met={c.met}>
-                  {c.met ? <CheckCircle2 /> : <Check style={{ opacity: 0.3 }} />}
-                  {c.label}
-                </Requirement>
-              ))}
-              <Requirement $met={passwordsMatch}>
-                {passwordsMatch ? <CheckCircle2 /> : <Check style={{ opacity: 0.3 }} />}
-                Passwords match
+        {isSignUp && password.length > 0 && (
+          <RequirementsList>
+            {passwordChecks.map(c => (
+              <Requirement key={c.label} $met={c.met}>
+                {c.met ? <CheckCircle2 /> : <Check style={{ opacity: 0.3 }} />}
+                {c.label}
               </Requirement>
-            </RequirementsList>
-          )}
+            ))}
+            <Requirement $met={passwordsMatch}>
+              {passwordsMatch ? <CheckCircle2 /> : <Check style={{ opacity: 0.3 }} />}
+              Passwords match
+            </Requirement>
+          </RequirementsList>
+        )}
 
-          {!isSignUp && (
-            <ForgotLink
-              type="button"
-              onClick={() => { setForgotOpen(true); setForgotEmail(email); setForgotError(''); setForgotSentTo(null); }}
-            >
-              Forgot password?
-            </ForgotLink>
-          )}
-
-          <Button
-            type="submit"
-            $variant="primary"
-            $size="lg"
-            $fullWidth
-            disabled={submitting || (isSignUp ? !canSubmitSignup : !canSubmitLogin)}
-            style={{ marginTop: 8 }}
+        {!isSignUp && (
+          <ForgotLink
+            type="button"
+            onClick={() => { setForgotOpen(true); setForgotEmail(email); setForgotError(''); setForgotSentTo(null); }}
           >
-            {submitting ? 'Loading…' : isSignUp ? 'Create account' : 'Log in'}
-          </Button>
-          {isSignUp && (
-            <LegalNotice>
-              By creating an account, you agree to Peachy's{' '}
-              <Link to="/terms">Terms of Use</Link> and{' '}
-              <Link to="/privacy">Privacy Policy</Link>.
-            </LegalNotice>
-          )}
-        </Form>
+            Forgot password?
+          </ForgotLink>
+        )}
 
-        <Divider>or</Divider>
-
-        <Button $variant="secondary" $size="lg" $fullWidth onClick={() => auth.loginWithGoogle()}>
-          <GoogleIcon />
-          Continue with Google
+        <Button
+          type="submit"
+          $variant="primary"
+          $size="md"
+          $fullWidth
+          disabled={submitting || (isSignUp ? !canSubmitSignup : !canSubmitLogin)}
+          style={{ marginTop: 8 }}
+        >
+          {submitting ? 'Loading…' : isSignUp ? 'Create account' : 'Log in'}
         </Button>
         {isSignUp && (
           <LegalNotice>
-            By continuing with Google, you also agree to our{' '}
-            <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.
+            By creating an account, you agree to Peachy's{' '}
+            <Link to="/terms">Terms of Use</Link> and{' '}
+            <Link to="/privacy">Privacy Policy</Link>.
           </LegalNotice>
         )}
+      </Form>
 
-        <BottomText>
-          {isSignUp
-            ? <>Already have an account? <Button type="button" $variant="link" $size="sm" onClick={() => { setIsSignUp(false); setError(''); }}>Log in</Button></>
-            : <>Don't have an account? <Button type="button" $variant="link" $size="sm" onClick={() => { setIsSignUp(true); setError(''); }}>Sign up</Button></>
-          }
-        </BottomText>
-      </Container>
+      <Divider $embedded={embedded}>or</Divider>
+
+      <Button $variant="secondary" $size="md" $fullWidth onClick={() => auth.loginWithGoogle()}>
+        <GoogleIcon />
+        Continue with Google
+      </Button>
+      {isSignUp && (
+        <LegalNotice>
+          By continuing with Google, you also agree to our{' '}
+          <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.
+        </LegalNotice>
+      )}
+
+      <BottomText $embedded={embedded}>
+        {isSignUp
+          ? <>Already have an account? <Button type="button" $variant="link" $size="sm" onClick={() => { setIsSignUp(false); setError(''); }}>Log in</Button></>
+          : <>Don't have an account? <Button type="button" $variant="link" $size="sm" onClick={() => { setIsSignUp(true); setError(''); }}>Sign up</Button></>
+        }
+      </BottomText>
 
       <Modal
         open={forgotOpen}
@@ -803,7 +764,6 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
       </Modal>
-      <Footer />
-    </PageWrapper>
+    </>
   );
 };

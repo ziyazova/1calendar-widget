@@ -58,6 +58,7 @@ export {
 export type { LabelVariant, LabelSize } from './Badges';
 export { Card, CardHeader, CardTitle, CardSubtitle, CardSection } from './Card';
 export { Modal, ModalFooter } from './Modal';
+export { UpgradeModal } from './UpgradeModal';
 export { Toast, ToastShell, ToastIconBubble, ToastMessage } from './Toast';
 export type { ToastTone } from './Toast';
 export {

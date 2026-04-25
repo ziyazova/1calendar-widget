@@ -22,11 +22,19 @@ interface ToastProps {
   tone?: ToastTone;
   duration?: number;
   icon?: React.ReactNode;
+  /** Where the toast docks. Default `bottom`; `top` works in editors where
+   *  bottom is busy (e.g. Studio's floating toolbar). */
+  position?: 'top' | 'bottom';
   children: React.ReactNode;
 }
 
-const slideIn = keyframes`
+const slideInBottom = keyframes`
   from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+`;
+
+const slideInTop = keyframes`
+  from { opacity: 0; transform: translate(-50%, -12px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
 `;
 
@@ -61,10 +69,13 @@ const toneMap: Record<ToastTone, { bg: string; fg: string; border: string; iconB
   },
 };
 
-export const ToastShell = styled.div<{ $tone: ToastTone }>`
+export const ToastShell = styled.div<{ $tone: ToastTone; $position?: 'top' | 'bottom' }>`
   position: fixed;
   left: 50%;
-  bottom: calc(32px + env(safe-area-inset-bottom));
+  ${({ $position }) =>
+    $position === 'top'
+      ? 'top: calc(16px + env(safe-area-inset-top));'
+      : 'bottom: calc(32px + env(safe-area-inset-bottom));'}
   transform: translateX(-50%);
   z-index: ${({ theme }) => theme.zIndex.popover};
   display: inline-flex;
@@ -84,7 +95,7 @@ export const ToastShell = styled.div<{ $tone: ToastTone }>`
   font-size: 13px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  animation: ${slideIn} 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: ${({ $position }) => ($position === 'top' ? slideInTop : slideInBottom)} 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 export const ToastIconBubble = styled.div<{ $tone: ToastTone }>`
@@ -112,7 +123,7 @@ const defaultIcon: Record<ToastTone, React.ReactNode> = {
   neutral: <Info />,
 };
 
-export function Toast({ open, onClose, tone = 'success', duration = 2000, icon, children }: ToastProps) {
+export function Toast({ open, onClose, tone = 'success', duration = 2000, icon, position = 'bottom', children }: ToastProps) {
   useEffect(() => {
     if (!open) return;
     const t = setTimeout(onClose, duration);
@@ -122,7 +133,7 @@ export function Toast({ open, onClose, tone = 'success', duration = 2000, icon, 
   if (!open) return null;
 
   return (
-    <ToastShell $tone={tone} role="status" aria-live="polite">
+    <ToastShell $tone={tone} $position={position} role="status" aria-live="polite">
       <ToastIconBubble $tone={tone}>{icon ?? defaultIcon[tone]}</ToastIconBubble>
       <ToastMessage>{children}</ToastMessage>
     </ToastShell>
