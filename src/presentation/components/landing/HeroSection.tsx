@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Button } from '../shared/Button';
+import { media } from '@/presentation/themes/media';
 
 /* ── Rotating text ── */
 const RotatingLine = styled.span<{ $width: number }>`
@@ -194,10 +195,13 @@ const Title = styled.h1`
     font-size: 56px;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 40px;
+  /* Mobile: fluid clamp so iPhone SE (375px) doesn't wrap a 40px headline
+   * onto a third line. At 640 → 40px (matches old @media md value); at
+   * 375 → ~33.75px (9vw), down to a 28px floor. */
+  ${media.mobile`
+    font-size: clamp(28px, 9vw, 40px);
     line-height: 1.2;
-  }
+  `}
 `;
 
 const HeroSubtitle = styled.p`
