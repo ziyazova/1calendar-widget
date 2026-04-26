@@ -229,9 +229,11 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Mobile: vertical stack, full-width, gap 12. Each CTA: 44 height,
-   * radius 12 (reverted from 14 per "радиус верни"). Label font now
-   * comes from the shared Button DS xl mobileFontSize (13). */
+  /* Mobile: vertical stack, full-width, gap 12. Height/radius/font
+   * all come from the shared Button DS xl tokens (mobileHeight 44,
+   * radius 12, mobileFontSize 13) — no inline overrides. Only the
+   * 100% width and the secondary's bumped 600 weight are layout
+   * choices that aren't part of the DS. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
@@ -241,8 +243,6 @@ const CTAs = styled.div`
 
     & > * {
       width: 100%;
-      height: 44px;
-      border-radius: 12px;
       font-weight: 600;
     }
   }

@@ -114,9 +114,11 @@ export const buttonSizeTokens: Record<ButtonSize, ButtonSizeTokens> = {
     radius: '12px',
     fontSize: '14px',
     iconSize: '16px',
-    // Hero / primary-CTA — bumped height on phone; label slightly
-    // tighter via mobileFontSize. Desktop frozen.
-    mobileHeight: '56px',
+    // Phone: collapses to lg-equivalent (44 / 13fs). Was 56 originally;
+    // user found that too tall for hero CTAs and we hardcoded 44 inline.
+    // Now in DS so every xl across the app gets the same mobile size
+    // (Apple HIG min 44) — no per-component drift.
+    mobileHeight: '44px',
     mobileFontSize: '13px',
   },
 };
