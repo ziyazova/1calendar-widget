@@ -271,8 +271,12 @@ export const theme = {
       cardGap: '12px',          // gap between sibling cards / steps inside a section
       // Headline → subtitle/body text on the same heading block.
       titleToBody: '8px',
-      // Body text (or solo title) → first content (grid, marquee, cards).
-      bodyToCards: '16px',
+      // Body text → first content (grid, marquee, cards).
+      bodyToCards: '20px',
+      // Solo title (no subtitle) → first content. = titleToBody (8) +
+      // bodyToCards (20). Keeps the visual descent from title-to-cards
+      // identical whether or not a subtitle is rendered.
+      titleToCards: '28px',
     },
   },
 

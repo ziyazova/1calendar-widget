@@ -70,8 +70,10 @@ const GalleryHeader = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
     gap: ${({ theme }) => theme.layout.mobile.titleToBody};
-    /* Title → marquee = 16 (bodyToCards) — unified with all sections. */
-    margin-bottom: ${({ theme }) => theme.layout.mobile.bodyToCards};
+    /* Solo title (no subtitle) → titleToCards (28 = titleToBody 8 +
+     * bodyToCards 20). Visual descent matches sections that have a
+     * subtitle. */
+    margin-bottom: ${({ theme }) => theme.layout.mobile.titleToCards};
   }
 `;
 
