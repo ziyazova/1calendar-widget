@@ -80,9 +80,12 @@ const MarqueeContainer = styled.div`
     padding: 0 36px;
   }
 
+  /* Mobile — drop horizontal padding so the carousel column can run
+   * edge-to-edge; gutter is handled by MarqueeInner's padding so the
+   * first/last card aligns with the section edge. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
-    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    padding: 0;
   }
 `;
 
@@ -98,20 +101,25 @@ const MarqueeColumn = styled.div`
     }
   }
 
-  /* Mobile — drop the marquee column entirely. Auto-scroll + height
-   * cap + mask gradient was reading as "heavy" on phone (c_mog11rq0).
-   * Switch to a static vertical stack of the first 3 testimonials —
-   * the same pattern Stripe / Vercel / GitHub use on mobile (no
-   * carousel, no auto-rotation, just a short list of strong proof).
-   * Constants:
-   *   - height: auto (no clipping, content drives height)
-   *   - mask: none (nothing to fade — all 3 cards fully visible)
-   *   - cards 4+ hidden via :nth-child rule on the inner stack
-   *   - only the first column renders (cols 2/3 already hidden) */
+  /* Mobile — column becomes the horizontal scroll container of a
+   * swipe-snap carousel. Reverted from the static stack after user
+   * preferred a carousel pattern (c_mog11rq0 follow-up).
+   * - height auto (cards drive height)
+   * - mask:none (no fade; the scroll edges are handled by padding)
+   * - overflow-x:auto + scroll-snap so swipes land on a card
+   * - only the first column renders (cols 2/3 still hidden) */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: auto;
     mask-image: none;
     -webkit-mask-image: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+    scrollbar-width: none;
 
     &:nth-child(n+2) {
       display: none;
@@ -136,19 +144,20 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
     animation: none;
   }
 
-  /* Mobile — no animation, only first 3 cards visible. The inner
-   * stack normally renders [...items, ...items] (10 cards) for the
-   * infinite-scroll loop; on phone we collapse that to a static list
-   * of the 3 strongest testimonials. The :nth-child cutoff keeps
-   * the section short and skim-friendly — same pattern Stripe /
-   * Vercel / GitHub use on mobile (no carousel, no rotation, just
-   * a brief social-proof snapshot).
-   * Comments c_mofyx1hg + c_mog11rq0 (2026-04-26). */
+  /* Mobile — horizontal swipe-snap carousel track. The inner stack
+   * normally renders [...items, ...items] (10 cards) for the infinite
+   * vertical scroll on desktop; on phone we keep the carousel direction
+   * horizontal but cap it at the 5 unique testimonials (hide duplicates).
+   * Padding 0/20 = mobile gutter so the leftmost card aligns with the
+   * section edge. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     animation: none;
+    flex-direction: row;
     gap: 12px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
 
-    & > *:nth-child(n+4) {
+    /* Hide the second copy of items so the swipe loop ends at 5. */
+    & > *:nth-child(n+6) {
       display: none;
     }
   }
@@ -173,6 +182,11 @@ const Card = styled.div`
      * on phone and the rest of the mobile-radii audit.
      * Comment c_mog10kli: "радиусы слишком большие". */
     border-radius: ${({ theme }) => theme.radii.lg};
+    /* Carousel card: fixed width, snap to center on swipe. min(85vw, 320px)
+     * keeps the card narrow enough that the next card peeks at the
+     * right edge — signals scrollability. */
+    width: min(85vw, 320px);
+    scroll-snap-align: center;
   }
 `;
 

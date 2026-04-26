@@ -112,8 +112,10 @@ export const buttonSizeTokens: Record<ButtonSize, ButtonSizeTokens> = {
     fontSize: '14px',
     iconSize: '16px',
     // Hero / primary-CTA scale on phone. Desktop frozen at 48.
+    // mobilePadding intentionally omitted so the button doesn't grow
+    // wider on phone — only height bumps. (User asked "по ширине мб
+    // меньше" after seeing 0/28.)
     mobileHeight: '56px',
-    mobilePadding: '0 28px',
   },
 };
 
