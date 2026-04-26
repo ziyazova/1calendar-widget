@@ -141,6 +141,14 @@ const Star = styled.span<{ $i: number }>`
   animation: ${starPop} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: ${({ $i }) => 0.9 + $i * 0.13}s;
   svg { width: 12px; height: 12px; fill: currentColor; }
+
+  /* Mobile — kill the peach pop animation and paint stars in brand
+   * accent (indigo) at ~70% opacity. Comment c_mog2ps42 (2026-04-26):
+   * "акцентного нашего цвета, не 100 процентов прозрачки". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    animation: none;
+    color: rgba(99, 102, 241, 0.7);
+  }
 `;
 
 /* ── Headline ── */
@@ -156,6 +164,12 @@ const Headline = styled.h1`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-top: 14px;
+    /* Hero title bigger on phone — clamp(44, 6vw, 84) was stuck at 44px
+     * below 640. Bump to clamp(48, 13vw, 60) so it scales 48 → 60 across
+     * 375 → 460 viewports. Comment c_mog2muer (2026-04-26): "сделай
+     * чуть больше". */
+    font-size: clamp(48px, 13vw, 60px);
+    line-height: 1.1;
   }
 
   em {
@@ -215,8 +229,8 @@ const CTAs = styled.div`
   /* Phone — stack CTAs vertically so each is full-width and tappable.
    * Cap the row width so they don't stretch edge-to-edge on landscape.
    * Tighter top margin so the button row sits close to the subtitle.
-   * Shrink buttons from xl → md dimensions to match the rest of the
-   * landing's mobile button sizing (Explore all, etc). */
+   * Children inherit the shared Button's xl mobileHeight (56) — the
+   * old forced 36px override was removed per c_mog2lpiy ("сделай больше"). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
@@ -226,10 +240,6 @@ const CTAs = styled.div`
 
     & > * {
       width: 100%;
-      height: 36px;
-      padding: 0 16px;
-      font-size: 13px;
-      border-radius: 10px;
     }
   }
 `;

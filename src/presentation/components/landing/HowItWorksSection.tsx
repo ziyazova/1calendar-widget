@@ -79,18 +79,21 @@ const Card = styled.div<{ $bg: string }>`
     pointer-events: none;
   }
 
-  /* Mobile — compact card. min-height drops from 150 → 110 because the
-   * icon, two-line title and one-line description fit in ~96px and the
-   * 150 floor was leaving a half-empty third of the card. Inner padding
-   * tightens to 16px so text breathes without dominating the card.
-   * Radius drops to radii.lg (16) so the corner-curve is proportional
-   * to the smaller card size; xl (20) was visually loud at this width.
-   * Comments c_mofywbb8 ("более компактные") + c_mog10kli ("радиусы
-   * слишком большие"). */
+  /* Mobile — list-row layout: icon left, text right.
+   * Was vertical (icon-on-top, text-below); switched after c_mog2od8x
+   * ("выровни слева а текст справа"). Reads as a compact step-list
+   * rather than a stack of square tiles — the typical mobile pattern
+   * for "How it works" sections.
+   * - flex-direction: row + align-items: center
+   * - min-height drops to auto (content drives it)
+   * - radius radii.lg (16) per the earlier mobile-radii audit. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 16px;
-    min-height: 110px;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 16px;
+    min-height: 0;
     border-radius: ${({ theme }) => theme.radii.lg};
+    gap: 14px;
   }
 `;
 
@@ -113,17 +116,18 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
     stroke-width: 1.8;
   }
 
-  /* Mobile — smaller icon block + tighter gap to title; matches the
-   * compactified card padding above. Radius drops to radii.md (12) so
-   * the corner is proportional to the 40px icon (lg=16 looked oversized).
-   * Comment c_mog10kli (2026-04-26): "радиусы слишком большие". */
+  /* Mobile — small list-row icon (36×36, 16px svg). margin-bottom
+   * removed because Card is now flex-row (gap controls the icon→text
+   * distance). Radius radii.md (12) keeps it proportional.
+   * c_mog10kli ("радиусы большие") + c_mog2od8x ("иконку мб меньше"). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: ${({ theme }) => theme.radii.md};
-    margin-bottom: 12px;
+    margin-bottom: 0;
+    flex-shrink: 0;
 
-    svg { width: 18px; height: 18px; }
+    svg { width: 16px; height: 16px; }
   }
 `;
 

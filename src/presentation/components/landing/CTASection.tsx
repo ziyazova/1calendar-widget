@@ -41,6 +41,12 @@ const CTATitle = styled.h2`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.fluid.h2};
+    /* Reset bottom margin so the global Title → Subtitle gap is 8
+     * (driven solely by Subtitle margin-top). Was stacking 8+8 = 16
+     * on mobile which read as different from other sections.
+     * Comment c_mog2nkjs (2026-04-26): "сделай расстояние до боди как
+     * и у других". */
+    margin-bottom: 0;
   }
 `;
 

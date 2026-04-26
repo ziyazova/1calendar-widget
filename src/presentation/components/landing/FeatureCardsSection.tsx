@@ -162,12 +162,11 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
 
-  /* Mobile — compact tab + min-width:0 + truncate so the title row
-   * lays out cleanly even on narrow cards. Comment c_mog13ar0
-   * (2026-04-26): "лейаут у этих карточек поезжавший". */
+  /* Mobile — compact tab. Tightened twice: c_mog13ar0 ("лейаут
+   * поезжавший") then c_mog2m2nv ("шапку чуть меньше + текст в ней"). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 10px 14px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 12px;
     min-width: 0;
 
     > *:first-of-type ~ * {
@@ -229,11 +228,11 @@ const FeatureCardTitle = styled.h3`
   margin: 0 0 12px;
   line-height: 1.2;
 
-  /* Mobile — title was reading as oversized inside the swipe card.
-   * 18/600 keeps the visual hierarchy without dominating the body.
-   * Comment c_mofz42xe (2026-04-26): "по шрифту, заголовки огромные". */
+  /* Mobile — title size cut twice: c_mofz42xe ("заголовки огромные")
+   * then c_mog2n5o4 ("в карточке зеделай чуть меньше"). 16/600 + the
+   * compact tab + 13/desc gives a quiet, readable card. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 18px;
+    font-size: 16px;
     margin: 0 0 8px;
   }
 `;
