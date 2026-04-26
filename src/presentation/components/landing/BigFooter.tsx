@@ -82,6 +82,13 @@ const BrandTagline = styled.p`
   color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.01em;
   line-height: 1.5;
+
+  /* Hide on mobile — tagline is decorative; brand name + nav columns
+   * carry the structure at this width.
+   * Comment c_mog12d2l (2026-04-26): "убери текст у телефонной версии". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
 `;
 
 const FooterNav = styled.div`

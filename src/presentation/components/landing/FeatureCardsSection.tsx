@@ -161,6 +161,19 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   font-size: 14px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
+
+  /* Mobile — compact tab + min-width:0 + truncate so the title row
+   * lays out cleanly even on narrow cards. Comment c_mog13ar0
+   * (2026-04-26): "лейаут у этих карточек поезжавший". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-width: 0;
+
+    > *:first-of-type ~ * {
+      min-width: 0;
+    }
+  }
 `;
 
 const FeatureTabDot = styled.span<{ $color: string }>`
@@ -288,9 +301,13 @@ const Dot = styled.button<{ $active: boolean }>`
   width: ${({ $active }) => ($active ? '20px' : '6px')};
   height: 6px;
   border-radius: 3px;
+  /* Active = brand accent (semi-transparent so it doesn't read as a
+   * solid bar); inactive = soft grey. Comment c_mog12vn0 (2026-04-26):
+   * "цвет полупрозрачный акцентный или серый". */
   background: ${({ $active, theme }) =>
-    $active ? theme.colors.text.primary : theme.colors.border.medium};
-  transition: width 0.25s ease, background 0.25s ease;
+    $active ? theme.colors.accent : theme.colors.border.medium};
+  opacity: ${({ $active }) => ($active ? 0.65 : 1)};
+  transition: width 0.25s ease, background 0.25s ease, opacity 0.25s ease;
 `;
 
 const WhyTitle = styled.h2`
