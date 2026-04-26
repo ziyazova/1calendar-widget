@@ -36,18 +36,28 @@ const Section = styled.section<{
   $tint?: boolean;
   $bleedTop?: boolean;
   $bleedBottom?: boolean;
+  /* Optional desktop-only top margin. Used to push a section down on
+   * desktop without disturbing the uniform mobile vertical rhythm. */
+  $mtDesktop?: string;
 }>`
+  margin-top: ${({ $mtDesktop }) => $mtDesktop || '0'};
   padding-top: ${({ $size = 'md', $bleedTop }) => ($bleedTop ? '0' : SECTION_Y[$size])};
   padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
   padding-left: 0;
   padding-right: 0;
   ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
+  /* Mobile vertical rhythm — single rule for ALL sections.
+   * 28px top + 28px bottom = 56px gap between any two adjacent sections.
+   * No per-section overrides on mobile so the rhythm reads as uniform.
+   * $bleedTop/$bleedBottom (CTA → Footer) still flatten to 0.
+   * $mtDesktop is reset here so the desktop-only push doesn't leak. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 0;
     padding-top: ${({ $size = 'md', $bleedTop }) =>
-      $bleedTop ? '0' : $size === 'flush' ? '0' : '48px'};
+      $bleedTop ? '0' : $size === 'flush' ? '0' : '28px'};
     padding-bottom: ${({ $size = 'md', $bleedBottom }) =>
-      $bleedBottom ? '0' : $size === 'flush' ? '0' : '48px'};
+      $bleedBottom ? '0' : $size === 'flush' ? '0' : '28px'};
   }
 `;
 
@@ -84,8 +94,11 @@ const Hero = styled.section<{ $v2?: boolean }>`
     z-index: 1;
   }
 
+  /* Mobile bottom padding aligned with Section's 28px so the gap
+   * between Hero and the first Section reads as the same 56px rhythm
+   * (28 + 28) used everywhere else on the mobile landing. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 32px 0 48px;
+    padding: 32px 0 28px;
     gap: 16px;
   }
 `;
@@ -116,7 +129,7 @@ export const LandingPage: React.FC = () => {
         <HowItWorksSection />
       </Section>
 
-      <Section $size="gap" $tint style={{ marginTop: '80px' }}>
+      <Section $size="gap" $tint $mtDesktop="80px">
         <TestimonialsSection />
       </Section>
 
