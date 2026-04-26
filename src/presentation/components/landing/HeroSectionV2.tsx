@@ -40,14 +40,13 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — explicit 56/20 padding box. Owns the entire Hero spacing
-   * on mobile; the outer Hero wrapper in LandingPage zeroes itself
-   * here. Rhythm inside is driven by margin-bottom on each child
-   * (Eyebrow 24, Headline 20, Sub 28). */
+  /* Phone — 52/20 padding box. Top reduced 56 → 52 to lift the eyebrow
+   * 4px higher per follow-up. Inner rhythm: Eyebrow 28 / Headline 20 /
+   * Sub 28 (margin-driven). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 56px 20px;
+    padding: 52px 20px 56px;
     justify-content: flex-start;
   }
 `;
