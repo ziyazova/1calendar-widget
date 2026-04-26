@@ -51,8 +51,12 @@ const Title = styled.h2`
   text-align: center;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.fluid.h2};
-    margin: 0 0 12px 0;
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+    /* Title → Subtitle = 8 (titleToBody) — unified with the rest of
+     * the landing (HowItWorks/Testimonials/CTA all use 8). */
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.titleToBody} 0;
   }
 `;
 
@@ -63,9 +67,11 @@ const Subtitle = styled.p`
   text-align: center;
   letter-spacing: -0.01em;
 
-  /* Mobile — Subtitle drives the gap to cards: margin-bottom 28. */
+  /* Mobile — sectionBody token (15/400/1.5). 28 below = body → cards. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 14px;
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
     margin: 0 0 28px 0;
   }
 `;

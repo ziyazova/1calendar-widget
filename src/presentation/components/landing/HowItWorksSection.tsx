@@ -21,7 +21,9 @@ const SectionTitle = styled.h2`
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.fluid.h2};
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
   }
 `;
 
@@ -32,9 +34,10 @@ const SectionSubtitle = styled.p`
   letter-spacing: -0.01em;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 14px;
-    /* Title → Subtitle = 8 (titleToBody); Subtitle → cards = 16 (bodyToCards).
-     * Per the global landing rhythm rule (2026-04-26). */
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+    /* Title → Subtitle = 8 (titleToBody); Subtitle → cards = 16. */
     margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
@@ -137,6 +140,13 @@ const CardTitle = styled.h3`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   margin: 0 0 8px;
+
+  /* Mobile — cardHeadline token (16/700/1.35). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.cardHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardHeadline.lineHeight};
+  }
 `;
 
 const CardDesc = styled.p`
@@ -145,6 +155,13 @@ const CardDesc = styled.p`
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   margin: 0;
   max-width: 240px;
+
+  /* Mobile — cardBody token (14/400/1.5). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
+  }
 `;
 
 const CTA_GRADIENT = peachyTheme.colors.gradients.softBannerLarge;

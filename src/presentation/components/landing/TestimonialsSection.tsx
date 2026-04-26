@@ -47,7 +47,9 @@ const Title = styled.h2`
   line-height: 1.2;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.fluid.h2};
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
@@ -60,8 +62,10 @@ const Subtitle = styled.p`
   letter-spacing: -0.01em;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 14px;
-    /* Title → Subtitle = 8; Subtitle → grid = 16. Global landing rhythm. */
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+    /* Title → Subtitle = 8; Subtitle → grid = 16. */
     margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }

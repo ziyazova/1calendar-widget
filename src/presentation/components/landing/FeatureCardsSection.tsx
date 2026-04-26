@@ -28,10 +28,12 @@ const FeatureStack = styled.div`
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    /* padding-left = section gutter (20) so first card aligns with
-     * section content boundary. padding-right 0 lets the next card
-     * peek at the viewport's right edge. */
-    padding: 0 0 0 20px;
+    /* Carousel matches TemplatesGallery: gutter on both sides of the
+     * scroll port + scroll-padding-left so the snap rest position lines
+     * up with the gutter (otherwise mandatory snap pulls the first
+     * card flush to the viewport edge — "съезжает справа"). */
+    padding: 0 20px;
+    scroll-padding-left: 20px;
 
     &::-webkit-scrollbar { display: none; }
     scrollbar-width: none;
@@ -125,10 +127,9 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     position: static;
     flex-direction: column;
     flex-shrink: 0;
-    /* 78vw card — next card peeks ~22% on the right edge.
-     * Snap-aligns to the left so the focused card sits flush with
-     * the section gutter. */
-    width: 78vw;
+    /* 90vw card — wider focused card with a small (~10%) peek of the
+     * next card to signal scrollability without dominating. */
+    width: 90vw;
     height: auto;
     padding: 0;
     gap: 0;
@@ -161,11 +162,13 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
 
-  /* Mobile — fixed window-style header: 44 height, 16 horizontal. */
+  /* Mobile — fixed window-style header: 44 height, 16 horizontal.
+   * Tab labels (Functionality / Design / Payment) muted via tertiary. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 44px;
     padding: 0 16px;
     font-size: 12px;
+    color: ${({ theme }) => theme.colors.text.tertiary};
     min-width: 0;
 
     > *:first-of-type ~ * {
@@ -228,11 +231,12 @@ const FeatureCardTitle = styled.h3`
   margin: 0 0 12px;
   line-height: 1.2;
 
-  /* Mobile — 18/700/1.3 + 8 below for a tight title→desc pair. */
+  /* Mobile — cardHeadline token (16/700/1.35). Tight 8 below for
+   * title→desc pair. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.3;
+    font-size: ${({ theme }) => theme.typography.mobile.cardHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardHeadline.lineHeight};
     margin: 0 0 8px 0;
   }
 `;
@@ -244,11 +248,11 @@ const FeatureCardDesc = styled.p`
   margin: 0;
   letter-spacing: -0.01em;
 
-  /* Mobile — 15/1.5 with text.body color (closest to spec text.secondary).
-   * margin-bottom 24 sets desc → image gap. */
+  /* Mobile — cardBody token (14/400/1.5). 24 below sets desc → image. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 15px;
-    line-height: 1.5;
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
     color: ${({ theme }) => theme.colors.text.body};
     margin: 0 0 24px 0;
   }
@@ -273,12 +277,12 @@ const FeatureCardImage = styled.div`
     display: block;
   }
 
-  /* Mobile — 16:10 aspect placeholder, 14 radius, subtle bg, no margin. */
+  /* Mobile — 4:3 aspect (taller than 16:10), 14 radius, subtle bg. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin: 0;
     flex: 0 0 auto;
     height: auto;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 3;
     min-height: 0;
     border-radius: 14px;
     background: ${({ theme }) => theme.colors.background.surfaceMuted};
@@ -327,7 +331,9 @@ const WhyTitle = styled.h2`
   margin: 0 0 32px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.fluid.h2};
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
     /* Solo title (no subtitle) → cards = 16 (bodyToCards). */
     margin: 0 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
   }

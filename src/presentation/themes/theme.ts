@@ -181,6 +181,16 @@ export const theme = {
       h2: 'clamp(24px, 5vw, 32px)',
     },
 
+    /* Mobile typography roles — single source of truth for landing
+     * type scale on phone. Hero is intentionally excluded (it has its
+     * own oversized scale). Card body MUST NEVER exceed section body. */
+    mobile: {
+      sectionHeadline: { size: '24px', lineHeight: '1.2',  weight: 600 },
+      sectionBody:     { size: '15px', lineHeight: '1.5',  weight: 400 },
+      cardHeadline:    { size: '16px', lineHeight: '1.35', weight: 600 },
+      cardBody:        { size: '14px', lineHeight: '1.5',  weight: 400 },
+    },
+
     letterSpacing: {
       widest: '0.06em',              // UPPERCASE pills
       normal: '0',

@@ -96,7 +96,9 @@ const GalleryTitle = styled.h2`
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.fluid.h2};
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
   }
 `;
 
@@ -291,8 +293,11 @@ const TemplateCardTitle = styled.span`
   text-overflow: ellipsis;
   min-width: 0;
 
+  /* Mobile — cardBody token (14/400/1.5) for the title row text. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 13px;
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
   }
 `;
 
@@ -304,13 +309,11 @@ const TemplateCardPrice = styled.span`
   line-height: 1.3;
   flex-shrink: 0;
 
-  /* Mobile — price one shade lighter than title (text.tertiary, weight 400)
-   * for the Apple/Stripe-style minimal aesthetic where price recedes and
-   * title leads. Comment c_mog2qfcg ("цена другого цвета — темнее или
-   * светлее?"): designer call → subtle wins for a quality/aesthetic brand. */
+  /* Mobile — cardBody token + lighter color (price recedes, Apple-style). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 13px;
-    font-weight: 400;
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
     color: ${({ theme }) => theme.colors.text.tertiary};
   }
 `;
