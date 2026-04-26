@@ -103,11 +103,11 @@ const Hero = styled.section<{ $v2?: boolean }>`
    * + follow-up "чуть больше воздуха в hero". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 32px 0 28px;
-    /* gap drives the entire hero rhythm — sub-elements (Eyebrow,
-     * Headline, Sub) zero their own margins on mobile so the visual
-     * hierarchy stays clean and even. CTAs get an extra margin-top
-     * to set the action apart. */
-    gap: 20px;
+    /* gap drives the entire hero rhythm — sub-elements zero their own
+     * margins on mobile so the hierarchy stays clean. 28 (was tightened
+     * to 20 — too sticky, "все прилипнуто"). CTAs add +4 for action zone.
+     * Final: 28 / 28 / 32. */
+    gap: 28px;
     min-height: 65vh;
   }
 `;

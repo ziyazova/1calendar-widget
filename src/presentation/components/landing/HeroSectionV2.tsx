@@ -153,9 +153,11 @@ const Headline = styled.h1`
   max-width: 920px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* margin-top zeroed; Hero gap (20) drives the rhythm. */
+    /* margin-top zeroed; Hero gap drives the rhythm. */
     margin-top: 0;
-    font-size: clamp(48px, 13vw, 60px);
+    /* slightly smaller per "текст в хиро чуть-чуть меньше" — was
+     * clamp(48, 13vw, 60). */
+    font-size: clamp(42px, 12vw, 54px);
     line-height: 1.1;
   }
 
@@ -216,14 +218,14 @@ const CTAs = styled.div`
 
   /* Phone — stack CTAs vertically, full-width up to 320 cap, height
    * locked to 44 (lg size, NOT the bumped xl mobileHeight 56).
-   * margin-top: 12 gives the action zone a little extra space beyond
-   * the Hero gap (20) so total Sub→CTAs reads as 32 vs 20 elsewhere
-   * — clean hierarchy: 20 / 20 / 32. */
+   * margin-top: 4 nudges the action zone slightly off the Hero gap
+   * (28) so Sub → CTAs reads as 32 vs 28 elsewhere — clean hierarchy:
+   * 28 / 28 / 32. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
     max-width: 320px;
-    margin: 12px auto 0;
+    margin: 4px auto 0;
     gap: 10px;
 
     & > * {
