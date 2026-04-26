@@ -37,18 +37,6 @@ const FeatureStack = styled.div`
 
     &::-webkit-scrollbar { display: none; }
     scrollbar-width: none;
-
-    /* Mask mirrors Top templates (TemplatesGallery): one-sided fade at
-     * rest, two-sided once the user has scrolled past the first card. */
-    &[data-scrolled="false"] {
-      mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to right, black 0%, black 88%, transparent 100%);
-    }
-
-    &[data-scrolled="true"] {
-      mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-    }
   }
 `;
 
