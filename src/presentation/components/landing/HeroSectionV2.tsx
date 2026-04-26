@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { ArrowRight } from 'lucide-react';
 import { Button as SharedButton } from '../shared';
 
 /* Brand palette lives in `theme.colors.peach.*`. Animation values that
@@ -773,7 +774,7 @@ export const HeroSectionV2: React.FC<HeroSectionV2Props> = ({ onBrowseTemplates,
 
           <CTAs>
             <SharedButton $variant="primary" $size="xl" onClick={onBrowseTemplates}>
-              Browse templates
+              Browse templates <ArrowRight />
             </SharedButton>
             <SharedButton $variant="secondary" $size="xl" onClick={onExploreWidgets}>
               Explore widgets
