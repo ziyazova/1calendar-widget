@@ -269,12 +269,13 @@ const TemplateCardMeta = styled.div`
   gap: 12px;
   padding: 6px;
 
-  /* Mobile — title + price are a pair (price = attribute of title);
-   * 4px gap reads as one block, not two. */
+  /* Mobile — same row layout as desktop: title left, price right.
+   * Title ellipsizes if needed (white-space: nowrap on the title). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
     padding: 0 4px;
   }
 `;
