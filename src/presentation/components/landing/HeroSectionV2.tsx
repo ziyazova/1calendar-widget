@@ -229,8 +229,8 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Mobile: vertical stack, full-width, gap 12. Each CTA: 48/15/600,
-   * radius 12 — reduced from 52/16/14 ("неоправданно большие"). */
+  /* Mobile: vertical stack, full-width, gap 12. Each CTA: 44/15/600,
+   * radius 14 — height 44 (HIG min), radius bumped 12 → 14. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
@@ -240,8 +240,8 @@ const CTAs = styled.div`
 
     & > * {
       width: 100%;
-      height: 48px;
-      border-radius: 12px;
+      height: 44px;
+      border-radius: 14px;
       font-size: 15px;
       font-weight: 600;
     }
