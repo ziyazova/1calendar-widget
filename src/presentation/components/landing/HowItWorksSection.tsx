@@ -33,7 +33,9 @@ const SectionSubtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin: ${({ theme }) => theme.layout.mobile.titleGap} 0 ${({ theme }) => theme.layout.mobile.titleGap};
+    /* Title → Subtitle = 8 (titleToBody); Subtitle → cards = 16 (bodyToCards).
+     * Per the global landing rhythm rule (2026-04-26). */
+    margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
 
@@ -81,10 +83,14 @@ const Card = styled.div<{ $bg: string }>`
    * icon, two-line title and one-line description fit in ~96px and the
    * 150 floor was leaving a half-empty third of the card. Inner padding
    * tightens to 16px so text breathes without dominating the card.
-   * Comment c_mofywbb8 (2026-04-26): "более компактные сделать карточки". */
+   * Radius drops to radii.lg (16) so the corner-curve is proportional
+   * to the smaller card size; xl (20) was visually loud at this width.
+   * Comments c_mofywbb8 ("более компактные") + c_mog10kli ("радиусы
+   * слишком большие"). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 16px;
     min-height: 110px;
+    border-radius: ${({ theme }) => theme.radii.lg};
   }
 `;
 
@@ -108,10 +114,13 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
   }
 
   /* Mobile — smaller icon block + tighter gap to title; matches the
-   * compactified card padding above. */
+   * compactified card padding above. Radius drops to radii.md (12) so
+   * the corner is proportional to the 40px icon (lg=16 looked oversized).
+   * Comment c_mog10kli (2026-04-26): "радиусы слишком большие". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 40px;
     height: 40px;
+    border-radius: ${({ theme }) => theme.radii.md};
     margin-bottom: 12px;
 
     svg { width: 18px; height: 18px; }

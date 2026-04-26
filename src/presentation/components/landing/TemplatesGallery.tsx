@@ -42,7 +42,9 @@ const TemplatesMarqueeWrap = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 8px ${({ theme }) => theme.layout.mobile.gutter} 0;
+    /* padding-top: 0 — header→marquee gap is fully owned by GalleryHeader's
+     * margin-bottom (= bodyToCards). No stacking. */
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 0;
   }
 
   /* Mobile — native swipe with snap. overscroll-behavior contains the
@@ -64,7 +66,10 @@ const GalleryHeader = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
-    gap: ${({ theme }) => theme.layout.mobile.titleGap};
+    gap: ${({ theme }) => theme.layout.mobile.titleToBody};
+    /* Title → marquee = 16 (bodyToCards). Pairs with marquee
+     * padding-top: 0 mobile so the gap doesn't stack. */
+    margin-bottom: ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
 
@@ -382,10 +387,12 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
         <ArrowRight />
       </TemplatesScrollHint>
       <MobileExploreRow>
-        {/* Mobile primary CTA → size lg (44px) per Apple HIG min tap target.
-         * Was md (36px). Comment c_mofz84kz (2026-04-26): "так и должна
-         * быть большой - провреь". */}
-        <SharedButton $variant="primary" $size="lg" onClick={() => onNavigate('/templates')}>
+        {/* Mobile size = md (36px). Was bumped to lg in 96df7a3 after
+         * c_mofz84kz suggested it should be bigger, but c_mog0zawt reads
+         * the lg version as "огромная" — reverted. The 320px width (set
+         * by MobileExploreRow's child rule) gives a comfortable tap area
+         * even at 36px height. */}
+        <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')}>
           Explore all <ArrowRight />
         </SharedButton>
       </MobileExploreRow>

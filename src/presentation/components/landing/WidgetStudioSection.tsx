@@ -19,8 +19,10 @@ const Header = styled.div`
   gap: 16px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-bottom: ${({ theme }) => theme.layout.mobile.titleGap};
-    gap: ${({ theme }) => theme.layout.mobile.titleGap};
+    /* Header → cards = 16 (bodyToCards). Header internal gap unused
+     * since TitleRow holds both Title and Subtitle. */
+    margin-bottom: ${({ theme }) => theme.layout.mobile.bodyToCards};
+    gap: 0;
   }
 `;
 
@@ -29,6 +31,13 @@ const TitleRow = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 8px;
+
+  /* Mobile — Title → Subtitle = 8 (titleToBody), matching every other
+   * section on the landing. Comment c_mog0zz5m (2026-04-26):
+   * "у зедлайна и боди расстояние ни как у всех". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    gap: ${({ theme }) => theme.layout.mobile.titleToBody};
+  }
 `;
 
 const Title = styled.h2`
@@ -51,8 +60,12 @@ const Subtitle = styled.p`
   text-align: center;
   letter-spacing: -0.01em;
 
+  /* Mobile — reset margin-top so TitleRow's gap (12) is the only thing
+   * controlling the headline → body distance. Avoids the gap+margin
+   * stacking that made this section's spacing feel different. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
+    margin: 0;
   }
 `;
 

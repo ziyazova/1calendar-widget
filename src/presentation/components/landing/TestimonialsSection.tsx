@@ -61,7 +61,8 @@ const Subtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin: ${({ theme }) => theme.layout.mobile.titleGap} 0 24px;
+    /* Title → Subtitle = 8; Subtitle → grid = 16. Global landing rhythm. */
+    margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
@@ -154,6 +155,10 @@ const Card = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 16px;
+    /* radii.lg (16) instead of xl (20) — matches the compact card size
+     * on phone and the rest of the mobile-radii audit.
+     * Comment c_mog10kli: "радиусы слишком большие". */
+    border-radius: ${({ theme }) => theme.radii.lg};
   }
 `;
 

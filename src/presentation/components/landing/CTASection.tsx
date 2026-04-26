@@ -52,7 +52,8 @@ const CTASubtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin: ${({ theme }) => theme.layout.mobile.titleGap} 0 ${({ theme }) => theme.layout.mobile.titleGap};
+    /* Title → Subtitle = 8; Subtitle → buttons = 16. Global landing rhythm. */
+    margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
 

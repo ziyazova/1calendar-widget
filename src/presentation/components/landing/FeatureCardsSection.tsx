@@ -29,7 +29,10 @@ const FeatureStack = styled.div`
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 24px 8px;
+    /* padding-top dropped from 4 → 0 so the gap from the parent
+     * Header → first card stays at the 12px titleGap rhythm instead of
+     * stacking +4. Comment c_mog0zz5m: "до картчоек тже". */
+    padding: 0 24px 8px;
 
     &::-webkit-scrollbar { display: none; }
     scrollbar-width: none;
@@ -299,7 +302,8 @@ const WhyTitle = styled.h2`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.fluid.h2};
-    margin: 0 0 ${({ theme }) => theme.layout.mobile.titleGap};
+    /* Solo title (no subtitle) → cards = 16 (bodyToCards). */
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
 

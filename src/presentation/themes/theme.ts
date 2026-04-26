@@ -253,10 +253,13 @@ export const theme = {
   // hardcoded inside each section (for now) per the desktop-frozen rule.
   layout: {
     mobile: {
-      gutter: '20px',          // section.paddingX — every section's outer horizontal padding
+      gutter: '20px',           // section.paddingX — every section's outer horizontal padding
       cardPadding: '20px 16px', // card internal padding (vertical horizontal)
       cardGap: '12px',          // gap between sibling cards / steps inside a section
-      titleGap: '12px',         // headline → body content (subtitle, list, grid)
+      // Headline → subtitle/body text on the same heading block.
+      titleToBody: '8px',
+      // Body text (or solo title) → first content (grid, marquee, cards).
+      bodyToCards: '16px',
     },
   },
 

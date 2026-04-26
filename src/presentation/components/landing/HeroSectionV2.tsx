@@ -81,13 +81,15 @@ const Eyebrow = styled.div`
   font-weight: 500;
   margin-top: -32px;
 
-  /* Mobile — compactify the eyebrow (smaller padding + smaller text)
-   * and add visible space below so the headline doesn't crowd it.
-   * Comment c_mofyulrb (2026-04-26): "чуть компактнее. больше отступа снизу". */
+  /* Mobile — compactified vs desktop but with enough breathing room
+   * around the inner stars+text. Settled at 6/12 padding and gap 8 after
+   * c_mofyulrb ("чуть компактнее") and c_mog0yvsq ("очень маленькие
+   * паддинги") together — middle of original (6/14/6/8) and the first
+   * compact attempt (4/10/4/6). Bottom margin keeps headline off it. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin: 0 0 12px;
-    padding: 4px 10px 4px 6px;
-    gap: 6px;
+    margin: 0 0 14px;
+    padding: 6px 12px 6px 8px;
+    gap: 8px;
     font-size: 11px;
   }
 `;
