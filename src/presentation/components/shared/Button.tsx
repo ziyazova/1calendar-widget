@@ -82,12 +82,22 @@ function variantCss(variant: ButtonVariant) {
 
 function sizeCss(size: ButtonSize) {
   const s = buttonSizeTokens[size];
+  // Optional mobile bump — applied via @media when the size token opts in
+  // (currently only `xl`). Desktop frozen at the default height/padding.
+  const mobile = s.mobileHeight || s.mobilePadding
+    ? `
+    @media (max-width: 768px) {
+      ${s.mobileHeight ? `height: ${s.mobileHeight};` : ''}
+      ${s.mobilePadding ? `padding: ${s.mobilePadding};` : ''}
+    }`
+    : '';
   return `
     height: ${s.height};
     padding: ${s.padding};
     border-radius: ${s.radius};
     font-size: ${s.fontSize};
     svg { width: ${s.iconSize}; height: ${s.iconSize}; }
+    ${mobile}
   `;
 }
 

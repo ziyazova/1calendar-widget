@@ -94,12 +94,17 @@ const Hero = styled.section<{ $v2?: boolean }>`
     z-index: 1;
   }
 
-  /* Mobile bottom padding aligned with Section's 28px so the gap
-   * between Hero and the first Section reads as the same 56px rhythm
-   * (28 + 28) used everywhere else on the mobile landing. */
+  /* Mobile — bottom padding 28 keeps the 56px gap rhythm with the first
+   * Section (28 + 28 = 56). min-height 65vh adds breathing room around
+   * the centered content (Eyebrow → Headline → Sub → CTAs) so the title
+   * sits closer to the visual center of the tinted Hero zone instead
+   * of crowding the top.
+   * Comment c_mofyu744 (2026-04-26): "отцентруй контент в залитой зоне"
+   * + follow-up "чуть больше воздуха в hero". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 32px 0 28px;
     gap: 16px;
+    min-height: 65vh;
   }
 `;
 

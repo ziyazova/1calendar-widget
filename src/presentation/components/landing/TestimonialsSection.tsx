@@ -98,14 +98,20 @@ const MarqueeColumn = styled.div`
     }
   }
 
+  /* Mobile — drop the marquee column entirely. Auto-scroll + height
+   * cap + mask gradient was reading as "heavy" on phone (c_mog11rq0).
+   * Switch to a static vertical stack of the first 3 testimonials —
+   * the same pattern Stripe / Vercel / GitHub use on mobile (no
+   * carousel, no auto-rotation, just a short list of strong proof).
+   * Constants:
+   *   - height: auto (no clipping, content drives height)
+   *   - mask: none (nothing to fade — all 3 cards fully visible)
+   *   - cards 4+ hidden via :nth-child rule on the inner stack
+   *   - only the first column renders (cols 2/3 already hidden) */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    height: 340px;
-
-    /* Narrow the fade on mobile — at 340px the 10% mask blanches a
-     * full quarter of the top/bottom card. 5%/95% (≈17px) softens the
-     * edge without washing out the readable content. */
-    mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+    height: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
 
     &:nth-child(n+2) {
       display: none;
@@ -130,13 +136,21 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
     animation: none;
   }
 
-  /* Mobile — disable the auto-scroll marquee. Constant motion in the
-   * lower half of a phone viewport is distracting more than convincing.
-   * The first 3-4 visible cards (set by MarqueeColumn height below)
-   * already convey the social proof; the rest live on /templates.
-   * Comment c_mofyx1hg (2026-04-26): "мб без анимации, карусель?". */
+  /* Mobile — no animation, only first 3 cards visible. The inner
+   * stack normally renders [...items, ...items] (10 cards) for the
+   * infinite-scroll loop; on phone we collapse that to a static list
+   * of the 3 strongest testimonials. The :nth-child cutoff keeps
+   * the section short and skim-friendly — same pattern Stripe /
+   * Vercel / GitHub use on mobile (no carousel, no rotation, just
+   * a brief social-proof snapshot).
+   * Comments c_mofyx1hg + c_mog11rq0 (2026-04-26). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     animation: none;
+    gap: 12px;
+
+    & > *:nth-child(n+4) {
+      display: none;
+    }
   }
 `;
 

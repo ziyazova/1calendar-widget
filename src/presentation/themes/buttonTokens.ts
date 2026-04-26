@@ -89,6 +89,12 @@ export interface ButtonSizeTokens {
   fontSize: string;
   iconSize: string;
   gap?: string;
+  /** Optional mobile overrides (≤ 768px). Big CTAs (xl) get bumped so
+   *  they read as a proper primary action on phone — Apple HIG large
+   *  CTA is ~56px, our desktop xl of 48px feels a touch under at this
+   *  width. Other sizes don't need a bump (lg=44 already meets HIG). */
+  mobileHeight?: string;
+  mobilePadding?: string;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -99,7 +105,16 @@ export const buttonSizeTokens: Record<ButtonSize, ButtonSizeTokens> = {
   sm: { height: '32px', padding: '0 14px', radius: '10px', fontSize: '12px', iconSize: '14px' },
   md: { height: '36px', padding: '0 16px', radius: '10px', fontSize: '13px', iconSize: '14px' },
   lg: { height: '44px', padding: '0 20px', radius: '12px', fontSize: '14px', iconSize: '16px' },
-  xl: { height: '48px', padding: '0 24px', radius: '12px', fontSize: '14px', iconSize: '16px' },
+  xl: {
+    height: '48px',
+    padding: '0 24px',
+    radius: '12px',
+    fontSize: '14px',
+    iconSize: '16px',
+    // Hero / primary-CTA scale on phone. Desktop frozen at 48.
+    mobileHeight: '56px',
+    mobilePadding: '0 28px',
+  },
 };
 
 export const sizePxMap: Record<ButtonSize, number> = {
