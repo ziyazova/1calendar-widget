@@ -7,12 +7,11 @@ const FeatureCardsSectionWrap = styled.section`
   margin: 0 auto;
   padding: 0 24px;
 
-  /* Phone — break out of the parent WidgetStudioSection's 24px padding
-   * so the card carousel runs edge-to-edge, matching the Top templates
-   * pattern. */
+  /* Phone — break out of WidgetStudioSection's 20px gutter so the
+   * carousel runs edge-to-edge (next card peeks at the right edge). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0;
-    margin: 0 -24px;
+    margin: 0 -20px;
     max-width: none;
   }
 `;
@@ -29,10 +28,10 @@ const FeatureStack = styled.div`
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    /* padding-top dropped from 4 → 0 so the gap from the parent
-     * Header → first card stays at the 12px titleGap rhythm instead of
-     * stacking +4. Comment c_mog0zz5m: "до картчоек тже". */
-    padding: 0 24px 8px;
+    /* padding-left = section gutter (20) so first card aligns with
+     * section content boundary. padding-right 0 lets the next card
+     * peek at the viewport's right edge. */
+    padding: 0 0 0 20px;
 
     &::-webkit-scrollbar { display: none; }
     scrollbar-width: none;
@@ -126,10 +125,10 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     position: static;
     flex-direction: column;
     flex-shrink: 0;
-    /* Full-screen-width card: viewport minus the stack's 24px side
-     * padding on each side. Snap-aligns to the left edge so one card
-     * fills the visible area per swipe. */
-    width: calc(100vw - 48px);
+    /* 78vw card — next card peeks ~22% on the right edge.
+     * Snap-aligns to the left so the focused card sits flush with
+     * the section gutter. */
+    width: 78vw;
     height: auto;
     padding: 0;
     gap: 0;
@@ -139,8 +138,8 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     margin-right: 0 !important;
     opacity: 1 !important;
     scroll-snap-align: start;
-    overflow: clip;
-    border-radius: ${({ theme }) => theme.radii.xl};
+    overflow: hidden;
+    border-radius: 20px;
     border: 1px solid ${({ theme }) => theme.colors.border.light};
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
   }
@@ -162,10 +161,10 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
 
-  /* Mobile — compact tab. Tightened twice: c_mog13ar0 ("лейаут
-   * поезжавший") then c_mog2m2nv ("шапку чуть меньше + текст в ней"). */
+  /* Mobile — fixed window-style header: 44 height, 16 horizontal. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 8px 12px;
+    height: 44px;
+    padding: 0 16px;
     font-size: 12px;
     min-width: 0;
 
@@ -204,10 +203,11 @@ const FeatureCardBody = styled.div`
   padding: 0 0 0 36px;
   flex: 1;
 
+  /* Mobile — symmetric 20 padding box (top/right/bottom/left). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
-    padding: 20px 20px 16px;
-    gap: 16px;
+    padding: 20px;
+    gap: 0;
   }
 `;
 
@@ -228,12 +228,12 @@ const FeatureCardTitle = styled.h3`
   margin: 0 0 12px;
   line-height: 1.2;
 
-  /* Mobile — title size cut twice: c_mofz42xe ("заголовки огромные")
-   * then c_mog2n5o4 ("в карточке зеделай чуть меньше"). 16/600 + the
-   * compact tab + 13/desc gives a quiet, readable card. */
+  /* Mobile — 18/700/1.3 + 8 below for a tight title→desc pair. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 16px;
-    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0 0 8px 0;
   }
 `;
 
@@ -244,9 +244,13 @@ const FeatureCardDesc = styled.p`
   margin: 0;
   letter-spacing: -0.01em;
 
+  /* Mobile — 15/1.5 with text.body color (closest to spec text.secondary).
+   * margin-bottom 24 sets desc → image gap. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.5;
+    color: ${({ theme }) => theme.colors.text.body};
+    margin: 0 0 24px 0;
   }
 `;
 
@@ -269,12 +273,15 @@ const FeatureCardImage = styled.div`
     display: block;
   }
 
+  /* Mobile — 16:10 aspect placeholder, 14 radius, subtle bg, no margin. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin: 0;
     flex: 0 0 auto;
-    height: 140px;
+    height: auto;
+    aspect-ratio: 16 / 10;
     min-height: 0;
-    border-radius: ${({ theme }) => theme.radii.lg};
+    border-radius: 14px;
+    background: ${({ theme }) => theme.colors.background.surfaceMuted};
   }
 `;
 
@@ -287,8 +294,11 @@ const Dots = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 6px;
-    padding: 16px 0 4px;
+    gap: 8px;
+    /* margin-top 20 — cards → dots; margin-bottom 0 — section
+     * controls the bottom rhythm. */
+    margin: 20px 0 0;
+    padding: 0;
   }
 `;
 
@@ -297,9 +307,9 @@ const Dot = styled.button<{ $active: boolean }>`
   border: 0;
   padding: 0;
   cursor: pointer;
-  width: ${({ $active }) => ($active ? '20px' : '6px')};
-  height: 6px;
-  border-radius: 3px;
+  width: ${({ $active }) => ($active ? '20px' : '8px')};
+  height: 8px;
+  border-radius: 4px;
   /* Active = brand accent (semi-transparent so it doesn't read as a
    * solid bar); inactive = soft grey. Comment c_mog12vn0 (2026-04-26):
    * "цвет полупрозрачный акцентный или серый". */

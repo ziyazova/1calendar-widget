@@ -7,8 +7,11 @@ const Section = styled.section`
   margin: 0 auto;
   padding: 0 48px;
 
+  /* Mobile — inner padding 12 stacks on the outer Section's 28 to
+   * give the spec'd 40 total vertical (28 + 12). Horizontal: 20
+   * gutter token. Result reads as a 40/20 box around content. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    padding: 12px ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -19,9 +22,9 @@ const Header = styled.div`
   gap: 16px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* Header → cards = 16 (bodyToCards). Header internal gap unused
-     * since TitleRow holds both Title and Subtitle. */
-    margin-bottom: ${({ theme }) => theme.layout.mobile.bodyToCards};
+    /* Header bottom = 0; Subtitle's margin-bottom (28) drives Header
+     * → cards. Title margin-bottom (12) drives Title → Subtitle. */
+    margin-bottom: 0;
     gap: 0;
   }
 `;
@@ -32,11 +35,10 @@ const TitleRow = styled.div`
   align-items: center;
   gap: 8px;
 
-  /* Mobile — Title → Subtitle = 8 (titleToBody), matching every other
-   * section on the landing. Comment c_mog0zz5m (2026-04-26):
-   * "у зедлайна и боди расстояние ни как у всех". */
+  /* Mobile — gap zeroed; spacing comes from Title margin-bottom (12)
+   * and Subtitle margin-bottom (28). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    gap: ${({ theme }) => theme.layout.mobile.titleToBody};
+    gap: 0;
   }
 `;
 
@@ -50,6 +52,7 @@ const Title = styled.h2`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.fluid.h2};
+    margin: 0 0 12px 0;
   }
 `;
 
@@ -60,12 +63,10 @@ const Subtitle = styled.p`
   text-align: center;
   letter-spacing: -0.01em;
 
-  /* Mobile — reset margin-top so TitleRow's gap (12) is the only thing
-   * controlling the headline → body distance. Avoids the gap+margin
-   * stacking that made this section's spacing feel different. */
+  /* Mobile — Subtitle drives the gap to cards: margin-bottom 28. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin: 0;
+    margin: 0 0 28px 0;
   }
 `;
 
