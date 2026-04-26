@@ -81,9 +81,14 @@ const Eyebrow = styled.div`
   font-weight: 500;
   margin-top: -32px;
 
+  /* Mobile — compactify the eyebrow (smaller padding + smaller text)
+   * and add visible space below so the headline doesn't crowd it.
+   * Comment c_mofyulrb (2026-04-26): "чуть компактнее. больше отступа снизу". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-top: 0;
-    font-size: 12px;
+    margin: 0 0 12px;
+    padding: 4px 10px 4px 6px;
+    gap: 6px;
+    font-size: 11px;
   }
 `;
 
@@ -231,10 +236,12 @@ const Meta = styled.div`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.peach.hint};
 
+  /* Hide on mobile — three feature bullets feel like padding when the
+   * page already has the full Templates Gallery and Why-people-love
+   * sections to convey the same message. Comment c_mofyz2zm (2026-04-26):
+   * "убрать в телефонной версии". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-top: 18px;
-    gap: 12px 18px;
-    font-size: 12px;
+    display: none;
   }
 `;
 

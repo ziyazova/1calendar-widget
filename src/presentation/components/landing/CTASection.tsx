@@ -18,8 +18,17 @@ const CTACard = styled.div`
   justify-content: center;
   text-align: center;
 
+  /* Mobile — turn the gradient strip into a self-contained card.
+   * Horizontal margin (= gutter) + bottom margin (= rhythm) + rounded
+   * corners pop the CTA out of the surrounding surfaceAlt fill instead
+   * of running edge-to-edge into the footer.
+   * Comment c_mofyxs51 (2026-04-26): "должна быть заливка у этого блока
+   * тоже с отступами и скруглениями". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 80px ${({ theme }) => theme.layout.mobile.gutter};
+    padding: 56px ${({ theme }) => theme.layout.mobile.gutter};
+    margin: 0 ${({ theme }) => theme.layout.mobile.gutter} 28px;
+    border-radius: ${({ theme }) => theme.radii['2xl']};
+    overflow: hidden;
   }
 `;
 

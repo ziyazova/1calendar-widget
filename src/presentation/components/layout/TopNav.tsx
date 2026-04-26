@@ -212,10 +212,13 @@ const CartButton = styled.button`
 
   &:hover { opacity: 0.7; }
 
-  /* 44×44 hit target on mobile (Apple HIG); icon size unchanged. */
+  /* Mobile — hide entirely. Cart functionality is being removed from
+   * the product (see project_no_cart memory); on phone we already
+   * suppress the icon. Desktop kept untouched per the desktop-frozen
+   * rule until cart is removed globally.
+   * Comment c_mofyy4jr (2026-04-26): "у нас корзины вообще нигде нет удали". */
   ${media.mobile`
-    width: 44px;
-    height: 44px;
+    display: none;
   `}
 `;
 

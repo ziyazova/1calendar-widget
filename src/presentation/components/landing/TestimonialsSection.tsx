@@ -128,6 +128,15 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
   @media (prefers-reduced-motion: reduce) {
     animation: none;
   }
+
+  /* Mobile — disable the auto-scroll marquee. Constant motion in the
+   * lower half of a phone viewport is distracting more than convincing.
+   * The first 3-4 visible cards (set by MarqueeColumn height below)
+   * already convey the social proof; the rest live on /templates.
+   * Comment c_mofyx1hg (2026-04-26): "мб без анимации, карусель?". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    animation: none;
+  }
 `;
 
 const Card = styled.div`

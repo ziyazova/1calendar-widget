@@ -153,10 +153,22 @@ const FooterBottomRow = styled.div`
   flex-wrap: wrap;
 `;
 
-const FooterBottom = styled.span`
+const FooterBottom = styled.span<{ $hideOnMobile?: boolean }>`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.01em;
+
+  /* Mobile — instances opted-in via $hideOnMobile drop out. The
+   * "Made with care in 2026" line is decorative; the © copyright
+   * is enough at this width.
+   * Comment c_mofz76xx (2026-04-26): "можно на телефоне убрать". */
+  ${({ $hideOnMobile }) =>
+    $hideOnMobile &&
+    `
+    @media (max-width: 768px) {
+      display: none;
+    }
+  `}
 `;
 
 interface BigFooterProps {
@@ -201,7 +213,7 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
           <FooterBottom>
             © {new Date().getFullYear()} Peachy Studio. All rights reserved.
           </FooterBottom>
-          <FooterBottom>
+          <FooterBottom $hideOnMobile>
             Made with care in 2026
           </FooterBottom>
         </FooterBottomRow>

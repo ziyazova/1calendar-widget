@@ -212,6 +212,14 @@ const FeatureCardTitle = styled.h3`
   letter-spacing: -0.03em;
   margin: 0 0 12px;
   line-height: 1.2;
+
+  /* Mobile — title was reading as oversized inside the swipe card.
+   * 18/600 keeps the visual hierarchy without dominating the body.
+   * Comment c_mofz42xe (2026-04-26): "по шрифту, заголовки огромные". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 18px;
+    margin: 0 0 8px;
+  }
 `;
 
 const FeatureCardDesc = styled.p`
@@ -220,6 +228,11 @@ const FeatureCardDesc = styled.p`
   line-height: 1.65;
   margin: 0;
   letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 13px;
+    line-height: 1.5;
+  }
 `;
 
 const FeatureCardImage = styled.div`

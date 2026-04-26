@@ -77,9 +77,14 @@ const Card = styled.div<{ $bg: string }>`
     pointer-events: none;
   }
 
+  /* Mobile — compact card. min-height drops from 150 → 110 because the
+   * icon, two-line title and one-line description fit in ~96px and the
+   * 150 floor was leaving a half-empty third of the card. Inner padding
+   * tightens to 16px so text breathes without dominating the card.
+   * Comment c_mofywbb8 (2026-04-26): "более компактные сделать карточки". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: ${({ theme }) => theme.layout.mobile.cardPadding};
-    min-height: 150px;
+    padding: 16px;
+    min-height: 110px;
   }
 `;
 
@@ -100,6 +105,16 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
     height: 22px;
     color: ${({ $color }) => $color};
     stroke-width: 1.8;
+  }
+
+  /* Mobile — smaller icon block + tighter gap to title; matches the
+   * compactified card padding above. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+
+    svg { width: 18px; height: 18px; }
   }
 `;
 
