@@ -67,12 +67,13 @@ const Subtitle = styled.p`
   text-align: center;
   letter-spacing: -0.01em;
 
-  /* Mobile — sectionBody token (15/400/1.5). 28 below = body → cards. */
+  /* Mobile — sectionBody token + bodyToCards margin-bottom for the
+   * gap to the carousel. Unified with the rest of the landing. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
     font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
     line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
-    margin: 0 0 28px 0;
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.bodyToCards} 0;
   }
 `;
 

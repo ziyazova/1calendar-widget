@@ -70,9 +70,8 @@ const GalleryHeader = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
     gap: ${({ theme }) => theme.layout.mobile.titleToBody};
-    /* Title → marquee = 24 (titleToCards: section title without
-     * subtitle uses a slightly larger gap than bodyToCards 16). */
-    margin-bottom: 24px;
+    /* Title → marquee = 16 (bodyToCards) — unified with all sections. */
+    margin-bottom: ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
 
