@@ -15,24 +15,41 @@ const FooterOuter = styled.div`
      content sits lower (more breathing room above it) and the copyright
      stays pinned to the floor. align-items: center keeps both wrappers
      at the same 1200px centered width as each other. */
-  min-height: 300px;
+  /* Desktop — 298 (iterated 300 → 260 → 280 → 298, +18 last pass).
+   * Extra 18 distributed symmetrically inside the wrapper +9 top / +9
+   * bottom (FooterWrapper pt 62→71, FooterBottomWrapper pb 32→41) so
+   * brand and copyright move inward equally, keeping the layout
+   * balanced. Mobile keeps 270 below, untouched. */
+  min-height: 298px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
+
+  /* Mobile — 270 (independent of desktop). Set during phone adaptation
+   * after FooterWrapper padding/FooterBrand margin tweaks. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    min-height: 270px;
+  }
 `;
 
 const FooterWrapper = styled.footer`
   width: 100%;
   max-width: 1200px;
-  /* Padding-top 82 drops the Peachy block well below the footer's top
-     edge — gives the brand a soft entrance from the surfaceAlt fill
-     instead of sitting flush against it. */
-  padding: 82px 48px 0;
+  /* Padding-top 53 (was 71, −18). Last ask: "контент футера на десктопе
+     выше на 18 пикс" — brand block lifts by exactly 18. The +18 height
+     on FooterOuter and the +9 on FooterBottomWrapper still hold, so
+     copyright stays anchored at the floor; only the top block moves. */
+  padding: 53px 48px 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 60px ${({ theme }) => theme.layout.mobile.gutter} 0;
+    /* 2 top — last trim ("футер сверху подрежь на 18 пикс"). Logo's
+     * vertical position is now driven almost entirely by FooterBrand's
+     * margin-top (36); this kills the residual top breathing inside the
+     * wrapper. The section's surfaceAlt band still extends 36 above
+     * via the wrapper Section's padding-top token. */
+    padding: 2px ${({ theme }) => theme.layout.mobile.gutter} 0;
   }
 `;
 
@@ -50,7 +67,11 @@ const FooterTop = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
-    gap: 32px;
+    /* gap 56 (was 44, was 32) — second push on the brand → nav gap
+     * per follow-up: "контент футера чуть ниже отпусти". Combined with
+     * FooterWrapper's now-16 top padding, the brand sits tight to the
+     * divider while nav drops well into the footer body. */
+    gap: 56px;
     padding-bottom: 24px;
   }
 `;
@@ -61,6 +82,14 @@ const FooterBrand = styled.div`
   gap: 12px;
   flex-shrink: 0;
   max-width: 240px;
+
+  /* Mobile — push the logo block down inside the footer without adding
+   * top padding to the wrapper (top edge stays trimmed). Iterated
+   * 18 → 36 → 10 (last ask: "сверху футер отрежь ещё на 26 сверху", so
+   * -26 from 36). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 10px;
+  }
 `;
 
 const FooterBrandRow = styled.div`
@@ -98,13 +127,18 @@ const FooterNav = styled.div`
      block on the right with breathing room between columns. */
   gap: 60px;
 
-  /* Mobile — switch to a 2-column grid so each NavGroup is ~half the
-   * viewport instead of being squeezed to ~110px in a 3-up flex-wrap.
-   * Third group flows to a second row beneath, full-width — natural. */
+  /* Mobile — 3-column grid (was 2). Longest link "Widget Studio" fits
+   * in ~95px, columns at ~100px each in a 375 viewport with 16px gaps
+   * still hold without wrapping, so a single tidy row beats 2-up + a
+   * lonely third group flowing to a second row.
+   * Comment c_mog7230m: "если помещается в одну линию все 3 столбика —
+   * давай сделаем". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    column-gap: 24px;
+    grid-template-columns: repeat(3, 1fr);
+    /* column-gap 20 (was 16) — c_mog87f5w: "чуть больше свепса между
+     * колонками". "Widget Studio" still fits at this gap. */
+    column-gap: 20px;
     row-gap: 28px;
   }
 `;
@@ -143,7 +177,10 @@ const FooterBottomWrapper = styled.div`
      container and pins the copyright row to the floor — works even when
      content naturally totals less than min-height. */
   margin-top: auto;
-  padding: 0 48px 32px;
+  /* Desktop pb 41 (was 32, +9). Symmetric pair with FooterWrapper's
+     padding-top 62→71 (also +9), absorbing the FooterOuter +18 height
+     bump evenly between top and bottom. */
+  padding: 0 48px 41px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 24px;
@@ -158,12 +195,28 @@ const FooterBottomRow = styled.div`
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+
+  /* Mobile — center the copyright. The "Made with care" sibling is
+   * hidden via $hideOnMobile, so space-between leaves the lone © text
+   * stuck to the left edge. Center reads as intentional.
+   * "контент внутри выровни". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    justify-content: center;
+  }
 `;
 
 const FooterBottom = styled.span<{ $hideOnMobile?: boolean }>`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.01em;
+
+  /* Mobile — copyright sits at the very bottom of the page, fine print
+   * is the right register here. 11px reads as "legal/secondary" rather
+   * than competing with footer nav links.
+   * Comment c_mog8636s: "меньше по размеру текст этот". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 11px;
+  }
 
   /* Mobile — instances opted-in via $hideOnMobile drop out. The
    * "Made with care in 2026" line is decorative; the © copyright

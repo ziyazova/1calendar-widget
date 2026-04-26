@@ -128,9 +128,23 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     opacity: 1 !important;
     scroll-snap-align: start;
     overflow: hidden;
-    border-radius: 20px;
+    /* Mobile uses radii.lg (16) — generic content card token, same as
+     * HowItWorks step card and Testimonials card so all phone-card
+     * surfaces share one corner radius. Desktop keeps radii['2xl'] (24)
+     * unchanged. */
+    border-radius: ${({ theme }) => theme.radii.lg};
+    /* Card fill = background.surfaceAlt — same DS tint that Testimonials
+     * cards use on phone (and the footer). Without it, white-on-white
+     * card-on-section blended into one block.
+     * Comment c_mog9wiit: "карточку выделить, сливается — мб залить в
+     * цвет футера". */
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
     border: 1px solid ${({ theme }) => theme.colors.border.light};
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+    /* Mobile-card shadow token — unified with HowItWorks / Testimonials
+     * so all three landing card families read as one on phone.
+     * !important needed because the desktop box-shadow above is itself
+     * a function of $index/$activeIdx and would otherwise win specificity. */
+    box-shadow: ${({ theme }) => theme.shadows.mobileCard} !important;
   }
 `;
 
@@ -151,12 +165,16 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   color: ${({ theme }) => theme.colors.text.primary};
 
   /* Mobile — fixed window-style header: 44 height, 16 horizontal.
-   * Tab labels (Functionality / Design / Payment) muted via tertiary. */
+   * Tab title text uses base body color (dark, but not too dark) —
+   * the dot still carries the per-card $color identity (FeatureTabDot
+   * reads $color directly). Reverted from per-card-colored title.
+   * Comment c_mogaqemw: "тeкст всё-таки тёмный базовый, но не сильно
+   * тёмный". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 44px;
     padding: 0 16px;
     font-size: 12px;
-    color: ${({ theme }) => theme.colors.text.tertiary};
+    color: ${({ theme }) => theme.colors.text.body};
     min-width: 0;
 
     > *:first-of-type ~ * {
@@ -178,6 +196,16 @@ const FeatureTabTitle = styled.span`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
+
+  /* Mobile — inherit color from FeatureCardTab (now per-card $color) so
+   * each tab label echoes its dot. Weight 500 — slightly bolder than
+   * 400 so the per-card color reads with intent without competing with
+   * the card title.
+   * Comments: c_mog6wo8p ("приглушить") + c_mog9ycm3 ("чуть жирнее"). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    color: inherit;
+    font-weight: 500;
+  }
 `;
 
 const FeatureTabActions = styled.div`
@@ -265,14 +293,16 @@ const FeatureCardImage = styled.div`
     display: block;
   }
 
-  /* Mobile — 4:3 aspect (taller than 16:10), 14 radius, subtle bg. */
+  /* Mobile — 4:3 aspect (taller than 16:10), media-radius token (md=12)
+   * so the image is one notch tighter than its parent card (lg=16) per
+   * the hierarchy invariant: media radius < card radius. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin: 0;
     flex: 0 0 auto;
     height: auto;
     aspect-ratio: 4 / 3;
     min-height: 0;
-    border-radius: 14px;
+    border-radius: ${({ theme }) => theme.radii.md};
     background: ${({ theme }) => theme.colors.background.surfaceMuted};
   }
 `;
@@ -294,19 +324,23 @@ const Dots = styled.div`
   }
 `;
 
-const Dot = styled.button<{ $active: boolean }>`
+const Dot = styled.button<{ $active: boolean; $color: string }>`
   appearance: none;
   border: 0;
   padding: 0;
   cursor: pointer;
   width: ${({ $active }) => ($active ? '20px' : '8px')};
   height: 8px;
-  border-radius: 4px;
-  /* Active = brand accent (semi-transparent so it doesn't read as a
-   * solid bar); inactive = soft grey. Comment c_mog12vn0 (2026-04-26):
-   * "цвет полупрозрачный акцентный или серый". */
-  background: ${({ $active, theme }) =>
-    $active ? theme.colors.accent : theme.colors.border.medium};
+  border-radius: ${({ theme }) => theme.radii.xs};
+  /* Active dot picks up its card's $color (Functionality=blue,
+   * Design=green, Payment=orange) so the indicator carries the same
+   * visual identity as the tab/title. Inactive stays soft grey.
+   * Opacity 0.65 keeps the active bar from reading as a solid hard
+   * stripe — softer indicator, more Apple-y.
+   * Comment c_moga1lrn: "переключатель когда активный менялся в цвет
+   * карточки". */
+  background: ${({ $active, $color, theme }) =>
+    $active ? $color : theme.colors.border.medium};
   opacity: ${({ $active }) => ($active ? 0.65 : 1)};
   transition: width 0.25s ease, background 0.25s ease, opacity 0.25s ease;
 `;
@@ -330,14 +364,19 @@ const WhyTitle = styled.h2`
 const FEATURE_CARDS = [
   {
     tab: 'Functionality',
-    color: '#3B82F6',
+    /* Swapped with Design — green now lives on Functionality
+     * (greens read as "running / working" → fits "automations,
+     * dashboards"). Single source of truth, applies across desktop
+     * and mobile (tab bg, dot, mobile title color, carousel pagination
+     * active color all read from this $color). */
+    color: '#7FA96B',
     title: 'Built just for you.',
     desc: 'Automations, dashboards, pre-filled sections. Ready the moment you open it.',
     image: '/feature-functionality.png',
   },
   {
     tab: 'Design',
-    color: '#7FA96B',
+    color: '#3B82F6',
     title: 'Looks just right.',
     desc: 'Clean, aesthetic, thoughtful. Open it and it just feels right.',
     image: '/feature-design.png',
@@ -410,10 +449,11 @@ export const FeatureCardsSection: React.FC = () => {
         ))}
       </FeatureStack>
       <Dots aria-hidden="true">
-        {FEATURE_CARDS.map((_, i) => (
+        {FEATURE_CARDS.map((f, i) => (
           <Dot
             key={i}
             $active={i === scrollIdx}
+            $color={f.color}
             onClick={() => scrollToCard(i)}
             type="button"
           />

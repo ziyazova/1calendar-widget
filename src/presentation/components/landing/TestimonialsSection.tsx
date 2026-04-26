@@ -30,8 +30,15 @@ type Testimonial = typeof testimonials.col1[number];
 
 /* ── Styled Components ── */
 
-const Section = styled.section`
-  background: transparent;
+/* Inner block — converted from styled.section to styled.div so the
+ * DOM doesn't have two nested <section> tags (LandingPage already
+ * wraps this component in its own <Section>). The gradient fill that
+ * used to live here moved to the outer LandingPage Section via the
+ * $gradientFill prop, so it now lands on the right element (the wider
+ * tinted band, not the inner content box).
+ * Last user note: "ты закрашиваешь не ту секцию … одну внутреннюю
+ * можно убрать". */
+const Section = styled.div`
   padding: 0;
   overflow: hidden;
   position: relative;
@@ -84,12 +91,36 @@ const MarqueeContainer = styled.div`
     padding: 0 36px;
   }
 
-  /* Mobile — drop horizontal padding so the carousel column can run
-   * edge-to-edge; gutter is handled by MarqueeInner's padding so the
-   * first/last card aligns with the section edge. */
+  /* Mobile — the 3-column marquee is hidden entirely. Mobile uses
+   * <MobileCarousel /> below, which renders all 14 unique testimonials
+   * in a single horizontal swipe carousel (no duplication, no hidden
+   * columns). The desktop tree stays untouched. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    grid-template-columns: 1fr;
-    padding: 0;
+    display: none;
+  }
+`;
+
+/* Mobile-only flat carousel — renders ALL testimonials (col1 + col2 +
+ * col3 = 14 unique reviews) so users on phones see the same social
+ * proof as desktop, just in a swipe layout instead of a vertical
+ * marquee. Desktop hides this entirely. */
+const MobileCarousel = styled.div`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+
+    &::-webkit-scrollbar { display: none; }
+    scrollbar-width: none;
   }
 `;
 
@@ -157,6 +188,11 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     animation: none;
     flex-direction: row;
+    /* Each card takes its own content height — flex default is stretch,
+     * which forced every card to match the tallest one (10+ line quotes).
+     * Result was huge whitespace under short reviews. flex-start lets
+     * each card sit at its natural height; carousel still snaps fine. */
+    align-items: flex-start;
     gap: 12px;
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
 
@@ -181,16 +217,25 @@ const Card = styled.div`
     0 12px 28px -16px rgba(43, 35, 32, 0.1);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 16px;
+    /* Card surface uses the same DS tint as the footer / hero ($tint
+     * applies background.surfaceAlt). Section bg is now plain (we
+     * dropped $tint from the wrapper), so the inversion is intentional —
+     * tinted cards on a clean section read as proper "speech bubbles". */
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    /* 24 padding all around (was 16) — gives quotes room to breathe. */
+    padding: 24px;
     /* radii.lg (16) instead of xl (20) — matches the compact card size
-     * on phone and the rest of the mobile-radii audit.
-     * Comment c_mog10kli: "радиусы слишком большие". */
+     * on phone and the rest of the mobile-radii audit. */
     border-radius: ${({ theme }) => theme.radii.lg};
-    /* Carousel card: fixed width, snap to center on swipe. min(85vw, 320px)
-     * keeps the card narrow enough that the next card peeks at the
-     * right edge — signals scrollability. */
-    width: min(85vw, 320px);
+    /* Carousel card width — bumped to min(88vw, 360px) so the right-side
+     * peek lands at ~10-15% (was ~30% with the previous 85vw/320px combo
+     * on small phones). Just enough to signal swipe without dominating. */
+    width: min(88vw, 360px);
     scroll-snap-align: center;
+    /* Mobile-card shadow token — single recipe shared with HowItWorks
+     * and FeatureCards so all three landing card families read as one
+     * on phone. */
+    box-shadow: ${({ theme }) => theme.shadows.mobileCard};
   }
 `;
 
@@ -200,6 +245,17 @@ const Stars = styled.div`
   margin-bottom: 14px;
   color: #F5A623;
   font-size: 12px;
+
+  /* Star size moved to CSS so mobile can override (16) without
+   * touching the JSX <svg width="14" height="14">. */
+  svg { width: 14px; height: 14px; }
+
+  /* Mobile — 16px stars, 2px gap, 16px to quote. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    gap: 2px;
+    margin-bottom: 16px;
+    svg { width: 16px; height: 16px; }
+  }
 `;
 
 const Text = styled.p`
@@ -213,7 +269,12 @@ const Text = styled.p`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 13px;
     line-height: 1.55;
-    margin: 0 0 14px;
+    /* Italic on mobile — visual marker that this is a quote, not our
+     * voice. Without it the block reads like product copy. */
+    font-style: italic;
+    /* 20 below = quote → divider (was 14). Symmetric with Divider's
+     * 16 below for the divider → name pair. */
+    margin: 0 0 20px;
   }
 `;
 
@@ -241,6 +302,13 @@ const Avatar = styled.div<{ $color: string }>`
   font-weight: 600;
   color: rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
+
+  /* Mobile — 36 (avatar lives in card "footer"; shouldn't dominate). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
 `;
 
 const AuthorInfo = styled.div`
@@ -262,7 +330,7 @@ const Role = styled.span`
 
 /* ── Star Icon ── */
 const StarIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 2.5c.4 0 .8.2 1 .6l2.4 5 5.4.8c.5.1.9.4 1 .9.2.4 0 .9-.3 1.2l-3.9 3.8.9 5.4c.1.5-.1 1-.5 1.2-.4.3-.9.3-1.3.1L12 18.8l-4.7 2.7c-.4.2-.9.2-1.3-.1-.4-.3-.6-.7-.5-1.2l.9-5.4L2.5 11c-.3-.3-.5-.8-.3-1.2.2-.5.5-.8 1-.9l5.4-.8 2.4-5c.2-.4.6-.6 1-.6z" />
   </svg>
 );
@@ -293,6 +361,20 @@ const TestimonialColumn: React.FC<{
   </MarqueeColumn>
 );
 
+/* All 14 unique testimonials, flattened in column-interleaved order
+ * (1 from col1, 1 from col2, 1 from col3, repeat) so the swipe sequence
+ * mixes voices/lengths instead of running col1's 5 in a row. */
+const ALL_TESTIMONIALS: Testimonial[] = (() => {
+  const out: Testimonial[] = [];
+  const max = Math.max(testimonials.col1.length, testimonials.col2.length, testimonials.col3.length);
+  for (let i = 0; i < max; i++) {
+    if (testimonials.col1[i]) out.push(testimonials.col1[i]);
+    if (testimonials.col2[i]) out.push(testimonials.col2[i]);
+    if (testimonials.col3[i]) out.push(testimonials.col3[i]);
+  }
+  return out;
+})();
+
 /* ── Exported Component ── */
 export const TestimonialsSection: React.FC = () => (
   <Section data-ux="Testimonials Section">
@@ -303,5 +385,20 @@ export const TestimonialsSection: React.FC = () => (
       <TestimonialColumn items={testimonials.col2} columnKey="c2" duration={40} reverse />
       <TestimonialColumn items={testimonials.col3} columnKey="c3" duration={45} />
     </MarqueeContainer>
+    <MobileCarousel data-ux="Testimonials Mobile Carousel">
+      {ALL_TESTIMONIALS.map((t, i) => (
+        <Card key={`m-${i}`}>
+          <Stars>
+            {[...Array(5)].map((_, s) => <StarIcon key={s} />)}
+          </Stars>
+          <Text>{t.text}</Text>
+          <Divider />
+          <Author>
+            <Avatar $color={t.color}>{t.initials}</Avatar>
+            <Name>{t.name}</Name>
+          </Author>
+        </Card>
+      ))}
+    </MobileCarousel>
   </Section>
 );

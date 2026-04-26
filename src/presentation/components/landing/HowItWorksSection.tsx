@@ -95,7 +95,9 @@ const Card = styled.div<{ $bg: string }>`
     /* flex-start so the icon top-edge aligns with the title cap-line
      * instead of vertically centering against the desc-tail. */
     align-items: flex-start;
-    padding: 14px 16px;
+    /* 18 vertical (was 14) — adds a touch of breathing room around the
+     * row content. Comment c_mog2y... ("карточки по высоте немного больше"). */
+    padding: 18px 16px;
     min-height: 0;
     border-radius: ${({ theme }) => theme.radii.lg};
     gap: 14px;
@@ -121,18 +123,19 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
     stroke-width: 1.8;
   }
 
-  /* Mobile — 52×52 icon block, top-aligned with title cap-line.
-   * radius 14 sits between radii.md (12) and lg (16) — proportional
-   * to the 52 size; one-off literal since DS doesn't have a 14 token. */
+  /* Mobile — original 36×36 icon (was bumped to 52, looked heavy
+   * against the short text block). Card keeps align-items: flex-start
+   * so the 36 icon sits flush with the title cap-line, not floating
+   * between title and desc. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: ${({ theme }) => theme.radii.md};
     margin-top: 0;
     margin-bottom: 0;
     flex-shrink: 0;
 
-    svg { width: 22px; height: 22px; }
+    svg { width: 16px; height: 16px; }
   }
 `;
 

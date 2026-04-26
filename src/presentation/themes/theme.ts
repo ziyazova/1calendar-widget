@@ -256,6 +256,17 @@ export const theme = {
     popover: '0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04)',
     // Focus ring on blue inputs/tabs (secondary state).
     focusBlue: '0 0 0 3px rgba(51, 132, 244, 0.1)',
+    // Mobile landing-card shadow — single recipe applied to every card
+    // in the phone view (HowItWorks steps / FeatureCards / Testimonials)
+    // so the three card families read as one. 4 layers: top + bottom
+    // inset highlights for the glass-like rim, soft near-shadow for
+    // contact, diffused drop for elevation.
+    mobileCard: `
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+      0 2px 8px rgba(0, 0, 0, 0.03),
+      0 12px 32px -12px rgba(0, 0, 0, 0.08)
+    `,
   },
 
   // Layout — section-level spacing tokens.
@@ -277,6 +288,12 @@ export const theme = {
       // bodyToCards (20). Keeps the visual descent from title-to-cards
       // identical whether or not a subtitle is rendered.
       titleToCards: '28px',
+      // Section vertical padding — applied as padding-top AND padding-
+      // bottom on every <Section> wrapper, plus Hero's internal padding-
+      // bottom. Sum of two adjacent sections = 72 (the visible gap).
+      // Single source of truth for the inter-section rhythm; bumping
+      // this value re-spaces the whole landing in one place.
+      sectionPaddingY: '36px',
     },
   },
 

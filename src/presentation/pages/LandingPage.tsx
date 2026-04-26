@@ -34,30 +34,62 @@ const Page = styled.div`
 const Section = styled.section<{
   $size?: keyof typeof SECTION_Y;
   $tint?: boolean;
+  /* Soft lavender→peach gradient fill, applied on DESKTOP + TABLET
+   * only. Used by Testimonials so the section reads as its own tonal
+   * panel without committing to a hard $tint. Mobile stays transparent
+   * (the tinted cards already define the band there). */
+  $gradientFill?: boolean;
+  /* $bleedTop / $bleedBottom — bleed on BOTH viewports (legacy).        */
   $bleedTop?: boolean;
   $bleedBottom?: boolean;
+  /* $bleedTopDesktop / $bleedBottomDesktop — bleed on DESKTOP ONLY.
+   * Mobile keeps its sectionPaddingY rhythm intact. Used when desktop
+   * needs adjacent sections to flow seamlessly (e.g. CTA → Footer)
+   * but mobile still needs the 72-gap rhythm. */
+  $bleedTopDesktop?: boolean;
+  $bleedBottomDesktop?: boolean;
   /* Optional desktop-only top margin. Used to push a section down on
    * desktop without disturbing the uniform mobile vertical rhythm. */
   $mtDesktop?: string;
 }>`
   margin-top: ${({ $mtDesktop }) => $mtDesktop || '0'};
-  padding-top: ${({ $size = 'md', $bleedTop }) => ($bleedTop ? '0' : SECTION_Y[$size])};
-  padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
+  padding-top: ${({ $size = 'md', $bleedTop, $bleedTopDesktop }) =>
+    ($bleedTop || $bleedTopDesktop) ? '0' : SECTION_Y[$size]};
+  padding-bottom: ${({ $size = 'md', $bleedBottom, $bleedBottomDesktop }) =>
+    ($bleedBottom || $bleedBottomDesktop) ? '0' : SECTION_Y[$size]};
   padding-left: 0;
   padding-right: 0;
   ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
+  ${({ $gradientFill }) => $gradientFill && `
+    /* Faint lavender → peach panel — desktop + tablet only. Tuned soft
+     * (alphas 0.08/0.06) so it reads as ambient tonal warmth, not a
+     * coloured block. Applied to the OUTER section (this wrapper). */
+    background: linear-gradient(
+      180deg,
+      rgba(198, 196, 245, 0.08) 0%,
+      rgba(255, 218, 224, 0.06) 100%
+    );
+  `}
+
+  /* Mobile — disable $gradientFill on phone (mobile is frozen). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    ${({ $gradientFill }) => $gradientFill && `background: transparent;`}
+  }
 
   /* Mobile vertical rhythm — single rule for ALL sections.
-   * 28px top + 28px bottom = 56px gap between any two adjacent sections.
-   * No per-section overrides on mobile so the rhythm reads as uniform.
-   * $bleedTop/$bleedBottom (CTA → Footer) still flatten to 0.
+   * Both top and bottom = layout.mobile.sectionPaddingY (36) → adjacent
+   * sections sum to 72. Hero's internal padding-bottom uses the same
+   * token so Hero → first section also resolves to 72.
+   * Only $bleedTop/$bleedBottom (BOTH-viewport bleeds) flatten to 0
+   * here; $bleedTopDesktop/$bleedBottomDesktop are desktop-only and
+   * deliberately do NOT affect mobile.
    * $mtDesktop is reset here so the desktop-only push doesn't leak. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin-top: 0;
-    padding-top: ${({ $size = 'md', $bleedTop }) =>
-      $bleedTop ? '0' : $size === 'flush' ? '0' : '28px'};
-    padding-bottom: ${({ $size = 'md', $bleedBottom }) =>
-      $bleedBottom ? '0' : $size === 'flush' ? '0' : '28px'};
+    padding-top: ${({ $size = 'md', $bleedTop, theme }) =>
+      $bleedTop ? '0' : $size === 'flush' ? '0' : theme.layout.mobile.sectionPaddingY};
+    padding-bottom: ${({ $size = 'md', $bleedBottom, theme }) =>
+      $bleedBottom ? '0' : $size === 'flush' ? '0' : theme.layout.mobile.sectionPaddingY};
   }
 `;
 
@@ -102,13 +134,19 @@ const Hero = styled.section<{ $v2?: boolean }>`
    * Comment c_mofyu744 (2026-04-26): "отцентруй контент в залитой зоне"
    * + follow-up "чуть больше воздуха в hero". */
   /* Mobile — outer wrapper gives full control to the inner
-   * HeroSectionV2 styled section (its own 56/20 padding box owns
-   * the entire hero spacing). No padding, no gap, no min-height
-   * here so values don't stack. */
+   * HeroSectionV2 styled section (its own padding box owns the entire
+   * hero spacing). No padding/gap/min-height here so values don't
+   * stack.
+   * margin-bottom 20 → gap from Hero fill edge to Top Templates content
+   * = 20 + 36 (Section padding-top) = 56. Iterated 72 → 52 → 20 → 56;
+   * 20 read as cramped, 72 too loose, 56 sits as a comfortable middle.
+   * One-off override; sectionPaddingY token (36) stays at 72-rhythm
+   * for all other section→section pairs. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0;
     gap: 0;
     min-height: 0;
+    margin-bottom: 20px;
   }
 `;
 
@@ -138,15 +176,15 @@ export const LandingPage: React.FC = () => {
         <HowItWorksSection />
       </Section>
 
-      <Section $size="gap" $tint $mtDesktop="80px">
+      <Section $size="gap" $mtDesktop="80px" $gradientFill>
         <TestimonialsSection />
       </Section>
 
-      <Section $size="gap" $tint $bleedBottom>
+      <Section $size="gap" $bleedTopDesktop $bleedBottomDesktop>
         <CTASection onBrowseTemplates={goTemplates} onExploreWidgets={goWidgets} />
       </Section>
 
-      <Section $size="gap" $tint $bleedTop $bleedBottom>
+      <Section $size="gap" $tint $bleedTopDesktop $bleedBottom>
         <BigFooter onNavigate={(path) => navigate(path)} noDivider />
       </Section>
     </Page>

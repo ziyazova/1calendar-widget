@@ -41,12 +41,13 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — top 32 (content lifted 8px from previous 40), bottom 24
-   * (section "cut" tighter from below), content centered. */
+  /* Phone — top 32, bottom = layout.mobile.sectionPaddingY (36). Hero's
+   * bottom matches the wrapper Section's top so Hero → first section
+   * resolves to the same 72-gap rhythm as every other section pair. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 32px 20px 24px;
+    padding: 32px 20px ${({ theme }) => theme.layout.mobile.sectionPaddingY};
     justify-content: center;
   }
 `;
@@ -205,7 +206,11 @@ const Headline = styled.h1`
 
 const Sub = styled.p`
   margin: 22px auto 0;
-  font-size: 16px;
+  /* Desktop 18 (was 16) — hero subtitles get a touch more weight than
+   * generic body. Mobile keeps 16 in the @media md block below — phone
+   * hero copy already runs longer at smaller widths.
+   * Comment c_mogbd1x8: "на десктопе мб это 18 сделать ток у хиро". */
+  font-size: 18px;
   line-height: 1.65;
   color: ${({ theme }) => theme.colors.peach.muted};
   max-width: 440px;
@@ -214,7 +219,8 @@ const Sub = styled.p`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 16px;
     line-height: 1.5;
-    color: ${({ theme }) => theme.colors.text.body};
+    /* Color matches desktop (peach.muted) — earlier override to text.body
+     * read too dark on phone (c_mog4rtwt: "по цвету надо как на десктопе"). */
     margin: 0 0 28px 0;
     max-width: 100%;
   }

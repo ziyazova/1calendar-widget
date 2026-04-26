@@ -74,6 +74,9 @@ const GalleryHeader = styled.div`
      * bodyToCards 20). Visual descent matches sections that have a
      * subtitle. */
     margin-bottom: ${({ theme }) => theme.layout.mobile.titleToCards};
+    /* Center the title row on mobile to match WidgetStudio /
+     * Testimonials / CTA. Last user note: "выровни контент". */
+    text-align: center;
   }
 `;
 
@@ -251,10 +254,19 @@ const TemplateCardWrap = styled.div`
 
   /* Mobile — width 75vw so the next card peeks ~25% at the right
    * edge (peek = scroll affordance). Snap-align start keeps the
-   * focused card flush to the section gutter. */
+   * focused card flush to the section gutter.
+   * Hover scale disabled — on phone the desktop &:hover rule fires on
+   * tap and pulses the entire card, which reads as "the card was
+   * pressed" rather than "the content responded".
+   * Comment c_mog84l4d: "у телефона при нажатии увеличивается вся
+   * карточка, убери это". */
   ${media.mobile`
     width: 75vw;
     scroll-snap-align: start;
+
+    &:hover {
+      transform: none;
+    }
   `}
 `;
 

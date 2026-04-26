@@ -140,12 +140,19 @@ const HeroTitle = styled.h1`
 
 const HeroDesc = styled.p`
   margin: 22px auto 32px;
-  font-size: ${({ theme }) => theme.typography.sizes.xl};
+  /* Desktop sizes['2xl'] (18). Mobile reverts to sizes.xl (16) below
+   * to match phone-frozen sizing. Comment c_mogbd5uw: same ask as the
+   * landing hero subtitle. */
+  font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 400;
   color: ${({ theme }) => theme.colors.peach.muted};
   line-height: 1.65;
   max-width: 440px;
   letter-spacing: -0.005em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.xl};
+  }
 `;
 
 /* HeroButton — replaced by shared <Button $variant="primary" $size="xl" $fullWidth> */
