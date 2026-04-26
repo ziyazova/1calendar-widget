@@ -81,14 +81,14 @@ const Eyebrow = styled.div`
   font-weight: 500;
   margin-top: -32px;
 
-  /* Mobile — fixed-height pill (32) per spec; spacing below = 24,
-   * stars-group → text gap = 10. */
+  /* Mobile — fixed-height pill (32); spacing below = 28 (was 24, +4),
+   * stars-group → text gap = 10. Text 12. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 32px;
-    margin: 0 0 24px;
+    margin: 0 0 28px;
     padding: 0 12px;
     gap: 10px;
-    font-size: 13px;
+    font-size: 12px;
   }
 `;
 
