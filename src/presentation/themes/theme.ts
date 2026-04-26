@@ -185,7 +185,10 @@ export const theme = {
      * type scale on phone. Hero is intentionally excluded (it has its
      * own oversized scale). Card body MUST NEVER exceed section body. */
     mobile: {
-      sectionHeadline: { size: '24px', lineHeight: '1.2',  weight: 600 },
+      // line-height 1 (tight) on section titles so the 8px titleToBody
+      // margin reads honestly — line-height padding was adding ~6px of
+      // descender/ascender space that made the gap feel larger.
+      sectionHeadline: { size: '24px', lineHeight: '1',    weight: 600 },
       sectionBody:     { size: '15px', lineHeight: '1.5',  weight: 400 },
       cardHeadline:    { size: '16px', lineHeight: '1.35', weight: 600 },
       cardBody:        { size: '14px', lineHeight: '1.5',  weight: 400 },
