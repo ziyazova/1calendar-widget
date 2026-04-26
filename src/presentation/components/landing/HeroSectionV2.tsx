@@ -81,11 +81,11 @@ const Eyebrow = styled.div`
   font-weight: 500;
   margin-top: -32px;
 
-  /* Mobile — bumped padding/gap higher per the latest "паддинги
-   * больше" ask. 8/16/8/12 + gap 10 + margin-bottom 14 reads as
-   * a comfortable badge that doesn't crowd the inner stars+text. */
+  /* Mobile — padding/gap larger per "паддинги больше". margin-bottom
+   * removed so the Hero's flex gap (20) is the only regulator of
+   * spacing between hero elements (clean hierarchy: 20/20/32). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin: 0 0 14px;
+    margin: 0;
     padding: 8px 16px 8px 12px;
     gap: 10px;
     font-size: 11px;
@@ -153,11 +153,8 @@ const Headline = styled.h1`
   max-width: 920px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-top: 14px;
-    /* Hero title bigger on phone — clamp(44, 6vw, 84) was stuck at 44px
-     * below 640. Bump to clamp(48, 13vw, 60) so it scales 48 → 60 across
-     * 375 → 460 viewports. Comment c_mog2muer (2026-04-26): "сделай
-     * чуть больше". */
+    /* margin-top zeroed; Hero gap (20) drives the rhythm. */
+    margin-top: 0;
     font-size: clamp(48px, 13vw, 60px);
     line-height: 1.1;
   }
@@ -203,7 +200,8 @@ const Sub = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin-top: 14px;
+    /* margin-top zeroed; Hero gap (20) drives the rhythm. */
+    margin-top: 0;
   }
 `;
 
@@ -217,13 +215,15 @@ const CTAs = styled.div`
   justify-content: center;
 
   /* Phone — stack CTAs vertically, full-width up to 320 cap, height
-   * locked to 44 (lg size, NOT the bumped xl mobileHeight 56). Latest
-   * direction: "просто large size, не такие высокие, ширина как была". */
+   * locked to 44 (lg size, NOT the bumped xl mobileHeight 56).
+   * margin-top: 12 gives the action zone a little extra space beyond
+   * the Hero gap (20) so total Sub→CTAs reads as 32 vs 20 elsewhere
+   * — clean hierarchy: 20 / 20 / 32. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
     max-width: 320px;
-    margin: 18px auto 0;
+    margin: 12px auto 0;
     gap: 10px;
 
     & > * {
