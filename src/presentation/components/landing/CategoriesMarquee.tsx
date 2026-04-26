@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { scrollLeft } from '@/presentation/themes/animations';
+import { media } from '@/presentation/themes/media';
 
 /* ── Categories Marquee ── */
 const CategoriesWrap = styled.div`
@@ -13,6 +14,15 @@ const CategoriesWrap = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 24px;
   }
+
+  /* Mobile — narrower fade so the dot indicator on the leftmost chip
+   * isn't half-hidden. 8% on a 375px viewport = 30px, which clips the
+   * dot; absolute 16px fade is enough to soften the edge without eating
+   * content. */
+  ${media.mobile`
+    mask-image: linear-gradient(to right, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  `}
 `;
 
 const CategoriesSection = styled.section`
@@ -32,6 +42,13 @@ const CategoriesTrack = styled.div<{ $duration: number; $reverse?: boolean }>`
 
   &:hover {
     animation-play-state: paused;
+  }
+
+  /* Respect users with motion sensitivity. Freezing at the initial
+   * position keeps the first ~3 chips visible as a static preview;
+   * the full catalog is one tap away on /templates. */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 `;
 
