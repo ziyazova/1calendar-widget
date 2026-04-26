@@ -32,7 +32,7 @@ const FooterWrapper = styled.footer`
   padding: 82px 48px 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 60px 24px 0;
+    padding: 60px ${({ theme }) => theme.layout.mobile.gutter} 0;
   }
 `;
 
@@ -91,9 +91,14 @@ const FooterNav = styled.div`
      block on the right with breathing room between columns. */
   gap: 60px;
 
+  /* Mobile — switch to a 2-column grid so each NavGroup is ~half the
+   * viewport instead of being squeezed to ~110px in a 3-up flex-wrap.
+   * Third group flows to a second row beneath, full-width — natural. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    gap: 40px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 24px;
+    row-gap: 28px;
   }
 `;
 
@@ -134,7 +139,7 @@ const FooterBottomWrapper = styled.div`
   padding: 0 48px 32px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 24px;
   }
 `;
 

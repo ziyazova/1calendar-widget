@@ -285,8 +285,8 @@ const WhyTitle = styled.h2`
   margin: 0 0 32px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 28px;
-    margin: 0 0 24px;
+    font-size: ${({ theme }) => theme.typography.fluid.h2};
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.titleGap};
   }
 `;
 

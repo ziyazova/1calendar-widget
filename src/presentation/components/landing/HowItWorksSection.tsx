@@ -9,7 +9,7 @@ const Section = styled.section`
   padding: 0 48px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -21,7 +21,7 @@ const SectionTitle = styled.h2`
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+    font-size: ${({ theme }) => theme.typography.fluid.h2};
   }
 `;
 
@@ -33,7 +33,7 @@ const SectionSubtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin-bottom: 8px;
+    margin: ${({ theme }) => theme.layout.mobile.titleGap} 0 ${({ theme }) => theme.layout.mobile.titleGap};
   }
 `;
 
@@ -44,7 +44,7 @@ const Grid = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: ${({ theme }) => theme.layout.mobile.cardGap};
   }
 `;
 
@@ -78,7 +78,7 @@ const Card = styled.div<{ $bg: string }>`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 22px 18px;
+    padding: ${({ theme }) => theme.layout.mobile.cardPadding};
     min-height: 150px;
   }
 `;

@@ -172,6 +172,15 @@ export const theme = {
       relaxed: 1.6,
     },
 
+    // Fluid typography — single clamp() per role replaces a stack of
+     // @media font-size overrides. Currently used on mobile only (via
+     // media.mobile) so desktop sizes stay frozen at their hardcoded values.
+    fluid: {
+      // Section H2 across the landing — uniform mobile size 24-32px.
+      // At 375px viewport → 24px; at 640px → 32px. Caps at 32 above.
+      h2: 'clamp(24px, 5vw, 32px)',
+    },
+
     letterSpacing: {
       widest: '0.06em',              // UPPERCASE pills
       normal: '0',
@@ -234,6 +243,21 @@ export const theme = {
     popover: '0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04)',
     // Focus ring on blue inputs/tabs (secondary state).
     focusBlue: '0 0 0 3px rgba(51, 132, 244, 0.1)',
+  },
+
+  // Layout — section-level spacing tokens.
+  //
+  // `mobile` namespace is the single source of truth for the mobile
+  // landing's vertical/horizontal rhythm. One value per role; no per-
+  // section overrides allowed in new code. Desktop values stay
+  // hardcoded inside each section (for now) per the desktop-frozen rule.
+  layout: {
+    mobile: {
+      gutter: '20px',          // section.paddingX — every section's outer horizontal padding
+      cardPadding: '20px 16px', // card internal padding (vertical horizontal)
+      cardGap: '12px',          // gap between sibling cards / steps inside a section
+      titleGap: '12px',         // headline → body content (subtitle, list, grid)
+    },
   },
 
   // Breakpoints

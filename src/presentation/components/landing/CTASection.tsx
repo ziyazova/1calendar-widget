@@ -19,7 +19,7 @@ const CTACard = styled.div`
   text-align: center;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 80px 24px;
+    padding: 80px ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -31,7 +31,7 @@ const CTATitle = styled.h2`
   margin: 0 0 8px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+    font-size: ${({ theme }) => theme.typography.fluid.h2};
   }
 `;
 
@@ -43,7 +43,7 @@ const CTASubtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin-bottom: 8px;
+    margin: ${({ theme }) => theme.layout.mobile.titleGap} 0 ${({ theme }) => theme.layout.mobile.titleGap};
   }
 `;
 

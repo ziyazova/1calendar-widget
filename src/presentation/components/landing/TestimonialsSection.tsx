@@ -47,8 +47,8 @@ const Title = styled.h2`
   line-height: 1.2;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
-    padding: 0 24px;
+    font-size: ${({ theme }) => theme.typography.fluid.h2};
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -61,8 +61,8 @@ const Subtitle = styled.p`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 14px;
-    margin: 8px 0 24px;
-    padding: 0 24px;
+    margin: ${({ theme }) => theme.layout.mobile.titleGap} 0 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -81,7 +81,7 @@ const MarqueeContainer = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
-    padding: 0 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 

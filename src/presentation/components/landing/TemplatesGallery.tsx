@@ -42,7 +42,7 @@ const TemplatesMarqueeWrap = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 8px 16px 0;
+    padding: 8px ${({ theme }) => theme.layout.mobile.gutter} 0;
   }
 
   /* Mobile — native swipe with snap. overscroll-behavior contains the
@@ -50,7 +50,7 @@ const TemplatesMarqueeWrap = styled.div`
   ${media.mobile`
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
-    scroll-padding-left: 16px;
+    scroll-padding-left: 20px;
   `}
 `;
 
@@ -63,7 +63,8 @@ const GalleryHeader = styled.div`
   gap: 20px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    gap: ${({ theme }) => theme.layout.mobile.titleGap};
   }
 `;
 
@@ -87,7 +88,7 @@ const GalleryTitle = styled.h2`
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+    font-size: ${({ theme }) => theme.typography.fluid.h2};
   }
 `;
 

@@ -8,7 +8,7 @@ const Section = styled.section`
   padding: 0 48px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -19,7 +19,8 @@ const Header = styled.div`
   gap: 16px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-bottom: 8px;
+    margin-bottom: ${({ theme }) => theme.layout.mobile.titleGap};
+    gap: ${({ theme }) => theme.layout.mobile.titleGap};
   }
 `;
 
@@ -39,7 +40,7 @@ const Title = styled.h2`
   text-align: center;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+    font-size: ${({ theme }) => theme.typography.fluid.h2};
   }
 `;
 
