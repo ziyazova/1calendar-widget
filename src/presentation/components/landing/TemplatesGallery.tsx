@@ -149,11 +149,13 @@ const MobileExploreRow = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
     justify-content: center;
-    /* 28 top — connects "see-all" to cards above (cards → button = 28,
-     * not 40 — 40 would read as a section break). */
-    padding: 28px 24px 0;
+    /* 28 top — connects "see-all" to cards above. Horizontal padding =
+     * mobile gutter (20) so the button aligns with section content
+     * boundaries instead of sitting in a 320px cap (which read as
+     * "ограничивается странно"). Button stretches full-width. */
+    padding: 28px ${({ theme }) => theme.layout.mobile.gutter} 0;
 
-    & > * { width: 100%; max-width: 320px; }
+    & > * { width: 100%; }
   }
 `;
 
