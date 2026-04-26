@@ -226,21 +226,15 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Phone — stack CTAs vertically so each is full-width and tappable.
-   * Cap the row width so they don't stretch edge-to-edge on landscape.
-   * Tighter top margin so the button row sits close to the subtitle.
-   * Children inherit the shared Button's xl mobileHeight (56) — the
-   * old forced 36px override was removed per c_mog2lpiy ("сделай больше"). */
+  /* Phone — stack CTAs vertically, each at its natural content width
+   * (not stretched to 320). Children inherit the shared Button's xl
+   * mobileHeight (56). c_mog2lpiy ("сделай больше") + c_mog2v7ru
+   * ("ненормально широкая, просто обычную большую"). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
-    width: 100%;
-    max-width: 320px;
+    align-items: center;
     margin: 18px auto 0;
     gap: 10px;
-
-    & > * {
-      width: 100%;
-    }
   }
 `;
 
