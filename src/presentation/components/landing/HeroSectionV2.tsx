@@ -81,15 +81,13 @@ const Eyebrow = styled.div`
   font-weight: 500;
   margin-top: -32px;
 
-  /* Mobile — compactified vs desktop but with enough breathing room
-   * around the inner stars+text. Settled at 6/12 padding and gap 8 after
-   * c_mofyulrb ("чуть компактнее") and c_mog0yvsq ("очень маленькие
-   * паддинги") together — middle of original (6/14/6/8) and the first
-   * compact attempt (4/10/4/6). Bottom margin keeps headline off it. */
+  /* Mobile — bumped padding/gap higher per the latest "паддинги
+   * больше" ask. 8/16/8/12 + gap 10 + margin-bottom 14 reads as
+   * a comfortable badge that doesn't crowd the inner stars+text. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     margin: 0 0 14px;
-    padding: 6px 12px 6px 8px;
-    gap: 8px;
+    padding: 8px 16px 8px 12px;
+    gap: 10px;
     font-size: 11px;
   }
 `;
@@ -141,14 +139,6 @@ const Star = styled.span<{ $i: number }>`
   animation: ${starPop} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: ${({ $i }) => 0.9 + $i * 0.13}s;
   svg { width: 12px; height: 12px; fill: currentColor; }
-
-  /* Mobile — kill the peach pop animation and paint stars in brand
-   * accent (indigo) at ~70% opacity. Comment c_mog2ps42 (2026-04-26):
-   * "акцентного нашего цвета, не 100 процентов прозрачки". */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    animation: none;
-    color: rgba(99, 102, 241, 0.7);
-  }
 `;
 
 /* ── Headline ── */
@@ -226,15 +216,20 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Phone — stack CTAs vertically, each at its natural content width
-   * (not stretched to 320). Children inherit the shared Button's xl
-   * mobileHeight (56). c_mog2lpiy ("сделай больше") + c_mog2v7ru
-   * ("ненормально широкая, просто обычную большую"). */
+  /* Phone — stack CTAs vertically, full-width up to 320 cap, height
+   * locked to 44 (lg size, NOT the bumped xl mobileHeight 56). Latest
+   * direction: "просто large size, не такие высокие, ширина как была". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
-    align-items: center;
+    width: 100%;
+    max-width: 320px;
     margin: 18px auto 0;
     gap: 10px;
+
+    & > * {
+      width: 100%;
+      height: 44px;
+    }
   }
 `;
 
