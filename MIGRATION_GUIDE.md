@@ -186,7 +186,62 @@ export { PlanUpgradeBar } from './PlanUpgradeBar';
 
 ---
 
-## 9. CLAUDE.md Sync Notes
+## 9. Responsive helpers — mobile/tablet adaptation
+
+**Rule:** the desktop layout is **frozen**. Mobile/tablet support is added on top via `max-width` overrides only. Never use `min-width` to alter desktop styles.
+
+### Breakpoints (Apple-style)
+
+Defined in `theme.breakpoints` alongside legacy `xs/sm/md/lg/xl` (which stay untouched for back-compat):
+
+| Slot | Value | Meaning |
+|---|---|---|
+| `mobile` | `640px` | phones — single column, burger nav, sticky CTAs |
+| `tablet` | `1024px` | iPad / small laptop — 2-col grids, compact hero |
+| `desktop` | `1025px` | min-width helper for the rare desktop-only override |
+
+### `media` helper — preferred for styled-components
+
+Import from `@/presentation/themes/media`. Tagged-template API, same shape as `css` from styled-components:
+
+```ts
+// BEFORE — ad-hoc, magic numbers, theme drilling
+const Hero = styled.section`
+  padding: 0 48px;
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 0 24px;
+  }
+`;
+
+// AFTER — single source of truth, grep-friendly
+import { media } from '@/presentation/themes/media';
+
+const Hero = styled.section`
+  padding: 0 48px;
+  ${media.mobile`
+    padding: 0 24px;
+  `}
+`;
+```
+
+`media.tablet` is **cumulative** with `media.mobile` — it applies on phones AND tablets (smallest wins). Use `media.desktopUp` only when a rule must apply to desktop alone.
+
+### `useMediaQuery` hook — only when CSS can't express it
+
+Use only when you need to render a different component tree, swap `aria-*`, or branch on touch capability in JS. For pure visual changes, prefer the `media` helper — it's cheaper and avoids hydration mismatches.
+
+```ts
+import { useMediaQuery, MQ } from '@/presentation/themes/useMediaQuery';
+
+const isMobile = useMediaQuery(MQ.MOBILE);
+const isTouch = useMediaQuery(MQ.TOUCH);
+```
+
+`MQ` constants: `MOBILE`, `TABLET`, `TOUCH`, `REDUCED_MOTION`.
+
+---
+
+## 10. CLAUDE.md Sync Notes
 
 Current CLAUDE.md references `accent: '#007AFF'` indirectly in a few places. After merging this, update:
 - Note that accent is now `#6366F1` (indigo), not iOS blue

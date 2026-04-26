@@ -237,7 +237,22 @@ export const theme = {
   },
 
   // Breakpoints
+  //
+  // Apple-style semantic slots (use these in new code):
+  //   mobile  ≤ 640px   — phones, single column, burger nav, sticky CTAs
+  //   tablet  ≤ 1024px  — iPad / small laptop, 2-col grids, compact hero
+  //   desktop ≥ 1025px  — current frozen desktop layout (min-width helper)
+  //
+  // Legacy aliases (xs/sm/md/lg/xl) are kept untouched for back-compat —
+  // dozens of existing @media queries reference them. New code MUST use the
+  // semantic slots via `media.mobile` / `media.tablet` from `./media.ts`.
   breakpoints: {
+    // Apple-style semantic slots — primary
+    mobile: '640px',
+    tablet: '1024px',
+    desktop: '1025px',
+
+    // Legacy aliases — DO NOT use in new code
     xs: '380px',
     sm: '480px',
     md: '768px',
