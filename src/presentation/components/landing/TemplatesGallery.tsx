@@ -3,6 +3,7 @@ import styled, { keyframes, css } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
 import { FilterChip, Button as SharedButton, TemplateMockupCard, TemplateMockupImage } from '../shared';
 import { TEMPLATES, type Category } from '@/presentation/data/templates';
+import { media } from '@/presentation/themes/media';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -43,6 +44,14 @@ const TemplatesMarqueeWrap = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 8px 16px 0;
   }
+
+  /* Mobile — native swipe with snap. overscroll-behavior contains the
+   * swipe so it doesn't trigger pull-to-refresh / browser back-gesture. */
+  ${media.mobile`
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scroll-padding-left: 16px;
+  `}
 `;
 
 const GalleryHeader = styled.div`
@@ -218,9 +227,18 @@ const TemplateCardWrap = styled.div`
     z-index: 2;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  /* Tablet — narrower card so 3 cards + a teaser of the 4th fit in
+   * the marquee viewport (was jumping straight from 300 to 200). */
+  ${media.tablet`
+    width: 240px;
+  `}
+
+  /* Mobile — even narrower; snap-align center so the swipe lands a
+   * card in the middle of the viewport. */
+  ${media.mobile`
     width: 200px;
-  }
+    scroll-snap-align: center;
+  `}
 `;
 
 /* Spacing wrapper around the shared <TemplateMockupCard> so the card has
