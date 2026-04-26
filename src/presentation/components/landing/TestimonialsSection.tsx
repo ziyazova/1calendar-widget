@@ -100,6 +100,12 @@ const MarqueeColumn = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 340px;
 
+    /* Narrow the fade on mobile — at 340px the 10% mask blanches a
+     * full quarter of the top/bottom card. 5%/95% (≈17px) softens the
+     * edge without washing out the readable content. */
+    mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+
     &:nth-child(n+2) {
       display: none;
     }
@@ -115,6 +121,12 @@ const MarqueeInner = styled.div<{ $duration: number; $reverse?: boolean }>`
 
   &:hover {
     animation-play-state: paused;
+  }
+
+  /* Motion-sensitive users see the testimonials frozen at top of the
+   * column — the visible cards alone are enough social proof. */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 `;
 
