@@ -213,7 +213,7 @@ const Sub = styled.p`
   font-weight: 400;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.5;
     color: ${({ theme }) => theme.colors.text.body};
     margin: 0 0 28px 0;
@@ -230,9 +230,8 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Mobile spec: vertical stack, full-width children, gap 12, no
-   * margin-top (Sub margin-bottom 28 is the only thing above). Each
-   * CTA: 52 height, 14 radius, 16/600 type. */
+  /* Mobile: vertical stack, full-width, gap 12. Each CTA: 48/15/600,
+   * radius 12 — reduced from 52/16/14 ("неоправданно большие"). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
@@ -242,9 +241,9 @@ const CTAs = styled.div`
 
     & > * {
       width: 100%;
-      height: 52px;
-      border-radius: 14px;
-      font-size: 16px;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 15px;
       font-weight: 600;
     }
   }
