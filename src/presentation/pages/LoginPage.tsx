@@ -92,6 +92,16 @@ const PasswordToggle = styled.button`
   svg { width: 16px; height: 16px; }
 
   &:hover { color: ${({ theme }) => theme.colors.text.body}; }
+
+  /* Touch devices — invisible 44×44 hit area expands the tap region
+   * around the 16px eye icon without affecting the visual layout. */
+  @media (hover: none) and (pointer: coarse) {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -14px;
+    }
+  }
 `;
 
 const Divider = styled.div`
@@ -148,8 +158,22 @@ const ForgotLink = styled.button`
   padding: 0;
   margin-top: ${({ theme }) => theme.spacing['1']};
   align-self: flex-end;
+  position: relative;
 
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
+
+  /* Touch — invisible hit area expands the tap region around the small
+   * "Forgot password?" text so it meets the 44px Apple HIG minimum. */
+  @media (hover: none) and (pointer: coarse) {
+    padding: 8px 4px;
+    margin-top: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -6px -8px;
+    }
+  }
 `;
 
 const ErrorText = styled.div`
