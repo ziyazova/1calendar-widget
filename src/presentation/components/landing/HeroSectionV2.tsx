@@ -41,14 +41,13 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — 52/20 padding box. Top reduced 56 → 52 to lift the eyebrow
-   * 4px higher per follow-up. Inner rhythm: Eyebrow 28 / Headline 20 /
-   * Sub 28 (margin-driven). */
+  /* Phone — top 32 (content lifted 8px from previous 40), bottom 24
+   * (section "cut" tighter from below), content centered. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 52px 20px 56px;
-    justify-content: flex-start;
+    padding: 32px 20px 24px;
+    justify-content: center;
   }
 `;
 
