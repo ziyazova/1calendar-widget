@@ -15,8 +15,11 @@ const TemplatesGallerySection = styled.section`
   padding: 0;
   position: relative;
 
+  /* Mobile — 12px extra bottom padding inside the section so the gap
+   * to the next section is 40 (Section wrapper 28 + this 12) instead
+   * of 28. Stops the next section from "приклеиваясь". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0;
+    padding: 0 0 12px;
   }
 `;
 
@@ -67,9 +70,9 @@ const GalleryHeader = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
     gap: ${({ theme }) => theme.layout.mobile.titleToBody};
-    /* Title → marquee = 16 (bodyToCards). Pairs with marquee
-     * padding-top: 0 mobile so the gap doesn't stack. */
-    margin-bottom: ${({ theme }) => theme.layout.mobile.bodyToCards};
+    /* Title → marquee = 24 (titleToCards: section title without
+     * subtitle uses a slightly larger gap than bodyToCards 16). */
+    margin-bottom: 24px;
   }
 `;
 
@@ -146,7 +149,9 @@ const MobileExploreRow = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
     justify-content: center;
-    padding: 16px 24px 0;
+    /* 28 top — connects "see-all" to cards above (cards → button = 28,
+     * not 40 — 40 would read as a section break). */
+    padding: 28px 24px 0;
 
     & > * { width: 100%; max-width: 320px; }
   }
@@ -239,11 +244,12 @@ const TemplateCardWrap = styled.div`
     width: 240px;
   `}
 
-  /* Mobile — even narrower; snap-align center so the swipe lands a
-   * card in the middle of the viewport. */
+  /* Mobile — width 75vw so the next card peeks ~25% at the right
+   * edge (peek = scroll affordance). Snap-align start keeps the
+   * focused card flush to the section gutter. */
   ${media.mobile`
-    width: 200px;
-    scroll-snap-align: center;
+    width: 75vw;
+    scroll-snap-align: start;
   `}
 `;
 
@@ -261,13 +267,12 @@ const TemplateCardMeta = styled.div`
   gap: 12px;
   padding: 6px;
 
-  /* On phone the card is 200px wide — fitting title + price on one row
-   * with ellipsis clips long names. Stack them instead: title on top,
-   * price below, both fully readable. */
+  /* Mobile — title + price are a pair (price = attribute of title);
+   * 4px gap reads as one block, not two. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    gap: 4px;
     padding: 0 4px;
   }
 `;

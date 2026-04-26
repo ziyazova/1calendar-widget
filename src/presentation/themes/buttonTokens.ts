@@ -95,6 +95,9 @@ export interface ButtonSizeTokens {
    *  width. Other sizes don't need a bump (lg=44 already meets HIG). */
   mobileHeight?: string;
   mobilePadding?: string;
+  /** Optional 1-2 px reduction of label font on phone — every size
+   *  reads as slightly tighter without dropping legibility. */
+  mobileFontSize?: string;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -102,20 +105,19 @@ export interface ButtonSizeTokens {
    ──────────────────────────────────────────────────────────────── */
 
 export const buttonSizeTokens: Record<ButtonSize, ButtonSizeTokens> = {
-  sm: { height: '32px', padding: '0 14px', radius: '10px', fontSize: '12px', iconSize: '14px' },
-  md: { height: '36px', padding: '0 16px', radius: '10px', fontSize: '13px', iconSize: '14px' },
-  lg: { height: '44px', padding: '0 20px', radius: '12px', fontSize: '14px', iconSize: '16px' },
+  sm: { height: '32px', padding: '0 14px', radius: '10px', fontSize: '12px', iconSize: '14px', mobileFontSize: '11px' },
+  md: { height: '36px', padding: '0 16px', radius: '10px', fontSize: '13px', iconSize: '14px', mobileFontSize: '12px' },
+  lg: { height: '44px', padding: '0 20px', radius: '12px', fontSize: '14px', iconSize: '16px', mobileFontSize: '13px' },
   xl: {
     height: '48px',
     padding: '0 24px',
     radius: '12px',
     fontSize: '14px',
     iconSize: '16px',
-    // Hero / primary-CTA scale on phone. Desktop frozen at 48.
-    // mobilePadding intentionally omitted so the button doesn't grow
-    // wider on phone — only height bumps. (User asked "по ширине мб
-    // меньше" after seeing 0/28.)
+    // Hero / primary-CTA — bumped height on phone; label slightly
+    // tighter via mobileFontSize. Desktop frozen.
     mobileHeight: '56px',
+    mobileFontSize: '13px',
   },
 };
 
