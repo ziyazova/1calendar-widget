@@ -27,6 +27,7 @@ const FeatureStack = styled.div`
     gap: 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     padding: 4px 24px 8px;
 
