@@ -5,6 +5,8 @@ import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, Sparkles } from 
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
+import { media } from '@/presentation/themes/media';
+import { useMediaQuery, MQ } from '@/presentation/themes/useMediaQuery';
 import {
   Button,
   AccountPillWrap,
@@ -60,9 +62,9 @@ const NavInner = styled.div`
   height: 100%;
   margin: 0 auto;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  ${media.mobile`
     padding: 16px 24px;
-  }
+  `}
 `;
 
 const LogoRow = styled.div<{ $pressed?: boolean; $disabled?: boolean }>`
@@ -107,9 +109,9 @@ const NavLinks = styled.div`
   gap: 28px;
   flex-shrink: 0;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  ${media.mobile`
     display: none;
-  }
+  `}
 `;
 
 const NavLink = styled.button<{ $active?: boolean }>`
@@ -127,12 +129,14 @@ const NavLink = styled.button<{ $active?: boolean }>`
 `;
 
 /* ── Burger ── */
+// 44×44 hit target on mobile (Apple HIG). Burger only renders on mobile,
+// so the size is unconditional; visual icon stays 20×20.
 const BurgerButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   cursor: pointer;
@@ -207,6 +211,12 @@ const CartButton = styled.button`
   svg { width: 18px; height: 18px; }
 
   &:hover { opacity: 0.7; }
+
+  /* 44×44 hit target on mobile (Apple HIG); icon size unchanged. */
+  ${media.mobile`
+    width: 44px;
+    height: 44px;
+  `}
 `;
 
 const CartBadge = styled.span`
@@ -228,11 +238,13 @@ const CartBadge = styled.span`
 `;
 
 /* Desktop dropdown */
+// Width clamps to viewport on narrow screens so the dropdown never
+// overflows the right edge (was 320px fixed → broke on iPhone SE 375).
 const CartDropdown = styled.div`
   position: absolute;
   top: calc(100% + 8px);
   right: -16px;
-  width: 320px;
+  width: min(320px, calc(100vw - 24px));
   background: ${({ theme }) => theme.colors.background.elevated};
   border: 1px solid ${({ theme }) => theme.colors.border.light};
   border-radius: ${({ theme }) => theme.radii.lg};
@@ -392,9 +404,9 @@ const MobileRight = styled.div`
   align-items: center;
   gap: 4px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  ${media.mobile`
     display: flex;
-  }
+  `}
 `;
 
 export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, activeLink, logoSub = 'Studio' }) => {
@@ -409,7 +421,10 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
   const { isLoggedIn, user, logout, isPro, planLoading } = useAuth();
   const { open: openUpgrade } = useUpgradeModal();
   const isLanding = location.pathname === '/';
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+  // Reactive — recomputes on resize. Was a one-shot read of innerWidth, so
+  // rotating the device or resizing the window left isMobile stale and
+  // mismatched with the CSS media queries above.
+  const isMobile = useMediaQuery(MQ.MOBILE);
 
   // Click-outside for the click-opened dropdowns (cart + account). Both open
   // on click now — account was hover-only before, which made the two menus
