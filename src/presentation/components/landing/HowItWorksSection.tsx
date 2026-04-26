@@ -92,7 +92,9 @@ const Card = styled.div<{ $bg: string }>`
    * - radius radii.lg (16) per the earlier mobile-radii audit. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: row;
-    align-items: center;
+    /* flex-start so the icon top-edge aligns with the title cap-line
+     * instead of vertically centering against the desc-tail. */
+    align-items: flex-start;
     padding: 14px 16px;
     min-height: 0;
     border-radius: ${({ theme }) => theme.radii.lg};
@@ -119,18 +121,32 @@ const IconWrap = styled.div<{ $bg: string; $color: string }>`
     stroke-width: 1.8;
   }
 
-  /* Mobile — small list-row icon (36×36, 16px svg). margin-bottom
-   * removed because Card is now flex-row (gap controls the icon→text
-   * distance). Radius radii.md (12) keeps it proportional.
-   * c_mog10kli ("радиусы большие") + c_mog2od8x ("иконку мб меньше"). */
+  /* Mobile — 52×52 icon block, top-aligned with title cap-line.
+   * radius 14 sits between radii.md (12) and lg (16) — proportional
+   * to the 52 size; one-off literal since DS doesn't have a 14 token. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    width: 36px;
-    height: 36px;
-    border-radius: ${({ theme }) => theme.radii.md};
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-top: 0;
     margin-bottom: 0;
     flex-shrink: 0;
 
-    svg { width: 16px; height: 16px; }
+    svg { width: 22px; height: 22px; }
+  }
+`;
+
+const StepContent = styled.div`
+  position: relative;
+  z-index: 1;
+
+  /* Mobile — flex 1 (fills row to right of icon), min-width 0 lets
+   * the title ellipsize cleanly, padding-top 2 nudges text down so
+   * the icon's top edge optically aligns with title cap-height. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    flex: 1;
+    min-width: 0;
+    padding-top: 2px;
   }
 `;
 
@@ -198,10 +214,10 @@ export const HowItWorksSection: React.FC<HowItWorksProps> = ({ showTitle = true,
       {steps.map(s => (
         <Card key={s.title} $bg={s.bg}>
           <IconWrap $bg={s.iconBg} $color={s.iconColor}><s.icon /></IconWrap>
-          <div style={{ position: 'relative', zIndex: 1 }}>
+          <StepContent>
             <CardTitle>{s.title}</CardTitle>
             <CardDesc>{s.desc}</CardDesc>
-          </div>
+          </StepContent>
         </Card>
       ))}
     </Grid>
