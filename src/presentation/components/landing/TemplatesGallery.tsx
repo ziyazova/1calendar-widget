@@ -382,7 +382,10 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
         <ArrowRight />
       </TemplatesScrollHint>
       <MobileExploreRow>
-        <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')}>
+        {/* Mobile primary CTA → size lg (44px) per Apple HIG min tap target.
+         * Was md (36px). Comment c_mofz84kz (2026-04-26): "так и должна
+         * быть большой - провреь". */}
+        <SharedButton $variant="primary" $size="lg" onClick={() => onNavigate('/templates')}>
           Explore all <ArrowRight />
         </SharedButton>
       </MobileExploreRow>

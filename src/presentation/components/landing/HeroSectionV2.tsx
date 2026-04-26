@@ -94,6 +94,14 @@ const Eyebrow = styled.div`
 
 const Avatars = styled.div`
   display: flex;
+
+  /* Hide on mobile — at 22px each, the three avatars read as decorative
+   * speckles next to the eyebrow text. The "10K+ creators" copy alone
+   * carries the social-proof signal at this width.
+   * Comment c_mog0vj1m (2026-04-26): "убери аватары из версии телефона". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
 `;
 
 const Avatar = styled.i<{ $bg: string; $i: number }>`
