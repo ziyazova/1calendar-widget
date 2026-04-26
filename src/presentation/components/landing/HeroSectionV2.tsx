@@ -235,16 +235,18 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Mobile: vertical stack, full-width, gap 12. Height/radius/font
-   * all come from the shared Button DS xl tokens (mobileHeight 44,
-   * radius 12, mobileFontSize 13) — no inline overrides. Only the
-   * 100% width and the secondary's bumped 600 weight are layout
-   * choices that aren't part of the DS. */
+  /* Mobile: vertical stack, capped at 380 to match /widgets hero
+   * EmailRow (which the user picked as the reference width — "в
+   * виджетах хиро оч хорошо"). On narrow phones the cap doesn't
+   * kick in (parent gutter is the limit); on wider phones (≥420)
+   * the buttons stay at 380 instead of stretching. Centered with
+   * margin: 0 auto. Height/radius/font come from shared Button xl
+   * tokens. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
-    max-width: none;
-    margin: 0;
+    max-width: 380px;
+    margin: 0 auto;
     gap: 12px;
 
     & > * {

@@ -55,8 +55,12 @@ const HeroCard = styled.div`
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 
   @media (max-width: 900px) {
-    margin-top: 116px;
-    padding: 12px 20px 24px;
+    /* Mobile — floating widgets are hidden (FloatingWidget @media md
+     * display:none), so the 116px top margin originally reserved for
+     * them collapses to 0. Horizontal padding uses the mobile gutter
+     * token to match main-landing ergonomic. */
+    margin-top: 0;
+    padding: 12px ${({ theme }) => theme.layout.mobile.gutter} 24px;
   }
 `;
 
@@ -80,7 +84,7 @@ const HeroInner = styled.div<{ $expanding?: boolean }>`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 36px 24px;
+    padding: 36px ${({ theme }) => theme.layout.mobile.gutter};
     border-radius: ${({ theme }) => theme.radii.xl};
   }
 `;
@@ -117,17 +121,56 @@ const HeroIcon = styled.div<{ $delay: string }>`
 
 const HeroTitle = styled.h1`
   font-family: 'Inter', sans-serif;
-  font-size: clamp(42px, 5.6vw, 74px);
+  /* Sized to match the main landing's Headline 1:1 — clamp + tracking
+   * + line-height all from Headline so both hero titles read as a
+   * single voice across the site. */
+  font-size: clamp(44px, 6vw, 84px);
   font-weight: 600;
   color: ${({ theme }) => theme.colors.peach.deep};
   letter-spacing: -0.03em;
   margin: 0;
   line-height: 1.2;
 
+  /* Same hand-drawn organic circle around the emphasized word as the
+   * main landing Headline em on / ("yours"). Single source of intent:
+   * hero-emphasized words across both landings get the same peach
+   * hand-circled treatment. */
   em {
     font-style: normal;
     font-weight: 600;
+    position: relative;
+    display: inline-block;
+    isolation: isolate;
     color: ${({ theme }) => theme.colors.peach.deep};
+
+    /* Same geometry as main landing Headline em (with the small width
+     * trim), but coloured in the brand indigo (#6366F1 / rgb 99 102
+     * 241) instead of peach — "пусть виджет выделяется не оранжевым,
+     * а нашим индиго". Alphas mirror the original pattern (top muted,
+     * sides/bottom stronger) for the hand-drawn pen-pressure look. */
+    &::before {
+      content: '';
+      position: absolute;
+      left: -0.07em;
+      right: -0.03em;
+      top: 8%;
+      bottom: 2%;
+      /* Alphas dropped (peaks 0.78/0.85 → 0.4/0.45) so indigo reads as
+       * a pen-stroke, not a marker. Single base hue (#6366F1) on all
+       * sides — no darker variant. */
+      border: 2.5px solid rgba(99, 102, 241, 0.4);
+      border-top-width: 1.5px;
+      border-right-width: 3px;
+      border-bottom-width: 3px;
+      border-left-width: 2px;
+      border-radius: 52% 48% 50% 50% / 55% 48% 52% 45%;
+      transform: rotate(-10deg) scaleX(1.05) skewX(-5deg);
+      z-index: -1;
+      pointer-events: none;
+      border-top-color: rgba(99, 102, 241, 0.25);
+      border-left-color: rgba(99, 102, 241, 0.38);
+      border-bottom-color: rgba(99, 102, 241, 0.45);
+    }
   }
 
   /* Phone — 42px base wraps "The widgets your Notion is missing" onto
@@ -162,8 +205,15 @@ const EmailRow = styled.div`
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 380px;
+  /* Desktop 364 (iterated 380 → 372 → 364, two −8 trims). Mobile
+   * keeps the original 380 (phone is frozen) via the @media md
+   * override below. */
+  max-width: 364px;
   margin: 0 auto;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    max-width: 380px;
+  }
 `;
 
 const EmailInput = styled.input`
@@ -196,11 +246,16 @@ const AuthDivider = styled.div`
   align-items: center;
   gap: 14px;
   width: 100%;
-  max-width: 380px;
+  /* Aligned with EmailRow: desktop 364, mobile 380. */
+  max-width: 364px;
   margin: 20px auto;
   color: ${({ theme }) => theme.colors.peach.hint};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   letter-spacing: 0.02em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    max-width: 380px;
+  }
 
   &::before, &::after {
     content: '';
@@ -274,11 +329,15 @@ const Section = styled.section<{
   padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
   ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
+  /* Mobile — same uniform 72-gap rhythm as the main landing
+   * (theme.layout.mobile.sectionPaddingY = 36). 36 + 36 = 72 between
+   * any two adjacent sections. Was 48; bumped down to align with
+   * main landing's mobile cadence. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding-top: ${({ $size = 'md', $bleedTop }) =>
-      $bleedTop ? '0' : $size === 'flush' ? '0' : '48px'};
-    padding-bottom: ${({ $size = 'md', $bleedBottom }) =>
-      $bleedBottom ? '0' : $size === 'flush' ? '0' : '48px'};
+    padding-top: ${({ $size = 'md', $bleedTop, theme }) =>
+      $bleedTop ? '0' : $size === 'flush' ? '0' : theme.layout.mobile.sectionPaddingY};
+    padding-bottom: ${({ $size = 'md', $bleedBottom, theme }) =>
+      $bleedBottom ? '0' : $size === 'flush' ? '0' : theme.layout.mobile.sectionPaddingY};
   }
 `;
 
@@ -290,18 +349,22 @@ const Hero = styled.div`
 const HeroScene = styled.div`
   position: relative;
   max-width: 1200px;
-  min-height: 728px;
+  /* Locked to exactly 728 (was min-height: 728 — content kept pushing
+   * the tinted box past it). With a fixed height the surfaceAlt band
+   * is a 728-tall slab; any content that exceeds (rare on desktop)
+   * overflows visibly into the white below.
+   * Last user note: "высота залитой зоны 728". */
+  height: 728px;
   margin: 0 auto;
-  /* Bottom padding trimmed (80 → 54) so the rendered hero block lands at
-     the requested 728px height — content was overshooting min-height by
-     ~26px. The shortfall to LandingPage's 80px is offset by the next
-     <Section $size="md">'s 80px top padding to keep the rhythm. */
   padding: 88px 48px 54px;
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: 0;
-    padding: 64px 24px 48px;
+    /* Top 32 (matches main landing hero); horizontal gutter token (20);
+     * bottom = sectionPaddingY (36) so Hero → first section gap reads
+     * as the same 36+36=72 rhythm everywhere on the site. */
+    padding: 32px ${({ theme }) => theme.layout.mobile.gutter} ${({ theme }) => theme.layout.mobile.sectionPaddingY};
   }
 `;
 
@@ -367,7 +430,13 @@ const WidgetGalleryHeader = styled.div`
   gap: 24px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px;
+    /* Gutter token (20) — same as main landing. */
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    /* Title → filter chips uses titleToCards token (28 = 8 + 20)
+     * since this header has no subtitle. */
+    gap: ${({ theme }) => theme.layout.mobile.titleToCards};
+    /* Center title row to match all other landing sections on mobile. */
+    text-align: center;
   }
 `;
 
@@ -384,18 +453,26 @@ const WidgetGalleryTitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0;
 
+  /* Mobile — sectionHeadline tokens (24/600/1) — same recipe as every
+   * landing section on phone (HowItWorks/Testimonials/CTA/etc). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['6xl']};
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
   }
 `;
 
 const WidgetGalleryFilterRow = styled(FilterRow)`
   margin-bottom: 0;
 
-  /* Phone — "Try for free" duplicates the Hero CTA right above. Hide
-   * it so the filter chips have room to breathe. */
+  /* Phone — hide ONLY the trailing "Try for free" CTA (it duplicates
+   * the Hero CTA right above). FilterChip is also a button element,
+   * so the earlier child-button rule was eating the chips too.
+   * :last-child targets the SharedButton appended after the chip map.
+   * Last user note: "только у Explore widgets надо всё-таки добавить
+   * фильтры ещё". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    & > button {
+    & > button:last-child {
       display: none;
     }
   }
@@ -413,8 +490,10 @@ const WidgetGalleryGrid = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: repeat(2, 1fr);
-    padding: 16px 24px;
-    gap: 16px;
+    /* Gutter + cardGap tokens — same horizontal/vertical rhythm as
+     * the rest of the mobile landing. */
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    gap: ${({ theme }) => theme.layout.mobile.cardGap};
   }
 `;
 
@@ -434,6 +513,16 @@ const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
   &:hover {
     border-color: ${({ theme }) => theme.colors.border.hairlineHover};
     box-shadow: ${({ theme }) => theme.shadows.cardHover};
+  }
+
+  /* Mobile — same surface treatment as Testimonials/FeatureCards on
+   * the main landing: surfaceAlt fill (so card pops out of the white
+   * section bg) + the shared mobileCard shadow recipe. Hover-scale
+   * disabled on phone since hover translates to tap and pulses the
+   * whole card. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    box-shadow: ${({ theme }) => theme.shadows.mobileCard};
   }
 `;
 
@@ -466,6 +555,14 @@ const WidgetGalleryCardTitle = styled.span`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
+
+  /* Mobile — cardHeadline tokens (16/600/1.35) — same recipe as
+   * HowItWorks/FeatureCards card titles. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.cardHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardHeadline.lineHeight};
+  }
 `;
 
 /* CustomizeBtn — use shared <Button $variant="secondary" $size="sm"> directly. */
@@ -571,10 +668,15 @@ const FeatureDesc = styled.p`
 const PricingSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 48px;
+  /* Desktop vertical padding (80/160) absorbed here so the wrapping
+   * <Section $size="flush"> stays out of the way and mobile can use
+   * sectionPaddingY without inline-style leakage. */
+  padding: 80px 48px 160px;
   text-align: center;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 0 24px; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: ${({ theme }) => theme.layout.mobile.sectionPaddingY} ${({ theme }) => theme.layout.mobile.gutter};
+  }
 `;
 
 const PricingTitle = styled.h2`
@@ -583,6 +685,14 @@ const PricingTitle = styled.h2`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 8px;
+
+  /* Mobile — sectionHeadline tokens (24/600/1). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+    margin: 0;
+  }
 `;
 
 const PricingSubtitle = styled.p`
@@ -590,6 +700,15 @@ const PricingSubtitle = styled.p`
   color: ${({ theme }) => theme.colors.peach.muted};
   margin: 8px 0 40px;
   letter-spacing: -0.01em;
+
+  /* Mobile — sectionBody tokens (15/400/1.5). titleToBody (8) above,
+   * bodyToCards (20) below — matches the rest of the landing. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+    margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
+  }
 `;
 
 export const PricingGrid = styled.div`
@@ -700,7 +819,9 @@ const BottomCTA = styled.section`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: 440px;
-    padding: 72px 24px;
+    /* Gutter token (20). Vertical padding kept generous (CTA needs
+     * presence at the page tail). */
+    padding: 72px ${({ theme }) => theme.layout.mobile.gutter};
   }
 `;
 
@@ -710,6 +831,14 @@ const CTATitle = styled.h2`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.03em;
   margin: 0 0 8px;
+
+  /* Mobile — sectionHeadline tokens (24/600/1). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+    margin: 0;
+  }
 `;
 
 const CTADesc = styled.p`
@@ -717,6 +846,14 @@ const CTADesc = styled.p`
   color: ${({ theme }) => theme.colors.peach.muted};
   margin: 8px 0 28px;
   letter-spacing: -0.01em;
+
+  /* Mobile — sectionBody tokens. titleToBody → bodyToCards spacing. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+    margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
+  }
 `;
 
 type WidgetCategory = 'all' | 'calendar' | 'clock' | 'boards' | 'buttons';
@@ -925,8 +1062,8 @@ export const WidgetStudioPage: React.FC = () => {
         </FloatingWidget>
 
         <HeroCard>
-            <HeroTitle>The <em>widgets</em> your<br />Notion is missing</HeroTitle>
-            <HeroDesc>Pick a widget you love. Tweak it until it feels like yours. Paste the link into Notion. That's it.</HeroDesc>
+            <HeroTitle><em>Widgets</em> your<br />Notion is missing</HeroTitle>
+            <HeroDesc>Pick a widget. Make it yours.<br />Paste into Notion. That's it.</HeroDesc>
             {isLoggedIn ? (
               <EmailRow>
                 <SharedButton $variant="primary" $size="xl" $fullWidth onClick={handleLaunch}>
@@ -1021,7 +1158,7 @@ export const WidgetStudioPage: React.FC = () => {
             <HowItWorksSection showTitle={true} variant="widgets" />
           </Section>
 
-          <Section $size="gap" style={{ paddingTop: 80, paddingBottom: 160 }}>
+          <Section $size="flush">
           <PricingSection>
             <PricingTitle>Simple pricing</PricingTitle>
             <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
