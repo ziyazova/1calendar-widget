@@ -40,14 +40,14 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — shrink vertical footprint + pin the social-proof eyebrow
-   * near the top of the filled card. Rest of the content (headline,
-   * sub, CTAs, meta) is centered vertically below it by the flex rules
-   * above. */
+  /* Phone — explicit 56/20 padding box. Owns the entire Hero spacing
+   * on mobile; the outer Hero wrapper in LandingPage zeroes itself
+   * here. Rhythm inside is driven by margin-bottom on each child
+   * (Eyebrow 24, Headline 20, Sub 28). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 12px 20px 32px;
+    padding: 56px 20px;
     justify-content: flex-start;
   }
 `;
@@ -81,14 +81,14 @@ const Eyebrow = styled.div`
   font-weight: 500;
   margin-top: -32px;
 
-  /* Mobile — padding/gap larger per "паддинги больше". margin-bottom
-   * removed so the Hero's flex gap (20) is the only regulator of
-   * spacing between hero elements (clean hierarchy: 20/20/32). */
+  /* Mobile — fixed-height pill (32) per spec; spacing below = 24,
+   * stars-group → text gap = 10. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin: 0;
-    padding: 8px 16px 8px 12px;
+    height: 32px;
+    margin: 0 0 24px;
+    padding: 0 12px;
     gap: 10px;
-    font-size: 11px;
+    font-size: 13px;
   }
 `;
 
@@ -128,6 +128,11 @@ const Stars = styled.span`
   font-size: 12px;
   display: inline-flex;
   gap: 0;
+
+  /* Mobile — small gap between stars per spec. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    gap: 2px;
+  }
 `;
 
 const Star = styled.span<{ $i: number }>`
@@ -139,6 +144,11 @@ const Star = styled.span<{ $i: number }>`
   animation: ${starPop} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: ${({ $i }) => 0.9 + $i * 0.13}s;
   svg { width: 12px; height: 12px; fill: currentColor; }
+
+  /* Mobile — 14px stars per spec. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    svg { width: 14px; height: 14px; }
+  }
 `;
 
 /* ── Headline ── */
@@ -153,12 +163,14 @@ const Headline = styled.h1`
   max-width: 920px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* margin-top zeroed; Hero gap drives the rhythm. */
-    margin-top: 0;
-    /* slightly smaller per "текст в хиро чуть-чуть меньше" — was
-     * clamp(48, 13vw, 60). */
-    font-size: clamp(42px, 12vw, 54px);
-    line-height: 1.1;
+    /* Mobile spec: 44/700/1.05/-0.02em + balanced wrap. margin-bottom 20
+     * carries the gap to Sub (no gap on Hero parent). */
+    margin: 0 0 20px 0;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   em {
@@ -201,9 +213,11 @@ const Sub = styled.p`
   font-weight: 400;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 14px;
-    /* margin-top zeroed; Hero gap (20) drives the rhythm. */
-    margin-top: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: ${({ theme }) => theme.colors.text.body};
+    margin: 0 0 28px 0;
+    max-width: 100%;
   }
 `;
 
@@ -216,21 +230,22 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Phone — stack CTAs vertically, full-width up to 320 cap, height
-   * locked to 44 (lg size, NOT the bumped xl mobileHeight 56).
-   * margin-top: 4 nudges the action zone slightly off the Hero gap
-   * (28) so Sub → CTAs reads as 32 vs 28 elsewhere — clean hierarchy:
-   * 28 / 28 / 32. */
+  /* Mobile spec: vertical stack, full-width children, gap 12, no
+   * margin-top (Sub margin-bottom 28 is the only thing above). Each
+   * CTA: 52 height, 14 radius, 16/600 type. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
-    max-width: 320px;
-    margin: 4px auto 0;
-    gap: 10px;
+    max-width: none;
+    margin: 0;
+    gap: 12px;
 
     & > * {
       width: 100%;
-      height: 44px;
+      height: 52px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
     }
   }
 `;

@@ -101,14 +101,14 @@ const Hero = styled.section<{ $v2?: boolean }>`
    * of crowding the top.
    * Comment c_mofyu744 (2026-04-26): "отцентруй контент в залитой зоне"
    * + follow-up "чуть больше воздуха в hero". */
+  /* Mobile — outer wrapper gives full control to the inner
+   * HeroSectionV2 styled section (its own 56/20 padding box owns
+   * the entire hero spacing). No padding, no gap, no min-height
+   * here so values don't stack. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 32px 0 28px;
-    /* gap drives the entire hero rhythm — sub-elements zero their own
-     * margins on mobile so the hierarchy stays clean. 28 (was tightened
-     * to 20 — too sticky, "все прилипнуто"). CTAs add +4 for action zone.
-     * Final: 28 / 28 / 32. */
-    gap: 28px;
-    min-height: 65vh;
+    padding: 0;
+    gap: 0;
+    min-height: 0;
   }
 `;
 
