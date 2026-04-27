@@ -6,6 +6,7 @@ import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge, Label } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
+import { CTASectionWrap, CTACard, CTATitle as MainCTATitle, CTASubtitle as MainCTASubtitle } from '@/presentation/components/landing/CTASection';
 import { HowItWorksSection } from '@/presentation/components/landing/HowItWorksSection';
 import { PinterestGallery } from '@/presentation/components/landing/PinterestGallery';
 import { useAuth } from '@/presentation/context/AuthContext';
@@ -55,12 +56,13 @@ const HeroCard = styled.div`
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 
   @media (max-width: 900px) {
-    /* Mobile — floating widgets are hidden (FloatingWidget @media md
-     * display:none), so the 116px top margin originally reserved for
-     * them collapses to 0. Horizontal padding uses the mobile gutter
-     * token to match main-landing ergonomic. */
+    /* Mobile — fully zeroed. HeroScene already provides the gutter (20)
+     * horizontally and 30/30 vertical padding around the content; an
+     * extra 24 here was just stacking on top of the section's bottom
+     * 30. Last user note: "убери паддинг с контента hero, там есть
+     * нижний отступ". */
     margin-top: 0;
-    padding: 12px ${({ theme }) => theme.layout.mobile.gutter} 24px;
+    padding: 0;
   }
 `;
 
@@ -84,8 +86,16 @@ const HeroInner = styled.div<{ $expanding?: boolean }>`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 36px ${({ theme }) => theme.layout.mobile.gutter};
-    border-radius: ${({ theme }) => theme.radii.xl};
+    /* Mobile — flatten the windowed-glass card so the hero looks 1:1
+     * with the main landing's HeroSectionV2 (where there's no inner
+     * card; content sits directly on the surfaceAlt band). Content
+     * then aligns visually with title/sub/CTAs ergonomic of /. */
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    padding: 0;
+    border-radius: 0;
   }
 `;
 
@@ -95,6 +105,14 @@ const HeroIcons = styled.div`
   justify-content: center;
   gap: 12px;
   margin-bottom: 28px;
+
+  /* Mobile — hidden so the hero is structurally 1:1 with the main
+   * landing's HeroSectionV2 (which has a single Eyebrow pill, no icon
+   * row). On phones the floats are hidden too, so the icon-row's only
+   * job (visual lead-in) isn't needed. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
 `;
 
 const HeroIcon = styled.div<{ $delay: string }>`
@@ -173,28 +191,68 @@ const HeroTitle = styled.h1`
     }
   }
 
-  /* Phone — 42px base wraps "The widgets your Notion is missing" onto
-   * 4 lines at 375px. Drop to 32px so it reads in 2 lines. */
+  /* Phone — 1:1 with main-landing Headline mobile spec
+   * (44/700/1.05/-0.02em + text-wrap: balance). Title now reads
+   * "Widgets your Notion is missing" — short enough that 44px wraps
+   * cleanly in 2 lines at 375px.
+   * Bottom margin 20 carries the gap to HeroDesc; HeroDesc mobile
+   * margin-top is 0 so spacing comes from one side only. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: 32px;
-    line-height: 1.15;
+    /* 44 — back to the main landing's mobile headline size 1:1 (the
+     * brief −4 trim was reverted). line-height returned to 1.05 to
+     * match Headline exactly. */
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    /* Hard cap 318 on phone — matches the Hero buttons cap so title
+     * doesn't stretch on 414+ phones. Centered. Manual <br /> + the
+     * mobile-only TitleBreakMobile still own the line breaks; the cap
+     * just prevents over-stretch on big-phone viewports. */
+    max-width: 318px;
+    margin: 0 auto 20px;
+  }
+`;
+
+/* Mobile-only line break inside the hero title. Desktop keeps its
+ * single explicit <br /> (after "your") so the title reads as
+ * "Widgets your | Notion is missing" — same break style as the main
+ * landing's Headline. On phone we add ONE more break (after "Notion")
+ * so the title reads as 3 short lines:
+ *   Widgets your | Notion | is missing
+ * Last user note: "примени стиль который в главном тайтле хиро". */
+const TitleBreakMobile = styled.br`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: block;
   }
 `;
 
 const HeroDesc = styled.p`
   margin: 22px auto 32px;
   /* Desktop sizes['2xl'] (18). Mobile reverts to sizes.xl (16) below
-   * to match phone-frozen sizing. Comment c_mogbd5uw: same ask as the
-   * landing hero subtitle. */
+   * to match phone-frozen sizing. */
   font-size: ${({ theme }) => theme.typography.sizes['2xl']};
   font-weight: 400;
   color: ${({ theme }) => theme.colors.peach.muted};
   line-height: 1.65;
   max-width: 440px;
-  letter-spacing: -0.005em;
+  /* Letter-spacing aligned with main-landing Sub (−0.01em). Was
+   * −0.005em which read marginally looser than the rest of the site's
+   * body copy. Title stays at −0.02em mobile / −0.03em desktop, so
+   * the title vs body contrast (tighter title, calmer body) is
+   * preserved — just calibrated to the main landing's pair. */
+  letter-spacing: -0.01em;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* 16/1.5 on phone. Hard cap 318 — matches Hero buttons + title cap
+     * so subtitle doesn't stretch on big-phone viewports. Centered.
+     * The line-break stays where the inline <br /> puts it. */
     font-size: ${({ theme }) => theme.typography.sizes.xl};
+    line-height: 1.5;
+    max-width: 318px;
+    margin: 0 auto 28px;
   }
 `;
 
@@ -212,7 +270,11 @@ const EmailRow = styled.div`
   margin: 0 auto;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    max-width: 380px;
+    /* Fixed 318 cap on phone — matches the main landing's HeroSectionV2
+     * CTAs cap exactly. Buttons no longer stretch with viewport width.
+     * Per "уменьши на 16 пикселей и зафиксируй на мобильной — пока в Hero". */
+    max-width: 318px;
+    padding: 0;
   }
 `;
 
@@ -246,7 +308,7 @@ const AuthDivider = styled.div`
   align-items: center;
   gap: 14px;
   width: 100%;
-  /* Aligned with EmailRow: desktop 364, mobile 380. */
+  /* Aligned with EmailRow: desktop 364, mobile 334. */
   max-width: 364px;
   margin: 20px auto;
   color: ${({ theme }) => theme.colors.peach.hint};
@@ -254,7 +316,12 @@ const AuthDivider = styled.div`
   letter-spacing: 0.02em;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    max-width: 380px;
+    /* Fixed 318 cap to match EmailRow + main landing CTAs on phone. */
+    max-width: 318px;
+    padding: 0;
+    /* Vertical margin trimmed 20 → 10 (each side) so the "or" rule
+     * sits closer to the buttons above and below it. */
+    margin: 10px auto;
   }
 
   &::before, &::after {
@@ -324,15 +391,22 @@ const Section = styled.section<{
   $tint?: boolean;
   $bleedTop?: boolean;
   $bleedBottom?: boolean;
+  /* Desktop-only bleed — mobile keeps its sectionPaddingY rhythm. Mirrors
+   * the main landing's Section flag so CTA → Footer can flow seamlessly
+   * on desktop while mobile retains 36+36=72 gap. */
+  $bleedTopDesktop?: boolean;
+  $bleedBottomDesktop?: boolean;
 }>`
-  padding-top: ${({ $size = 'md', $bleedTop }) => ($bleedTop ? '0' : SECTION_Y[$size])};
-  padding-bottom: ${({ $size = 'md', $bleedBottom }) => ($bleedBottom ? '0' : SECTION_Y[$size])};
+  padding-top: ${({ $size = 'md', $bleedTop, $bleedTopDesktop }) =>
+    ($bleedTop || $bleedTopDesktop) ? '0' : SECTION_Y[$size]};
+  padding-bottom: ${({ $size = 'md', $bleedBottom, $bleedBottomDesktop }) =>
+    ($bleedBottom || $bleedBottomDesktop) ? '0' : SECTION_Y[$size]};
   ${({ $tint, theme }) => $tint && `background: ${theme.colors.background.surfaceAlt};`}
 
   /* Mobile — same uniform 72-gap rhythm as the main landing
    * (theme.layout.mobile.sectionPaddingY = 36). 36 + 36 = 72 between
-   * any two adjacent sections. Was 48; bumped down to align with
-   * main landing's mobile cadence. */
+   * any two adjacent sections. Desktop-only bleed flags do NOT collapse
+   * mobile padding here — only $bleedTop/$bleedBottom (universal) do. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding-top: ${({ $size = 'md', $bleedTop, theme }) =>
       $bleedTop ? '0' : $size === 'flush' ? '0' : theme.layout.mobile.sectionPaddingY};
@@ -360,11 +434,22 @@ const HeroScene = styled.div`
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* Mobile — section grows with content + 30 top / 30 bottom. The
+     * desktop height: 728 must be unset (otherwise mobile would inherit
+     * a 728-tall slab); min-height: 0 + height: auto give the natural
+     * intrinsic height. Horizontal gutter token (20).
+     * Last user note: "размером контента плюс сверху и снизу по 30 пикселей". */
+    height: auto;
     min-height: 0;
-    /* Top 32 (matches main landing hero); horizontal gutter token (20);
-     * bottom = sectionPaddingY (36) so Hero → first section gap reads
-     * as the same 36+36=72 rhythm everywhere on the site. */
-    padding: 32px ${({ theme }) => theme.layout.mobile.gutter} ${({ theme }) => theme.layout.mobile.sectionPaddingY};
+    /* 52 top / 48 bottom. Mobile hero locked to 545 on both pages per
+     * "высоту хиро ещё больше — 545 у обоих". Bottom 48 matches the main
+     * landing's HeroSectionV2 mobile bottom-padding so Hero → first-section
+     * headline gap is uniform across pages: 48 (this padding) + 36 (next
+     * Section's mobile sectionPaddingY) = 84 of whitespace. Top is 52
+     * because /widgets hero content is taller than the main hero by ~26,
+     * so it needs less top padding to land on the same 545 total height.
+     * Horizontal gutter token (20). */
+    padding: 52px ${({ theme }) => theme.layout.mobile.gutter} 48px;
   }
 `;
 
@@ -432,9 +517,10 @@ const WidgetGalleryHeader = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     /* Gutter token (20) — same as main landing. */
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
-    /* Title → filter chips uses titleToCards token (28 = 8 + 20)
-     * since this header has no subtitle. */
-    gap: ${({ theme }) => theme.layout.mobile.titleToCards};
+    /* Title → filter chips: 24 (was titleToCards 28, −4 per request).
+     * Local override — token left untouched so other sections that use
+     * titleToCards keep their rhythm. */
+    gap: 24px;
     /* Center title row to match all other landing sections on mobile. */
     text-align: center;
   }
@@ -468,9 +554,7 @@ const WidgetGalleryFilterRow = styled(FilterRow)`
   /* Phone — hide ONLY the trailing "Try for free" CTA (it duplicates
    * the Hero CTA right above). FilterChip is also a button element,
    * so the earlier child-button rule was eating the chips too.
-   * :last-child targets the SharedButton appended after the chip map.
-   * Last user note: "только у Explore widgets надо всё-таки добавить
-   * фильтры ещё". */
+   * :last-child targets the SharedButton appended after the chip map. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     & > button:last-child {
       display: none;
@@ -489,11 +573,28 @@ const WidgetGalleryGrid = styled.div`
   gap: 28px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    grid-template-columns: repeat(2, 1fr);
-    /* Gutter + cardGap tokens — same horizontal/vertical rhythm as
-     * the rest of the mobile landing. */
-    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    /* Phone — replicate the main landing's "Top templates" pattern:
+     * horizontal swipe instead of a 2-col grid. Each card peeks the
+     * next one (~25%) at the right edge as a scroll affordance.
+     * Snap-type: x mandatory + scroll-padding so the focused card
+     * lands flush with the section gutter, matching TemplatesGallery
+     * on /. */
+    display: flex;
+    flex-direction: row;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-left: ${({ theme }) => theme.layout.mobile.gutter};
+    /* 20 top — gap from the filter row above to the first card.
+     * Iterated 0 → 8 → 20. Matches the bodyToCards rhythm token. */
+    padding: ${({ theme }) => theme.layout.mobile.bodyToCards} ${({ theme }) => theme.layout.mobile.gutter} 0;
     gap: ${({ theme }) => theme.layout.mobile.cardGap};
+
+    &::-webkit-scrollbar { display: none; }
+    scrollbar-width: none;
   }
 `;
 
@@ -516,13 +617,24 @@ const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
   }
 
   /* Mobile — same surface treatment as Testimonials/FeatureCards on
-   * the main landing: surfaceAlt fill (so card pops out of the white
-   * section bg) + the shared mobileCard shadow recipe. Hover-scale
-   * disabled on phone since hover translates to tap and pulses the
-   * whole card. */
+   * the main landing: surfaceAlt fill + the shared mobileCard shadow.
+   * Plus the swipe-card sizing copied from TemplateCardWrap on /:
+   * 75vw width with snap-align start gives a ~25% peek of the next
+   * card at the right edge as a scroll affordance. flex-shrink: 0
+   * keeps each card at its target width inside the flex marquee.
+   * Hover-scale disabled — on phone hover triggers on tap and the
+   * pulse reads as "the card was pressed". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
     box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    flex-shrink: 0;
+    width: 75vw;
+    scroll-snap-align: start;
+
+    &:hover {
+      transform: none;
+      box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    }
   }
 `;
 
@@ -556,12 +668,198 @@ const WidgetGalleryCardTitle = styled.span`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
 
-  /* Mobile — cardHeadline tokens (16/600/1.35) — same recipe as
-   * HowItWorks/FeatureCards card titles. */
+  /* Mobile — cardBody tokens (14/400/1.5). Was cardHeadline (16/600), but
+   * widget tile titles read as a label sitting under the thumbnail (like
+   * "Top templates" card titles), not as a headline → smaller, lighter.
+   * Last user note: "названия виджетов в карточках size 14". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.cardHeadline.size};
-    font-weight: ${({ theme }) => theme.typography.mobile.cardHeadline.weight};
-    line-height: ${({ theme }) => theme.typography.mobile.cardHeadline.lineHeight};
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
+  }
+`;
+
+/* ── Mobile Pricing block ──────────────────────────────────────────────
+ * On phone, the desktop two-column "Free / Pro" grid is replaced with a
+ * single Pro hero card + a comparison table below. Layout copied from
+ * /widgets mobile spec screenshot Screenshot 2026-04-27 at 01.56.16:
+ *   PricingGrid (Free + Pro) hidden on mobile via DesktopOnlyPricingGrid.
+ *   MobilePricing renders <ProHeroCard> and <ComparisonTable> stacked.
+ * Desktop is untouched. */
+const DesktopOnlyPricingGrid = styled.div`
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const MobilePricing = styled.div`
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  /* 358 cap: ProHeroCard inside has padding 18 20, so the inner CTA
+   * (ProCtaButton, width 100%) lands at 358 − 40 = 318 — same width
+   * as every other locked CTA on the phone landing.
+   * Per "примени настройки ограничения ко всем кнопкам на мобиле". */
+  max-width: 358px;
+  margin: 0 auto;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+  }
+`;
+
+const ProHeroCard = styled.div`
+  /* Gradient softened per c_mogfr7e9 ("чуть тусклее"): mixed against
+   * the page surface so it reads as a hint of lavender rather than a
+   * solid block. Stops moved closer in hue too. */
+  background: linear-gradient(150deg, #F6F4FF 0%, #F1EFFC 100%);
+  border-radius: ${({ theme }) => theme.radii.xl};
+  /* Padding aligned with ComparisonHeader (18 20) so PRO/POPULAR row
+   * sits at the same vertical inset as "WHAT YOU GET" header on the
+   * card below — same horizontal rhythm too (20). Bottom kept at 24
+   * for breathing room above the CTA + hint stack.
+   * Comment c_moh4qeq0: "про и popular выровни чуть выше — падinги
+   * у карточек одинаковые должны быть". */
+  padding: 18px 20px 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProEyebrowRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+`;
+
+const ProEyebrow = styled.span`
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+`;
+
+const ProPriceRow = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 20px;
+`;
+
+const ProPrice = styled.span`
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+const ProPriceUnit = styled.span`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+`;
+
+const ProCtaButton = styled.button`
+  width: 100%;
+  height: 48px;
+  border-radius: 14px;
+  background: ${({ theme }) => theme.colors.text.primary};
+  color: #fff;
+  border: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: opacity ${({ theme }) => theme.transitions.medium};
+
+  &:hover { opacity: 0.92; }
+`;
+
+const ProHintLine = styled.p`
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  letter-spacing: -0.005em;
+`;
+
+const ComparisonCard = styled.div`
+  background: #fff;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.xl};
+  overflow: hidden;
+`;
+
+const ComparisonHeader = styled.div`
+  /* Was muted gray uppercase on white — too quiet for the section's
+   * lead-in. Picked up the indigo accent + a soft lavender wash that
+   * matches the Pro column's tint below, so the header reads as the
+   * "what's in the table" headline rather than a label.
+   * Comment c_moh4nxzv: "давай чуть ярче, как-то привлекательней этот блок". */
+  padding: 18px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.accent};
+  background: rgba(99, 102, 241, 0.06);
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
+`;
+
+const ComparisonTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  th, td {
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.35;
+    border-top: 1px solid ${({ theme }) => theme.colors.border.light};
+  }
+
+  th:first-child, td:first-child {
+    text-align: left;
+    padding-left: 20px;
+    font-weight: 600;
+  }
+
+  /* Pro column gets the soft lavender wash so it reads as the
+   * recommended tier, mirroring the screenshot. */
+  th:last-child, td:last-child {
+    background: rgba(99, 102, 241, 0.06);
+    color: ${({ theme }) => theme.colors.text.primary};
+    font-weight: 500;
+  }
+
+  /* Column header eyebrow style (FREE / PRO). */
+  thead th {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: ${({ theme }) => theme.colors.text.tertiary};
+    border-top: 0;
+  }
+
+  thead th:last-child {
+    color: ${({ theme }) => theme.colors.accent};
+  }
+
+  /* Free column body cells — muted tone. */
+  tbody td:nth-child(2) {
+    color: ${({ theme }) => theme.colors.text.tertiary};
+  }
+
+  /* Check / cross icon size. */
+  svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
   }
 `;
 
@@ -797,62 +1095,25 @@ export const PricingFeatures = styled.ul<{ $highlighted?: boolean }>`
 
 /* PricingBtn — replaced by shared <Button $variant="primary|outline" $size="lg" $fullWidth> */
 
-/* Kill FooterOuter's 120px margin-top for flush layout */
-const FooterFlush = styled.div`
-  background: ${({ theme }) => theme.colors.background.surfaceAlt};
-  & > div:first-child { margin-top: 0; }
-`;
+/* Bottom CTA: imports CTASectionWrap / CTACard / CTATitle / CTASubtitle
+ * from landing/CTASection so this page's tail-CTA is the SAME component
+ * the main landing renders for "Your Notion is waiting" — only the inner
+ * content (title text, subtitle copy, action area) differs. No locally
+ * forked styled-component for the gradient card anymore. */
 
-/* ── Bottom CTA ── */
-const BottomCTA = styled.section`
-  width: 100%;
-  min-height: 560px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(150deg, rgba(237, 228, 255, 0.7) 0%, rgba(232, 237, 255, 0.65) 25%, rgba(238, 234, 255, 0.6) 50%, rgba(245, 235, 250, 0.65) 75%, rgba(255, 240, 245, 0.7) 100%);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  padding: 96px 48px;
-  text-align: center;
-
+/* Override only inside the imported CTACard on mobile: EmailRow must stop
+ * being capped at 380 / horizontally centered (the Hero rule), and gain
+ * 20px of air above to match CTAButtonRow's mobile spacing in the main
+ * landing's CTASection. */
+const BottomCTACard = styled(CTACard)`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    min-height: 440px;
-    /* Gutter token (20). Vertical padding kept generous (CTA needs
-     * presence at the page tail). */
-    padding: 72px ${({ theme }) => theme.layout.mobile.gutter};
-  }
-`;
-
-const CTATitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.sizes['8xl']};
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.03em;
-  margin: 0 0 8px;
-
-  /* Mobile — sectionHeadline tokens (24/600/1). */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
-    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
-    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
-    margin: 0;
-  }
-`;
-
-const CTADesc = styled.p`
-  font-size: 16px;
-  color: ${({ theme }) => theme.colors.peach.muted};
-  margin: 8px 0 28px;
-  letter-spacing: -0.01em;
-
-  /* Mobile — sectionBody tokens. titleToBody → bodyToCards spacing. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
-    font-weight: ${({ theme }) => theme.typography.mobile.sectionBody.weight};
-    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
-    margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
+    & > ${EmailRow} {
+      /* 318 cap to match every other CTA / email row across the phone
+       * landing — buttons no longer stretch on 414+ phones.
+       * Per "примени настройки ограничения ко всем кнопкам на мобиле". */
+      max-width: 318px;
+      margin: 20px auto 0;
+    }
   }
 `;
 
@@ -1062,7 +1323,9 @@ export const WidgetStudioPage: React.FC = () => {
         </FloatingWidget>
 
         <HeroCard>
-            <HeroTitle><em>Widgets</em> your<br />Notion is missing</HeroTitle>
+            <HeroTitle>
+              Widgets your<br />{' '}Notion<TitleBreakMobile />{' '}is missing
+            </HeroTitle>
             <HeroDesc>Pick a widget. Make it yours.<br />Paste into Notion. That's it.</HeroDesc>
             {isLoggedIn ? (
               <EmailRow>
@@ -1086,8 +1349,8 @@ export const WidgetStudioPage: React.FC = () => {
                 </EmailRow>
                 {codeError && <CodeError>{codeError}</CodeError>}
                 <AuthDivider>or</AuthDivider>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                  <SharedButton $variant="secondary" $size="lg" onClick={() => loginWithGoogle()} style={{ minWidth: 260 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', maxWidth: 318, margin: '0 auto' }}>
+                  <SharedButton $variant="secondary" $size="lg" onClick={() => loginWithGoogle()} style={{ width: '100%' }}>
                     <GoogleIcon />
                     Continue with Google
                   </SharedButton>
@@ -1148,6 +1411,11 @@ export const WidgetStudioPage: React.FC = () => {
             </WidgetGalleryCardWrap>
           ))}
         </WidgetGalleryGrid>
+        {/* Mobile "Try for free" CTA under the marquee was removed per
+            comment c_mogfqr0m ("убери кнопку тут ток") — Hero's primary
+            CTA + the Pricing CTA already provide enough conversion
+            anchors on phone. WidgetGalleryMobileCtaRow styled-component
+            kept defined as dead code in case the row is reinstated. */}
       </WidgetGallerySection>
       </Section>
 
@@ -1162,64 +1430,141 @@ export const WidgetStudioPage: React.FC = () => {
           <PricingSection>
             <PricingTitle>Simple pricing</PricingTitle>
             <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
-            <PricingGrid>
-              <PricingCard>
-                <PricingPlanRow>
-                  <PricingPlan>Free</PricingPlan>
-                </PricingPlanRow>
-                <PricingPriceRow>
-                  <PricingPrice>$0</PricingPrice>
-                  <PricingPeriod>forever</PricingPeriod>
-                </PricingPriceRow>
-                <PricingFeatures>
-                  <li><Check /> Up to 3 widgets</li>
-                  <li><Check /> Calendar &amp; Clock only</li>
-                  <li><Check /> Basic colors &amp; layout</li>
-                  <li><Check /> Embed in Notion</li>
-                </PricingFeatures>
-                <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch} style={{ marginTop: 24 }}>Get started</SharedButton>
-              </PricingCard>
-              <PricingCard $highlighted>
-                <PricingPlanRow>
-                  <PricingPlan $highlighted>Pro</PricingPlan>
+            <DesktopOnlyPricingGrid>
+              <PricingGrid>
+                <PricingCard>
+                  <PricingPlanRow>
+                    <PricingPlan>Free</PricingPlan>
+                  </PricingPlanRow>
+                  <PricingPriceRow>
+                    <PricingPrice>$0</PricingPrice>
+                    <PricingPeriod>forever</PricingPeriod>
+                  </PricingPriceRow>
+                  <PricingFeatures>
+                    <li><Check /> Up to 3 widgets</li>
+                    <li><Check /> Calendar &amp; Clock only</li>
+                    <li><Check /> Basic colors &amp; layout</li>
+                    <li><Check /> Embed in Notion</li>
+                  </PricingFeatures>
+                  <SharedButton $variant="outline" $size="lg" $fullWidth onClick={handleLaunch} style={{ marginTop: 24 }}>Get started</SharedButton>
+                </PricingCard>
+                <PricingCard $highlighted>
+                  <PricingPlanRow>
+                    <PricingPlan $highlighted>Pro</PricingPlan>
+                    <PlanBadge $pro $size="xs">Popular</PlanBadge>
+                  </PricingPlanRow>
+                  <PricingPriceRow>
+                    <PricingPrice>$4</PricingPrice>
+                    <PricingPeriod>monthly</PricingPeriod>
+                  </PricingPriceRow>
+                  <PricingFeatures $highlighted>
+                    <li><Check /> Unlimited widgets</li>
+                    <li><Check /> All widget types</li>
+                    <li><Check /> Full customization</li>
+                    <li><Check /> Exclusive widget styles</li>
+                  </PricingFeatures>
+                  <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch} style={{ marginTop: 24 }}>Get Pro</SharedButton>
+                </PricingCard>
+              </PricingGrid>
+            </DesktopOnlyPricingGrid>
+
+            {/* Mobile-only layout per spec screenshot 2026-04-27 at 01.56.16:
+                ProHeroCard with PRO eyebrow + POPULAR pill + $4 monthly +
+                full-width black "Start Pro — $4/mo" button + "Or stay on
+                Free forever" hint. ComparisonTable below maps Free → Pro
+                feature parity. Desktop sees nothing of this. */}
+            <MobilePricing>
+              <ProHeroCard>
+                <ProEyebrowRow>
+                  <ProEyebrow>Pro</ProEyebrow>
                   <PlanBadge $pro $size="xs">Popular</PlanBadge>
-                </PricingPlanRow>
-                <PricingPriceRow>
-                  <PricingPrice>$4</PricingPrice>
-                  <PricingPeriod>monthly</PricingPeriod>
-                </PricingPriceRow>
-                <PricingFeatures $highlighted>
-                  <li><Check /> Unlimited widgets</li>
-                  <li><Check /> All widget types</li>
-                  <li><Check /> Full customization</li>
-                  <li><Check /> Exclusive widget styles</li>
-                </PricingFeatures>
-                <SharedButton $variant="primary" $size="lg" $fullWidth onClick={handleLaunch} style={{ marginTop: 24 }}>Get Pro</SharedButton>
-              </PricingCard>
-            </PricingGrid>
+                </ProEyebrowRow>
+                <ProPriceRow>
+                  <ProPrice>$4</ProPrice>
+                  <ProPriceUnit>monthly</ProPriceUnit>
+                </ProPriceRow>
+                <ProCtaButton onClick={handleLaunch}>Start Pro — $4/mo</ProCtaButton>
+                <ProHintLine>Or stay on Free</ProHintLine>
+              </ProHeroCard>
+              <ComparisonCard>
+                <ComparisonHeader>What you get</ComparisonHeader>
+                <ComparisonTable>
+                  <thead>
+                    <tr>
+                      {/* First header cell labels the row axis. Empty
+                          cell read as a visual hole on phone — c_mogfty51
+                          ("добавь в первую ячейку что-нибудь чтобы
+                          выровнять"). "Feature" anchors the comparison. */}
+                      <th>Feature</th>
+                      <th>Free</th>
+                      <th>Pro</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Widgets</td>
+                      <td>Up to 3</td>
+                      <td>Unlimited</td>
+                    </tr>
+                    <tr>
+                      <td>Widget types</td>
+                      <td>Calendar, Clock</td>
+                      <td>All types</td>
+                    </tr>
+                    <tr>
+                      <td>Customization</td>
+                      <td>Basic</td>
+                      <td>Full</td>
+                    </tr>
+                    <tr>
+                      <td>Exclusive styles</td>
+                      <td>—</td>
+                      <td><Check /></td>
+                    </tr>
+                    <tr>
+                      <td>Notion embed</td>
+                      <td><Check /></td>
+                      <td><Check /></td>
+                    </tr>
+                    <tr>
+                      <td>Priority support</td>
+                      <td>—</td>
+                      <td><Check /></td>
+                    </tr>
+                  </tbody>
+                </ComparisonTable>
+              </ComparisonCard>
+            </MobilePricing>
           </PricingSection>
           </Section>
 
-          <BottomCTA>
-            <CTATitle>Ready to build?</CTATitle>
-            <CTADesc>Sign up and start creating widgets for your Notion.</CTADesc>
-            <EmailRow>
-              <EmailInput
-                type="email"
-                placeholder="Enter your email"
-              />
-              <SharedButton $variant="primary" $size="xl" $fullWidth onClick={() => navigate('/login')}>
-                Get started <ArrowRight />
-              </SharedButton>
-            </EmailRow>
-          </BottomCTA>
+          {/* Bottom CTA — uses the EXACT components the main landing's
+              "Your Notion is waiting" CTA renders (CTASectionWrap +
+              CTACard + CTATitle + CTASubtitle from landing/CTASection),
+              with the page-specific email-form swapped in for the inner
+              action area. One styled-component family for both surfaces. */}
+          <Section $size="gap" $bleedTopDesktop $bleedBottomDesktop>
+            <CTASectionWrap data-ux="Ready to build CTA">
+              <BottomCTACard>
+                <MainCTATitle>Ready to build?</MainCTATitle>
+                <MainCTASubtitle>Sign up and start creating widgets for your Notion.</MainCTASubtitle>
+                <EmailRow>
+                  <EmailInput
+                    type="email"
+                    placeholder="Enter your email"
+                  />
+                  <SharedButton $variant="primary" $size="xl" $fullWidth onClick={() => navigate('/login')}>
+                    Get started <ArrowRight />
+                  </SharedButton>
+                </EmailRow>
+              </BottomCTACard>
+            </CTASectionWrap>
+          </Section>
         </>
       )}
 
-      <Section $size="gap" $bleedTop $bleedBottom style={{ background: '#FAFAFA' }}>
-        <FooterFlush>
-          <BigFooter onNavigate={(path) => navigate(path)} />
-        </FooterFlush>
+      <Section $size="gap" $tint $bleedTopDesktop $bleedBottom>
+        <BigFooter onNavigate={(path) => navigate(path)} noDivider />
       </Section>
       </PageContent>
 

@@ -2,11 +2,16 @@ import React from 'react';
 import styled from 'styled-components';
 import { PrimaryButton, SecondaryButton } from '../shared/Button';
 
-const CTASectionWrap = styled.section`
+/* CTASectionWrap / CTACard / CTATitle / CTASubtitle / CTAButtonRow are
+ * exported so other landing-style pages (e.g. /widgets "Ready to build?")
+ * can reuse the EXACT same gradient-card visuals — only the inner content
+ * (title text, subtitle copy, action area) changes per surface. Keeps the
+ * tail-CTA pattern as a single source of truth. */
+export const CTASectionWrap = styled.section`
   width: 100%;
 `;
 
-const CTACard = styled.div`
+export const CTACard = styled.div`
   /* Desktop — alphas bumped iteratively for contrast: 0.4 → 0.5 (+0.1)
    * → 0.56 (+0.06). Mobile reverts to original 0.4 alphas via @media
    * md so phone visuals stay frozen.
@@ -53,7 +58,7 @@ const CTACard = styled.div`
   }
 `;
 
-const CTATitle = styled.h2`
+export const CTATitle = styled.h2`
   font-size: 40px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
@@ -68,7 +73,7 @@ const CTATitle = styled.h2`
   }
 `;
 
-const CTASubtitle = styled.p`
+export const CTASubtitle = styled.p`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.peach.muted};
   margin: 8px 0 32px;
@@ -94,7 +99,7 @@ const MobileBreak = styled.br`
   }
 `;
 
-const ButtonRow = styled.div`
+export const CTAButtonRow = styled.div`
   display: flex;
   gap: 12px;
   justify-content: center;
@@ -143,12 +148,12 @@ export const CTASection: React.FC<CTASectionProps> = ({ onBrowseTemplates, onExp
         <CTASubtitle>
           20+ planners, ready to use.<MobileBreak />{' '}Starting from $8.
         </CTASubtitle>
-        <ButtonRow>
+        <CTAButtonRow>
           <PrimaryButton onClick={onBrowseTemplates}>
             Shop Templates
           </PrimaryButton>
           <SecondaryButton onClick={onExploreWidgets} style={{ background: '#fff' }}>See Widgets</SecondaryButton>
-        </ButtonRow>
+        </CTAButtonRow>
       </CTACard>
     </CTASectionWrap>
   );

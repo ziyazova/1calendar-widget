@@ -41,13 +41,16 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
-  /* Phone — top 32, bottom = layout.mobile.sectionPaddingY (36). Hero's
-   * bottom matches the wrapper Section's top so Hero → first section
-   * resolves to the same 72-gap rhythm as every other section pair. */
+  /* Phone — symmetric 63/63 padding (total 126). Hero height locked at 545
+   * per "высоту хиро 545 у обоих" + content vertically centered within
+   * the section per "выровни контент по середине секции". The earlier
+   * 78/48 split was asymmetric to align Hero → first-section gap with
+   * /widgets; that constraint is dropped in favor of true vertical
+   * centering on the main landing. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     min-height: auto;
     margin-top: 0;
-    padding: 32px 20px ${({ theme }) => theme.layout.mobile.sectionPaddingY};
+    padding: 63px 20px;
     justify-content: center;
   }
 `;
@@ -163,9 +166,11 @@ const Headline = styled.h1`
   max-width: 920px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* Mobile spec: 44/700/1.05/-0.02em + balanced wrap. margin-bottom 20
-     * carries the gap to Sub (no gap on Hero parent). */
-    margin: 0 0 20px 0;
+    /* Mobile spec: 44/700/1.05/-0.02em + balanced wrap. Hard cap 318
+     * matches the Hero buttons cap so the headline doesn't stretch on
+     * 414+ phones. Centered. margin-bottom 20 carries the gap to Sub. */
+    max-width: 318px;
+    margin: 0 auto 20px;
     font-size: 44px;
     font-weight: 700;
     line-height: 1.05;
@@ -219,10 +224,10 @@ const Sub = styled.p`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: 16px;
     line-height: 1.5;
-    /* Color matches desktop (peach.muted) — earlier override to text.body
-     * read too dark on phone (c_mog4rtwt: "по цвету надо как на десктопе"). */
-    margin: 0 0 28px 0;
-    max-width: 100%;
+    /* Hard cap 318 — matches Hero buttons + headline cap so subtitle
+     * doesn't stretch on big-phone viewports. Centered. */
+    max-width: 318px;
+    margin: 0 auto 28px;
   }
 `;
 
@@ -235,19 +240,22 @@ const CTAs = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  /* Mobile: vertical stack, capped at 380 to match /widgets hero
-   * EmailRow (which the user picked as the reference width — "в
-   * виджетах хиро оч хорошо"). On narrow phones the cap doesn't
-   * kick in (parent gutter is the limit); on wider phones (≥420)
-   * the buttons stay at 380 instead of stretching. Centered with
-   * margin: 0 auto. Height/radius/font come from shared Button xl
-   * tokens. */
+  /* Mobile: vertical stack, full-width, gap 12. Height/radius/font
+   * all come from the shared Button DS xl tokens (mobileHeight 44,
+   * radius 12, mobileFontSize 13) — no inline overrides. Only the
+   * 100% width and the secondary's bumped 600 weight are layout
+   * choices that aren't part of the DS. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
     width: 100%;
-    max-width: 380px;
+    /* Fixed 318 cap on phone — buttons no longer stretch with viewport
+     * (was uncapped + 8px inset, which made buttons 14-30px too wide on
+     * larger phones). −16 vs the prior trim, locked. Per "уменьши на 16
+     * пикселей и зафиксируй на мобильной — пока в Hero". */
+    max-width: 318px;
     margin: 0 auto;
     gap: 12px;
+    padding: 0;
 
     & > * {
       width: 100%;
