@@ -29,6 +29,7 @@ export {
   UpgradePrice,
 } from './AccountMenu';
 export { BackButton } from './BackButton';
+export { LandingFooter } from './LandingFooter';
 export { SectionHeader } from './SectionHeader';
 export { PageWrapper } from './PageWrapper';
 export { Button, PrimaryButton, SecondaryButton } from './Button';

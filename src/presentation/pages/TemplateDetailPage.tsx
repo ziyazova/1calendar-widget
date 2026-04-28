@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ChevronDown, Eye, ShoppingCart, Check } from 'lucide-react';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, BackButton, Button, Card, Accordion, TemplateMockupCard, TemplateMockupImage } from '@/presentation/components/shared';
-import { BigFooter } from '@/presentation/components/landing/BigFooter';
+import { PageWrapper, BackButton, Button, Card, Accordion, TemplateMockupCard, TemplateMockupImage, LandingFooter } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, FAQ_ITEMS } from '@/presentation/data/templates';
 import { useCart } from '@/presentation/context/CartContext';
@@ -21,31 +20,42 @@ const Content = styled.div`
   animation: ${fadeUp} 0.35s ease both;
   overflow-x: hidden;
 
+  /* Phone — catalog rhythm: top sectionPaddingY − 4 (= 32, raises the
+   * BackButton 4px up; BackButton's own margin-bottom 36 carries the
+   * released space as gap below it). Sides gutter (20). Bottom 100 to
+   * clear the sticky MobileBuyBar (~88px) with comfortable margin.
+   * Single rule covers ≤md range; sm-specific override removed since
+   * the values are now consistent across phone sizes. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 24px 20px 60px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    padding: 16px 16px 100px;
+    padding: calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} - 4px)
+      ${({ theme }) => theme.layout.mobile.gutter}
+      100px;
   }
 `;
 
 const TwoCol = styled.div`
   display: grid;
-  grid-template-columns: 1fr 320px;
+  /* Sidebar 280 — narrowed from 320 per "сайдбар чуть уже"
+   * (c_2026-04-28). Matches the lg breakpoint width so the sidebar
+   * stays consistent across desktop sizes. */
+  grid-template-columns: 1fr 280px;
   grid-template-rows: auto auto;
   gap: 48px;
   align-items: start;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: 1fr 280px;
     gap: 32px;
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    /* 36 — uniform major-block gap on mobile (TopSection / RightCol /
+     * BottomSection / Related). Per "расстояние до Template Overview
+     * 36 на мобилке" (c_2026-04-28). Was 24, doubling with PagesCard's
+     * 36 margin-bottom gave 60 — fixed by removing PagesCard's
+     * margin-bottom and letting flex-gap own the rhythm. */
+    gap: 36px;
   }
 `;
 
@@ -76,9 +86,37 @@ const BottomSection = styled.div`
   max-width: 100%;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    order: 3;
+    order: 4;
   }
 `;
+
+/* DesktopOnly: display block on desktop, display: none on phone. Used
+ * to keep elements visible in their original desktop layout while the
+ * mobile flow renders a re-positioned copy of the same content. */
+const DesktopOnly = styled.div`
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+/* MobileOnlyAt: hidden on desktop, shown on phone with a fixed flex
+ * order so it lands in the right slot of the TwoCol mobile column.
+ * Per c_moh79qfc "кнопки идут первее, далее описание — но только на
+ * телефоне" (Description, $order=3) and c_moh79ywx "этот блок последний
+ * в телефоне" (Related Templates, $order=5). */
+const MobileOnlyAt = styled.div<{ $order: number }>`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: block;
+    order: ${({ $order }) => $order};
+    min-width: 0;
+    max-width: 100%;
+  }
+`;
+
+/* Footer rendering moved to shared <LandingFooter /> — same wrapper
+ * pattern as every landing page (surfaceAlt tint + noDivider). */
 
 /* ── Breadcrumb ── */
 
@@ -131,26 +169,219 @@ const Title = styled.h1`
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
-  margin: 0 0 6px;
+  /* Title → Description gap 8 desktop (was 12 → -4 per "подними её
+   * на 4 пикселя", c_2026-04-28). Mobile lock via override below. */
+  margin: 0 0 8px;
 
+  /* Phone — 24/600/1.2. Title (product name) sits one tier above the
+   * 18 sub-section headlines so the page hierarchy reads cleanly:
+   * Title 24 → Section H2 18 → body 14. Per "Title планнера 24, h2
+   * секций 18, body 14". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['5xl']};
+    font-size: 24px;
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: 1.2;
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.titleToBody};
   }
 `;
 
 const Description = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
+  /* Desktop bumped 14 → 16 — supporting copy under H1 was reading
+   * thin against the 32 hero. Per "текст слишком мелкий на компе"
+   * (c_2026-04-28). Mobile keeps 14 explicitly via override below. */
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
   color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
-  margin: 0 0 ${({ theme }) => theme.spacing['3']};
+  /* Description → carousel gap 24 (was 12) — needs more breath
+   * before the photo. Mobile lock via override below. */
+  margin: 0 0 24px;
   word-break: break-word;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
+  /* Phone — body 14/1.5 (sizes.base). Mobile rules locked separately
+   * via /templates/:id mobile rhythm; never roll desktop bumps into
+   * the mobile branch. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.base};
+    line-height: 1.5;
+    color: ${({ theme }) => theme.colors.text.tertiary};
+    max-width: 100%;
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
   }
 `;
 
 /* ── Image carousel ── (card surface now comes from shared TemplateMockupCard) */
+
+/* Desktop carousel wrapper — keeps the chevron-driven slideshow as-is.
+ * Hidden on mobile so we can render the scroll-snap row instead. */
+const DesktopCarousel = styled.div`
+  position: relative;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+/* Mobile-only horizontal scroll-snap carousel. One slide per viewport
+ * width, snap-mandatory so the user always lands on a single image.
+ * Tap any slide → opens the Lightbox modal at that index. Border is
+ * bumped to a slightly louder line on mobile per "outline чуть ярче"
+ * (c_2026-04-28). */
+const MobileCarousel = styled.div`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    margin: 0 calc(-1 * ${({ theme }) => theme.layout.mobile.gutter}) 12px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+`;
+
+/* Mobile slide — wraps the shared TemplateMockupCard so the cloudy
+ * gradient backdrop + drop-shadowed product image are identical to
+ * the desktop hero. Image scale on mobile is bumped from 70 → 78%
+ * per "вернуть как было но чуть увеличить" (c_2026-04-28) — keeps
+ * the contain-fit, just larger inside the gradient frame. */
+const MobileSlide = styled.button`
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: zoom-in;
+  display: block;
+
+  & > div {
+    border-color: rgba(43, 35, 32, 0.14);
+  }
+
+  & img {
+    width: 78%;
+    height: 78%;
+  }
+`;
+
+/* Slide counter pill — bottom-right of the active mobile slide. Reads
+ * "2 / 6" style. Sits above the image via a wrapping row position. */
+const MobileSlideCounter = styled.div`
+  position: absolute;
+  right: ${({ theme }) => theme.layout.mobile.gutter};
+  bottom: 20px;
+  padding: 4px 10px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  /* Softened — pill should sit gently on top of the photo, not punch
+   * through it. Per "контейнер чуть совсем чуть менее контрастным"
+   * (c_2026-04-28). */
+  background: rgba(17, 17, 19, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  letter-spacing: 0.02em;
+  pointer-events: none;
+`;
+
+const MobileCarouselWrap = styled.div`
+  position: relative;
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px)) {
+    & > ${MobileSlideCounter} { display: none; }
+  }
+`;
+
+/* ── Lightbox modal ── tap any image → fullscreen view, swipe between
+ * gallery items, tap close (×) or backdrop to dismiss. */
+
+const LightboxBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  /* Softer wash + lighter blur — second pass per "чуть менее
+   * интенсивный blur при открытии" (c_2026-04-28). */
+  background: rgba(22, 22, 26, 0.42);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lbFade 0.18s ease-out;
+  @keyframes lbFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+`;
+
+const LightboxTrack = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+`;
+
+const LightboxSlide = styled.div`
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+`;
+
+const LightboxClose = styled.button`
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top, 0px));
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  &:hover { background: rgba(255, 255, 255, 0.2); }
+`;
+
+const LightboxCounter = styled.div`
+  position: absolute;
+  bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+`;
+
 
 const CarouselLabel = styled.div`
   position: absolute;
@@ -239,70 +470,236 @@ const Thumb = styled.button<{ $active: boolean }>`
 /* ── Sections ── */
 
 const SectionTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.sizes.xl};
+  /* Desktop bumped xl (16) → 3xl (20) — proper h2 weight above the
+   * 16 body so hierarchy reads. Mobile lock below pins it to 16 via
+   * detailPage.titleSize. */
+  font-size: ${({ theme }) => theme.typography.sizes['3xl']};
   font-weight: ${({ theme }) => theme.typography.weights.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
-  margin: 0 0 ${({ theme }) => theme.spacing['3']};
+  /* margin-bottom 20 desktop — title → cards (Pages, FAQ, Related)
+   * gap. When the next sibling is a body paragraph (Template Overview)
+   * or a body-style list (Key Features), it pulls itself up by -8 so
+   * the gap collapses to title → body 12. Per "title-cards 20,
+   * title-body 12" (c_2026-04-28 desktop pass). Mobile lock via
+   * detailPage tokens below. */
+  margin: 0 0 20px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.lg};
+  & + p {
+    margin-top: -8px;
+  }
+
+  /* Mobile rhythm — every section heading on the detail page lines up
+   * via theme.layout.mobile.detailPage tokens. Edit there to retune
+   * the whole page in one shot. Spec: title 16/600/1.3, title→content
+   * 12, section→section 36. Per c_2026-04-28. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.layout.mobile.detailPage.titleSize};
+    font-weight: ${({ theme }) => theme.layout.mobile.detailPage.titleWeight};
+    line-height: ${({ theme }) => theme.layout.mobile.detailPage.titleLineHeight};
+    margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.titleToContent};
   }
 `;
 
 const OverviewText = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
+  /* Desktop bumped 14 → 16 — body copy under section H2s was reading
+   * too thin in the comfortable wide column. Mobile lock below keeps
+   * 14 (sizes.base). */
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
   color: ${({ theme }) => theme.colors.text.body};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
-  margin: 0 0 ${({ theme }) => theme.spacing['8']};
+  /* Desktop section gap 32 → 56 so blocks have proper breathing room
+   * per "мало воздуха везде, адаптируй красиво" (c_2026-04-28
+   * desktop pass). Mobile lock at sectionGap below. */
+  margin: 0 0 46px;
   word-break: break-word;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
+  /* Mobile rhythm — body sits 12 below the title and 36 above the
+   * next section's title. Per "body→cards = title→cards (12),
+   * section→section 36" (c_2026-04-28).
+   * line-height 1.5 (was 1.7 relaxed) — relaxed paragraph leading
+   * inflated the perceived top/bottom whitespace, making the section
+   * feel taller than the others. Per "паддинги сверху-снизу и расстояние
+   * кажется больше — почини" (c_2026-04-28). margin-top: 0 explicit
+   * so the styled p element doesn't pick up browser default top margin
+   * (about 1em) on top of SectionTitle's 12 below. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* Mobile font lock — desktop bumped to 16, mobile must stay 14. */
+    font-size: ${({ theme }) => theme.typography.sizes.base};
+    margin-top: 0;
+    margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.sectionGap};
+    line-height: 1.5;
   }
 `;
 
+/* Key Features list — clean inline list, no background. Earlier
+ * gradient experiment was reverted ("ты не ту секцию раскрасил —
+ * надо было Benefits"); the gradient now lives on the Benefits card
+ * via <BenefitsCard> below. */
 const FeatureList = styled.ul`
   list-style: none;
   padding: 0;
-  margin: 0 0 ${({ theme }) => theme.spacing['8']};
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing['3']};
+  /* Desktop:
+   *  - section gap 56 (matches OverviewText rhythm)
+   *  - title → cards gap = 20
+   *  - 2-column grid. Larger gap (20/16 → 24/20) so cards breathe.
+   *    Per "карточки меньше по размеру, больше спейса между"
+   *    (c_2026-04-28). */
+  margin: 0 0 46px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 40px;
+  row-gap: 16px;
+
+  /* Mobile lock — flex column, dense block rhythm, sectionGap below. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 0;
+    margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.sectionGap};
+  }
 `;
 
 const FeatureItem = styled.li`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.body};
-  line-height: ${({ theme }) => theme.typography.lineHeights.normal};
-  padding-left: 20px;
-  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   word-break: break-word;
+  /* Desktop — soft surfaceAlt fill (lightest neutral, #FAFAFA) +
+   * outline. Padding tightened 12/14 → 10/12 per "паддинги у этих
+   * карточек меньше" (c_2026-04-28). */
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: 10px 12px;
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 8px;
-    width: 6px;
-    height: 6px;
-    border-radius: ${({ theme }) => theme.radii.full};
-    background: ${({ theme }) => theme.colors.accent};
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* Mobile lock — inline list (no card chrome), tighter gap. */
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    gap: 8px;
   }
+`;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
-    padding-left: 16px;
+/* Check icon — bare indigo glyph, no circle wash. Aligned with the
+ * title's first text line: title font 14 / line-height 1.35 → ~19px
+ * line-box, with the cap-area sitting roughly 4-9px from the top of
+ * that box. Icon is 14×14; centering its visual middle on the title's
+ * cap-line center means the icon top sits ~2px below the line-box top.
+ * Per "галочки выровни с зэдлайнами блока внутри". */
+const FeatureBadge = styled.span`
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  color: ${({ theme }) => theme.colors.accent};
 
-    &::before {
-      width: 5px;
-      height: 5px;
-      top: 7px;
-    }
+  svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+  }
+`;
+
+const FeatureBody = styled.div`
+  min-width: 0;
+  flex: 1;
+`;
+
+/* Title + body split for each feature line. The data lives as a single
+ * string with an em-dash separator ("Title — body") in templates.ts;
+ * we split at render time so the bold-title / muted-body hierarchy
+ * works without a data migration. Per c_moh7c3oc "избавиться от длинных
+ * дефисов и оформить красивее". If a feature has no "—" the whole
+ * string renders as the title (no body). */
+const FeatureItemTitle = styled.span`
+  display: block;
+  /* Desktop 14 (base) — cards are compact, title sits as a strong
+   * 14/600 line above a 13 desc. Mobile lock pins to base. */
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  /* Quieter than text.primary so the title doesn't compete with the
+   * page-level H1 / Section titles. */
+  color: ${({ theme }) => theme.colors.text.body};
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    line-height: 1.25;
+    /* Mobile — keep dark color (text.body inherits from desktop), but
+     * lighter weight (medium 500) instead of semibold (600). Per
+     * "вернём тёмный цвет, но менее жирный вес" (c_2026-04-28). */
+    font-weight: ${({ theme }) => theme.typography.weights.medium};
+  }
+`;
+
+const FeatureItemDesc = styled.span`
+  display: block;
+  margin-top: 4px;
+  /* Desktop 13 (md) — small sub-copy under the 14 title. Mobile
+   * lock bumps it to 14 via override below. */
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  line-height: 1.5;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 2px;
+    font-size: ${({ theme }) => theme.typography.sizes.base};
+    line-height: 1.35;
   }
 `;
 
 /* ── Sidebar cards ── */
+
+/* Benefits card — outlined Card on desktop, soft lavender gradient
+ * panel on mobile (theme.colors.gradients.softBanner — same recipe
+ * GradientBanner uses on the main landing). Padding tightened on
+ * mobile so the One-time Payment / Instant Download / Lifetime Updates
+ * stack reads as its own block rather than a sidebar card. Per
+ * "не ту секцию раскрасил — надо было Benefits, и только у телефона". */
+const BenefitsCard = styled(Card)`
+  /* Desktop — 36 gap to the Pages Included block below (uniform
+   * section→section rhythm, matches the mobile sectionGap token).
+   * Per "расстояние между секциями 36" (c_2026-04-28). */
+  margin-bottom: 36px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* No fill on mobile, no padding — Benefits read as a quiet inline
+     * list flush with the page gutter. Per "заливку вообще убери".
+     * margin-top -8 lifts to the image (8px closer); margin-bottom 28
+     * (sectionGap 36 - 8) gives Pages Included 16 less gap above (8
+     * cascade + 8 reduced gap = 16 higher total per "Pages Included
+     * на 12 → ещё 4 выше"). All-positive trick avoids the layout-
+     * shift bug we saw with negative margin-top on PagesGroupedHeader. */
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+    margin-top: -8px;
+    margin-bottom: 28px;
+  }
+`;
+
+/* Pages card — soft surfaceAlt fill on desktop (matches Key Features
+ * cards' light grey tone). Outline preserved. Per "блок окрасить
+ * тоже в светло-серый очень" (c_2026-04-28). Mobile keeps the
+ * transparent + outline look unchanged. */
+const PagesCard = styled(Card)`
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  border-color: ${({ theme }) => theme.colors.border.light};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    background: transparent;
+    padding: 0 16px;
+    /* margin-bottom 0 on mobile — TwoCol's flex gap (36) carries the
+     * gap to BottomSection. Keeping a 36 mb here doubled the rhythm
+     * to 72. Per "паддинг снизу убери, расстояние 36" (c_2026-04-28). */
+    margin-bottom: 0;
+  }
+`;
 
 const BenefitRow = styled.div`
   display: flex;
@@ -316,16 +713,21 @@ const BenefitRow = styled.div`
     width: 16px;
     height: 16px;
     color: ${({ theme }) => theme.colors.accent};
+    stroke-width: 2.5;
     flex-shrink: 0;
   }
 
   &:last-child { margin-bottom: 0; }
 
+  /* Mobile — 14×14 to match FeatureBadge (Key Features). All page
+   * checkmarks read identical on phone per "галочки одинаковые" (c_2026-04-28). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    svg { width: 14px; height: 14px; }
+  }
+
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
     gap: 8px;
     margin-bottom: 10px;
-    svg { width: 14px; height: 14px; }
   }
 `;
 
@@ -337,6 +739,15 @@ const BtnGroup = styled.div`
   padding-top: 20px;
   border-top: 1px solid ${({ theme }) => theme.colors.border.light};
 
+  /* Phone — entire BtnGroup hidden. Both Buy Now and Buy on Etsy
+   * moved to <MobileBuyBar> at the bottom of the page; rendering them
+   * twice on mobile felt duplicative. The EtsyDisclosure copy that
+   * lived inside this group on desktop is now hidden alongside on
+   * phone — bar carries the action, no inline disclaimer needed.
+   * Per "убираем кнопку Buy Now + Buy on Etsy спускаем к навигации". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: none;
+  }
 `;
 
 const AddedBtn = styled(Button).attrs({ $variant: 'success' as const, $size: 'lg' as const, $fullWidth: true })`
@@ -390,8 +801,9 @@ const PagesItem = styled.li`
     min-width: 16px;
   }
 
+  /* Mobile keeps font 14 (sizes.base) — was 13 (sizes.md), broke
+   * page-wide consistency. Padding stays tighter on mobile. */
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
     padding: 5px 0;
   }
 `;
@@ -409,6 +821,161 @@ const ShowMoreLink = styled.button`
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
 `;
 
+/* Pages Included as a nested accordion — mirrors the screenshot
+ * (Screenshot 2026-04-27 at 15.46.05): each section row expands into
+ * its own page list. Only renders when template.pagesGrouped is set;
+ * otherwise the page falls back to the flat <PagesList> above.
+ *
+ * Compactness: built so the same component handles both surfaces —
+ * mobile (≤ md) ships the bigger 32px header rows + first section
+ * auto-open, desktop ships the tighter 40px rows + all closed. The
+ * difference is driven by CSS @media queries on the same instance,
+ * not by a runtime prop. */
+/* Header lives OUTSIDE the PagesCard now — title + subtitle render
+ * as a free-standing section heading (same pattern as Template
+ * Overview / Key Features above). PagesCard only carries the
+ * accordion rows beneath. Per "вывести наружу как Template Overview". */
+/* Sidebar variant of SectionTitle — desktop 16 (xl) so the auxiliary
+ * sidebar heading sits visibly below the 20 main-column H2s. Mobile
+ * keeps the 16 detailPage.titleSize from the base. Per "Pages
+ * Included — 16 размер" (c_2026-04-28 desktop pass). */
+const SidebarSectionTitle = styled(SectionTitle)`
+  font-size: ${({ theme }) => theme.typography.sizes.xl};
+`;
+
+const PagesGroupedHeader = styled.div`
+  /* Desktop 16 — header block (title + subtitle) → card gap. Tuned
+   * 12 → 20 → 16 per "на 4 пикселя выше" (c_2026-04-28). Mobile keeps
+   * titleToContent (12). */
+  margin-bottom: 16px;
+
+  /* Mobile — body→cards uses titleToContent. No negative margin-top
+   * here — caused layout-shift when the accordion below expanded
+   * ("блок поднимается наверх", c_2026-04-28). The Pages Included
+   * section gets its lift from BenefitsCard's reduced mb instead. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 0;
+    margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.titleToContent};
+  }
+`;
+
+/* Subtitle under the "Pages Included" title — visible on every
+ * viewport. Desktop bumped 12 → 13 (sizes.md) — was reading too
+ * small under the H2 (16) title. margin-top 8 desktop (was 4) per
+ * "расстояние между ними увеличь" (c_2026-04-28). */
+const PagesGroupedSubtitle = styled.span`
+  display: block;
+  margin-top: 8px;
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.base};
+  }
+`;
+
+const PagesGroupedRow = styled.div<{ $open: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* Padding: 14/24 desktop — vertical 14 for breathing, horizontal 24
+   * because the Card now uses $padding="none" (the inner elements
+   * own their padding). Mobile keeps 10/0 via override below (Card
+   * has 0 16 mobile padding, so rows get the 16 from card). */
+  padding: 14px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  /* Mobile body weight 600, desktop 500 — matches screenshot spec
+   * (compact=false on mobile bumps the row weight for touch). */
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.primary};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
+  transition: color ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.accent};
+  }
+
+  svg.chevron {
+    width: 14px;
+    height: 14px;
+    color: ${({ theme }) => theme.colors.text.tertiary};
+    transition: transform ${({ theme }) => theme.transitions.medium};
+    transform: rotate(${({ $open }) => ($open ? '180deg' : '0deg')});
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-weight: 600;
+    /* Mobile lock — keep 10 vertical padding (touch target stays
+     * compact); desktop bumped to 14 above for breath. */
+    padding: 10px 0;
+  }
+`;
+
+const PagesGroupedRowMeta = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+
+  /* Mobile — 12 (sizes.sm). The count meta reads as a tiny caption
+   * next to the section name, sitting below the 14 page-wide body
+   * size. Per "цифра и pages меньше". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.sm};
+  }
+`;
+
+/* Per-section panel — animated height collapse. Children fade-in via
+ * fadeUp (existing landing animation, no new keyframes invented). */
+const PagesGroupedPanel = styled.div<{ $h: number }>`
+  overflow: hidden;
+  transition: max-height ${({ theme }) => theme.transitions.base};
+  max-height: ${({ $h }) => $h}px;
+`;
+
+const PagesGroupedInner = styled.ul`
+  list-style: none;
+  /* Desktop — horizontal 24 matches PagesGroupedRow now that Card
+   * uses $padding="none". Inner indent 12 keeps the accordion list
+   * visually nested under its parent row. */
+  padding: 6px 24px 14px 36px;
+  margin: 0;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* Mobile — Card mobile padding (0 16) carries horizontal; only
+     * indent inside. */
+    padding: 6px 0 10px 12px;
+  }
+`;
+
+const PagesGroupedItem = styled.li`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.body};
+  padding: 6px 0;
+  letter-spacing: -0.005em;
+  animation: ${fadeUp} 0.2s ease both;
+
+  /* Mobile bumps to 14 — page-wide "non-headline = 14" rule. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.base};
+  }
+`;
+
+const PagesGroupedTotal = styled.div`
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid ${({ theme }) => theme.colors.border.light};
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  text-align: center;
+`;
+
 /* Product description table */
 
 const InfoRow = styled.div`
@@ -422,9 +989,7 @@ const InfoRow = styled.div`
     border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
-  }
+  /* Mobile font kept at 14 (sizes.base) — page-wide consistency. */
 `;
 
 const InfoLabel = styled.span`
@@ -448,23 +1013,57 @@ const Divider = styled.hr`
 const RelatedGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  /* Desktop gap 16 — more air between sidebar related templates per
+   * "отступы больше между ними" (c_2026-04-28). Mobile stays at the
+   * compact 8 since the cards already breathe via stretch. */
+  gap: 16px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    gap: 8px;
+  }
 `;
 
 const RelatedCard = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 0;
+  /* Vertical padding removed per "паддинги у этих секций сверху-снизу
+   * убери" (c_2026-04-28). RelatedGrid's gap (8) carries the rhythm. */
+  padding: 0;
   cursor: pointer;
   position: relative;
 `;
 
 /* Fixed-width wrapper so the shared <TemplateMockupCard $size="thumb"> (aspect
-   35/24) sits at exactly 140×96 in the Related rail. */
+   35/24) sits at exactly 140×96 in the Related rail. On mobile the
+   thumb is narrowed and the inner card aspect is overridden to 5/4
+   so the picture reads "чуть квадратнее" per c_2026-04-28. */
 const RelatedThumbSlot = styled.div`
-  width: 140px;
+  /* Desktop 120 + aspect 5/4 — wider photo and closer to square per
+   * "ширину фото карточек увеличь, ближе к квадрату" (c_2026-04-28).
+   * Drop-shadow removed; outline border carries the edge. */
+  width: 120px;
   flex-shrink: 0;
+
+  & > div {
+    aspect-ratio: 5 / 4;
+    box-shadow: none;
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    width: 112px;
+
+    /* Mobile — disable the card's hover border/shadow swap so the
+     * card itself doesn't visually shift on tap. The inner image
+     * keeps its 1.06 zoom via TemplateMockupImage's $hoverZoom (the
+     * card's :hover still triggers the image transform). Per "пусть
+     * на телефоне зумируется не карточки, а внутри контент только"
+     * (c_2026-04-28). */
+    & > div:hover {
+      border-color: rgba(43, 35, 32, 0.06);
+      box-shadow: none;
+    }
+  }
 `;
 
 const RelatedPreview = styled.div`
@@ -507,17 +1106,23 @@ const RelatedInfo = styled.div`
 `;
 
 const RelatedTitle = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ theme }) => theme.colors.text.primary};
+  /* 14 (sizes.base), 400, text.body — quieter than primary so the
+   * sidebar names don't compete with the main column. Per "названия
+   * менее активные в Related Templates" (c_2026-04-28). */
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: ${({ theme }) => theme.typography.weights.normal};
+  color: ${({ theme }) => theme.colors.text.body};
   letter-spacing: -0.01em;
   display: block;
   margin-bottom: 2px;
 `;
 
 const RelatedPrice = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  color: ${({ theme }) => theme.colors.text.body};
+  /* 13 (sizes.md) + text.tertiary — quieter than RelatedTitle (14 /
+   * text.body) so the price reads as supporting meta, not as a CTA.
+   * Per "цену еще менее активной чем название" (c_2026-04-28). */
+  font-size: ${({ theme }) => theme.typography.sizes.md};
+  color: ${({ theme }) => theme.colors.text.tertiary};
 `;
 
 /* ── FAQ (uses shared <Accordion>; just a vertical stack) ── */
@@ -525,7 +1130,26 @@ const RelatedPrice = styled.span`
 const FaqList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing['2']};
+  /* Desktop gap 12 (was 8) — +4 between FAQ questions per
+   * "тут на 4 увеличь на компе" (c_2026-04-28). Mobile lock keeps 8. */
+  gap: ${({ theme }) => theme.spacing['3']};
+
+  /* Drop the inner panel's top hairline on every viewport — the
+   * answer flows directly under the question without a divider band.
+   * Per "девайдер верхний убери" (c_2026-04-28 desktop pass). Mobile
+   * already had this; desktop now matches. */
+  & > div > div:nth-child(2) > div {
+    border-top: 0;
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* margin-bottom 0 on mobile — TwoCol's flex gap (36) carries the
+     * gap to Related Templates. Was sectionGap (36), doubled with
+     * flex gap = 72. Per "паддинг снизу убери" (c_2026-04-28).
+     * gap lock 8 — desktop bumped to 12, mobile stays compact. */
+    gap: ${({ theme }) => theme.spacing['2']};
+    margin-bottom: 0;
+  }
 `;
 
 // Shared <Accordion> renders its children raw — style the FAQ answer here so
@@ -537,12 +1161,19 @@ const FaqAnswerText = styled.p`
   margin: 0;
   word-break: break-word;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
-  }
+  /* Mobile — keep 14 (sizes.base) per page-wide consistency. The
+   * earlier 6px top inset was reverted per "alignment у ответов
+   * верни как было" — answers now flow at the Accordion's default
+   * inner padding. */
 `;
 
-/* ── Mobile sticky buy bar ── */
+/* ── Mobile sticky buy bar ──
+ * Single-row layout — price is now embedded inside the Buy Now button
+ * ("Buy Now · $X") since Etsy's price is set on Etsy and can't be
+ * mirrored here truthfully. Two CTAs side-by-side (Buy Now + Buy on
+ * Etsy), each flex: 1 to share width evenly. Visible across the full
+ * mobile range (≤ md = 768).
+ * Per "цену в кнопку Buy Now засунем — на Etsy цена не контролируется". */
 
 const MobileBuyBar = styled.div`
   display: none;
@@ -555,35 +1186,71 @@ const MobileBuyBar = styled.div`
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid ${({ theme }) => theme.colors.border.light};
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  /* Padding 12 / 16 / 14 keeps the bar compact: two flex: 1 buttons
+   * sit in a row, with breathing room top + bottom. safe-area inset
+   * extra room on iPhones with home-indicator. */
+  padding: 12px 16px 14px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
     gap: 8px;
+
+    & > * { flex: 1; }
   }
 `;
 
-const MobileBuyPrice = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 60px;
-`;
+/* MobileBuyBtn replaced by shared <Button $variant="primary|success" $size="lg">. */
 
-const MobileBuyPriceValue = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.lg};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.02em;
-`;
+/* PagesAccordionGroup — single section row in the Pages Included
+ * accordion. CONTROLLED component: parent owns the openIdx state so
+ * only one section can be open at a time (opening section N closes
+ * whatever was open before). Per "открывается одна — открываешь
+ * другую — предыдущая закрывается". `isLast` drops the bottom
+ * hairline so the card doesn't end with a trailing divider. */
+const PagesAccordionGroup: React.FC<{
+  section: string;
+  pages: string[];
+  open: boolean;
+  onToggle: () => void;
+  isLast?: boolean;
+}> = ({ section, pages, open, onToggle, isLast }) => {
+  const innerRef = useRef<HTMLUListElement>(null);
+  const [h, setH] = useState(0);
 
-const MobileBuyPriceLabel = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.xs};
-  color: ${({ theme }) => theme.colors.text.tertiary};
-`;
+  useEffect(() => {
+    if (!innerRef.current) return;
+    const ro = new ResizeObserver(() => {
+      if (innerRef.current) setH(innerRef.current.scrollHeight);
+    });
+    ro.observe(innerRef.current);
+    setH(innerRef.current.scrollHeight);
+    return () => ro.disconnect();
+  }, [open]);
 
-/* MobileBuyBtn replaced by shared <Button $variant="primary|success" $size="xl">. */
+  return (
+    <>
+      <PagesGroupedRow
+        $open={open}
+        onClick={onToggle}
+        style={isLast ? { borderBottom: 'none' } : undefined}
+      >
+        <span>{section}</span>
+        <PagesGroupedRowMeta>
+          {pages.length} pages
+          <ChevronDown className="chevron" />
+        </PagesGroupedRowMeta>
+      </PagesGroupedRow>
+      <PagesGroupedPanel $h={open ? h : 0}>
+        <PagesGroupedInner ref={innerRef}>
+          {pages.map(p => (
+            <PagesGroupedItem key={p}>{p}</PagesGroupedItem>
+          ))}
+        </PagesGroupedInner>
+      </PagesGroupedPanel>
+    </>
+  );
+};
 
 /* ── Component ── */
 
@@ -595,11 +1262,32 @@ export const TemplateDetailPage: React.FC = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showAllPages, setShowAllPages] = useState(false);
+  /* Pages Included accordion — single openIdx so opening one section
+   * collapses the previously open one. Starts at 0 (first section open
+   * by default). Set to -1 if user wants to fully collapse the active. */
+  const [openPagesIdx, setOpenPagesIdx] = useState<number>(0);
   const [buyError, setBuyError] = useState<string | null>(null);
   const [buying, setBuying] = useState(false);
-  const slides = [0, 1, 2, 3, 4, 5];
+  /* Lightbox modal state — index = open slide; null = closed. */
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   const template = TEMPLATES.find(t => t.id === id);
+
+  /* Real gallery — falls back to [image] when `images` isn't populated.
+   * Drives both the desktop chevron carousel and the mobile scroll-snap
+   * row so both views render the same set of slides.
+   *
+   * Placeholder duplication: when the template has only a single image,
+   * the cover is duplicated into 3 slides so the carousel UX is visible
+   * end-to-end. Per "задублируй картинку как заготовку, я потом заменю"
+   * (c_2026-04-28). When real `images` arrive, this duplication is
+   * skipped automatically. */
+  const gallery = useMemo<string[]>(() => {
+    if (!template) return [];
+    if (template.images && template.images.length > 0) return template.images;
+    return [template.image, template.image, template.image];
+  }, [template]);
+  const slides = gallery.map((_, i) => i);
 
   const related = useMemo(() => {
     if (!template) return [];
@@ -659,19 +1347,53 @@ export const TemplateDetailPage: React.FC = () => {
         <TwoCol>
           <TopSection>
             <Title>{template.title}</Title>
+            {/* Description sits under the title on every device — short
+                supporting copy above the Carousel. Per "текст пусть
+                будет под headline'ом только короче — не спускай ниже". */}
             <Description>{template.description}</Description>
 
-            {/* Carousel — shared TemplateMockupCard (hero size) +
-                carousel chevrons layered on top. */}
-            <TemplateMockupCard $size="hero" style={{ marginBottom: 12 }}>
-              <TemplateMockupImage $size="hero" $hoverZoom={false} src={template.image} alt={template.title} />
-              <CarouselBtn $side="left" onClick={() => setActiveSlide(i => i > 0 ? i - 1 : slides.length - 1)}>
-                <ChevronLeft />
-              </CarouselBtn>
-              <CarouselBtn $side="right" onClick={() => setActiveSlide(i => i < slides.length - 1 ? i + 1 : 0)}>
-                <ChevronRight />
-              </CarouselBtn>
-            </TemplateMockupCard>
+            {/* Carousel — desktop keeps the chevron-driven slideshow,
+                mobile renders a horizontal scroll-snap row of all
+                gallery images. Tapping a mobile slide opens the
+                lightbox at that index. Per c_2026-04-28: real carousel
+                + tap-to-expand + swipe between photos. */}
+            <DesktopCarousel>
+              <TemplateMockupCard $size="hero" style={{ marginBottom: 12 }}>
+                <TemplateMockupImage
+                  $size="hero"
+                  $hoverZoom={false}
+                  src={gallery[activeSlide] ?? template.image}
+                  alt={template.title}
+                  onClick={() => setLightboxIdx(activeSlide)}
+                  style={{ cursor: 'zoom-in' }}
+                />
+                {gallery.length > 1 && (
+                  <>
+                    <CarouselBtn $side="left" onClick={() => setActiveSlide(i => i > 0 ? i - 1 : gallery.length - 1)}>
+                      <ChevronLeft />
+                    </CarouselBtn>
+                    <CarouselBtn $side="right" onClick={() => setActiveSlide(i => i < gallery.length - 1 ? i + 1 : 0)}>
+                      <ChevronRight />
+                    </CarouselBtn>
+                  </>
+                )}
+              </TemplateMockupCard>
+            </DesktopCarousel>
+
+            <MobileCarouselWrap>
+              <MobileCarousel>
+                {gallery.map((src, i) => (
+                  <MobileSlide key={i} type="button" onClick={() => setLightboxIdx(i)}>
+                    <TemplateMockupCard $size="hero">
+                      <TemplateMockupImage $size="hero" $hoverZoom={false} src={src} alt={`${template.title} — slide ${i + 1}`} />
+                    </TemplateMockupCard>
+                  </MobileSlide>
+                ))}
+              </MobileCarousel>
+              {gallery.length > 1 && (
+                <MobileSlideCounter>{gallery.length} photos</MobileSlideCounter>
+              )}
+            </MobileCarouselWrap>
 
             {/* Thumbnails hidden until real images are added
             <Thumbnails>
@@ -690,13 +1412,30 @@ export const TemplateDetailPage: React.FC = () => {
             {/* Key Features */}
             <SectionTitle>Key Features</SectionTitle>
             <FeatureList>
-              {template.features.map((f, i) => (
-                <FeatureItem key={i}>{f}</FeatureItem>
-              ))}
+              {template.features.map((f, i) => {
+                /* Split feature on the em-dash / en-dash separator —
+                 * REQUIRES whitespace on both sides so we don't split
+                 * compound words like "All-In-One System" on the inner
+                 * hyphen (regex used to be /[—–-]/ which captured the
+                 * first hyphen and rendered "All" as the title).
+                 * Pre-dash = title, post-dash = description. */
+                const match = f.match(/^(.+?)\s+[—–]\s+(.+)$/);
+                const title = match ? match[1].trim() : f;
+                const desc = match ? match[2].trim() : null;
+                return (
+                  <FeatureItem key={i}>
+                    <FeatureBadge><Check /></FeatureBadge>
+                    <FeatureBody>
+                      <FeatureItemTitle>{title}</FeatureItemTitle>
+                      {desc && <FeatureItemDesc>{desc}</FeatureItemDesc>}
+                    </FeatureBody>
+                  </FeatureItem>
+                );
+              })}
             </FeatureList>
 
             {/* FAQ */}
-            <SectionTitle style={{ marginTop: '32px' }}>FAQ</SectionTitle>
+            <SectionTitle>Frequently Asked Questions</SectionTitle>
             <FaqList>
               {FAQ_ITEMS.map((faq, i) => (
                 <Accordion
@@ -713,7 +1452,7 @@ export const TemplateDetailPage: React.FC = () => {
 
           {/* ── Right sidebar ── */}
           <RightCol>
-            <Card $variant="outlined" $padding="lg" $radius="lg" style={{ marginBottom: 16 }}>
+            <BenefitsCard $variant="outlined" $padding="lg" $radius="lg">
               <BenefitRow><Check /> One-time Payment</BenefitRow>
               <BenefitRow><Check /> Instant Download</BenefitRow>
               <BenefitRow><Check /> Video Setup Guides</BenefitRow>
@@ -767,23 +1506,84 @@ export const TemplateDetailPage: React.FC = () => {
                   </>
                 )}
               </BtnGroup>
-            </Card>
+            </BenefitsCard>
 
-            <Card $variant="outlined" $padding="lg" $radius="lg" style={{ marginBottom: 16 }}>
-              <SectionTitle style={{ fontSize: '14px', marginBottom: '12px' }}>Pages Included</SectionTitle>
-              <PagesList>
-                {(showAllPages ? template.pagesIncluded : template.pagesIncluded.slice(0, 3)).map((p, i) => (
-                  <PagesItem key={i}>{p}</PagesItem>
+            {template.pagesGrouped ? (
+              <>
+                {/* Header lives OUTSIDE the PagesCard — same pattern
+                    as Template Overview / Key Features (free-standing
+                    section heading above its content). The card below
+                    only carries accordion rows. */}
+                <PagesGroupedHeader>
+                  {/* Inline margin: 0 so the SectionTitle's default
+                      bottom margin doesn't double up with the header
+                      wrapper's spacing. Font-size inherits from the
+                      shared SectionTitle (18 on mobile per the page
+                      headlines rule, h2-tier on desktop). */}
+                  <SidebarSectionTitle style={{ margin: 0 }}>Pages Included</SidebarSectionTitle>
+                  <PagesGroupedSubtitle>
+                    {template.pagesGrouped.reduce((n, g) => n + g.pages.length, 0)} pages across {template.pagesGrouped.length} sections
+                  </PagesGroupedSubtitle>
+                </PagesGroupedHeader>
+                <PagesCard $variant="outlined" $padding="none" $radius="lg">
+                  {template.pagesGrouped.map((g, i) => (
+                    <PagesAccordionGroup
+                      key={g.section}
+                      section={g.section}
+                      pages={g.pages}
+                      open={openPagesIdx === i}
+                      onToggle={() => setOpenPagesIdx(prev => (prev === i ? -1 : i))}
+                      isLast={i === template.pagesGrouped!.length - 1}
+                    />
+                  ))}
+                </PagesCard>
+              </>
+            ) : (
+              <PagesCard $variant="outlined" $padding="none" $radius="lg">
+                <SectionTitle>Pages Included</SectionTitle>
+                <PagesList>
+                  {(showAllPages ? template.pagesIncluded : template.pagesIncluded.slice(0, 3)).map((p, i) => (
+                    <PagesItem key={i}>{p}</PagesItem>
+                  ))}
+                </PagesList>
+                {template.pagesIncluded.length > 3 && !showAllPages && (
+                  <ShowMoreLink onClick={() => setShowAllPages(true)}>
+                    +{template.pagesIncluded.length - 3} more pages
+                  </ShowMoreLink>
+                )}
+              </PagesCard>
+            )}
+
+            {/* Related Templates — desktop position (last block in the
+                sticky right column). On mobile this block re-renders
+                at the very bottom of the page via <MobileOnlyAt
+                $order={5}> below. */}
+            <DesktopOnly>
+              <SectionTitle style={{ fontSize: '16px', marginTop: '36px', marginBottom: '16px' }}>Related Templates</SectionTitle>
+              <RelatedGrid>
+                {related.map(r => (
+                  <RelatedCard key={r.id} onClick={() => navigate(`/templates/${r.id}`)}>
+                    <RelatedPreview><img src={r.image} alt={r.title} /></RelatedPreview>
+                    <RelatedThumbSlot>
+                      <TemplateMockupCard $size="thumb" $interactive>
+                        <TemplateMockupImage $size="thumb" src={r.image} alt={r.title} />
+                      </TemplateMockupCard>
+                    </RelatedThumbSlot>
+                    <RelatedInfo>
+                      <RelatedTitle>{r.title}</RelatedTitle>
+                      <RelatedPrice>{r.price}</RelatedPrice>
+                    </RelatedInfo>
+                  </RelatedCard>
                 ))}
-              </PagesList>
-              {template.pagesIncluded.length > 3 && !showAllPages && (
-                <ShowMoreLink onClick={() => setShowAllPages(true)}>
-                  +{template.pagesIncluded.length - 3} more pages
-                </ShowMoreLink>
-              )}
-            </Card>
+              </RelatedGrid>
+            </DesktopOnly>
+          </RightCol>
 
-            <SectionTitle style={{ fontSize: '16px', marginTop: '24px', marginBottom: '16px' }}>Related Templates</SectionTitle>
+          {/* Mobile-only Related Templates — sits at the very end
+              (order 5, after BottomSection). Per c_moh79ywx "этот блок
+              последний в телефоне". */}
+          <MobileOnlyAt $order={5}>
+            <SectionTitle>Related Templates</SectionTitle>
             <RelatedGrid>
               {related.map(r => (
                 <RelatedCard key={r.id} onClick={() => navigate(`/templates/${r.id}`)}>
@@ -800,47 +1600,138 @@ export const TemplateDetailPage: React.FC = () => {
                 </RelatedCard>
               ))}
             </RelatedGrid>
-          </RightCol>
+          </MobileOnlyAt>
         </TwoCol>
       </Content>
 
-      <BigFooter onNavigate={(path) => navigate(path)} />
+      {/* clearStickyBar — page renders a fixed <MobileBuyBar> below, so
+          the footer pushes its bottom up by ~120px on mobile. Otherwise
+          the bar's glass surface clips the footer's last row at scroll
+          end. Per "сейчас футер съедает, надо править". */}
+      <LandingFooter
+        onNavigate={(path) => navigate(path)}
+        clearStickyBar
+      />
 
-      {/* Mobile sticky buy bar — only rendered when we have somewhere to send
-          the buyer (Etsy URL, or local checkout is enabled post-Polar). */}
+      {/* Mobile sticky buy bar — single row of action CTAs. The Polar
+          price embeds inside the Buy Now label ("Buy Now · $9.00")
+          since the price is controlled here; Etsy's button is plain
+          ("Buy on Etsy") because the Etsy listing's price is set on
+          their side and may differ. The in-page <BtnGroup> hides these
+          buttons on mobile so the bar is the only fulfillment surface
+          on phone. */}
       {(template.polarProductId || template.etsyUrl || FEATURES.ENABLE_LOCAL_CHECKOUT) && (
         <MobileBuyBar>
-          <MobileBuyPrice>
-            <MobileBuyPriceValue>{isFree ? 'Free' : template.price}</MobileBuyPriceValue>
-            <MobileBuyPriceLabel>one-time</MobileBuyPriceLabel>
-          </MobileBuyPrice>
           {FEATURES.ENABLE_LOCAL_CHECKOUT && inCart ? (
-            <Button $variant="success" $size="xl" onClick={() => removeItem(template.id)} style={{ flex: 1 }}>
+            <Button $variant="success" $size="lg" onClick={() => removeItem(template.id)}>
               <Check /> Added
             </Button>
-          ) : template.polarProductId && !isFree ? (
-            <Button $variant="primary" $size="xl" onClick={handleBuyNow} disabled={buying} style={{ flex: 1 }}>
-              {buying ? 'Opening…' : 'Buy Now'}
-            </Button>
-          ) : template.etsyUrl ? (
-            <Button
-              $variant="primary"
-              $size="xl"
-              as="a"
-              href={template.etsyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ flex: 1 }}
-            >
-              {isFree ? 'Get for Free' : 'Buy on Etsy'}
-            </Button>
           ) : (
-            <Button $variant="primary" $size="xl" onClick={handleAddToCart} style={{ flex: 1 }}>
-              {isFree ? 'Get for Free' : 'Add to Cart'}
-            </Button>
+            <>
+              {template.polarProductId && !isFree && (
+                <Button $variant="primary" $size="lg" onClick={handleBuyNow} disabled={buying}>
+                  {buying ? 'Opening…' : `Buy Now · ${template.price}`}
+                </Button>
+              )}
+              {template.etsyUrl && (
+                <Button
+                  $variant={template.polarProductId && !isFree ? 'secondary' : 'primary'}
+                  $size="lg"
+                  as="a"
+                  href={template.etsyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {isFree ? 'Get for Free' : 'Buy on Etsy'}
+                </Button>
+              )}
+              {/* Local-checkout fallback when neither Polar nor Etsy
+                  is configured — keeps the bar useful for free items
+                  and dev environments. Embeds price for Polar parity. */}
+              {!template.polarProductId && !template.etsyUrl && (
+                <Button $variant="primary" $size="lg" onClick={handleAddToCart}>
+                  {isFree ? 'Get for Free' : `Add to Cart · ${template.price}`}
+                </Button>
+              )}
+            </>
           )}
         </MobileBuyBar>
       )}
+
+      {lightboxIdx !== null && (
+        <Lightbox
+          images={gallery}
+          startIdx={lightboxIdx}
+          alt={template.title}
+          onClose={() => setLightboxIdx(null)}
+        />
+      )}
     </PageWrapper>
+  );
+};
+
+/* Lightbox — fullscreen photo viewer with native horizontal swipe via
+ * scroll-snap. Opens at startIdx, lets the user swipe between gallery
+ * items, closes on × button, backdrop tap, or Escape. Body scroll is
+ * locked while open. */
+const Lightbox: React.FC<{
+  images: string[];
+  startIdx: number;
+  alt: string;
+  onClose: () => void;
+}> = ({ images, startIdx, alt, onClose }) => {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState(startIdx);
+
+  useEffect(() => {
+    /* Scroll the track to startIdx on open. instant — no animated jump
+     * from slide 0. */
+    const track = trackRef.current;
+    if (track) {
+      track.scrollTo({ left: startIdx * track.clientWidth, behavior: 'auto' });
+    }
+    /* Body scroll lock + Escape handler. */
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [startIdx, onClose]);
+
+  /* Update the active index based on scroll position so the counter
+   * tracks the slide the user is currently on. */
+  const onScroll = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const idx = Math.round(track.scrollLeft / track.clientWidth);
+    if (idx !== active) setActive(idx);
+  };
+
+  return (
+    <LightboxBackdrop onClick={onClose}>
+      <LightboxClose onClick={(e) => { e.stopPropagation(); onClose(); }} aria-label="Close">×</LightboxClose>
+      {/* Track no longer stops propagation — clicks anywhere outside
+          the image (slide padding, around the image, etc) bubble up to
+          the backdrop and close. The image itself swallows clicks so
+          tapping the photo doesn't dismiss. Per "тыкаю за картинку —
+          закрывается" (c_2026-04-28). */}
+      <LightboxTrack ref={trackRef} onScroll={onScroll}>
+        {images.map((src, i) => (
+          <LightboxSlide key={i}>
+            <img
+              src={src}
+              alt={`${alt} — ${i + 1}`}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </LightboxSlide>
+        ))}
+      </LightboxTrack>
+      {images.length > 1 && (
+        <LightboxCounter>{active + 1} / {images.length}</LightboxCounter>
+      )}
+    </LightboxBackdrop>
   );
 };

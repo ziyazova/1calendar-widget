@@ -67,12 +67,11 @@ const FooterTop = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: column;
-    /* gap 56 (was 44, was 32) — second push on the brand → nav gap
-     * per follow-up: "контент футера чуть ниже отпусти". Combined with
-     * FooterWrapper's now-16 top padding, the brand sits tight to the
-     * divider while nav drops well into the footer body. */
-    gap: 56px;
-    padding-bottom: 24px;
+    /* gap 32 (was 56) — footer felt too tall / "выделяется" on mobile
+     * per c_2026-04-27. Pulls nav block back up so the surfaceAlt
+     * footer band reads quieter. */
+    gap: 32px;
+    padding-bottom: 16px;
   }
 `;
 
@@ -183,7 +182,7 @@ const FooterBottomWrapper = styled.div`
   padding: 0 48px 41px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 24px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 16px;
   }
 `;
 
@@ -199,9 +198,10 @@ const FooterBottomRow = styled.div`
   /* Mobile — center the copyright. The "Made with care" sibling is
    * hidden via $hideOnMobile, so space-between leaves the lone © text
    * stuck to the left edge. Center reads as intentional.
-   * "контент внутри выровни". */
+   * "контент внутри выровни". Tighter padding-top per "footer оч много". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     justify-content: center;
+    padding-top: 16px;
   }
 `;
 

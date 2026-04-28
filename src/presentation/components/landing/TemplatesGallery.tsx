@@ -154,14 +154,21 @@ const MobileExploreRow = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
-    justify-content: center;
-    /* 28 top — connects "see-all" to cards above. Horizontal padding =
-     * mobile gutter (20) so the button aligns with section content
-     * boundaries instead of sitting in a 320px cap (which read as
-     * "ограничивается странно"). Button stretches full-width. */
+    justify-content: flex-end;
     padding: 28px ${({ theme }) => theme.layout.mobile.gutter} 0;
 
     & > * { width: 100%; }
+  }
+
+  /* Wide phones / phablets (481-768): cap at 318 and stick to the
+   * right edge of the content column. On narrower phones (≤ 480) the
+   * cap doesn't kick in — button stays full-width and the flex-end
+   * justification has no slack to act on. Per "пусть растягивается до
+   * определённого размера телефона, дальше становится меньше по ширине
+   * у огромных телефонов и стикается справа". */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.sm} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    & > * { max-width: 318px; }
   }
 `;
 
@@ -306,10 +313,11 @@ const TemplateCardTitle = styled.span`
   text-overflow: ellipsis;
   min-width: 0;
 
-  /* Mobile — cardBody token (14/400/1.5) for the title row text. */
+  /* Mobile — title 14/500. Synced with /templates' 2-col CardTitle —
+   * weight came down 600 → 500 per "текст менее жирный". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
-    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    font-weight: 500;
     line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
   }
 `;
@@ -322,10 +330,12 @@ const TemplateCardPrice = styled.span`
   line-height: 1.3;
   flex-shrink: 0;
 
-  /* Mobile — cardBody token + lighter color (price recedes, Apple-style). */
+  /* Mobile — price 13/500 (sizes.md). Same recipe as /templates' 2-col
+   * Price: tighter than title (14/600) so price reads as secondary in
+   * the row. Color recedes to text.tertiary (Apple-style). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
-    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+    font-size: ${({ theme }) => theme.typography.sizes.md};
+    font-weight: 500;
     line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
     color: ${({ theme }) => theme.colors.text.tertiary};
   }

@@ -12,9 +12,23 @@ export interface Template {
   badge?: string;
   gradient: string;
   image: string;
+  /** Optional gallery for the detail page carousel + lightbox.
+   *  When omitted/empty, the carousel falls back to a single-slide
+   *  view of `image`. Mobile renders a scroll-snap row; desktop keeps
+   *  the chevron-driven slideshow. */
+  images?: string[];
   releaseDate: string;
   author: string;
   pagesIncluded: string[];
+  /**
+   * Optional grouped variant of `pagesIncluded`. When present, the
+   * detail page renders a nested-accordion "Pages Included" section
+   * (Planner / Productivity / Wellness / Lifestyle expanding into
+   * their own page lists). When absent, falls back to the flat
+   * `pagesIncluded` list. Migrate templates one at a time —
+   * incremental rollout keeps untouched templates rendering as before.
+   */
+  pagesGrouped?: { section: string; pages: string[] }[];
   features: string[];
   overview: string;
   /**
@@ -33,11 +47,35 @@ export interface Template {
   polarProductId?: string;
 }
 
+/* Shared placeholder pagesGrouped — gives every template the same
+ * accordion structure on /templates/:id until per-template content is
+ * authored. Per "протяни как могут — скопируй" (c_2026-04-28).
+ * Override on a specific template by passing `pagesGrouped: [...]`
+ * with custom sections when ready. */
+const DEFAULT_PAGES_GROUPED: { section: string; pages: string[] }[] = [
+  {
+    section: 'Planner',
+    pages: ['Life Dashboard', 'Daily Planner', 'Weekly Planner', 'Monthly Calendar', 'Yearly Overview', 'Goal Setting', 'Vision Board', 'Habit Tracker'],
+  },
+  {
+    section: 'Productivity',
+    pages: ['Productivity Hub', 'Projects Database', 'Tasks Inbox', 'Notes Library', 'Resources Vault', 'Quick Capture'],
+  },
+  {
+    section: 'Wellness',
+    pages: ['Wellness Dashboard', 'Routine Tracker', 'Mood Journal', 'Workout Log', 'Meal Planner', 'Sleep Tracker', 'Self-Care Calendar', 'Reflection Pages', 'Gratitude Log', 'Manifestation Board'],
+  },
+  {
+    section: 'Lifestyle',
+    pages: ['Finances Overview', 'Travel Plans', 'Reading List', 'Watchlist'],
+  },
+];
+
 export const TEMPLATES: Template[] = [
   {
     id: '1',
     title: 'Ultimate Life Planner',
-    description: 'Your complete life operating system. Manage every aspect of your life from one powerful Notion workspace with daily, weekly, and monthly views.',
+    description: 'A complete life planner with daily, weekly, and monthly views, all in one connected Notion workspace.',
     category: ['planners', 'productivity'],
     categoryLabel: 'Notion',
     price: '$9.00',
@@ -50,6 +88,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Nov 20, 2025',
     author: 'Peachy Studio',
     pagesIncluded: ['Life Dashboard', 'Daily Planner', 'Weekly Planner', 'Calendar', 'Productivity Hub', 'Wellness Section'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'All-In-One System — Everything in a single workspace.',
       'Connected Databases — Linked data across all areas.',
@@ -76,6 +115,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Feb 20, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Wellness Dashboard', 'Daily Planner', 'Weekly Planner', 'Routine Tracker', 'Vision Board', 'Journal'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Self-Care Routines — Morning and evening rituals.',
       'Vision Board — Visualize your dream life.',
@@ -102,6 +142,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Jan 15, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Academic Dashboard', 'Course Tracker', 'Assignment Board', 'Weekly Schedule', 'Grade Calculator', 'Class Notes'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Dark Mode Design — Easy on the eyes for late study.',
       'Course Progress Bars — Visual completion tracking.',
@@ -128,6 +169,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Mar 20, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Life Dashboard', 'Daily Plan', 'Weekly Plan', 'Monthly Plan', 'Wellness Tracker', 'Phone Dashboard'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Nature Aesthetic — Soft greens and floral accents.',
       'Three Planning Views — Daily, weekly, and monthly.',
@@ -154,6 +196,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Mar 1, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Academic Dashboard', 'Student Planner', 'Course Manager', 'Weekly Schedule', 'Academic Updates', 'Grade Calculator'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Clean Light Design — Minimal and distraction-free.',
       'Course Management — Track all your classes at once.',
@@ -167,7 +210,7 @@ export const TEMPLATES: Template[] = [
   {
     id: '6',
     title: 'Mystic Life Planner',
-    description: 'A mystical dark-themed life planner with celestial illustrations, moon phases, and daily/weekly/monthly planning views.',
+    description: 'A mystical dark-themed life planner with celestial illustrations, moon phases, and clean planning views.',
     category: ['planners'],
     categoryLabel: 'Notion',
     price: '$10.00',
@@ -180,6 +223,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Dec 10, 2025',
     author: 'Peachy Studio',
     pagesIncluded: ['Life Dashboard', 'Daily Plan', 'Weekly Plan', 'Monthly Plan', 'Planner', 'Wellness Section'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Celestial Aesthetic — Moon phases and star illustrations.',
       'Daily/Weekly/Monthly Plans — Three planning horizons.',
@@ -206,6 +250,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Feb 1, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Tablet Dashboard', 'Student Planner', 'Course Manager', 'Class Schedule', 'Reading Materials', 'Pomodoro Tracker'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Light Academia Design — Warm vintage-inspired tones.',
       'Course Cards — Beautiful visual course overview.',
@@ -232,6 +277,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Mar 15, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Glow Up Dashboard', 'Skincare Tracker', 'Vision Board', 'Self-Care Log', 'Manifestation Journal', 'Calendar'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Self-Care Routines — Morning and evening rituals.',
       'Vision Board — Visualize your dream life.',
@@ -245,7 +291,7 @@ export const TEMPLATES: Template[] = [
   {
     id: '9',
     title: 'Olive Life Planner',
-    description: 'A beautifully designed all-in-one life planner with an elegant olive aesthetic, connected databases, and daily planning.',
+    description: 'An all-in-one life planner with an elegant olive aesthetic, connected databases, and daily planning.',
     category: ['planners', 'productivity'],
     categoryLabel: 'Notion',
     price: '$9.00',
@@ -258,6 +304,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Feb 28, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Life Dashboard', 'Daily Planner', 'Weekly Planner', 'Monthly Planner', 'Contacts', 'Quick Actions'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Daily/Weekly/Monthly Plans — Three planning horizons.',
       'Connected Databases — Everything linked together.',
@@ -284,6 +331,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Apr 1, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Planner Dashboard', 'Daily Planner', 'Weekly Planner', 'Calendar', 'Productivity Hub', 'Wellness Section'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Vintage Aesthetic — Hand-drawn cherub illustrations.',
       'Analog Clock Widget — Beautiful time display.',
@@ -310,6 +358,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Jan 28, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Life Dashboard', 'Daily Plan', 'Weekly Plan', 'Monthly Plan', 'Planner', 'Phone Dashboard'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Nature Aesthetic — Soft greens and tulip accents.',
       'Three Planning Views — Daily, weekly, and monthly.',
@@ -336,6 +385,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Jan 25, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Academic Dashboard', 'Course Tracker', 'Assignment Board', 'Class Schedule', 'Grade Calculator', 'Reading List'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Dark Academia Design — Rich, moody color palette.',
       'Course Management — Track all your classes at once.',
@@ -362,6 +412,7 @@ export const TEMPLATES: Template[] = [
     releaseDate: 'Feb 10, 2026',
     author: 'Peachy Studio',
     pagesIncluded: ['Academic Dashboard', 'Student Planner', 'Course Manager', 'Weekly Schedule', 'Academic Updates', 'Grade Calculator'],
+    pagesGrouped: DEFAULT_PAGES_GROUPED,
     features: [
       'Dark Mode Design — Easy on the eyes for late study.',
       'Course Progress Bars — Visual completion tracking.',
@@ -375,11 +426,13 @@ export const TEMPLATES: Template[] = [
 ];
 
 export const CATEGORIES: { key: Category; label: string; title: string; subtitle: string; subs: { key: string; label: string }[] }[] = [
+  /* `label` = filter chip copy (short, one-word topic nouns).
+   * `title` = page H1 (longer, marketing). Same source, two surfaces. */
   { key: 'all', label: 'All', title: 'Templates', subtitle: 'Notion templates, planners, trackers & more', subs: [] },
   { key: 'planners', label: 'Life Planners', title: 'Life Planners', subtitle: 'Weekly, monthly and custom planners', subs: [] },
-  { key: 'productivity', label: 'Productivity Systems', title: 'Productivity Systems', subtitle: 'OKRs, roadmaps and goal setting', subs: [] },
-  { key: 'health', label: 'Health & Wellness', title: 'Health & Wellness', subtitle: 'Meal planning, fitness and wellness', subs: [] },
-  { key: 'student', label: 'Student Planner', title: 'Student Planner', subtitle: 'Academic planners and study tools', subs: [] },
+  { key: 'productivity', label: 'Productivity', title: 'Productivity Systems', subtitle: 'OKRs, roadmaps and goal setting', subs: [] },
+  { key: 'health', label: 'Wellness', title: 'Health & Wellness', subtitle: 'Meal planning, fitness and wellness', subs: [] },
+  { key: 'student', label: 'Study', title: 'Student Planner', subtitle: 'Academic planners and study tools', subs: [] },
 ];
 
 export const FAQ_ITEMS = [

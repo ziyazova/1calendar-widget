@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, BackButton, FilterRow, FilterChip, TemplateMockupCard, TemplateMockupImage } from '@/presentation/components/shared';
-import { BigFooter } from '@/presentation/components/landing/BigFooter';
+import { PageWrapper, BackButton, FilterRow, FilterChip, TemplateMockupCard, TemplateMockupImage, LandingFooter } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { TEMPLATES, CATEGORIES, type Category } from '@/presentation/data/templates';
 
@@ -18,7 +17,17 @@ const Header = styled.div`
   padding: 48px 48px 24px;
   animation: ${fadeUp} 0.25s ease both;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { padding: 24px 24px 16px; }
+  /* Phone — gutter 20 horizontal, top 32 (sectionPaddingY 36 − 4),
+   * bottom 24. Top trimmed by 4 so the BackButton lifts 4px upward
+   * without moving the Title — the freed 4 reappears as extra gap
+   * between Back and Title (BackButton's margin-bottom carries it).
+   * Per "Back подними на 4 пикселя, остальное не трогай, пусть
+   * отступ увеличится". Bottom 24 owns the chips → cards gap. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} - 4px)
+      ${({ theme }) => theme.layout.mobile.gutter}
+      24px;
+  }
 `;
 
 
@@ -29,8 +38,14 @@ const PageTitle = styled.h1`
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 10px;
 
+  /* Phone — sectionHeadline tokens (24/600/1). Margin-bottom = titleToBody
+   * (8) — Title → Subtitle rhythm matches every landing section that has
+   * a subtitle. Per "расстояние от title до body как на лендинге". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['5xl']};
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.titleToBody};
   }
 `;
 
@@ -40,6 +55,16 @@ const PageSubtitle = styled.p`
   /* 40px gap between subtitle and the FilterRow chips below. */
   margin: 0 0 40px;
   letter-spacing: -0.01em;
+
+  /* Phone — sectionBody tokens (15/400/1.5). Margin-bottom 24 — matches
+   * the chips → first-card gap below so Subtitle → chips → cards reads
+   * as a uniform 24-rhythm on /templates. Hardcoded (not bodyToCards
+   * 20) per "от lead до чипов тоже больше — 24". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+    margin: 0 0 24px;
+  }
 `;
 
 /* ── Search ── */
@@ -124,50 +149,122 @@ const Grid = styled.div`
     gap: 24px 20px;
   }
 
+  /* Phone (≤ md = 768) — single column. Per "сделай чтобы растягивалась
+   * по странице на ширину — на телефонной версии": cards fill the
+   * whole content column on every phone size, photos no longer feel
+   * small in a 2-col split. Tablet 2-col is dropped at this breakpoint
+   * (was a half-step compromise). gutter 20 sides, sectionPaddingY × 2
+   * = 72 bottom for footer rhythm. align-items: start keeps cells at
+   * intrinsic height so the column doesn't stretch tall ones. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 0 24px 60px;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px 16px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter}
+      calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} * 2);
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 20px;
+    align-items: start;
   }
 `;
 
 const TemplateCardWrap = styled.div`
   cursor: pointer;
   animation: ${fadeUp} 0.25s ease both;
+  /* Defensive: cell never overflows its grid track. Without min-width:0
+   * the inner ellipsizing CardTitle could push the wrap wider than 1fr
+   * on some Safari builds, which made the right-side page gutter look
+   * smaller than the left. Per "отступ справа от страницы кривой —
+   * меньше". */
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+`;
+
+/* Spacing wrapper around <TemplateMockupCard> — mirrors the main landing's
+ * TemplateCardSlot (12px bottom margin) so the gap between card image and
+ * meta is identical: 12 (this) + 6 (CardMeta padding-top) = 18 desktop,
+ * 12 (this) + 0 (mobile CardMeta) = 12 mobile. Same recipe on both
+ * surfaces; edit both together. */
+const CardSlot = styled.div`
+  margin-bottom: 12px;
 `;
 
 
+/* Card meta on /templates is intentionally identical to the main
+ * landing's "Top templates" card meta (TemplateCardMeta / Title / Price
+ * in landing/TemplatesGallery.tsx). Same cards on both surfaces — same
+ * text size, same padding, same color logic. Edit both together if a
+ * value changes. The only /templates-specific difference is the $free →
+ * success coloring on the price, which signals free templates in the
+ * catalog (the marquee on / doesn't include free items). */
 const CardMeta = styled.div`
-  padding: 10px 6px 0;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
+  padding: 6px;
 
+  /* Phone — switch from baseline to center alignment. With title and
+   * price at different sizes (14 vs 13) baseline produced visually
+   * uneven row heights between adjacent cards in 2-col, contributing
+   * to the "left/right rows don't line up" issue. center is stable. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 8px 4px 0;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px;
   }
 `;
 
 const CardTitle = styled.span`
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  font-size: 14px;
+  font-weight: 500;
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 
+  /* 2-col phone range (sm < vw ≤ md): title 14/500. Weight came down
+   * from 600 → 500 per "текст менее жирный надо" — 600 read too heavy
+   * in the narrow 2-col column. Same weight as desktop now. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes.md};
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: 500;
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
+  }
+
+  /* 1-col phone range (vw ≤ sm): title restores to cardBody weight (400)
+   * — single full-width card uses the lighter weight to match section
+   * body copy. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
   }
 `;
 
 const Price = styled.span<{ $free: boolean }>`
-  font-size: ${({ theme }) => theme.typography.sizes.md};
-  font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ $free, theme }) => $free ? theme.colors.success.base : theme.colors.text.tertiary};
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ $free, theme }) => $free ? theme.colors.success.base : theme.colors.text.body};
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  flex-shrink: 0;
+
+  /* 2-col phone: 13/500 per spec "Цена: 13px / 500". Slightly tighter
+   * than title (14/600) so price reads as secondary in the row. Color
+   * recedes to text.tertiary (Apple-style price treatment). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.md};
+    font-weight: 500;
+    line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
+    color: ${({ $free, theme }) => $free ? theme.colors.success.base : theme.colors.text.tertiary};
+  }
+
+  /* 1-col phone: restores to cardBody (14/400) like the rest of body
+   * copy on the wider single-column card. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
+  }
 `;
 
 const EmptyState = styled.div`
@@ -177,6 +274,9 @@ const EmptyState = styled.div`
   color: ${({ theme }) => theme.colors.text.tertiary};
   font-size: ${({ theme }) => theme.typography.sizes.base};
 `;
+
+/* Footer rendering moved to shared <LandingFooter /> — same wrapper
+ * pattern as every landing page (surfaceAlt tint + noDivider). */
 
 
 export const TemplatesPage: React.FC = () => {
@@ -253,9 +353,11 @@ export const TemplatesPage: React.FC = () => {
         ) : (
           filtered.map((template, i) => (
             <TemplateCardWrap key={template.id} style={{ animationDelay: `${i * 0.04}s` }} onClick={() => navigate(`/templates/${template.id}`)}>
-              <TemplateMockupCard $size="grid" $interactive>
-                <TemplateMockupImage $size="grid" src={template.image} alt={template.title} />
-              </TemplateMockupCard>
+              <CardSlot>
+                <TemplateMockupCard $size="grid" $interactive>
+                  <TemplateMockupImage $size="grid" src={template.image} alt={template.title} />
+                </TemplateMockupCard>
+              </CardSlot>
               <CardMeta>
                 <CardTitle>{template.title}</CardTitle>
                 <Price $free={template.price === 'Free'}>{template.price}</Price>
@@ -265,7 +367,7 @@ export const TemplatesPage: React.FC = () => {
         )}
       </Grid>
 
-      <BigFooter onNavigate={(path) => navigate(path)} />
+      <LandingFooter onNavigate={(path) => navigate(path)} />
     </PageWrapper>
   );
 };

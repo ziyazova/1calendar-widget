@@ -755,6 +755,10 @@ const ProPrice = styled.span`
   letter-spacing: -0.03em;
   line-height: 1;
   color: ${({ theme }) => theme.colors.text.primary};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: 32px;
+  }
 `;
 
 const ProPriceUnit = styled.span`
@@ -826,6 +830,18 @@ const ComparisonTable = styled.table`
     text-align: left;
     padding-left: 20px;
     font-weight: 600;
+    /* Feature column (axis labels) sits on the footer's surfaceAlt
+     * wash so the row labels feel grouped, contrasting with Pro's
+     * lavender wash. Per c_moh5k1rd "feature и free окрась в цвет
+     * футера bg". */
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  }
+
+  /* Free column gets the same surfaceAlt wash as Feature. Both columns
+   * (label + Free) share a quieter neutral tone — the eye lands on Pro
+   * (lavender) as the lead. */
+  th:nth-child(2), td:nth-child(2) {
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
   }
 
   /* Pro column gets the soft lavender wash so it reads as the
@@ -846,8 +862,11 @@ const ComparisonTable = styled.table`
     border-top: 0;
   }
 
+  /* PRO header: extra-bold (800) so the recommended tier stands out
+   * vs FREE's 700. Per c_moh5f5pr "тут жирный текст надо". */
   thead th:last-child {
     color: ${({ theme }) => theme.colors.accent};
+    font-weight: 800;
   }
 
   /* Free column body cells — muted tone. */

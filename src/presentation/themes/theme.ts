@@ -294,6 +294,32 @@ export const theme = {
       // Single source of truth for the inter-section rhythm; bumping
       // this value re-spaces the whole landing in one place.
       sectionPaddingY: '36px',
+      // BackButton → page Title gap on catalog-style pages (/templates,
+      // /templates/:id, etc). Single token shared by every page that
+      // renders a <BackButton /> above its H1, so bumping this one value
+      // re-spaces every navigation header consistently.
+      backToTitle: '40px',
+
+      // Detail page (/templates/:id) section rhythm — distinct from the
+      // landing rhythm above because the product detail page has many
+      // small text sections (Overview / Features / FAQ / Pages / Related)
+      // stacked tightly, where the landing has fewer, taller blocks.
+      // Locked spec from c_2026-04-28 iteration:
+      //   - section title: 16/600/1.3 (smaller than landing's 18 H2)
+      //   - title → cards (no body) = body → cards = title → body = 12
+      //   - section → section = 36
+      //   - "first heading after a tall block" lift = 28 (Pages Included
+      //     above the Benefits inline list). One-off; not the default.
+      // Apply this scope on any product/template detail page so they all
+      // line up. Don't re-derive — read from here.
+      detailPage: {
+        titleSize: '16px',
+        titleWeight: 600,
+        titleLineHeight: 1.3,
+        titleToContent: '16px',  // unified gap title→{body|cards} & body→cards
+        sectionGap: '36px',      // bottom margin on every section's last block
+        liftFirstHeading: '28px', // Pages Included above Benefits — one-off
+      },
     },
   },
 

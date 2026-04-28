@@ -131,6 +131,15 @@ export const Tag = styled.span<{ $accent?: boolean }>`
     $accent ? 'rgba(79, 87, 201, 0.85)' : theme.colors.text.body};
   letter-spacing: -0.01em;
   white-space: nowrap;
+
+  /* Phone — tighter chip (2 8, font 10) per c_moh6ch1l "на телефоне
+   * чип надо меньше такой и токенизировать для телефона". Tokenized
+   * here in the shared Tag, so every Tag call-site (gallery cards on
+   * /widgets, anywhere else) gets the compact mobile variant for free. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 2px 8px;
+    font-size: ${({ theme }) => theme.typography.sizes['2xs']};
+  }
 `;
 
 /* ── Legacy constants — re-exported for call-sites that still reference them. ── */
