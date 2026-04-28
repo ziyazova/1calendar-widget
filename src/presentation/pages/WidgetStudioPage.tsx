@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { ArrowRight, Calendar, Clock, Image, Pencil, Lock, Sparkle, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopNav } from '../components/layout/TopNav';
-import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge, Label } from '@/presentation/components/shared';
+import { PageWrapper, FilterRow, FilterChip, SectionHeader, BackButton, Button as SharedButton, GoogleIcon, Modal, ModalFooter, Tag, PlanBadge, Label, LandingFooter } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
 import { BigFooter } from '@/presentation/components/landing/BigFooter';
 import { CTASectionWrap, CTACard, CTATitle as MainCTATitle, CTASubtitle as MainCTASubtitle } from '@/presentation/components/landing/CTASection';
@@ -13,6 +13,7 @@ import { useAuth } from '@/presentation/context/AuthContext';
 import { LoginModal } from '@/presentation/components/auth/LoginModal';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 import { useWidgetQuota } from '@/presentation/hooks/useWidgetQuota';
+import { useIsCompact } from '@/presentation/hooks/useIsMobile';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
@@ -564,6 +565,69 @@ const WidgetGalleryFilterRow = styled(FilterRow)`
 
 /* WidgetGalleryBtn — replaced by shared <Button $variant="primary" $size="md"> */
 
+/* Top-of-image badge row inside a gallery card. Tag (calendar/clock/
+ * board) sits on the left, optional Pro pill on the right. Flex with
+ * align-items: center so labels of different heights share a vertical
+ * center line (Pro xs is shorter than the mobile-overridden Tag).
+ * pointer-events: none lets clicks fall through to the underlying
+ * card. Per "Pro выровни с лейблом календарь по середине" (c_2026-04-28). */
+const CardBadgeRow = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1;
+  pointer-events: none;
+`;
+
+/* Logged-in /widgets header — mirrors /templates Header/Title/Subtitle
+ * 1-to-1 on mobile so the catalog feels like the same page family on
+ * phone. Desktop values frozen — copies the inline-styled originals
+ * verbatim. Per "хочу чтобы /widgets logged-in была адаптирована один
+ * в один как /templates, на компе не трогать" (c_2026-04-28). */
+const LoggedInHeader = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 48px 24px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} - 4px)
+      ${({ theme }) => theme.layout.mobile.gutter}
+      24px;
+  }
+`;
+
+const LoggedInTitle = styled.h1`
+  font-size: 40px;
+  font-weight: 600;
+  color: #1F1F1F;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+    margin: 0 0 ${({ theme }) => theme.layout.mobile.titleToBody};
+  }
+`;
+
+const LoggedInSubtitle = styled.p`
+  font-size: 16px;
+  color: #999;
+  margin: 0 0 40px;
+  letter-spacing: -0.01em;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+    margin: 0 0 24px;
+  }
+`;
+
 const WidgetGalleryGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
@@ -573,28 +637,21 @@ const WidgetGalleryGrid = styled.div`
   gap: 28px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* Phone — replicate the main landing's "Top templates" pattern:
-     * horizontal swipe instead of a 2-col grid. Each card peeks the
-     * next one (~25%) at the right edge as a scroll affordance.
-     * Snap-type: x mandatory + scroll-padding so the focused card
-     * lands flush with the section gutter, matching TemplatesGallery
-     * on /. */
-    display: flex;
-    flex-direction: row;
-    grid-template-columns: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
-    scroll-padding-left: ${({ theme }) => theme.layout.mobile.gutter};
-    /* 20 top — gap from the filter row above to the first card.
-     * Iterated 0 → 8 → 20. Matches the bodyToCards rhythm token. */
-    padding: ${({ theme }) => theme.layout.mobile.bodyToCards} ${({ theme }) => theme.layout.mobile.gutter} 0;
-    gap: ${({ theme }) => theme.layout.mobile.cardGap};
+    /* Tablet (>600, ≤md) — 2-col grid. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 20px;
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter}
+      calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} * 2);
+    align-items: start;
+  }
 
-    &::-webkit-scrollbar { display: none; }
-    scrollbar-width: none;
+  /* Phone (≤600) — single-column grid. Breakpoint bumped from sm (480)
+   * to 600 per "2 в ряд пусть будет после 600" (c_2026-04-28). */
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 20px;
   }
 `;
 
@@ -616,24 +673,48 @@ const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
     box-shadow: ${({ theme }) => theme.shadows.cardHover};
   }
 
-  /* Mobile — same surface treatment as Testimonials/FeatureCards on
-   * the main landing: surfaceAlt fill + the shared mobileCard shadow.
-   * Plus the swipe-card sizing copied from TemplateCardWrap on /:
-   * 75vw width with snap-align start gives a ~25% peek of the next
-   * card at the right edge as a scroll affordance. flex-shrink: 0
-   * keeps each card at its target width inside the flex marquee.
-   * Hover-scale disabled — on phone hover triggers on tap and the
-   * pulse reads as "the card was pressed". */
+  /* Mobile — single-column grid card (was 75vw swipe-card). Per
+   * "хочу один в один как /templates" (c_2026-04-28). Surface still
+   * gets the surfaceAlt + mobileCard shadow treatment so it reads
+   * like the catalog cards. Hover-scale disabled — on phone hover
+   * triggers on tap and the pulse reads as "the card was pressed". */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
     box-shadow: ${({ theme }) => theme.shadows.mobileCard};
-    flex-shrink: 0;
-    width: 75vw;
-    scroll-snap-align: start;
+    width: 100%;
 
     &:hover {
       transform: none;
       box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    }
+  }
+
+  /* Tag (calendar/clock/board) sizing:
+   *  - ≤768 (1-кол + 2-кол): sm 12, padding 5/12
+   *  - 769-1100 (3-кол compact): xs 11, padding 3/10 — narrower cards,
+   *    Tag should be more compact. Pro pill matches via Label[size="xs"]
+   *    which already runs smaller; bumped a touch tighter via the
+   *    descendant Label override below. Per "769-1100 — лейблы
+   *    календарь и про надо меньше" (c_2026-04-28).
+   *  - >1100: default Tag (no override). */
+  @media (min-width: 769px) and (max-width: 1100px) {
+    ${Tag} {
+      padding: 3px 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.xs};
+    }
+    /* Pro pill (Label[$variant="pro"]) — visually balance with the
+     * smaller Tag at this range. Tighter padding/font. */
+    ${CardBadgeRow} > span:nth-child(2) {
+      padding: 0 7px;
+      font-size: 9px;
+      height: 16px;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    ${Tag} {
+      padding: 5px 12px;
+      font-size: ${({ theme }) => theme.typography.sizes.sm};
     }
   }
 `;
@@ -646,10 +727,11 @@ const WidgetGalleryMeta = styled.div`
   gap: 8px;
   border-top: 1px solid rgba(0, 0, 0, 0.04);
 
-  /* Phone — 2-col grid leaves ~155px per card, too narrow to fit title
-   * "+ Customize" in one row. Stack them: title on top, full-width
-   * button below. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  /* Compact card layout (≤1100, >600) — 3-col-narrow & 2-col cards
+   * both stack title on top with a full-width button below.
+   * Smaller button (height 30, padding 0/12, font sm 12) per "размер
+   * кнопки когда 2 и 3 в ряд тоже меньше" (c_2026-04-28). */
+  @media (max-width: 1100px) {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
@@ -657,6 +739,40 @@ const WidgetGalleryMeta = styled.div`
 
     & > button {
       width: 100%;
+      justify-content: center;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.sm};
+    }
+  }
+
+  /* Phone (≤600) — 1-col grid → title and button on the same row.
+   * Per "2 в ряд после 600" (c_2026-04-28). Customize variant swap
+   * to "primary" (black) is done in JSX via useIsMobile, so no color
+   * overrides here — only size. */
+  @media (max-width: 600px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+
+    & > div:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    & > button {
+      width: auto;
+      flex-shrink: 0;
+      /* Slightly compact button on phone — height 32 (sm token),
+       * tight padding so each button hugs its label. No min-width
+       * — Customize/Upgrade can vary in width. Per "кнопки чуть
+       * меньше, не одного размера если текст разный" (c_2026-04-28). */
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.md};
       justify-content: center;
     }
   }
@@ -1171,6 +1287,12 @@ export const WidgetStudioPage: React.FC = () => {
   const [galleryScrolled, setGalleryScrolled] = useState(false);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const { loginWithCode, login, loginWithGoogle, isLoggedIn } = useAuth();
+  /* Compact layout flag (≤1100) — drives:
+   *   - Customize variant: primary (black) at ≤1100, secondary (grey)
+   *     at >1100.
+   *   - Pro badge position: top-right inside the image (opposite the
+   *     category Tag) at ≤1100, beside the title at >1100. */
+  const isCompact = useIsCompact();
   const { open: openUpgrade } = useUpgradeModal();
   const quota = useWidgetQuota();
   const [nameModal, setNameModal] = useState<{ title: string; category: string; type: string; style: string } | null>(null);
@@ -1226,20 +1348,20 @@ export const WidgetStudioPage: React.FC = () => {
         <TopNav activeLink="studio" logoSub="Widgets" />
         {/* Header owns the chips → cards gap (24px bottom padding) so it
             matches /templates and stays consistent regardless of mobile. */}
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 48px 24px' }}>
+        <LoggedInHeader>
           <BackButton onClick={() => navigate(-1 as any)} label="Back" />
           {/* Headline swaps the leading word as the filter changes — same
               pattern /templates uses, but only the qualifier shifts here:
               "Notion" → category ("Calendar", "Clock", "Board"), while
               "Widgets" stays anchored. */}
-          <h1 style={{ fontSize: 40, fontWeight: 600, color: '#1F1F1F', letterSpacing: '-0.03em', margin: '0 0 10px' }}>
+          <LoggedInTitle>
             {activeFilter === 'all' ? 'Notion' :
              activeFilter === 'calendar' ? 'Calendar' :
              activeFilter === 'clock' ? 'Clock' :
              activeFilter === 'boards' ? 'Board' :
              activeFilter === 'buttons' ? 'Button' : 'Notion'} Widgets
-          </h1>
-          <p style={{ fontSize: 16, color: '#999', margin: '0 0 40px', letterSpacing: '-0.01em' }}>Browse styles, customize and embed in your Notion workspace</p>
+          </LoggedInTitle>
+          <LoggedInSubtitle>Browse styles, customize and embed in your Notion workspace</LoggedInSubtitle>
           <FilterRow>
             {GALLERY_FILTERS.map(f => (
               <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
@@ -1247,29 +1369,34 @@ export const WidgetStudioPage: React.FC = () => {
               </FilterChip>
             ))}
           </FilterRow>
-        </div>
+        </LoggedInHeader>
         <WidgetGalleryGrid style={{ paddingTop: 0 }}>
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
             <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
-                <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{item.category === 'calendar' ? 'calendar' : item.category === 'clock' ? 'clock' : 'board'}</Tag>
+                <CardBadgeRow>
+                  <Tag>{item.category === 'calendar' ? 'calendar' : item.category === 'clock' ? 'clock' : 'board'}</Tag>
+                  {isCompact && item.pro && (
+                    <Label $variant="pro" $size="xs">Pro</Label>
+                  )}
+                </CardBadgeRow>
                 <GalleryImage src={item.image} alt={item.title} />
               </div>
               <WidgetGalleryMeta>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                   <WidgetGalleryCardTitle>{item.title}</WidgetGalleryCardTitle>
-                  {item.pro && <Label $variant="pro" $size="xs">Pro</Label>}
+                  {!isCompact && item.pro && <Label $variant="pro" $size="xs">Pro</Label>}
                 </div>
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
                   <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
                 ) : (
-                  <SharedButton $variant="secondary" $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
+                  <SharedButton $variant={isCompact ? 'primary' : 'secondary'} $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>
           ))}
         </WidgetGalleryGrid>
-        <BigFooter onNavigate={(path) => navigate(path)} />
+        <LandingFooter onNavigate={(path) => navigate(path)} />
 
         {/* Name Modal — uses shared <Modal> so it matches the Delete confirmation dialog. */}
         <Modal

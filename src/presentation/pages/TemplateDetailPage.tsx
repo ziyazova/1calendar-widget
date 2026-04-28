@@ -40,11 +40,16 @@ const TwoCol = styled.div`
    * stays consistent across desktop sizes. */
   grid-template-columns: 1fr 280px;
   grid-template-rows: auto auto;
-  gap: 48px;
+  /* Column gap 48 (main → sidebar). Row gap 40 (Top → Bottom)
+   * — reduced from 48 by 8 per "уменьши гэп между фото и Template
+   * Overview на десктопе" (c_2026-04-28). */
+  column-gap: 48px;
+  row-gap: 40px;
   align-items: start;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    gap: 32px;
+    column-gap: 32px;
+    row-gap: 24px;
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
@@ -212,9 +217,13 @@ const Description = styled.p`
 /* ── Image carousel ── (card surface now comes from shared TemplateMockupCard) */
 
 /* Desktop carousel wrapper — keeps the chevron-driven slideshow as-is.
- * Hidden on mobile so we can render the scroll-snap row instead. */
+ * Hidden on mobile so we can render the scroll-snap row instead.
+ * Drop-shadow stripped on the inner TemplateMockupCard per "испрaвь
+ * тень у фото главной карточки" (c_2026-04-28). */
 const DesktopCarousel = styled.div`
   position: relative;
+
+  & > div { box-shadow: none; }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: none;
@@ -890,7 +899,10 @@ const PagesGroupedRow = styled.div<{ $open: boolean }>`
   /* Mobile body weight 600, desktop 500 — matches screenshot spec
    * (compact=false on mobile bumps the row weight for touch). */
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
+  /* Open section paints accent (indigo) — both row title and chevron.
+   * Per "пусть при раскрытии секция уедет акцентного цвета, на тел и
+   * десктоп" (c_2026-04-28). Closed sections stay text.primary. */
+  color: ${({ $open, theme }) => ($open ? theme.colors.accent : theme.colors.text.primary)};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
   transition: color ${({ theme }) => theme.transitions.fast};
 
@@ -901,7 +913,7 @@ const PagesGroupedRow = styled.div<{ $open: boolean }>`
   svg.chevron {
     width: 14px;
     height: 14px;
-    color: ${({ theme }) => theme.colors.text.tertiary};
+    color: ${({ $open, theme }) => ($open ? theme.colors.accent : theme.colors.text.tertiary)};
     transition: transform ${({ theme }) => theme.transitions.medium};
     transform: rotate(${({ $open }) => ($open ? '180deg' : '0deg')});
   }
@@ -1358,7 +1370,7 @@ export const TemplateDetailPage: React.FC = () => {
                 lightbox at that index. Per c_2026-04-28: real carousel
                 + tap-to-expand + swipe between photos. */}
             <DesktopCarousel>
-              <TemplateMockupCard $size="hero" style={{ marginBottom: 12 }}>
+              <TemplateMockupCard $size="hero">
                 <TemplateMockupImage
                   $size="hero"
                   $hoverZoom={false}
