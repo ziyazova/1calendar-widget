@@ -98,8 +98,8 @@ import {
   BannerTitle as DashBannerTitle,
   BannerSub as DashBannerSub,
   BannerCta as DashBannerCta,
-  PurchaseCard, PurchaseImg,
 } from './StudioPage';
+import { PurchaseCard, PurchaseImg } from '@/presentation/components/dashboard/PurchaseList';
 import { ColorPicker } from '../components/ui/ColorPicker';
 import {
   widgetColors, backgroundColors, accentColors,

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { X } from 'lucide-react';
 
@@ -77,6 +77,16 @@ const Sheet = styled.div<{ $open: boolean; $maxHeight: string; $bottomOffset: st
   padding-bottom: ${({ $bottomOffset }) => ($bottomOffset === '0px' ? 'env(safe-area-inset-bottom)' : '0')};
 `;
 
+/* Wraps Handle + Header — receives pointer events for drag-to-dismiss.
+   touch-action:none stops the browser from claiming the vertical gesture
+   for native scroll/page-pull while we're tracking it. */
+const DragGrip = styled.div`
+  flex-shrink: 0;
+  touch-action: none;
+  cursor: grab;
+  &:active { cursor: grabbing; }
+`;
+
 const Handle = styled.div`
   display: flex;
   justify-content: center;
@@ -139,6 +149,14 @@ export function BottomSheet({
   bottomOffset = '0px',
   children,
 }: BottomSheetProps) {
+  /* Drag-to-dismiss state. dragY = current downward offset in px during a
+     gesture; dragging gates whether we override the styled-component's
+     transform. Reset whenever the sheet is closed externally so the next
+     open starts fresh. Threshold = 80px OR fast swipe (>0.5 px/ms). */
+  const [dragY, setDragY] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const startRef = useRef<{ y: number; t: number } | null>(null);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -148,19 +166,64 @@ export function BottomSheet({
     return () => document.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open) {
+      setDragY(0);
+      setDragging(false);
+      startRef.current = null;
+    }
+  }, [open]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    startRef.current = { y: e.clientY, t: Date.now() };
+    setDragging(true);
+    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!startRef.current) return;
+    const diff = Math.max(0, e.clientY - startRef.current.y);
+    setDragY(diff);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!startRef.current) return;
+    const diff = Math.max(0, e.clientY - startRef.current.y);
+    const dt = Date.now() - startRef.current.t;
+    const velocity = diff / Math.max(1, dt);
+    startRef.current = null;
+    setDragging(false);
+    setDragY(0);
+    if (diff > 80 || velocity > 0.5) onClose();
+  };
+
   return (
     <>
       <Backdrop $open={open} $bottomOffset={bottomOffset} onClick={onClose} />
-      <Sheet $open={open} $maxHeight={maxHeight} $bottomOffset={bottomOffset} aria-hidden={!open} role="dialog">
-        <Handle />
-        {title !== undefined && (
-          <Header>
-            <Title $capitalize={capitalizeTitle}>{title}</Title>
-            <CloseBtn onClick={onClose} aria-label="Close">
-              <X />
-            </CloseBtn>
-          </Header>
-        )}
+      <Sheet
+        $open={open}
+        $maxHeight={maxHeight}
+        $bottomOffset={bottomOffset}
+        aria-hidden={!open}
+        role="dialog"
+        style={dragging ? { transform: `translateY(${dragY}px)`, transition: 'none' } : undefined}
+      >
+        <DragGrip
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+        >
+          <Handle />
+          {title !== undefined && (
+            <Header>
+              <Title $capitalize={capitalizeTitle}>{title}</Title>
+              <CloseBtn onClick={onClose} aria-label="Close">
+                <X />
+              </CloseBtn>
+            </Header>
+          )}
+        </DragGrip>
         <Body>{children}</Body>
       </Sheet>
     </>

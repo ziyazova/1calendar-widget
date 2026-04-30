@@ -71,28 +71,40 @@ const avatarDropIn = keyframes`
 
 export const AccountDropdown = styled.div`
   position: absolute;
-  top: calc(100% + 10px);
-  right: -8px;
+  /* Tighter to the pill (8px gap) and flush-right with it — was
+     right:-8px which pushed the panel past the pill's edge and read as
+     misaligned. Now sits squarely under the right edge of the avatar. */
+  top: calc(100% + 8px);
+  right: 0;
   z-index: 100;
-  width: 264px;
-  padding: 10px;
+  width: 280px;
+  /* Tight outer padding so rows breathe inside without the panel feeling
+     bulky overall; rows define their own internal padding. */
+  padding: 6px;
   background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  /* Cleaner two-layer popover shadow — soft ambient + tighter contact halo,
-     no muddy bottom-blur. Mirrors the popover token in theme.shadows. */
-  box-shadow: ${({ theme }) => theme.shadows.popover};
+  /* Hairline border + crisp three-layer shadow — quiet contact line,
+     mid ambient, soft long shadow. Replaces the heavier popover token
+     to match Linear / Vercel-style menu surfaces. */
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px -4px rgba(0, 0, 0, 0.08),
+    0 20px 40px -12px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0;
-  animation: ${avatarDropIn} 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: ${avatarDropIn} 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 export const DropdownUserRow = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 10px 14px;
+  /* Balanced padding — was 8px/10px/14px (extra-fat bottom). Now
+     symmetric so the user row sits cleanly between top edge and the
+     first divider. */
+  padding: 10px;
 `;
 
 export const DropdownUserText = styled.div`
@@ -121,31 +133,67 @@ export const DropdownEmail = styled.div`
 
 export const DropdownDivider = styled.div`
   height: 1px;
-  background: ${({ theme }) => theme.colors.border.light};
-  margin: 4px -2px 12px;
+  background: ${({ theme }) => theme.colors.border.hairline};
+  margin: 8px 0;
 `;
 
 export const DropdownSpacer = styled.div`
-  height: 12px;
+  height: 8px;
 `;
 
 export const DropdownMenuGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
 `;
 
+/* Clean row for the desktop avatar dropdown — mirrors the mobile menu's
+   MobileLink (Linear / Notion / Vercel feel). Plain icon + label,
+   subtle hover fill, no borders / gradients / chevrons. Replaces the
+   <Button $variant="ghost"> usage that carried more chrome than needed. */
+export const DropdownItem = styled.button<{ $active?: boolean; $danger?: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ $active, $danger, theme }) =>
+    $danger ? theme.colors.danger.strong
+    : $active ? theme.colors.text.primary
+    : theme.colors.text.body};
+  background: ${({ $active }) => $active ? 'rgba(0,0,0,0.04)' : 'none'};
+  border: none;
+  border-radius: ${({ theme }) => theme.radii.md};
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.015em;
+  text-align: left;
+  transition: background 140ms ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: ${({ $danger, theme }) => $danger ? theme.colors.danger.strong : theme.colors.text.tertiary};
+    stroke-width: 1.75;
+  }
+
+  &:hover {
+    background: ${({ $danger }) => $danger ? 'rgba(220, 40, 40, 0.05)' : 'rgba(0, 0, 0, 0.03)'};
+  }
+`;
+
+/* Pro pill — flat, no accent border/bg/shadow. Reads as a quiet badge
+   row, not a CTA. Manage link sits right-aligned. */
 export const ProPlanRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 48px;
-  padding: 0 16px;
+  padding: 8px 10px;
   border-radius: ${({ theme }) => theme.radii.md};
-  background: rgba(99, 102, 241, 0.05);
-  border: 1px solid ${({ theme }) => theme.colors.accent};
-  box-shadow: 0 1px 2px rgba(99, 102, 241, 0.08);
 `;
 
 export const ProPlanLabel = styled.span`

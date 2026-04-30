@@ -4,7 +4,7 @@ import { Sparkle } from 'lucide-react';
 import { Button } from './Button';
 
 export type PlanUsageMode = 'free' | 'pro';
-export type PlanUsageSize = 'wide' | 'compact';
+export type PlanUsageSize = 'wide' | 'compact' | 'inline';
 
 interface PlanUsageCardProps {
   mode: PlanUsageMode;
@@ -107,6 +107,67 @@ const ProLabel = styled.div<{ $size?: PlanUsageSize }>`
   }
 `;
 
+/* Inline variant — no card surface, no ring, no button. Used on mobile
+   where space is precious and the ring + label + button stack reads as
+   too heavy for what is just a secondary status signal. Renders as a
+   single text line, tone shifts with usage:
+     • Free, plenty (≥2 left):  "Free plan · 2 left"        — green tone
+     • Free, low (1 left):      "Free plan · 1 left"        — amber/warning tone
+     • Free, at limit:          "You've reached your limit · Upgrade to add more →" — accent, clickable
+     • Pro:                     "Peachy Pro"                — neutral
+
+   The tone gradient (green → amber → accent) gives the indicator more
+   visual weight without bringing back the card surface — per "хочу чуть
+   более акцентную эту штуку" (c_2026-04-29). */
+type InlineTone = 'success' | 'warning' | 'accent' | 'info' | 'neutral';
+
+const toneColor = (tone: InlineTone, theme: ReturnType<typeof useTheme>) => {
+  switch (tone) {
+    case 'success': return theme.colors.success.fg;
+    case 'warning': return theme.colors.warning.text;
+    case 'accent':  return theme.colors.accent;
+    /* `info` = brand.indigoDark. Used for the Free-plan inline status
+       on mobile — deeper indigo than `accent` so it stands out without
+       reading as alarm; sits in the same brand family as the at-limit
+       accent CTA so the indicator feels coherent across states.
+       Iterated through state.active blue (didn't fit) per "голубой не
+       нравится" (c_2026-04-29). */
+    case 'info':    return theme.colors.brand.indigoDark;
+    case 'neutral':
+    default:        return theme.colors.text.tertiary;
+  }
+};
+
+const InlineText = styled.span<{ $tone: InlineTone; $clickable?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: ${({ $tone, theme }) => toneColor($tone, theme)};
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
+
+  strong {
+    font-weight: 600;
+    /* Brand-accentuated label — picks up the tone color on success/
+       warning/accent so "Free plan" / "You've reached your limit" reads
+       as the headline of the inline status. Pro/neutral falls back to
+       text.primary so it still reads as a label, not a tone. */
+    color: ${({ $tone, theme }) =>
+      $tone === 'neutral' ? theme.colors.text.primary : toneColor($tone, theme)};
+  }
+
+  ${({ $clickable, theme }) =>
+    $clickable &&
+    `
+    &:hover {
+      color: ${theme.colors.brand.indigoDark};
+      strong { color: ${theme.colors.brand.indigoDark}; }
+    }
+  `}
+`;
+
 interface UsageRingProps {
   used: number;
   limit: number;
@@ -178,6 +239,44 @@ export const PlanUsageCard: React.FC<PlanUsageCardProps> = ({
   onUpgrade,
   onManage,
 }) => {
+  /* Inline — text-only rendering for mobile slots where the card
+     surface is too bulky. No ring, no button surface, just a single
+     line that conveys plan + usage state.
+
+     Tone hierarchy is brand-only — green/amber felt off-style and
+     read as "alarm" on this surface (per "красный не в тему вообще
+     тревогу дает", c_2026-04-29). Two states only:
+       • Free, any room left → neutral (calm status line)
+       • Free, at limit       → accent indigo + clickable (upgrade CTA)
+       • Pro                  → accent indigo (brand mark) */
+  if ($size === 'inline') {
+    if (mode === 'pro') {
+      return (
+        <InlineText $tone="accent">
+          <strong>Peachy Pro</strong>
+        </InlineText>
+      );
+    }
+    const atLimit = used >= limit;
+    if (atLimit) {
+      return (
+        <InlineText $tone="accent" $clickable={!!onUpgrade} onClick={onUpgrade}>
+          <strong>You've reached your limit</strong>
+          <span aria-hidden="true">·</span>
+          <span>Upgrade to add more →</span>
+        </InlineText>
+      );
+    }
+    const left = Math.max(limit - used, 0);
+    return (
+      <InlineText $tone="info">
+        <strong>Free plan</strong>
+        <span aria-hidden="true">·</span>
+        <span>{left} {left === 1 ? 'widget' : 'widgets'} left</span>
+      </InlineText>
+    );
+  }
+
   if (mode === 'pro') {
     return (
       <Wrap $size={$size} $pro>

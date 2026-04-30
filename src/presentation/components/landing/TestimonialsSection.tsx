@@ -232,10 +232,11 @@ const Card = styled.div`
      * on small phones). Just enough to signal swipe without dominating. */
     width: min(88vw, 360px);
     scroll-snap-align: center;
-    /* Mobile-card shadow token — single recipe shared with HowItWorks
-     * and FeatureCards so all three landing card families read as one
-     * on phone. */
-    box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    /* Quiet two-layer shadow — was theme.shadows.mobileCard which read
+     * as muddy/awkward on the tinted surfaceAlt fill. Now matches the
+     * cleaner FeatureCards mobile recipe: thin contact line + soft
+     * mid-distance halo, nothing else. */
+    box-shadow: 0 1px 2px rgba(43, 35, 32, 0.03), 0 6px 16px -6px rgba(43, 35, 32, 0.06);
   }
 `;
 

@@ -54,6 +54,11 @@ export const CTACard = styled.div`
      * stay at radii.lg (16); this big lavender block sits one notch
      * above. */
     border-radius: ${({ theme }) => theme.radii.xl};
+    /* Very subtle hairline outline so the CTA card lifts off the
+     * surrounding surfaceAlt fill without feeling boxed-in. Alpha 0.05
+     * is barely visible on its own — just a soft edge definition.
+     * Per c_yourNotion: "оч оч оч тонкий светлый аутлайн". */
+    border: 1px solid rgba(0, 0, 0, 0.05);
     overflow: hidden;
   }
 `;

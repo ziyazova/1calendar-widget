@@ -9,8 +9,7 @@ import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 import { WidgetStorageService, type SavedWidget } from '@/infrastructure/services/WidgetStorageService';
 import { AccountService } from '@/infrastructure/services/AccountService';
 import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
-import { PurchaseService, type Purchase } from '@/infrastructure/services/PurchaseService';
-import { TEMPLATES } from '@/presentation/data/templates';
+import { PurchaseListItem, usePurchases } from './PurchaseList';
 import { CalendarSettings } from '@/domain/value-objects/CalendarSettings';
 import { ClockSettings } from '@/domain/value-objects/ClockSettings';
 import { PlanPill, Button as SharedButton, Card as SharedCard, FilterChip as SharedFilterChip, FilterRow as SharedFilterRow } from '@/presentation/components/shared';
@@ -175,13 +174,6 @@ const FILTERS: { key: WidgetFilter; label: string }[] = [
   { key: 'calendar', label: 'Calendars' },
   { key: 'clock', label: 'Clocks' },
   { key: 'board', label: 'Boards' },
-];
-
-
-const PURCHASES = [
-  { id: 'p1', name: 'Weekly Planner', price: 'Free', date: 'Mar 22, 2026', order: '#PY-1042', image: '/template-main.png', slug: 'weekly-planner' },
-  { id: 'p2', name: 'Life OS Template', price: '$7.99', date: 'Mar 20, 2026', order: '#PY-1038', image: '/template-main.png', slug: 'life-os' },
-  { id: 'p3', name: 'Student Planner', price: '$3.99', date: 'Mar 15, 2026', order: '#PY-1025', image: '/template-main.png', slug: 'student-planner' },
 ];
 
 
@@ -525,59 +517,9 @@ export const EmptyHint = styled.p`
   margin: 0;
 `;
 
-/* Purchase cards */
-
-const PurchaseCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: ${({ theme }) => theme.colors.background.elevated};
-  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  transition: all ${({ theme }) => theme.transitions.fast};
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
-    box-shadow: ${({ theme }) => theme.shadows.card};
-  }
-
-  & + & { margin-top: 8px; }
-`;
-
-const PurchaseImg = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: ${({ theme }) => theme.radii.md};
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.background.surfaceMuted};
-  flex-shrink: 0;
-  img { width: 100%; height: 100%; object-fit: cover; }
-`;
-
-const PurchaseDetails = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const PurchaseTitle = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
-const PurchaseMeta = styled.div`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin-top: 2px;
-`;
-
-const PurchasePriceTag = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin-right: 8px;
-`;
+/* Purchase cards moved to ./PurchaseList.tsx — single source of truth
+   shared between this view and the dashboard's inline My Purchases
+   section on /studio. Import the public surface from there. */
 
 /* Settings */
 
@@ -694,6 +636,10 @@ const DashboardView: React.FC<{
   const { isRegistered, user, isPro } = useAuth();
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
   const [loading, setLoading] = useState(true);
+  /* Real purchases — same source PurchasesView uses, so the dashboard
+     overview's "Recent Purchases" block automatically mirrors what the
+     account page shows (no more hardcoded PURCHASES drift). */
+  const { purchases } = usePurchases();
 
   const loadWidgets = useCallback(async () => {
     if (!isRegistered) { setLoading(false); return; }
@@ -774,13 +720,15 @@ const DashboardView: React.FC<{
         )}
       </Section>
 
-      {/* Recent Purchases */}
+      {/* Recent Purchases — first 3 items via shared PurchaseListItem.
+          Drives off the same usePurchases() hook as the full Purchases
+          page, so the dashboard preview always mirrors the real list. */}
       <Section>
         <SectionHeading>
-          <SectionTitle>Recent Purchases <SectionCount>{PURCHASES.length}</SectionCount></SectionTitle>
-          {PURCHASES.length > 0 && <SharedButton $variant="link" $size="sm" onClick={() => onNavigate('purchases')}>View all <ArrowRight /></SharedButton>}
+          <SectionTitle>Recent Purchases <SectionCount>{purchases.length}</SectionCount></SectionTitle>
+          {purchases.length > 0 && <SharedButton $variant="link" $size="sm" onClick={() => onNavigate('purchases')}>View all <ArrowRight /></SharedButton>}
         </SectionHeading>
-        {PURCHASES.length === 0 ? (
+        {purchases.length === 0 ? (
           <EmptyBox onClick={() => onNavigate('templates')}>
             <EmptyCircle><Download /></EmptyCircle>
             <EmptyTitle>No purchases yet</EmptyTitle>
@@ -788,16 +736,8 @@ const DashboardView: React.FC<{
           </EmptyBox>
         ) : (
           <>
-            {PURCHASES.slice(0, 3).map(p => (
-              <PurchaseCard key={p.id}>
-                <PurchaseImg><img src={p.image} alt={p.name} /></PurchaseImg>
-                <PurchaseDetails>
-                  <PurchaseTitle>{p.name}</PurchaseTitle>
-                  <PurchaseMeta>{p.date}</PurchaseMeta>
-                </PurchaseDetails>
-                <PurchasePriceTag>{p.price}</PurchasePriceTag>
-                <SharedButton $variant="secondary" $size="sm"><Download /></SharedButton>
-              </PurchaseCard>
+            {purchases.slice(0, 3).map(p => (
+              <PurchaseListItem key={p.id} purchase={p} />
             ))}
           </>
         )}
@@ -903,46 +843,7 @@ const BrowseShopBtn = styled.button`
 
 const PurchasesView: React.FC = () => {
   const navigate = useNavigate();
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      const rows = await PurchaseService.getMyPurchases();
-      if (!cancelled) {
-        setPurchases(rows);
-        setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  // Resolve a card image + slug by looking up the polar product id in the
-  // local catalogue. Falls back to a generic placeholder if the product
-  // isn't on the site yet (legacy purchase or new Polar product).
-  const enrich = (p: Purchase) => {
-    const template = TEMPLATES.find(t => t.polarProductId === p.polarProductId);
-    return {
-      image: template?.image ?? '/template-main.png',
-      slug: template?.id,
-      title: template?.title ?? p.productName ?? 'Template purchase',
-    };
-  };
-
-  const formatPrice = (cents: number | null, currency: string) => {
-    if (cents == null) return '';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.toUpperCase(),
-    }).format(cents / 100);
-  };
-
-  const formatDate = (iso: string) => {
-    try {
-      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    } catch { return iso; }
-  };
+  const { purchases, loading } = usePurchases();
 
   return (
     <Container>
@@ -959,27 +860,9 @@ const PurchasesView: React.FC = () => {
         </EmptyBox>
       ) : (
         <>
-          {purchases.map(p => {
-            const info = enrich(p);
-            return (
-              <PurchaseCard key={p.id} style={{ cursor: info.slug ? 'pointer' : 'default' }} onClick={() => info.slug && navigate(`/templates/${info.slug}`)}>
-                <PurchaseImg style={{ width: 64, height: 64 }}><img src={info.image} alt={info.title} /></PurchaseImg>
-                <PurchaseDetails>
-                  <PurchaseTitle>{info.title}</PurchaseTitle>
-                  <PurchaseMeta>#{p.polarOrderId.slice(-8)} · {formatDate(p.createdAt)}{p.status === 'refunded' ? ' · refunded' : ''}</PurchaseMeta>
-                </PurchaseDetails>
-                <PurchasePriceTag>{formatPrice(p.amountCents, p.currency)}</PurchasePriceTag>
-                <SharedButton $variant="secondary" $size="sm" onClick={(e) => {
-                  e.stopPropagation();
-                  // Download links live in the Polar email delivery. Open the
-                  // Polar customer portal where the buyer can redownload.
-                  void SubscriptionService.openCustomerPortal().then(ok => {
-                    if (!ok) window.open('https://polar.sh', '_blank', 'noopener,noreferrer');
-                  });
-                }}><Download /> Download</SharedButton>
-              </PurchaseCard>
-            );
-          })}
+          {purchases.map(p => (
+            <PurchaseListItem key={p.id} purchase={p} />
+          ))}
         </>
       )}
 

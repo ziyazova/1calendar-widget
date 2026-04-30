@@ -89,6 +89,11 @@ function App() {
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/widgets" element={<WidgetStudioPage />} />
+                  {/* /dashboard = dashboard view (Welcome + Widgets/Purchases tabs).
+                      /studio    = widget editor (entered via Edit/Customize actions
+                      that navigate here with a widget pre-loaded into state). Both
+                      paths render the same StudioPage; pathname picks the view. */}
+                  <Route path="/dashboard" element={<StudioPage diContainer={diContainer} />} />
                   <Route path="/studio" element={<StudioPage diContainer={diContainer} />} />
                   <Route path="/templates" element={<TemplatesPage />} />
                   <Route path="/templates/:id" element={<TemplateDetailPage />} />

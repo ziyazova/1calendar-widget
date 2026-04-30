@@ -34,6 +34,14 @@ const Title = styled.h1<{ $embedded?: boolean }>`
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tightest};
   text-align: center;
   margin: 0 0 ${({ theme }) => theme.spacing['2']};
+
+  /* Phone — embedded variant ("Welcome back" / "Create account" inside
+     the BottomSheet) trimmed one tier down (5xl → 3xl) so the heading
+     doesn't dominate the sheet on small viewports. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ $embedded, theme }) =>
+      $embedded ? theme.typography.sizes['3xl'] : theme.typography.sizes['7xl']};
+  }
 `;
 
 const Subtitle = styled.p<{ $embedded?: boolean }>`
@@ -329,7 +337,7 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const auth = useAuth();
-  const handleSuccess = onAuthenticated ?? (() => navigate('/studio'));
+  const handleSuccess = onAuthenticated ?? (() => navigate('/dashboard'));
 
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(initialSignUp);
@@ -657,7 +665,17 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({
 
       <Divider $embedded={embedded}>or</Divider>
 
-      <Button $variant="secondary" $size="md" $fullWidth onClick={() => auth.loginWithGoogle()}>
+      <Button
+        $variant="secondary"
+        $size="md"
+        $fullWidth
+        onClick={() => auth.loginWithGoogle()}
+        /* display:flex (block-level) — Button defaults to inline-flex
+           which ignores margin:auto, so the constrained-width pill
+           slid to the left edge instead of centering. Same fix used
+           on LoginPage's Google button. */
+        style={{ display: 'flex', maxWidth: 320, margin: '0 auto' }}
+      >
         <GoogleIcon />
         Continue with Google
       </Button>

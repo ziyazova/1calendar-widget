@@ -146,29 +146,34 @@ const DesktopExploreSlot = styled.div`
   }
 `;
 
-/* Mobile-only CTA row that sits under the marquee. Centered full-width
- * button, natural reading order: user scrolls through the preview then
- * taps "Explore all" to see the whole catalog. */
+/* Phone-only (≤sm = 480) CTA row that sits under the marquee. Centered
+ * full-width button. Above sm the button moves up to HeaderExploreSlot
+ * next to the "Top templates" headline (since FilterRow is hidden on
+ * the 481-768 range, there's no inline slot for it yet). Per "после 480
+ * кнопка уходит к секции Top Templates напротив headline; после
+ * появления фильтров — напротив фильтров как на десктопе" (c_2026-04-29). */
 const MobileExploreRow = styled.div`
   display: none;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     display: flex;
-    justify-content: flex-end;
     padding: 28px ${({ theme }) => theme.layout.mobile.gutter} 0;
 
     & > * { width: 100%; }
   }
+`;
 
-  /* Wide phones / phablets (481-768): cap at 318 and stick to the
-   * right edge of the content column. On narrower phones (≤ 480) the
-   * cap doesn't kick in — button stays full-width and the flex-end
-   * justification has no slack to act on. Per "пусть растягивается до
-   * определённого размера телефона, дальше становится меньше по ширине
-   * у огромных телефонов и стикается справа". */
+/* Wide-phone / tablet slot (481-768) — sits next to the "Top templates"
+ * headline because the FilterRow is hidden in that range. Button takes
+ * its natural desktop width (no full-stretch). Above md the FilterRow
+ * appears and the button moves there via DesktopExploreSlot. */
+const HeaderExploreSlot = styled.div`
+  display: none;
+
   @media (min-width: calc(${({ theme }) => theme.breakpoints.sm} + 1px))
     and (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    & > * { max-width: 318px; }
+    display: flex;
+    align-items: center;
   }
 `;
 
@@ -378,6 +383,11 @@ export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ onNavigate }
           <GalleryTitleGroup>
             <GalleryTitle>Top templates</GalleryTitle>
           </GalleryTitleGroup>
+          <HeaderExploreSlot>
+            <SharedButton $variant="primary" $size="md" onClick={() => onNavigate('/templates')}>
+              Explore all <ArrowRight />
+            </SharedButton>
+          </HeaderExploreSlot>
         </GalleryTitleRow>
         <FilterRow>
           {TEMPLATE_CATEGORIES.map(c => (

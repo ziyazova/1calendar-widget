@@ -11,6 +11,7 @@ import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
 import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, Tag, Toast, ToastShell, ToastIconBubble, ToastMessage } from '@/presentation/components/shared';
+import { PurchaseListItem, usePurchases } from '@/presentation/components/dashboard/PurchaseList';
 import {
   /* Single source of truth for empty-state visuals — see DS showcase. */
   EmptyBox as DashEmptyBox,
@@ -66,6 +67,24 @@ const cardAppear = keyframes`
 
 const TabBarWrap = styled.div`
   margin-bottom: 32px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-bottom: 24px;
+
+    /* Mobile — stretch the SegmentGroup to full width and split its
+     * children evenly so it reads as the section switcher. The default
+     * inline-flex group sat on the left and lost attention to the
+     * PlanUsageCard above. Per "не понятно что переключатель"
+     * (c_2026-04-29). */
+    & > div {
+      display: flex;
+      width: 100%;
+
+      & > button {
+        flex: 1;
+      }
+    }
+  }
 `;
 
 /* Section headers */
@@ -74,6 +93,10 @@ const SectionRow = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-bottom: 12px;
+  }
 `;
 
 const SectionTitle = styled.h2`
@@ -82,6 +105,12 @@ const SectionTitle = styled.h2`
   color: ${({ theme }) => theme.colors.text.primary};
   letter-spacing: -0.02em;
   margin: 0;
+
+  /* Phone — drop from 5xl (26) to 3xl (20) so the section header sits
+   * below the welcome H1 (24) without competing. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+  }
 `;
 
 const SectionCount = styled.span`
@@ -91,14 +120,29 @@ const SectionCount = styled.span`
   font-size: ${({ theme }) => theme.typography.sizes.lg};
 `;
 
-/* Widget cards */
+/* Widget cards. Mobile/tablet adaptation mirrors the /widgets gallery
+   (WidgetGalleryGrid in WidgetStudioPage.tsx) so saved widgets and
+   browse widgets feel like the same surface across the app:
+     >md     → 3 columns
+     ≤md     → 2 columns (16/20 gap, align-items: start)
+     ≤600    → 1 column (full-width cards) */
 const WidgetGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: 1fr; }
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 20px;
+  }
 `;
 
 export const WidgetCard = styled.div<{ $i: number }>`
@@ -112,6 +156,52 @@ export const WidgetCard = styled.div<{ $i: number }>`
   &:hover {
     border-color: ${({ theme }) => theme.colors.border.hairlineHover};
     box-shadow: ${({ theme }) => theme.shadows.cardHover};
+  }
+
+  /* Mobile/tablet — match /widgets gallery card chrome
+     (WidgetGalleryCardWrap): surfaceAlt fill + mobileCard shadow so
+     saved-widget tiles read as the same surface as the browse-widget
+     gallery. Hover-pulse disabled — on phone hover triggers on tap. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    width: 100%;
+
+    &:hover {
+      transform: none;
+      box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    }
+
+    /* Tag (calendar/clock/board) inside the preview scales up on
+       mobile to match the /widgets gallery card. Default Tag is too
+       small relative to the bigger 2-col / 1-col surfaces. */
+    ${Tag} {
+      padding: 5px 12px;
+      font-size: ${({ theme }) => theme.typography.sizes.sm};
+    }
+  }
+
+  /* 1-в-ряд (≤600) — Tag drops further to sm (12) with 4/11 padding.
+     Iterated through md (13) per "чуть меньше" then again per
+     "лейблы все такие календарь часы и тд которые в карточках когда
+     один в ряд надо меньше" (c_2026-04-29). At full-width the tag
+     should read as a quiet category marker, not a callout. */
+  @media (max-width: 600px) {
+    ${Tag} {
+      padding: 4px 11px;
+      font-size: ${({ theme }) => theme.typography.sizes.sm};
+    }
+  }
+
+  /* Compact 3-col range (769-1100) — narrow cards (≈211-330px) and a
+     scaled-down preview need a smaller tag too, otherwise the label
+     reads as oversized against the shrunk thumbnail. Mirrors the
+     /widgets compact-range Tag override. xs (11px) with 3/10 padding. */
+  @media (min-width: 769px) and (max-width: 1100px) {
+    ${Tag} {
+      padding: 3px 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.xs};
+    }
   }
 `;
 
@@ -132,6 +222,20 @@ export const WidgetBottom = styled.div`
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid rgba(0,0,0,0.04);
+
+  /* Compact 3-col range (769-1100) — at the narrow end (≈211px wide
+     at 769 viewport) the inline row "Name | Edit Copy Delete" gets
+     cramped: Edit button text wraps or the actions row pushes the name
+     out of view. Stack the name above a full-width actions row instead,
+     mirroring WidgetGalleryMeta's compact-range layout in /widgets.
+     ≤768 (2-col) and ≤600 (1-col) keep the inline row — at those
+     widths the cards are wide enough to handle name + 3 buttons. */
+  @media (min-width: 769px) and (max-width: 1100px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 12px 12px;
+  }
 `;
 
 export const WidgetName = styled.div`
@@ -199,12 +303,25 @@ const WelcomeH1 = styled.h1`
     font-style: normal;
     font-weight: normal;
   }
+
+  /* Phone — sectionHeadline rhythm (24/600/1.2). Per "адаптируй
+   * /studio дашборд под телефон" (c_2026-04-29). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+  }
 `;
 
 const WelcomeSub = styled.p`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
+
+  /* Phone — sectionBody (15/400/1.5). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionBody.size};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionBody.lineHeight};
+  }
 `;
 
 /* Big gradient hero banner used at the top of the Dashboard widgets tab.
@@ -271,31 +388,9 @@ const EmptyStateSub = styled.p`
   margin: 0;
 `;
 
-/* Purchase cards */
-export const PurchaseCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: #fff;
-  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.fast};
-  &:hover { border-color: ${({ theme }) => theme.colors.border.hairlineHover}; box-shadow: ${({ theme }) => theme.shadows.card}; }
-  & + & { margin-top: 20px; }
-`;
-
-export const PurchaseImg = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.background.surfaceMuted};
-  flex-shrink: 0;
-  img { width: 100%; height: 100%; object-fit: cover; }
-`;
+/* Purchase card styled bits live in components/dashboard/PurchaseList.tsx
+   — shared between this page's "My Purchases" section and the dedicated
+   /studio (account → Purchases) view. Single source of truth. */
 
 /* ── Mobile editor (≤768) ── */
 const MobileEditorWrap = styled.div`
@@ -311,7 +406,7 @@ const MobileTopBar = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 14px 14px;
   flex-shrink: 0;
   border-bottom: 1px solid rgba(0,0,0,0.04);
 `;
@@ -332,6 +427,10 @@ const MobileBackBtn = styled.button`
 const MobileWidgetName = styled.div`
   flex: 1;
   min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font-size: ${({ theme }) => theme.typography.sizes.base};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.accent};
@@ -339,24 +438,109 @@ const MobileWidgetName = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
+  cursor: text;
+  /* Pencil affordance — kept very quiet (low opacity, small size) so it
+     doesn't compete with the name itself; the name colour stays the
+     hero. Lifts to full opacity on hover/active for clear feedback. */
+  svg {
+    width: 11px;
+    height: 11px;
+    color: ${({ theme }) => theme.colors.text.tertiary};
+    opacity: 0.45;
+    flex-shrink: 0;
+    transition: opacity ${({ theme }) => theme.transitions.fast};
+  }
+  &:hover svg, &:active svg { opacity: 1; }
 `;
 
-const MobileCopyBtn = styled.button<{ $copied: boolean }>`
-  display: flex; align-items: center; justify-content: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border: none;
+/* Inline rename input — styled to look like the static name (same font,
+   weight, accent colour) so the transition tap → edit is seamless. */
+const MobileWidgetNameInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid ${({ theme }) => theme.colors.border.hairlineHover};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.sizes.base};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.accent};
+  letter-spacing: -0.01em;
+  text-align: center;
+  outline: none;
+  &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
+`;
+
+/* Right slot in MobileTopBar — same width as MobileBackBtn so the
+   centered MobileWidgetName visually sits in the true middle. Holds
+   the save-status icon (saving/saved). */
+const MobileTopBarRight = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 36px;
+  flex-shrink: 0;
+`;
+
+/* Floating embed-URL form pinned to the TOP of MobileArtboard — mirrors
+   the desktop bottom toolbar (input readOnly + Copy) so mobile users
+   get the same one-tap-to-copy affordance without crowding the topbar.
+   Centered with a max-width cap so on tablet-ish viewports it doesn't
+   stretch edge-to-edge; sits ~18px below the artboard top so it has a
+   little breathing room from the back button row. */
+const MobileEmbedBar = styled.div`
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
   border-radius: ${({ theme }) => theme.radii.md};
+  padding: 6px 6px 6px 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+  z-index: 5;
+`;
+
+const MobileEmbedInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 11px;
+  font-family: monospace;
+  color: ${({ theme }) => theme.colors.text.hint};
+  outline: none;
+`;
+
+const MobileEmbedCopyBtn = styled.button<{ $copied: boolean }>`
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
   background: ${({ $copied, theme }) => $copied ? theme.colors.success.base : theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.text.inverse};
-  font-size: ${({ theme }) => theme.typography.sizes.md};
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   flex-shrink: 0;
   transition: background ${({ theme }) => theme.transitions.fast};
-  svg { width: 14px; height: 14px; }
+  svg { width: 12px; height: 12px; }
 `;
 
 export const MobileArtboard = styled.div`
@@ -392,8 +576,8 @@ export const MobileWidgetScale = styled.div`
 
 export const MobileSectionTabs = styled.div`
   display: flex;
-  gap: 4px;
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  gap: 6px;
+  padding: 8px 20px calc(8px + env(safe-area-inset-bottom));
   background: ${({ theme }) => theme.colors.background.elevated};
   border-top: 1px solid ${({ theme }) => theme.colors.border.hairline};
   flex-shrink: 0;
@@ -408,7 +592,7 @@ export const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: bo
   min-width: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px;
-  height: 48px;
+  height: 52px;
   border: none;
   /* Active state is colour-only — icon + label flip to accent, no card
      highlight behind. Disabled = muted text + opacity for "unavailable". */
@@ -432,15 +616,17 @@ const PreviewScale = styled.div`
   transform: scale(0.55);
   transform-origin: center center;
   pointer-events: none;
+
+  /* Compact 3-col range (769-1100) — cards drop to ~211-330px wide
+     and the default 0.55 preview crowds the surface. Scale down 30%
+     (0.55 → 0.385) so the widget reads as a thumbnail with breathing
+     room around it, matching the visual weight at wider viewports. */
+  @media (min-width: 769px) and (max-width: 1100px) {
+    transform: scale(0.385);
+  }
 `;
 
 const PREVIEW_TIME = new Date(2026, 2, 25, 10, 42, 15);
-
-const PURCHASES = [
-  { id: 'p1', name: 'Weekly Planner', price: 'Free', date: 'Mar 22, 2026', order: '#PY-1042', image: '/template-main.png', slug: 'weekly-planner' },
-  { id: 'p2', name: 'Life OS Template', price: '$7.99', date: 'Mar 20, 2026', order: '#PY-1038', image: '/template-main.png', slug: 'life-os' },
-  { id: 'p3', name: 'Student Planner', price: '$3.99', date: 'Mar 15, 2026', order: '#PY-1025', image: '/template-main.png', slug: 'student-planner' },
-];
 
 const WidgetPreview: React.FC<{ type: string; style: string; savedSettings?: Record<string, unknown> }> = ({ type, style, savedSettings }) => {
   const saved = (savedSettings || {}) as Record<string, unknown>;
@@ -529,7 +715,7 @@ const DowngradeBanner: React.FC<{
 
 /* ── Component ── */
 
-type StudioTab = 'widgets' | 'templates';
+type StudioTab = 'widgets' | 'purchases';
 
 export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const theme = useTheme();
@@ -540,8 +726,19 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   // `?purchased=<polarProductId>` lands here from Polar after a successful
   // template checkout. Show a banner + optional signup CTA for guests.
   const [purchasedProductId, setPurchasedProductId] = useState<string | null>(() => searchParams.get('purchased'));
-  const [tab, setTab] = useState<StudioTab>('widgets');
+  /* Tab state synced with URL ?tab=. Lets the navbar dropdown deep-link
+     directly into a tab (e.g. /studio?tab=purchases from the Purchases
+     menu item). Defaults to 'widgets' when the param is missing or
+     unrecognised. */
+  const [tab, setTab] = useState<StudioTab>(() => {
+    const t = searchParams.get('tab');
+    return t === 'purchases' ? 'purchases' : 'widgets';
+  });
   const [widgets, setWidgets] = useState<SavedWidget[]>([]);
+  /* Real purchases — same hook + same item component as the dedicated
+     /studio (account → Purchases) view, so the dashboard's "My
+     Purchases" section auto-mirrors the source list. */
+  const { purchases } = usePurchases();
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
   const [mobileSection, setMobileSection] = useState<PanelSection>(null);
@@ -554,7 +751,18 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [editingWidgetKey, setEditingWidgetKey] = useState<string>('');
   const [editingWidgetId, setEditingWidgetId] = useState<string | null>(null);
   const [editingWidgetName, setEditingWidgetName] = useState<string>('');
-  const [editorOpen, setEditorOpen] = useState(false);
+  /* True while the user is inline-renaming the widget on the mobile
+     editor's top bar. Tap the name (or pencil) → input; Enter/blur
+     commits, Escape reverts. The auto-save effect on editingWidgetName
+     handles persistence — no extra wiring needed here. */
+  const [renamingName, setRenamingName] = useState(false);
+  const renameDraftRef = useRef<string>('');
+  /* Editor state. URL is a mirror — /studio when editor is open,
+     /dashboard when it's closed — but the source of truth stays in
+     this state so click handlers update synchronously without racing
+     with the route change. Two effects below keep URL ↔ state in
+     sync (one for outgoing changes, one for direct URL access). */
+  const [editorOpen, setEditorOpen] = useState(location.pathname === '/studio');
   const [copied, setCopied] = useState(false);
   const [copiedWidgetId, setCopiedWidgetId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SavedWidget | null>(null);
@@ -591,9 +799,31 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
   useEffect(() => { loadWidgets(); }, [loadWidgets]);
 
-  // Handle incoming newWidget from /widgets Customize flow
+  // Sync tab state with the ?tab= URL param. Lets the navbar dropdown
+  // (Purchases item → /dashboard?tab=purchases) deep-link directly into
+  // a tab even when the user is already on /dashboard.
   useEffect(() => {
-    const state = location.state as { newWidget?: { name: string; type: string; style: string } } | null;
+    const t = searchParams.get('tab');
+    const next: StudioTab = t === 'purchases' ? 'purchases' : 'widgets';
+    setTab(prev => (prev === next ? prev : next));
+  }, [searchParams]);
+
+  // No guard for /studio without editingWidget — the render condition
+  // (`if (editorOpen && editingWidget)`) already falls through to the
+  // dashboard view in that case. An aggressive redirect here was
+  // racing with handleEdit's batched setEditingWidget + navigate and
+  // bouncing the editor before it could mount.
+
+  // Handle incoming newWidget (from /widgets Customize) and editWidget
+  // (from dashboard Edit click) via location.state — both routes mount
+  // a fresh StudioPage instance, so passing the payload through router
+  // state is the only way to survive the remount.
+  useEffect(() => {
+    const state = location.state as {
+      newWidget?: { name: string; type: string; style: string };
+      editWidget?: SavedWidget;
+    } | null;
+
     if (state?.newWidget) {
       const { name, type, style } = state.newWidget;
       // Clear state so it doesn't re-trigger
@@ -618,8 +848,39 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           // Reset saved fingerprint so the first auto-save creates the record.
           lastSavedRef.current = '';
           setEditorOpen(true);
+          navigate('/studio', { replace: true });
         } catch (err) {
           Logger.error('StudioPage', 'Failed to create widget from nav state', err);
+        }
+      })();
+      return;
+    }
+
+    if (state?.editWidget) {
+      const w = state.editWidget;
+      window.history.replaceState({}, '');
+      (async () => {
+        try {
+          const widget = await diContainer.createWidgetUseCase.execute(w.type);
+          const savedSettings = (w.settings || {}) as Record<string, unknown>;
+          let updated;
+          if (w.type === 'calendar') {
+            updated = widget.updateSettings(new CalendarSettings({ ...savedSettings, style: w.style as CalendarSettings['style'] }));
+          } else if (w.type === 'clock') {
+            updated = widget.updateSettings(new ClockSettings({ ...savedSettings, style: w.style as ClockSettings['style'] }));
+          } else {
+            updated = widget.updateSettings(new BoardSettings({ ...savedSettings, layout: w.style as BoardSettings['layout'] }));
+          }
+          setEditingWidget(updated);
+          setEditingWidgetKey(`${w.type}-${w.style}`);
+          setEditingWidgetId(w.id);
+          setEditingWidgetName(w.name);
+          setSaveStatus('idle');
+          // Mark as already-saved so the debounced auto-save doesn't re-fire on open.
+          lastSavedRef.current = JSON.stringify(serializeSettings(updated)) + '|' + w.name;
+          setEditorOpen(true);
+        } catch (err) {
+          Logger.error('StudioPage', 'Failed to load widget for editing', err);
         }
       })();
     }
@@ -722,29 +983,16 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     setWidgets(prev => prev.filter(w => w.id !== id));
   };
 
-  const handleEdit = async (w: SavedWidget) => {
-    try {
-      const widget = await diContainer.createWidgetUseCase.execute(w.type);
-      const savedSettings = (w.settings || {}) as Record<string, unknown>;
-      let updated;
-      if (w.type === 'calendar') {
-        updated = widget.updateSettings(new CalendarSettings({ ...savedSettings, style: w.style as CalendarSettings['style'] }));
-      } else if (w.type === 'clock') {
-        updated = widget.updateSettings(new ClockSettings({ ...savedSettings, style: w.style as ClockSettings['style'] }));
-      } else {
-        updated = widget.updateSettings(new BoardSettings({ ...savedSettings, layout: w.style as BoardSettings['layout'] }));
-      }
-      setEditingWidget(updated);
-      setEditingWidgetKey(`${w.type}-${w.style}`);
-      setEditingWidgetId(w.id);
-      setEditingWidgetName(w.name);
-      setSaveStatus('idle');
-      // Mark current state as saved so the first debounced auto-save does not re-fire on open.
-      lastSavedRef.current = JSON.stringify(serializeSettings(updated)) + '|' + w.name;
-      setEditorOpen(true);
-    } catch (err) {
-      Logger.error('StudioPage', 'Failed to load widget for editing', err);
-    }
+  /* Edit handler — pushes the widget through location.state so the
+     /dashboard → /studio navigation survives React Router's component
+     remount (each <Route> mounts its own StudioPage instance, so state
+     set here would be lost otherwise). The mount-time effect below
+     reads location.state.editWidget and hydrates the editor. Was the
+     "needs two clicks" bug — first click set local state in the
+     /dashboard instance which got unmounted on navigate; second click
+     hit the already-mounted /studio instance so it worked. */
+  const handleEdit = (w: SavedWidget) => {
+    navigate('/studio', { state: { editWidget: w } });
   };
 
   const handleEditorBack = () => {
@@ -758,6 +1006,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     }
     setEditorOpen(false);
     setEditingWidgetId(null);
+    navigate('/dashboard');
   };
 
   // If editing, show full-screen editor (Figma-style artboard)
@@ -798,29 +1047,60 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             <MobileBackBtn onClick={handleEditorBack} aria-label="Back">
               <ChevronLeft />
             </MobileBackBtn>
-            <MobileWidgetName>
-              {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-            </MobileWidgetName>
-            {/* Save status dot — non-intrusive */}
-            {saveStatus === 'saving' && <Loader2 style={{ width: 14, height: 14, color: theme.colors.text.tertiary, animation: 'spin 1s linear infinite' }} />}
-            {saveStatus === 'saved' && <Check style={{ width: 14, height: 14, color: theme.colors.success.fg }} />}
+            {renamingName ? (
+              <MobileWidgetNameInput
+                autoFocus
+                value={editingWidgetName}
+                onChange={e => setEditingWidgetName(e.target.value)}
+                onFocus={e => {
+                  renameDraftRef.current = editingWidgetName;
+                  e.currentTarget.select();
+                }}
+                onBlur={() => {
+                  if (!editingWidgetName.trim()) setEditingWidgetName(renameDraftRef.current || 'Untitled Widget');
+                  setRenamingName(false);
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
+                  if (e.key === 'Escape') { setEditingWidgetName(renameDraftRef.current); setRenamingName(false); }
+                }}
+              />
+            ) : (
+              <MobileWidgetName onClick={() => setRenamingName(true)} role="button" aria-label="Rename widget">
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {editingWidgetName || editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                </span>
+                <Pencil />
+              </MobileWidgetName>
+            )}
             <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-            <MobileCopyBtn
-              $copied={copied}
-              onClick={() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-                if (navigator.clipboard) {
-                  navigator.clipboard.writeText(embedUrl).catch(() => {});
-                }
-              }}
-            >
-              {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
-            </MobileCopyBtn>
+            <MobileTopBarRight>
+              {saveStatus === 'saving' && <Loader2 style={{ width: 14, height: 14, color: theme.colors.text.tertiary, animation: 'spin 1s linear infinite' }} />}
+              {saveStatus === 'saved' && <Check style={{ width: 14, height: 14, color: theme.colors.success.fg }} />}
+            </MobileTopBarRight>
           </MobileTopBar>
 
           <MobileArtboard>
             <MobileDotGrid />
+            <MobileEmbedBar>
+              <MobileEmbedInput
+                readOnly
+                value={embedUrl}
+                onClick={e => (e.target as HTMLInputElement).select()}
+              />
+              <MobileEmbedCopyBtn
+                $copied={copied}
+                onClick={() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(embedUrl).catch(() => {});
+                  }
+                }}
+              >
+                {copied ? <><Check /> Copied</> : <><Copy /> Copy</>}
+              </MobileEmbedCopyBtn>
+            </MobileEmbedBar>
             <MobileWidgetScale>
               <WidgetDisplay widget={editingWidget} />
             </MobileWidgetScale>
@@ -849,7 +1129,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             capitalizeTitle
             /* Sit ABOVE the persistent MobileSectionTabs (48px tab + 8px top
                + 8px bottom padding + safe-area) so navigation stays visible. */
-            bottomOffset="calc(64px + env(safe-area-inset-bottom))"
+            bottomOffset="calc(68px + env(safe-area-inset-bottom))"
           >
             {mobileSection && (
               <CustomizationPanel
@@ -886,9 +1166,57 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             }}>
               <ArrowRight style={{ width: 14, height: 14, transform: 'rotate(180deg)' }} /> Back
             </button>
-            <span style={{ fontSize: 15, fontWeight: 600, color: theme.colors.state.active, letterSpacing: '-0.02em' }}>
-              {editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-            </span>
+            {/* Editable widget name — same rename pattern as the mobile
+                top bar (tap → input, Enter/blur commits, Esc reverts).
+                Auto-save effect on editingWidgetName picks up the change. */}
+            {renamingName ? (
+              <input
+                autoFocus
+                value={editingWidgetName}
+                onChange={e => setEditingWidgetName(e.target.value)}
+                onFocus={e => {
+                  renameDraftRef.current = editingWidgetName;
+                  e.currentTarget.select();
+                }}
+                onBlur={() => {
+                  if (!editingWidgetName.trim()) setEditingWidgetName(renameDraftRef.current || 'Untitled Widget');
+                  setRenamingName(false);
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
+                  if (e.key === 'Escape') { setEditingWidgetName(renameDraftRef.current); setRenamingName(false); }
+                }}
+                style={{
+                  height: 30, padding: '0 10px',
+                  fontSize: 15, fontWeight: 600, color: theme.colors.state.active, letterSpacing: '-0.02em',
+                  fontFamily: 'inherit',
+                  border: `1px solid ${theme.colors.state.active}`, borderRadius: 8,
+                  background: theme.colors.background.surfaceAlt, outline: 'none', minWidth: 180,
+                }}
+              />
+            ) : (
+              <span
+                onClick={() => setRenamingName(true)}
+                role="button"
+                aria-label="Rename widget"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  fontSize: 15, fontWeight: 600, color: theme.colors.state.active, letterSpacing: '-0.02em',
+                  cursor: 'text', padding: '4px 0',
+                }}
+                className="rename-target"
+              >
+                <span>{editingWidgetName || editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
+                <Pencil
+                  style={{
+                    width: 11, height: 11, color: theme.colors.text.tertiary,
+                    opacity: 0.45, transition: 'opacity 0.15s',
+                  }}
+                  className="rename-pencil"
+                />
+              </span>
+            )}
+            <style>{`.rename-target:hover .rename-pencil { opacity: 1 !important; }`}</style>
             {/* Save status — mirrors Figma/Notion auto-save indicator */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6,
@@ -1029,7 +1357,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
   return (
     <Page>
-      <TopNav activeLink="studio" />
+      <TopNav activeLink={editorOpen ? 'studio' : 'dashboard'} />
       <EmailVerificationBanner />
       <DowngradeBanner isPro={isPro} status={plan.status} endsAt={plan.currentPeriodEnd} />
 
@@ -1054,7 +1382,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </span>
           {!isRegistered && (
             <button
-              onClick={() => navigate(`/login?returnTo=${encodeURIComponent('/studio?view=purchases')}`)}
+              onClick={() => navigate(`/login?returnTo=${encodeURIComponent('/dashboard?tab=purchases')}`)}
               style={{
                 background: theme.colors.success.dark, color: theme.colors.text.inverse, border: 'none', borderRadius: 8,
                 padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
@@ -1082,22 +1410,28 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
       )}
 
       <Container>
-        {/* Welcome — H1 and plan pill share a row (Linear/Notion/Vercel
-            anchor pattern), subtitle hangs free below. On mobile the row
-            collapses to a column so the pill drops under the title. */}
-        <div style={{ marginBottom: 32, marginTop: 24 }}>
-          <div style={{
-            display: 'flex',
-            flexDirection: (isMobile ? 'column' : 'row') as 'column' | 'row',
-            alignItems: isMobile ? 'stretch' : 'center',
-            justifyContent: 'space-between',
-            gap: isMobile ? 12 : 0,
-          }}>
-            <WelcomeH1>Welcome <span className="emoji" aria-hidden="true">👋</span></WelcomeH1>
+        {/* Welcome — desktop: H1 + plan pill share a row, subtitle below.
+            Mobile: H1 → Subtitle → Plan card stacked. Per "Manage your
+            widgets and templates должно быть под Welcome" (c_2026-04-29). */}
+        {isMobile ? (
+          <div style={{ marginBottom: 24, marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div>
+              <WelcomeH1>Welcome <span className="emoji" aria-hidden="true">👋</span></WelcomeH1>
+              <WelcomeSub>Manage your widgets and templates</WelcomeSub>
+            </div>
+            {/* Mobile uses the inline text variant — even the compact
+                206px pill (ring + "3/3" + Upgrade) read as "много места
+                занимает а инфы не дает" on phone. Inline collapses the
+                whole status to a single line:
+                  • Free under limit: "Free plan · 2 left"
+                  • Free at limit:    "You've reached your limit · Upgrade to add more →"
+                  • Pro:              "Peachy Pro"
+                Desktop keeps the wide pill — see the else branch below.
+                (c_2026-04-29) */}
             {planLoading ? null : (
               <PlanUsageCard
                 mode={isPro ? 'pro' : 'free'}
-                $size="wide"
+                $size="inline"
                 used={widgets.length}
                 limit={3}
                 onUpgrade={() => openUpgrade()}
@@ -1105,14 +1439,36 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               />
             )}
           </div>
-          <WelcomeSub>Manage your widgets and templates</WelcomeSub>
-        </div>
+        ) : (
+          <div style={{ marginBottom: 32, marginTop: 24 }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 0,
+            }}>
+              <WelcomeH1>Welcome <span className="emoji" aria-hidden="true">👋</span></WelcomeH1>
+              {planLoading ? null : (
+                <PlanUsageCard
+                  mode={isPro ? 'pro' : 'free'}
+                  $size="wide"
+                  used={widgets.length}
+                  limit={3}
+                  onUpgrade={() => openUpgrade()}
+                  onManage={() => navigate('/settings')}
+                />
+              )}
+            </div>
+            <WelcomeSub>Manage your widgets and templates</WelcomeSub>
+          </div>
+        )}
 
         {/* Tab bar */}
         <TabBarWrap>
           <SegmentGroup>
             <Segment $active={tab === 'widgets'} onClick={() => setTab('widgets')}>Widgets</Segment>
-            <Segment $active={tab === 'templates'} onClick={() => setTab('templates')}>Templates</Segment>
+            <Segment $active={tab === 'purchases'} onClick={() => setTab('purchases')}>Purchases</Segment>
           </SegmentGroup>
         </TabBarWrap>
 
@@ -1153,7 +1509,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                     <WidgetBottom>
                       <WidgetName>{w.name}</WidgetName>
                       <WidgetActions>
-                        <SharedButton $variant="secondary" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
+                        <SharedButton $variant="outline" $size="sm" onClick={() => handleEdit(w)}><Pencil /> Edit</SharedButton>
                         <SharedButton
                           $variant={copiedWidgetId === w.id ? 'successSoft' : 'outline'}
                           $size="sm"
@@ -1212,8 +1568,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
           </>
         )}
 
-        {/* ── Templates Tab ── */}
-        {tab === 'templates' && (
+        {/* ── Purchases Tab ── */}
+        {tab === 'purchases' && (
           <>
             {/* Browse banner — top */}
             <div style={{
@@ -1236,12 +1592,15 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </BannerCta>
             </div>
 
-            {/* Purchases — below */}
-            <SectionRow>
-              <SectionTitle>My Purchases <SectionCount>{PURCHASES.length}</SectionCount></SectionTitle>
+            {/* Purchases — driven by shared usePurchases() hook + the
+                shared <PurchaseListItem>, so this section automatically
+                mirrors the dedicated /studio (account → Purchases) view.
+                #purchases anchor lets the dropdown shortcut scroll here. */}
+            <SectionRow id="purchases">
+              <SectionTitle>My Purchases <SectionCount>{purchases.length}</SectionCount></SectionTitle>
             </SectionRow>
 
-            {PURCHASES.length === 0 ? (
+            {purchases.length === 0 ? (
               <DashEmptyBox onClick={() => navigate('/templates')}>
                 <DashEmptyCircle><Download /></DashEmptyCircle>
                 <DashEmptyTitle>No purchases yet</DashEmptyTitle>
@@ -1249,16 +1608,8 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </DashEmptyBox>
             ) : (
               <>
-                {PURCHASES.map(p => (
-                  <PurchaseCard key={p.id} onClick={() => navigate(`/templates/${p.slug}`)}>
-                    <PurchaseImg><img src={p.image} alt={p.name} /></PurchaseImg>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary }}>{p.name}</div>
-                      <div style={{ fontSize: 12, color: theme.colors.text.tertiary, marginTop: 2 }}>{p.order} · {p.date}</div>
-                    </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary, marginRight: 8 }}>{p.price}</div>
-                    <SharedButton $variant="secondary" $size="sm" onClick={(e) => { e.stopPropagation(); }}><Download /> Download</SharedButton>
-                  </PurchaseCard>
+                {purchases.map(p => (
+                  <PurchaseListItem key={p.id} purchase={p} />
                 ))}
               </>
             )}

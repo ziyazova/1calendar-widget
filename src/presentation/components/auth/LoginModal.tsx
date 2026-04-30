@@ -1,17 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Modal } from '@/presentation/components/shared';
+import { Modal, BottomSheet } from '@/presentation/components/shared';
 import { LoginFlow } from './LoginFlow';
+import { useIsPhone } from '@/presentation/hooks/useIsMobile';
 
 /**
- * LoginModal — <LoginFlow> embedded in a shared <Modal>. Use to gate an
- * action behind auth without redirecting away (e.g. Customize on a widget
- * card). On success, onAuthenticated fires and the modal closes; the caller
- * resumes the interrupted action.
+ * LoginModal — <LoginFlow> embedded in a centered Modal on desktop, in
+ * a BottomSheet on mobile. The bottom-sheet variant is the standard
+ * mobile pattern (iOS/Android, Linear, Vercel, etc.) and avoids the
+ * jumpy centered-modal-with-changing-content problem.
  *
- * Width is constrained by Modal `size="sm"` (400px) — login forms read
- * better narrow. The inner wrapper resets the Modal body's flex gap so
- * LoginFlow's own margins drive the rhythm.
+ * Use to gate an action behind auth without redirecting away (e.g.
+ * Customize on a widget card). On success, onAuthenticated fires and
+ * the surface closes; the caller resumes the interrupted action.
  */
 interface LoginModalProps {
   open: boolean;
@@ -30,22 +31,49 @@ const FlowWrap = styled.div`
   > * { margin: revert; }
 `;
 
+/* Mobile sheet body — generous symmetric padding so LoginFlow content
+   sits clear of the sheet edges. The sheet itself owns the bottom
+   safe-area inset, so we only add horizontal + top padding here.
+   Bottom 32 (was 24, +8) — extra breathing room below the bottom-most
+   "Don't have an account? / Sign up" link before the sheet's edge. */
+const SheetBody = styled.div`
+  padding: 8px 24px 32px;
+`;
+
 export const LoginModal: React.FC<LoginModalProps> = ({
   open,
   onClose,
   onAuthenticated,
   initialSignUp,
 }) => {
+  const isPhone = useIsPhone();
+
+  const handleAuth = () => {
+    onAuthenticated?.();
+    onClose();
+  };
+
+  if (isPhone) {
+    return (
+      <BottomSheet open={open} onClose={onClose} maxHeight="90vh">
+        <SheetBody>
+          <LoginFlow
+            embedded
+            initialSignUp={initialSignUp}
+            onAuthenticated={handleAuth}
+          />
+        </SheetBody>
+      </BottomSheet>
+    );
+  }
+
   return (
-    <Modal open={open} onClose={onClose} size="sm">
+    <Modal open={open} onClose={onClose} size="md">
       <FlowWrap>
         <LoginFlow
           embedded
           initialSignUp={initialSignUp}
-          onAuthenticated={() => {
-            onAuthenticated?.();
-            onClose();
-          }}
+          onAuthenticated={handleAuth}
         />
       </FlowWrap>
     </Modal>

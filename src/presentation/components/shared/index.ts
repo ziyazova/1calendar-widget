@@ -22,6 +22,7 @@ export {
   DropdownDivider,
   DropdownSpacer,
   DropdownMenuGroup,
+  DropdownItem,
   ProPlanRow,
   ProPlanLabel,
   ProManageLink,

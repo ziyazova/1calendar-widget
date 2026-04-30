@@ -49,7 +49,10 @@ const Grid = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: 1fr;
-    gap: ${({ theme }) => theme.layout.mobile.cardGap};
+    /* +4px on top of the standard mobile cardGap token — local override
+     * for the How it works step list specifically (per-section ask),
+     * so the cards breathe without changing the global token. */
+    gap: calc(${({ theme }) => theme.layout.mobile.cardGap} + 4px);
   }
 `;
 
@@ -101,6 +104,11 @@ const Card = styled.div<{ $bg: string }>`
     min-height: 0;
     border-radius: ${({ theme }) => theme.radii.lg};
     gap: 14px;
+    /* Same very-thin outline as the CTA card — desktop's purple-tinted
+     * border (rgba 150,145,175,0.28) read as too colored against the
+     * mobile surfaceAlt section. Match the CTA hairline so all hero-tier
+     * mobile cards share one edge treatment. */
+    border: 1px solid rgba(0, 0, 0, 0.05);
   }
 `;
 

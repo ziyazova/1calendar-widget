@@ -4,7 +4,7 @@ import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-do
 import { TopNav } from '../components/layout/TopNav';
 import {
   PageWrapper,
-  Footer,
+  LandingFooter,
   Button,
   Card,
   Modal,
@@ -20,8 +20,11 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 80px 24px 120px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    padding: 48px 20px 80px;
+  /* Phone — compact form per "тут чуть компактнее" (c_2026-04-29).
+   * 32 top + 48 bottom (was 48/80). Title→form rhythm tightens too
+   * via Subtitle margin-bottom override below. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 32px 20px 48px;
   }
 `;
 
@@ -32,6 +35,14 @@ const Title = styled.h1`
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tightest};
   text-align: center;
   margin: 0 0 ${({ theme }) => theme.spacing['3']};
+
+  /* Phone — sectionHeadline (24/600/1.2). 32 was too dominant on a
+   * 375 viewport and pushed the form below into the fold. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
+    font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
+    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+  }
 `;
 
 const Subtitle = styled.p`
@@ -39,6 +50,12 @@ const Subtitle = styled.p`
   color: ${({ theme }) => theme.colors.text.tertiary};
   text-align: center;
   margin: 0 0 ${({ theme }) => theme.spacing['8']};
+
+  /* Phone — Subtitle → form gap 32 → 20 per "тут чуть компактнее"
+   * (c_2026-04-29). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-bottom: 20px;
+  }
 `;
 
 const Form = styled.form`
@@ -125,6 +142,13 @@ const BottomText = styled.p`
   margin-top: ${({ theme }) => theme.spacing['8']};
   font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.text.tertiary};
+
+  /* Phone — 16 (was 12, +4). User asked to push the "Don't have an
+   * account?" link a touch lower from the Google CTA so it doesn't
+   * stick to the button. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    margin-top: 16px;
+  }
 `;
 
 const LegalNotice = styled.p`
@@ -425,15 +449,15 @@ export const LoginPage: React.FC = () => {
             <SignedInMeta>
               Signed in as <strong>{displayName}</strong> ({auth.user?.email})
             </SignedInMeta>
-            <Button $variant="primary" $size="lg" $fullWidth onClick={() => navigate('/studio')} style={{ marginTop: 16 }}>
-              Go to Studio <ArrowRight />
+            <Button $variant="primary" $size="lg" $fullWidth onClick={() => navigate('/dashboard')} style={{ marginTop: 16 }}>
+              Go to Dashboard <ArrowRight />
             </Button>
             <Button $variant="secondary" $size="lg" $fullWidth onClick={async () => { await auth.logout(); }} style={{ marginTop: 8 }}>
               <LogOut /> Log out
             </Button>
           </Card>
         </Container>
-        <Footer />
+        <LandingFooter onNavigate={(path) => navigate(path)} />
       </PageWrapper>
     );
   }
@@ -487,7 +511,7 @@ export const LoginPage: React.FC = () => {
             </div>
           </ConfirmCard>
         </Container>
-        <Footer />
+        <LandingFooter onNavigate={(path) => navigate(path)} />
       </PageWrapper>
     );
   }
@@ -517,8 +541,8 @@ export const LoginPage: React.FC = () => {
           setResendCountdown(60); // initial throttle — Supabase recently sent the email
           return;
         }
-        // Session granted (e.g. auto-confirm enabled) → go to studio.
-        navigate('/studio');
+        // Session granted (e.g. auto-confirm enabled) → go to dashboard.
+        navigate('/dashboard');
       } else {
         if (!canSubmitLogin) {
           setError('Please enter your email and password.');
@@ -533,7 +557,7 @@ export const LoginPage: React.FC = () => {
           }
           return;
         }
-        navigate('/studio');
+        navigate('/dashboard');
       }
     } finally {
       setSubmitting(false);
@@ -719,7 +743,16 @@ export const LoginPage: React.FC = () => {
 
         <Divider>or</Divider>
 
-        <Button $variant="secondary" $size="lg" $fullWidth onClick={() => auth.loginWithGoogle()}>
+        <Button
+          $variant="secondary"
+          $size="lg"
+          $fullWidth
+          onClick={() => auth.loginWithGoogle()}
+          /* display:flex (block-level) — Button defaults to inline-flex
+             which ignores margin:auto, so the constrained-width pill
+             slid to the left edge instead of centering. */
+          style={{ display: 'flex', maxWidth: 320, margin: '0 auto' }}
+        >
           <GoogleIcon />
           Continue with Google
         </Button>
@@ -827,7 +860,7 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
       </Modal>
-      <Footer />
+      <LandingFooter onNavigate={(path) => navigate(path)} />
     </PageWrapper>
   );
 };

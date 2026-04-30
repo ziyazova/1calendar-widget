@@ -148,6 +148,16 @@ const NavGroup = styled.div`
   gap: 12px;
 `;
 
+/* Legal column variant — single column stack (Privacy / Terms / Refund
+ * / Imprint each on their own row). Was 2×2 grid; reverted to one
+ * column per c_legal-stack ("в столбик один а не два") so all four
+ * links read as a tidy vertical list flush with the other Footer cols. */
+const LegalLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
 const NavTitle = styled.span`
   font-size: 12px;
   font-weight: 600;
@@ -261,8 +271,12 @@ export const BigFooter: React.FC<BigFooterProps> = ({ onNavigate, noDivider }) =
             </NavGroup>
             <NavGroup>
               <NavTitle>Legal</NavTitle>
-              <NavLink onClick={() => onNavigate('/privacy')}>Privacy</NavLink>
-              <NavLink onClick={() => onNavigate('/terms')}>Terms</NavLink>
+              <LegalLinks>
+                <NavLink onClick={() => onNavigate('/privacy')}>Privacy</NavLink>
+                <NavLink onClick={() => onNavigate('/terms')}>Terms</NavLink>
+                <NavLink onClick={() => onNavigate('/refund')}>Refund</NavLink>
+                <NavLink onClick={() => onNavigate('/legal')}>Imprint</NavLink>
+              </LegalLinks>
             </NavGroup>
           </FooterNav>
         </FooterTop>

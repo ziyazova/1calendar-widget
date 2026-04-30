@@ -13,7 +13,7 @@ import { useAuth } from '@/presentation/context/AuthContext';
 import { LoginModal } from '@/presentation/components/auth/LoginModal';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 import { useWidgetQuota } from '@/presentation/hooks/useWidgetQuota';
-import { useIsCompact } from '@/presentation/hooks/useIsMobile';
+import { useIsCompact, useIsPhone } from '@/presentation/hooks/useIsMobile';
 
 const PageContent = styled.div<{ $hide?: boolean }>`
   opacity: ${({ $hide }) => $hide ? 0 : 1};
@@ -199,9 +199,9 @@ const HeroTitle = styled.h1`
    * Bottom margin 20 carries the gap to HeroDesc; HeroDesc mobile
    * margin-top is 0 so spacing comes from one side only. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* 44 — back to the main landing's mobile headline size 1:1 (the
-     * brief −4 trim was reverted). line-height returned to 1.05 to
-     * match Headline exactly. */
+    /* Locked to spec: 44px / weight 700 / line-height 1.05 (≈46.2px) /
+     * letter-spacing -0.02em (≈-0.88px). Stays the hero voice — sized
+     * for impact, not for the smaller TemplatesPage section-title look. */
     font-size: 44px;
     font-weight: 700;
     line-height: 1.05;
@@ -349,7 +349,9 @@ const AuthLoginHint = styled.div`
   font-size: ${({ theme }) => theme.typography.sizes.md};
   color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.005em;
-  margin-top: 4px;
+  /* Was 4 — bumped to 8 so the link sits clear of the Google CTA above
+     (parent already has gap:8, total spacing reads ~16). */
+  margin-top: 8px;
 `;
 
 
@@ -516,8 +518,11 @@ const WidgetGalleryHeader = styled.div`
   gap: 24px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    /* Gutter token (20) — same as main landing. */
-    padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
+    /* Gutter token (20) — same as main landing. padding-bottom 24
+     * owns the chips → cards gap (was 0 — chips touched the grid).
+     * Per "фильтры в Explore widgets не имеют расстояния от карточек"
+     * (c_2026-04-29). */
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 24px;
     /* Title → filter chips: 24 (was titleToCards 28, −4 per request).
      * Local override — token left untouched so other sections that use
      * titleToCards keep their rhythm. */
@@ -552,18 +557,123 @@ const WidgetGalleryTitle = styled.h2`
 const WidgetGalleryFilterRow = styled(FilterRow)`
   margin-bottom: 0;
 
-  /* Phone — hide ONLY the trailing "Try for free" CTA (it duplicates
-   * the Hero CTA right above). FilterChip is also a button element,
-   * so the earlier child-button rule was eating the chips too.
-   * :last-child targets the SharedButton appended after the chip map. */
+  /* Phone — hide the entire filter row. Mobile users get a clean
+   * horizontal-scroll preview of widgets instead of a full filter
+   * UI. They can register / log in to use real filters. Mirrors the
+   * Top templates section on / per "сделать как Top Templates,
+   * фильтры скрываются, при растяжении появляются" (c_2026-04-29). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    & > button:last-child {
-      display: none;
-    }
+    display: none;
   }
 `;
 
 /* WidgetGalleryBtn — replaced by shared <Button $variant="primary" $size="md"> */
+
+/* Wide-phone / tablet (481-768) — Try for free sits next to the
+ * "Explore widgets" headline since the FilterRow is hidden in that
+ * range. Mirrors HeaderExploreSlot on / Top Templates. */
+const HeaderTryForFreeSlot = styled.div`
+  display: none;
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.sm} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    align-items: center;
+  }
+`;
+
+/* Landing-only horizontal-scroll gallery for /widgets logged-out
+ * mobile. Desktop matches WidgetGalleryGrid (3-col grid, padding
+ * 20/48/24). On phone the cards switch to a marquee-style scroll
+ * mirroring the Top templates section on /. Filters are hidden on
+ * mobile; they reappear when the viewport widens past md. Per "сделать
+ * такую же как Top Templates, ТОЛЬКО ТЕЛЕФОН" (c_2026-04-29). */
+const LandingMobileGallery = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 48px 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    display: flex;
+    flex-direction: row;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-left: ${({ theme }) => theme.layout.mobile.gutter};
+    padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 0;
+    gap: ${({ theme }) => theme.layout.mobile.cardGap};
+
+    &::-webkit-scrollbar { display: none; }
+    scrollbar-width: none;
+  }
+`;
+
+/* Landing card variant — extends WidgetGalleryCardWrap (which carries
+ * the surfaceAlt fill + shadow on mobile) with the marquee-card sizing
+ * (75vw + flex-shrink + scroll-snap-align). */
+const LandingMobileGalleryCard = styled.div<{ $i?: number }>`
+  background: #fff;
+  border: 1.5px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  overflow: hidden;
+  transition: all ${({ theme }) => theme.transitions.medium};
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.border.hairlineHover};
+    box-shadow: ${({ theme }) => theme.shadows.cardHover};
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    flex-shrink: 0;
+    /* 641-768 — fixed 240 width so 2-3 cards + a teaser fit in the
+     * marquee viewport. Mirrors TemplateCardWrap on / Top Templates
+     * (the 240 tablet-tier). Per "с 640 ширины пусть в горизонтале
+     * показывает чуть больше виджетов чем один" (c_2026-04-29). */
+    width: 240px;
+    scroll-snap-align: start;
+
+    &:hover {
+      transform: none;
+      box-shadow: ${({ theme }) => theme.shadows.mobileCard};
+    }
+  }
+
+  /* Phone (≤640) — 75vw with ~25% peek of the next card at the right
+   * edge. Same as TemplateCardWrap mobile-tier. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    width: 75vw;
+  }
+
+  /* Tag (calendar/clock/board) — bigger pill in the horizontal scroll
+   * mode (≤md). Default Tag mobile (10/2-8) reads thin against the
+   * larger card preview. Per "лейблы calendar/clock больше когда в
+   * горизонтальном скролле" (c_2026-04-29). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    ${Tag} {
+      padding: 5px 12px;
+      font-size: ${({ theme }) => theme.typography.sizes.sm};
+    }
+  }
+
+  /* Tablet-tier (641-768) — 3-card horizontal scroll, narrower 240
+   * cards. Tag scales down accordingly. Per "когда три в горизонтале
+   * надо меньше лейбл" (c_2026-04-29). */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.mobile} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    ${Tag} {
+      padding: 3px 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.xs};
+    }
+  }
+`;
 
 /* Top-of-image badge row inside a gallery card. Tag (calendar/clock/
  * board) sits on the left, optional Pro pill on the right. Flex with
@@ -717,6 +827,19 @@ const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
       font-size: ${({ theme }) => theme.typography.sizes.sm};
     }
   }
+
+  /* 1-в-ряд (≤600) — Tag drops to sm (12) with 4/11 padding. Earlier
+   * iteration scaled UP at this width per "чуть больше когда один в
+   * ряд", but the bigger label stole attention from the card content;
+   * latest ask: "лейблы все такие календарь часы и тд которые в
+   * карточках когда один в ряд надо меньше" (c_2026-04-29). At
+   * full-width the tag should read as a quiet category marker. */
+  @media (max-width: 600px) {
+    ${Tag} {
+      padding: 4px 11px;
+      font-size: ${({ theme }) => theme.typography.sizes.sm};
+    }
+  }
 `;
 
 const WidgetGalleryMeta = styled.div`
@@ -730,11 +853,14 @@ const WidgetGalleryMeta = styled.div`
   /* Compact card layout (≤1100, >600) — 3-col-narrow & 2-col cards
    * both stack title on top with a full-width button below.
    * Smaller button (height 30, padding 0/12, font sm 12) per "размер
-   * кнопки когда 2 и 3 в ряд тоже меньше" (c_2026-04-28). */
+   * кнопки когда 2 и 3 в ряд тоже меньше" (c_2026-04-28).
+   * gap 12 (was 8) — more breathing between title text and the button
+   * below per "у compact отступ от кнопки до текста чуть больше"
+   * (c_2026-04-29). */
   @media (max-width: 1100px) {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 12px;
     padding: 10px 10px 10px;
 
     & > button {
@@ -830,6 +956,9 @@ const ProHeroCard = styled.div`
    * solid block. Stops moved closer in hue too. */
   background: linear-gradient(150deg, #F6F4FF 0%, #F1EFFC 100%);
   border-radius: ${({ theme }) => theme.radii.xl};
+  /* Hairline outline — same recipe as the CTA card and HowItWorks
+   * mobile cards so all hero-tier surfaces share one edge treatment. */
+  border: 1px solid rgba(0, 0, 0, 0.05);
   /* Padding aligned with ComparisonHeader (18 20) so PRO/POPULAR row
    * sits at the same vertical inset as "WHAT YOU GET" header on the
    * card below — same horizontal rhythm too (20). Bottom kept at 24
@@ -908,24 +1037,24 @@ const ProHintLine = styled.p`
 
 const ComparisonCard = styled.div`
   background: #fff;
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  /* Same hairline as ProHeroCard / CTA / HowItWorks mobile cards so the
+   * pricing block reads as one family. Was border.light which was a
+   * touch heavier than the new mobile card treatment. */
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: ${({ theme }) => theme.radii.xl};
   overflow: hidden;
 `;
 
 const ComparisonHeader = styled.div`
-  /* Was muted gray uppercase on white — too quiet for the section's
-   * lead-in. Picked up the indigo accent + a soft lavender wash that
-   * matches the Pro column's tint below, so the header reads as the
-   * "what's in the table" headline rather than a label.
-   * Comment c_moh4nxzv: "давай чуть ярче, как-то привлекательней этот блок". */
+  /* Neutral header — body color (darker than tertiary) for stronger
+   * presence as the table lead-in. Was tertiary which read as faded. */
   padding: 18px 20px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.accent};
-  background: rgba(99, 102, 241, 0.06);
+  color: ${({ theme }) => theme.colors.text.body};
+  background: transparent;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
 `;
 
@@ -1293,6 +1422,10 @@ export const WidgetStudioPage: React.FC = () => {
    *   - Pro badge position: top-right inside the image (opposite the
    *     category Tag) at ≤1100, beside the title at >1100. */
   const isCompact = useIsCompact();
+  /* Narrow phone (≤480) — Customize on /widgets landing paints
+   * primary (black) per "до 480 кастомайз батоны будут темными"
+   * (c_2026-04-29). */
+  const isPhone = useIsPhone();
   const { open: openUpgrade } = useUpgradeModal();
   const quota = useWidgetQuota();
   const [nameModal, setNameModal] = useState<{ title: string; category: string; type: string; style: string } | null>(null);
@@ -1315,7 +1448,10 @@ export const WidgetStudioPage: React.FC = () => {
 
   const handleLaunch = useCallback(() => {
     setExpanding(true);
-    setTimeout(() => navigate('/studio'), 450);
+    /* "Launch" from /widgets goes to the dashboard — there's no widget
+       in editor state at this point, so /studio would just bounce back
+       via the dashboard guard. */
+    setTimeout(() => navigate('/dashboard'), 450);
   }, [navigate]);
 
   // If already logged in, show "Go to Studio" instead of auto-redirect
@@ -1495,7 +1631,7 @@ export const WidgetStudioPage: React.FC = () => {
                 </EmailRow>
                 {codeError && <CodeError>{codeError}</CodeError>}
                 <AuthDivider>or</AuthDivider>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', maxWidth: 318, margin: '0 auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%', maxWidth: 280, margin: '0 auto' }}>
                   <SharedButton $variant="secondary" $size="lg" onClick={() => loginWithGoogle()} style={{ width: '100%' }}>
                     <GoogleIcon />
                     Continue with Google
@@ -1525,11 +1661,21 @@ export const WidgetStudioPage: React.FC = () => {
             <WidgetGalleryTitle>
               {activeFilter === 'all' ? 'Explore widgets' : GALLERY_FILTERS.find(f => f.key === activeFilter)?.label || 'Widgets'}
             </WidgetGalleryTitle>
+            <HeaderTryForFreeSlot>
+              <SharedButton $variant="primary" $size="md" onClick={isLoggedIn ? handleLaunch : () => setLoginModalOpen(true)}>
+                {isLoggedIn ? 'Open Studio' : 'Try for free'} <ArrowRight />
+              </SharedButton>
+            </HeaderTryForFreeSlot>
           </WidgetGalleryTitleRow>
           <WidgetGalleryFilterRow>
             {GALLERY_FILTERS.map(f => (
               <FilterChip key={f.key} $active={activeFilter === f.key} onClick={() => setActiveFilter(f.key)}>
-                {f.label}
+                {/* Landing (logged-out) only — "All" reads as "Featured"
+                 * since the grid shows a curated 6-card preview (max 2
+                 * rows). The filter key stays 'all' so the slice/filter
+                 * logic continues to work. Per "заменить All на Featured
+                 * только в этом случае" (c_2026-04-29). */}
+                {f.key === 'all' ? 'Featured' : f.label}
               </FilterChip>
             ))}
             <SharedButton $variant="primary" $size="md" onClick={isLoggedIn ? handleLaunch : () => navigate('/login')} style={{ marginLeft: 'auto' }}>
@@ -1537,9 +1683,9 @@ export const WidgetStudioPage: React.FC = () => {
             </SharedButton>
           </WidgetGalleryFilterRow>
         </WidgetGalleryHeader>
-        <WidgetGalleryGrid>
+        <LandingMobileGallery>
           {(activeFilter === 'all' ? GALLERY_ITEMS.slice(0, 6) : GALLERY_ITEMS.filter(item => item.category === activeFilter)).map((item, i) => (
-            <WidgetGalleryCardWrap key={`${activeFilter}-${i}`} $i={i}>
+            <LandingMobileGalleryCard key={`${activeFilter}-${i}`} $i={i}>
               <div style={{ aspectRatio: '4/3', overflow: 'hidden', position: 'relative', background: '#FAFAF9' }}>
                 <Tag style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{item.category === 'calendar' ? 'calendar' : item.category === 'clock' ? 'clock' : 'board'}</Tag>
                 <GalleryImage src={item.image} alt={item.title} />
@@ -1551,12 +1697,15 @@ export const WidgetStudioPage: React.FC = () => {
                 </div>
                 {/* Not-logged-in users see Customize on pro widgets too — the
                      upgrade wall only appears once they have an account. The
-                     PRO badge sets the expectation without blocking try-outs. */}
-                <SharedButton $variant="secondary" $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
+                     PRO badge sets the expectation without blocking try-outs.
+                     Variant flips to primary (black) on narrow phone so the
+                     CTA reads as the dominant action when the card layout
+                     is single-column. */}
+                <SharedButton $variant={isPhone ? 'primary' : 'secondary'} $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
               </WidgetGalleryMeta>
-            </WidgetGalleryCardWrap>
+            </LandingMobileGalleryCard>
           ))}
-        </WidgetGalleryGrid>
+        </LandingMobileGallery>
         {/* Mobile "Try for free" CTA under the marquee was removed per
             comment c_mogfqr0m ("убери кнопку тут ток") — Hero's primary
             CTA + the Pricing CTA already provide enough conversion
@@ -1630,7 +1779,6 @@ export const WidgetStudioPage: React.FC = () => {
                   <ProPriceUnit>monthly</ProPriceUnit>
                 </ProPriceRow>
                 <ProCtaButton onClick={handleLaunch}>Start Pro — $4/mo</ProCtaButton>
-                <ProHintLine>Or stay on Free</ProHintLine>
               </ProHeroCard>
               <ComparisonCard>
                 <ComparisonHeader>What you get</ComparisonHeader>

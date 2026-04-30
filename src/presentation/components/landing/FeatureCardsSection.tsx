@@ -28,6 +28,10 @@ const FeatureStack = styled.div`
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
+    /* flex-start prevents shorter cards from stretching to match the
+     * tallest card in the row — was reading as awkward whitespace
+     * inside the cards with shorter copy ("растягивается по дурачки"). */
+    align-items: flex-start;
     /* Carousel matches TemplatesGallery: gutter on both sides of the
      * scroll port + scroll-padding-left so the snap rest position lines
      * up with the gutter (otherwise mandatory snap pulls the first
@@ -133,18 +137,27 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
      * surfaces share one corner radius. Desktop keeps radii['2xl'] (24)
      * unchanged. */
     border-radius: ${({ theme }) => theme.radii.lg};
-    /* Card fill = background.surfaceAlt — same DS tint that Testimonials
-     * cards use on phone (and the footer). Without it, white-on-white
-     * card-on-section blended into one block.
+    /* Card fill = background.elevated (white) so the per-card $color
+     * border reads cleanly against the section background. The previous
+     * surfaceAlt fill was muddying the colored border edge.
      * Comment c_mog9wiit: "карточку выделить, сливается — мб залить в
-     * цвет футера". */
-    background: ${({ theme }) => theme.colors.background.surfaceAlt};
-    border: 1px solid ${({ theme }) => theme.colors.border.light};
-    /* Mobile-card shadow token — unified with HowItWorks / Testimonials
-     * so all three landing card families read as one on phone.
-     * !important needed because the desktop box-shadow above is itself
-     * a function of $index/$activeIdx and would otherwise win specificity. */
-    box-shadow: ${({ theme }) => theme.shadows.mobileCard} !important;
+     * цвет футера" → resolved by colored outline instead of tinted fill. */
+    background: ${({ theme }) => theme.colors.background.elevated};
+    /* Border picks up each card's tab color (Functionality / Design /
+     * Payment) — same logic as desktop so the mobile outline echoes the
+     * tab dot. Soft 0.35 alpha keeps it readable without shouting. */
+    border: 1px solid ${({ $color }) => {
+      const hex = $color.replace('#', '');
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, 0.35)`;
+    }} !important;
+    /* Quiet single-layer shadow — was a heavier mobileCard token that
+     * fought with the new colored border. !important needed because
+     * the desktop box-shadow above is itself a function of $index/
+     * $activeIdx and would otherwise win specificity. */
+    box-shadow: 0 1px 2px rgba(26, 22, 19, 0.03), 0 6px 16px -6px rgba(26, 22, 19, 0.06) !important;
   }
 `;
 
@@ -165,16 +178,21 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   color: ${({ theme }) => theme.colors.text.primary};
 
   /* Mobile — fixed window-style header: 44 height, 16 horizontal.
-   * Tab title text uses base body color (dark, but not too dark) —
-   * the dot still carries the per-card $color identity (FeatureTabDot
-   * reads $color directly). Reverted from per-card-colored title.
-   * Comment c_mogaqemw: "тeкст всё-таки тёмный базовый, но не сильно
-   * тёмный". */
+   * Tab title text uses a darkened version of the per-card $color
+   * (multiplied by 0.55) so each tab label echoes its dot but reads
+   * as a confident dark accent instead of a pastel. FeatureTabTitle
+   * inherits this via color: inherit. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     height: 44px;
     padding: 0 16px;
     font-size: 12px;
-    color: ${({ theme }) => theme.colors.text.body};
+    color: ${({ $color }) => {
+      const hex = $color.replace('#', '');
+      const r = Math.round(parseInt(hex.slice(0, 2), 16) * 0.55);
+      const g = Math.round(parseInt(hex.slice(2, 4), 16) * 0.55);
+      const b = Math.round(parseInt(hex.slice(4, 6), 16) * 0.55);
+      return `rgb(${r}, ${g}, ${b})`;
+    }};
     min-width: 0;
 
     > *:first-of-type ~ * {
@@ -219,7 +237,11 @@ const FeatureCardBody = styled.div`
   display: flex;
   align-items: stretch;
   gap: 68px;
-  padding: 0 0 0 36px;
+  /* padding-left 40 (was 36, +4) — overall body content area shrinks
+   * by 4px on desktop. Combined with the text column +4 below, image
+   * area gives up 8px to text + outer trim. Mobile padding override
+   * below stays untouched. */
+  padding: 0 0 0 40px;
   flex: 1;
 
   /* Mobile — symmetric 20 padding box (top/right/bottom/left). */
@@ -231,7 +253,11 @@ const FeatureCardBody = styled.div`
 `;
 
 const FeatureCardText = styled.div`
-  flex: 0 0 calc(36% - 48px);
+  /* Text column iteratively widened on desktop: 48 → 44 → 38 (+10
+   * from original). The body needed the room for "Automations,
+   * dashboards, pre-filled sections. Ready the moment you open it."
+   * to wrap better. Image flex:1 absorbs the lost width. */
+  flex: 0 0 calc(36% - 38px);
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -258,7 +284,7 @@ const FeatureCardTitle = styled.h3`
 `;
 
 const FeatureCardDesc = styled.p`
-  font-size: 13px;
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.65;
   margin: 0;

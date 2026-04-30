@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+const PHONE_BREAKPOINT = 480;
 const MOBILE_BREAKPOINT = 768;
 const TABLET_BREAKPOINT = 1024;
 const COMPACT_BREAKPOINT = 1100;
@@ -36,4 +37,11 @@ export function useIsTablet(): boolean {
  *  button on wider screens. */
 export function useIsCompact(): boolean {
   return useMediaQuery(`(max-width: ${COMPACT_BREAKPOINT}px)`);
+}
+
+/** Narrow phone — true at ≤480px (sm breakpoint). Used to swap button
+ *  variants where the dense single-column layout calls for a darker
+ *  CTA, e.g. /widgets landing Customize → primary at this width. */
+export function useIsPhone(): boolean {
+  return useMediaQuery(`(max-width: ${PHONE_BREAKPOINT}px)`);
 }

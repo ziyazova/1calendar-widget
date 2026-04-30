@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, Sparkles } from 'lucide-react';
+import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, Sparkles, ShoppingBag, LayoutGrid, LayoutTemplate, Calendar } from 'lucide-react';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
@@ -21,6 +21,7 @@ import {
   DropdownDivider,
   DropdownSpacer,
   DropdownMenuGroup,
+  DropdownItem,
   ProPlanRow,
   ProPlanLabel,
   ProManageLink,
@@ -47,10 +48,21 @@ const Nav = styled.nav`
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
   height: 78px;
   padding-top: env(safe-area-inset-top, 0px);
+
+  /* Mobile — slimmer nav (74, was 78). NavInner switches to vertical
+     padding 0 + align-items:center so the logo / burger sit dead
+     centre in the smaller bar. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    height: 74px;
+  }
 `;
 
 const NavSpacer = styled.div`
   height: calc(71px + env(safe-area-inset-top, 0px));
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    height: calc(67px + env(safe-area-inset-top, 0px));
+  }
 `;
 
 const NavInner = styled.div`
@@ -63,7 +75,10 @@ const NavInner = styled.div`
   margin: 0 auto;
 
   ${media.mobile`
-    padding: 16px 24px;
+    /* Drop the asymmetric vertical padding (was 16) — height: 100%
+       + align-items: center already centers the row. Keeps content
+       perfectly centered in the slimmer 74px nav. */
+    padding: 0 20px;
   `}
 `;
 
@@ -155,42 +170,149 @@ const slideUp = keyframes`
   to { transform: translateY(0); }
 `;
 
-const MobileMenu = styled.div`
+/* Backdrop behind the new mobile menu — dims the page so the sheet
+   reads as an overlay surface, not a band. Sits below the menu but
+   above page content. Tap closes the menu. */
+const MobileMenuBackdrop = styled.div`
   position: fixed;
-  top: 57px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 99;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 16px 24px;
-  animation: ${fadeIn} 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0.18);
+  /* Stronger blur (was 2px) — page content behind the menu reads as
+     out-of-focus glass, makes the menu pop forward without needing
+     extra dim. Same value for both auth states. */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: ${fadeIn} 0.18s ease;
 `;
 
-const MobileLink = styled.button<{ $active?: boolean }>`
-  width: 100%;
-  text-align: left;
-  padding: 14px 16px;
+/* Edge-to-edge panel that slides down from under the nav — reads as a
+   continuation of the navbar (page-like), not a floating card. Sticks
+   to the viewport sides, only the bottom corners rounded so the seam
+   with the nav stays flush. Soft drop shadow at the bottom edge gives
+   it depth without competing with the page. NOT fullscreen — height is
+   content-driven up to a viewport cap, with internal scroll. */
+const MobileMenu = styled.div`
+  position: fixed;
+  top: calc(74px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.hairline};
+  border-radius: 0 0 ${({ theme }) => theme.radii.lg} ${({ theme }) => theme.radii.lg};
+  box-shadow: 0 16px 32px -8px rgba(0,0,0,0.10);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 74px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  animation: ${fadeIn} 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+`;
+
+const MobileMenuScroll = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 12px;
+`;
+
+/* Identity row — compact strip. Tightened down so the avatar + name +
+   email feel like a tidy header, not a hero. */
+const MobileMenuIdentity = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 8px 14px;
+`;
+
+const MobileMenuIdentityText = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* Headline → subtitle gap pulled out into the column so it's a
+     single source of truth — was a flaky margin-top on the email. */
+  gap: 3px;
+`;
+
+const MobileMenuName = styled.div`
   font-size: 14px;
-  font-weight: ${({ $active }) => $active ? '600' : '400'};
-  color: ${({ $active, theme }) => $active ? theme.colors.text.primary : theme.colors.text.body};
-  background: ${({ $active }) => $active ? 'rgba(0, 0, 0, 0.03)' : 'none'};
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const MobileMenuEmail = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.text.tertiary};
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+/* Hairline divider — full-bleed inside the scroll padding so groups
+   feel separated by structure, not by labels. Top margin shaved (4 vs
+   8) so the divider lifts up closer to the welcome / identity block
+   above. */
+const MobileMenuDivider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.colors.border.hairline};
+  margin: 4px 0 8px;
+`;
+
+/* Clean row — no icon bubble, no gradient, no chevron. Plain icon +
+   label, subtle hover/active fill, minimal motion. Mirrors how Linear
+   / Notion / Vercel handle nav lists on mobile. & + & adds a 4px
+   vertical gap between consecutive rows so Templates/Widgets/etc don't
+   feel mashed together (per c_dropdown-row-spacing). */
+const MobileLink = styled.button<{ $active?: boolean; $danger?: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 10px;
+  & + & { margin-top: 4px; }
+  font-size: 15px;
+  font-weight: 500;
+  color: ${({ $active, $danger, theme }) =>
+    $danger ? theme.colors.danger.strong
+    : $active ? theme.colors.text.primary
+    : theme.colors.text.body};
+  background: ${({ $active }) => $active ? 'rgba(0,0,0,0.04)' : 'none'};
   border: none;
   border-radius: ${({ theme }) => theme.radii.md};
   cursor: pointer;
   font-family: inherit;
-  letter-spacing: -0.01em;
-  transition: all ${({ theme }) => theme.transitions.fast};
+  letter-spacing: -0.015em;
+  text-align: left;
+  transition: background 140ms ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: ${({ $danger, theme }) => $danger ? theme.colors.danger.strong : theme.colors.text.tertiary};
+    stroke-width: 1.75;
+  }
 
   &:hover {
-    background: rgba(0, 0, 0, 0.03);
-    color: ${({ theme }) => theme.colors.text.primary};
+    background: ${({ $danger }) => $danger ? 'rgba(220, 40, 40, 0.05)' : 'rgba(0, 0, 0, 0.03)'};
   }
+`;
+
+const MobileMenuFooter = styled.div<{ $bordered?: boolean }>`
+  padding: 8px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  /* Border only when there's content above worth separating from the
+     CTAs (logged-in flow has account links right above). Guest flow
+     already shows the Log in / Sign up directly under the nav links —
+     a second hairline above the footer reads as a duplicate. */
+  ${({ $bordered, theme }) => $bordered && `border-top: 1px solid ${theme.colors.border.hairline};`}
 `;
 
 /* ── Cart ── */
@@ -522,6 +644,15 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
         <NavLinks>
           <NavLink $active={activeLink === 'templates'} onClick={() => navigate('/templates')}>Notion Templates</NavLink>
           <NavLink $active={activeLink === 'studio'} onClick={() => navigate('/widgets')}>Notion Widgets</NavLink>
+          {/* Dashboard — top-level entry to /studio for logged-in users.
+              Was previously hidden behind the avatar pill labeled
+              "Dashboard"; that pill actually opens the profile menu, so
+              clicking the label took 2 hops to reach the dashboard.
+              Split per "когда нав баре сверху текст Dashboard - но по
+              факту это профиль дропдаун" (c_2026-04-29). */}
+          {isLoggedIn && (
+            <NavLink $active={activeLink === 'dashboard'} onClick={() => navigate('/dashboard')}>Dashboard</NavLink>
+          )}
           {itemCount > 0 && <CartWrap ref={cartRef}>
             <CartButton aria-label="Cart" onClick={() => setCartOpen(!cartOpen)}>
               <ShoppingCart />
@@ -545,7 +676,9 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                 <PeachAvatar $size={30} $fontSize={11}>
                   {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                 </PeachAvatar>
-                Dashboard
+                {/* Pill is now a pure profile menu — Dashboard moved to
+                    its own NavLink above. No text label keeps the pill
+                    compact (avatar + chevron only). */}
                 <PillChevron $open={avatarOpen} />
               </AccountPill>
 
@@ -578,10 +711,10 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                   {!planLoading && !isPro && (
                     <Button
                       $variant="accent"
-                      $size="xl"
+                      $size="md"
                       $fullWidth
                       onClick={() => { setAvatarOpen(false); openUpgrade(); }}
-                      style={{ justifyContent: 'space-between', padding: '0 16px' }}
+                      style={{ justifyContent: 'space-between', padding: '0 14px', height: 38 }}
                     >
                       <UpgradeInner>
                         <Sparkles fill="currentColor" strokeWidth={1.5} />
@@ -593,41 +726,36 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
 
                   <DropdownSpacer />
 
+                  {/* Dashboard moved to NavLinks as a top-level entry —
+                      dropdown stays focused on account-only shortcuts:
+                      Purchases (your past orders) + Settings + Logout.
+                      Purchases deep-links into the dashboard's Purchases
+                      tab via ?tab=purchases (StudioPage syncs tab state
+                      with the search param). */}
                   <DropdownMenuGroup>
-                    <Button
-                      $variant="ghost"
-                      $size="md"
-                      $fullWidth
-                      onClick={() => { setAvatarOpen(false); navigate('/studio'); }}
-                      style={{ justifyContent: 'flex-start', gap: 12 }}
-                    >
-                      <Home />
-                      Dashboard
-                    </Button>
-                    <Button
-                      $variant="ghost"
-                      $size="md"
-                      $fullWidth
-                      onClick={() => { setAvatarOpen(false); navigate('/settings'); }}
-                      style={{ justifyContent: 'flex-start', gap: 12 }}
-                    >
+                    <DropdownItem onClick={() => { setAvatarOpen(false); navigate('/dashboard?tab=widgets'); }}>
+                      <LayoutGrid />
+                      My Widgets
+                    </DropdownItem>
+                    <DropdownItem onClick={() => { setAvatarOpen(false); navigate('/dashboard?tab=purchases'); }}>
+                      <ShoppingBag />
+                      Purchases
+                    </DropdownItem>
+                    <DropdownItem onClick={() => { setAvatarOpen(false); navigate('/settings'); }}>
                       <Settings />
                       Settings
-                    </Button>
+                    </DropdownItem>
                   </DropdownMenuGroup>
 
                   <DropdownDivider />
 
-                  <Button
-                    $variant="ghostDanger"
-                    $size="md"
-                    $fullWidth
+                  <DropdownItem
+                    $danger
                     onClick={async () => { setAvatarOpen(false); await logout(); navigate('/'); }}
-                    style={{ justifyContent: 'flex-start', gap: 12 }}
                   >
                     <LogOut />
                     Log out
-                  </Button>
+                  </DropdownItem>
                 </AccountDropdown>
               )}
             </AccountPillWrap>
@@ -661,19 +789,143 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
     )}
 
     {menuOpen && (
-      <MobileMenu>
-        <MobileLink $active={activeLink === 'templates'} onClick={() => handleNav('/templates')}>Notion Templates</MobileLink>
-        <MobileLink $active={activeLink === 'studio'} onClick={() => handleNav('/widgets')}>Notion Widgets</MobileLink>
-        <Button
-          $variant="primary"
-          $size="xl"
-          $fullWidth
-          style={{ marginTop: 12 }}
-          onClick={() => handleNav(isLoggedIn ? '/studio' : '/login')}
-        >
-          {isLoggedIn ? 'Studio' : 'Log in'}
-        </Button>
-      </MobileMenu>
+      <>
+        <MobileMenuBackdrop onClick={() => setMenuOpen(false)} />
+        <MobileMenu role="menu">
+          <MobileMenuScroll>
+            {/* Top strip — identity for logged-in users, welcome copy
+                for guests. Both sit in the same MobileMenuIdentity slot
+                so the menu always opens with a "who you are / who you
+                could be" anchor instead of jumping straight into nav. */}
+            {!isLoggedIn && (
+              <>
+                <MobileMenuIdentity>
+                  <MobileMenuIdentityText>
+                    {/* Slightly larger + muted (tertiary) — reads as a
+                        passive greeting, not an active heading. */}
+                    <MobileMenuName style={{ fontSize: 16, color: 'rgba(0,0,0,0.7)', fontWeight: 500 }}>
+                      Welcome to Peachy
+                    </MobileMenuName>
+                    <MobileMenuEmail>Sign in or create an account</MobileMenuEmail>
+                  </MobileMenuIdentityText>
+                </MobileMenuIdentity>
+                <MobileMenuDivider />
+              </>
+            )}
+            {isLoggedIn && (
+              <>
+                <MobileMenuIdentity>
+                  <PeachAvatar $size={32} $fontSize={12}>
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </PeachAvatar>
+                  <MobileMenuIdentityText>
+                    <MobileMenuName>{user?.name || 'User'}</MobileMenuName>
+                    <MobileMenuEmail>{user?.email || ''}</MobileMenuEmail>
+                  </MobileMenuIdentityText>
+                  {/* Upgrade / Pro indicator — sits as a compact pill in
+                      the same row as the avatar + name + email so the
+                      identity strip carries the plan state inline,
+                      without a second full-width Upgrade row below. */}
+                  {!planLoading && !isPro && (
+                    <Button
+                      $variant="accent"
+                      $size="sm"
+                      onClick={() => { setMenuOpen(false); openUpgrade(); }}
+                      style={{ flexShrink: 0, padding: '0 12px', gap: 6, fontSize: 13 }}
+                    >
+                      <Sparkles fill="currentColor" strokeWidth={1.5} style={{ width: 13, height: 13 }} />
+                      Upgrade
+                    </Button>
+                  )}
+                  {!planLoading && isPro && (
+                    <ProManageLink
+                      onClick={() => { setMenuOpen(false); navigate('/settings'); }}
+                      style={{ flexShrink: 0 }}
+                    >
+                      Pro · Manage
+                    </ProManageLink>
+                  )}
+                </MobileMenuIdentity>
+
+                <MobileMenuDivider />
+              </>
+            )}
+
+            {/* Public navigation — visible to everyone. Hairline divider
+                between groups carries the structure, no labels needed. */}
+            <MobileLink
+              $active={activeLink === 'templates'}
+              onClick={() => handleNav('/templates')}
+            >
+              <Calendar />
+              Notion Templates
+            </MobileLink>
+            <MobileLink
+              $active={activeLink === 'studio'}
+              onClick={() => handleNav('/widgets')}
+            >
+              <LayoutTemplate />
+              Notion Widgets
+            </MobileLink>
+
+            {/* Account shortcuts — only for logged-in users, mirrors the
+                desktop dropdown's DropdownMenuGroup. */}
+            {isLoggedIn && (
+              <>
+                <MobileMenuDivider />
+                <MobileLink onClick={() => handleNav('/dashboard?tab=widgets')}>
+                  <LayoutGrid />
+                  My Widgets
+                </MobileLink>
+                <MobileLink onClick={() => handleNav('/dashboard?tab=purchases')}>
+                  <ShoppingBag />
+                  Purchases
+                </MobileLink>
+                <MobileLink onClick={() => handleNav('/settings')}>
+                  <Settings />
+                  Settings
+                </MobileLink>
+              </>
+            )}
+          </MobileMenuScroll>
+
+          {/* Footer pinned outside the scroll area so logout / login is
+              always reachable even on small viewports with long content. */}
+          <MobileMenuFooter $bordered={isLoggedIn}>
+            {isLoggedIn ? (
+              <MobileLink
+                $danger
+                onClick={async () => { setMenuOpen(false); await logout(); navigate('/'); }}
+              >
+                <LogOut />
+                Log out
+              </MobileLink>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Button
+                  $variant="primary"
+                  $size="lg"
+                  $fullWidth
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate('/login', { state: { signup: true } });
+                  }}
+                >
+                  Create account
+                </Button>
+                <Button
+                  $variant="secondary"
+                  $size="lg"
+                  $fullWidth
+                  onClick={() => handleNav('/login')}
+                >
+                  Log in
+                </Button>
+              </div>
+            )}
+          </MobileMenuFooter>
+        </MobileMenu>
+      </>
     )}
     </>
   );
