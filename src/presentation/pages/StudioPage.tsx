@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import styled, { keyframes, useTheme } from 'styled-components';
-import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, Type, Palette, LayoutDashboard, Wand2, ChevronLeft, ChevronDown } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, Type, Palette, LayoutDashboard, Wand2, ChevronLeft, ChevronDown, Sparkles } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -1842,17 +1842,33 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         {/* ── Widgets Tab ── */}
         {tab === 'widgets' && (
           <>
-            {/* Create new widget — gradient banner. Uses <BannerSurface>
-                token, single source of truth (also rendered live in DS). */}
-            <BannerSurface $mobile={isMobile}>
-              <div>
-                <BannerTitle>Create new widget</BannerTitle>
-                <BannerSub>Browse styles, customize and embed in Notion</BannerSub>
-              </div>
-              <BannerCta $fullWidth={isMobile} onClick={() => navigate('/widgets')}>
-                <Plus /> Browse widgets
-              </BannerCta>
-            </BannerSurface>
+            {/* Banner switches role at the Free 3-widget cap:
+                - Under cap → "Create new widget" (CTA → /widgets gallery)
+                - At cap (registered, !isPro, ≥3 widgets) → "Limit reached"
+                  with an Upgrade CTA. Customize buttons inside /widgets
+                  already swap to "Upgrade", so blocking the entry banner
+                  here closes the last create-path on the dashboard. */}
+            {isRegistered && !isPro && widgets.length >= 3 ? (
+              <BannerSurface $mobile={isMobile}>
+                <div>
+                  <BannerTitle>You've hit your widget limit</BannerTitle>
+                  <BannerSub>Upgrade to Pro for unlimited widgets and all styles</BannerSub>
+                </div>
+                <BannerCta $fullWidth={isMobile} onClick={() => openUpgrade()}>
+                  <Sparkles /> Upgrade to Pro
+                </BannerCta>
+              </BannerSurface>
+            ) : (
+              <BannerSurface $mobile={isMobile}>
+                <div>
+                  <BannerTitle>Create new widget</BannerTitle>
+                  <BannerSub>Browse styles, customize and embed in Notion</BannerSub>
+                </div>
+                <BannerCta $fullWidth={isMobile} onClick={() => navigate('/widgets')}>
+                  <Plus /> Browse widgets
+                </BannerCta>
+              </BannerSurface>
+            )}
 
             {/* Your widgets */}
             <SectionRow $noFiltersBelow={widgets.length < 6 || new Set(widgets.map(w => w.type)).size < 2}>

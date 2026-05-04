@@ -180,18 +180,20 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
      * скруглые у карточек" (telephone version). Desktop keeps
      * radii['2xl'] (24). */
     border-radius: ${({ theme }) => theme.radii.xl};
-    /* Transparent fill — per "оставь прозрачным фон не заливай ничем".
-     * The colored outline still reads against the page background. */
-    background: transparent;
+    /* Mobile fill = footer's surfaceAlt — soft warm tint that ties the
+     * carousel into the page's bottom rhythm. Image inside stays
+     * transparent so it doesn't read as a separate tinted block. */
+    background: ${({ theme }) => theme.colors.background.surfaceAlt};
     /* Border picks up each card's tab color (Functionality / Design /
      * Payment) — same logic as desktop so the mobile outline echoes the
-     * tab dot. Soft 0.35 alpha keeps it readable without shouting. */
-    border: 1px solid ${({ $color }) => {
+     * tab dot. 1.5px width + 0.45 alpha so the outline reads more
+     * confidently on the surfaceAlt fill (was 1px / 0.35). */
+    border: 1.5px solid ${({ $color }) => {
       const hex = $color.replace('#', '');
       const r = parseInt(hex.slice(0, 2), 16);
       const g = parseInt(hex.slice(2, 4), 16);
       const b = parseInt(hex.slice(4, 6), 16);
-      return `rgba(${r}, ${g}, ${b}, 0.35)`;
+      return `rgba(${r}, ${g}, ${b}, 0.45)`;
     }} !important;
     /* Quiet single-layer shadow — was a heavier mobileCard token that
      * fought with the new colored border. !important needed because
@@ -301,13 +303,13 @@ const FeatureCardText = styled.div`
 
   /* Mobile — text sits flush left under the tab. max-width caps the
    * line length so on wider mobile cards the title/desc don't stretch
-   * edge-to-edge. 24px padding all around. */
+   * edge-to-edge. 28px padding all around. */
   @media (max-width: 649px) {
     flex: 0 1 auto;
     align-self: flex-start;
     width: 100%;
     max-width: 320px;
-    padding: 24px;
+    padding: 28px;
   }
 `;
 
@@ -383,6 +385,11 @@ const FeatureCardImage = styled.div`
     @media (max-width: 649px) {
       transform: scale(1.06);
       transform-origin: center;
+      /* mix-blend-mode: multiply — white pixels in the widget mockup
+       * blend out against the card's surfaceAlt fill, so the screenshot
+       * reads as content sitting on the card surface, not on a separate
+       * white block. */
+      mix-blend-mode: multiply;
     }
   }
 
@@ -396,6 +403,8 @@ const FeatureCardImage = styled.div`
     aspect-ratio: 4 / 3;
     min-height: 0;
     border-radius: ${({ theme }) => theme.radii.lg};
+    /* Transparent — same as the card around it, so the image sits on
+     * the page background, not on a tinted block. */
     background: transparent;
   }
 `;
@@ -469,7 +478,7 @@ const FEATURE_CARDS = [
      * active color all read from this $color). */
     color: '#7FA96B',
     title: 'Built just for you.',
-    desc: 'Automations, dashboards, pre-filled sections. Ready the moment you open it.',
+    desc: 'Automations, dashboards, pre-filled sections — ready instantly.',
     image: '/feature-functionality.png',
   },
   {
