@@ -43,6 +43,26 @@ const Wrap = styled.div<{ $size: PlanUsageSize; $pro?: boolean }>`
     return $size === 'wide' ? '325px' : '206px';
   }};
   ${({ $pro, $size }) => $pro && $size === 'compact' && 'height: 50px;'}
+
+  /* Tablet (769–1024) — both compact + wide shrink so the upgrade card
+   * doesn't dominate the narrower viewport. Per "коробочку upgrade
+   * чуть меньше, не такую огромную для планшета". */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    ${({ $size, $pro }) =>
+      !$pro && $size === 'compact' &&
+      `
+        width: 200px;
+        padding: 6px 12px;
+        gap: 10px;
+      `}
+    ${({ $size, $pro }) =>
+      !$pro && $size === 'wide' &&
+      `
+        width: 320px;
+        padding: 10px 14px;
+        gap: 12px;
+      `}
+  }
 `;
 
 const Label = styled.div`
@@ -268,8 +288,13 @@ export const PlanUsageCard: React.FC<PlanUsageCardProps> = ({
       );
     }
     const left = Math.max(limit - used, 0);
+    /* Neutral grey instead of brand indigo — other platforms (Vercel,
+     * Linear, Notion, Figma) treat "you're on Free, here's how much
+     * is left" as quiet status text, not a brand accent. The accent
+     * tone is reserved for the at-limit upgrade CTA above. Per
+     * "акцентируется и путает на телефоне" (c_2026-05-05). */
     return (
-      <InlineText $tone="info">
+      <InlineText $tone="neutral">
         <strong>Free plan</strong>
         <span aria-hidden="true">·</span>
         <span>{left} {left === 1 ? 'widget' : 'widgets'} left</span>
@@ -314,7 +339,7 @@ export const PlanUsageCard: React.FC<PlanUsageCardProps> = ({
 
   return (
     <Wrap $size={$size}>
-      <UsageRing used={used} limit={limit} size={40} stroke={3.5} />
+      <UsageRing used={used} limit={limit} size={38} stroke={3.7} />
       <Label>
         <Eyebrow $atLimit={atLimit}>{atLimit ? 'Limit reached' : 'Widgets'}</Eyebrow>
         <Usage>

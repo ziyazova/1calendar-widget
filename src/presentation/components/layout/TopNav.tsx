@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Trash2, LogOut, Settings, Home, Sparkles, ShoppingBag, LayoutGrid, LayoutTemplate, Calendar } from 'lucide-react';
-import { useCart } from '@/presentation/context/CartContext';
+import { Menu, X, LogOut, Settings, Home, Sparkles, ShoppingBag, LayoutGrid, LayoutTemplate, Calendar } from 'lucide-react';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useUpgradeModal } from '@/presentation/context/UpgradeModalContext';
 import { media } from '@/presentation/themes/media';
@@ -80,6 +79,13 @@ const NavInner = styled.div`
        perfectly centered in the slimmer 74px nav. */
     padding: 0 20px;
   `}
+
+  /* 641–770 — drop horizontal padding to 0 so the logo + burger
+   * sit flush with viewport edges (the desktop 48 was crowding
+   * the row). Per "паддинги у верхней навигации убери у 640-770". */
+  @media (min-width: 641px) and (max-width: 770px) {
+    padding: 0 20px;
+  }
 `;
 
 const LogoRow = styled.div<{ $pressed?: boolean; $disabled?: boolean }>`
@@ -124,7 +130,11 @@ const NavLinks = styled.div`
   gap: 28px;
   flex-shrink: 0;
 
-  ${media.mobile`
+  /* Hide all the way through tablet (≤1024) — at 641–1024 the inline
+   * row crowds against the auth/cart cluster on the right and the
+   * burger version reads cleaner. Per "пусть в топ навигации будет
+   * телефонная версия до размеров планшета". */
+  ${media.tablet`
     display: none;
   `}
 `;
@@ -141,6 +151,12 @@ const NavLink = styled.button<{ $active?: boolean }>`
   transition: color ${({ theme }) => theme.transitions.fast};
   white-space: nowrap;
   &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
+
+  /* Tablet (641–820) — drop label size 13 → 12 to free the few pixels
+   * needed for all four nav items + auth/cart at this width. */
+  @media (min-width: 641px) and (max-width: 820px) {
+    font-size: 12px;
+  }
 `;
 
 /* ── Burger ── */
@@ -170,20 +186,26 @@ const slideUp = keyframes`
   to { transform: translateY(0); }
 `;
 
-/* Backdrop behind the new mobile menu — dims the page so the sheet
-   reads as an overlay surface, not a band. Sits below the menu but
-   above page content. Tap closes the menu. */
+/* Backdrop behind the mobile menu. On phones (≤640) the menu is an
+   edge-to-edge sheet so a dim+blur layer reads as a proper overlay.
+   On wide-phone / tablet (641–1024) the menu is a small card pinned to
+   the right; dimming the whole page there feels heavy, so the backdrop
+   becomes an invisible click-catcher (no fill, no blur) — the page
+   stays readable, only the menu floats over it. Tap still closes. */
 const MobileMenuBackdrop = styled.div`
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 98;
   background: rgba(0, 0, 0, 0.18);
-  /* Stronger blur (was 2px) — page content behind the menu reads as
-     out-of-focus glass, makes the menu pop forward without needing
-     extra dim. Same value for both auth states. */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   animation: ${fadeIn} 0.18s ease;
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 `;
 
 /* Edge-to-edge panel that slides down from under the nav — reads as a
@@ -207,6 +229,32 @@ const MobileMenu = styled.div`
   flex-direction: column;
   max-height: calc(100vh - 74px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   animation: ${fadeIn} 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Wide-phone / tablet (641–1024) — burger is still showing, but the
+   * viewport is wide enough that an edge-to-edge sheet feels wrong.
+   * Anchor the panel to the right (under the burger) as a floating
+   * card. Backdrop dim is suppressed at this breakpoint, so the card
+   * earns its presence via a heavier shadow, a subtle backdrop-filter
+   * on the card itself (blur the area behind ONLY the card, not the
+   * page), and a slightly darker border so the edge stays crisp on
+   * any underlying content. */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    top: calc(74px + 8px + env(safe-area-inset-top, 0px));
+    left: auto;
+    right: 12px;
+    width: 360px;
+    max-width: calc(100vw - 24px);
+    background: ${({ theme }) => theme.colors.background.elevated};
+    border: 1px solid ${({ theme }) => theme.colors.border.medium};
+    border-radius: ${({ theme }) => theme.radii.lg};
+    box-shadow:
+      0 2px 4px rgba(26, 22, 19, 0.06),
+      0 16px 32px -8px rgba(26, 22, 19, 0.16),
+      0 40px 72px -20px rgba(26, 22, 19, 0.22);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    max-height: calc(100vh - 90px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
 `;
 
 const MobileMenuScroll = styled.div`
@@ -529,7 +577,9 @@ const MobileRight = styled.div`
   align-items: center;
   gap: 4px;
 
-  ${media.mobile`
+  /* Show burger up through tablet (≤1024) — paired with NavLinks
+   * being hidden in the same range. */
+  ${media.tablet`
     display: flex;
   `}
 `;
@@ -538,40 +588,24 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
-  const cartRef = useRef<HTMLDivElement>(null);
-  const { items, itemCount, removeItem } = useCart();
   const { isLoggedIn, user, logout, isPro, planLoading } = useAuth();
   const { open: openUpgrade } = useUpgradeModal();
   const isLanding = location.pathname === '/';
-  // Reactive — recomputes on resize. Was a one-shot read of innerWidth, so
-  // rotating the device or resizing the window left isMobile stale and
-  // mismatched with the CSS media queries above.
-  const isMobile = useMediaQuery(MQ.MOBILE);
 
-  // Click-outside for the click-opened dropdowns (cart + account). Both open
-  // on click now — account was hover-only before, which made the two menus
-  // behave differently on desktop. Mobile cart uses a bottom sheet, which has
-  // its own backdrop, so we skip the listener there.
+  // Click-outside for the avatar dropdown.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (cartOpen && cartRef.current && !cartRef.current.contains(target)) {
-        setCartOpen(false);
-      }
       if (avatarOpen && avatarRef.current && !avatarRef.current.contains(target)) {
         setAvatarOpen(false);
       }
     };
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      if (cartOpen) setCartOpen(false);
-      if (avatarOpen) setAvatarOpen(false);
+      if (e.key === 'Escape' && avatarOpen) setAvatarOpen(false);
     };
-    const needsListener = (cartOpen && !isMobile) || avatarOpen;
-    if (needsListener) {
+    if (avatarOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleEsc);
     }
@@ -579,7 +613,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEsc);
     };
-  }, [cartOpen, avatarOpen, isMobile]);
+  }, [avatarOpen]);
 
   const handleLogo = () => {
     setMenuOpen(false);
@@ -595,43 +629,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
     setMenuOpen(false);
     navigate(path);
   };
-
-  const total = items.reduce((sum, item) => {
-    const num = parseFloat(item.price.replace('$', ''));
-    return sum + (isNaN(num) ? 0 : num);
-  }, 0);
-
-  const cartItems = (
-    <>
-      {items.length === 0 ? (
-        <CartEmpty>Your cart is empty</CartEmpty>
-      ) : (
-        <>
-          {items.map(item => (
-            <CartItemRow key={item.id}>
-              <CartItemImage>
-                <img src={item.image} alt={item.title} />
-              </CartItemImage>
-              <CartItemInfo>
-                <CartItemTitle>{item.title}</CartItemTitle>
-                <CartItemPrice>{item.price}</CartItemPrice>
-              </CartItemInfo>
-              <CartRemoveBtn onClick={() => removeItem(item.id)} aria-label="Remove">
-                <Trash2 />
-              </CartRemoveBtn>
-            </CartItemRow>
-          ))}
-          <CartFooter>
-            <CartTotal>
-              <span>Total</span>
-              <CartTotalValue>{total === 0 ? 'Free' : `$${total.toFixed(2)}`}</CartTotalValue>
-            </CartTotal>
-            <Button $variant="primary" $size="lg" $fullWidth onClick={() => { setCartOpen(false); navigate('/checkout'); }}>Checkout</Button>
-          </CartFooter>
-        </>
-      )}
-    </>
-  );
 
   return (
     <>
@@ -653,18 +650,8 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
           {isLoggedIn && (
             <NavLink $active={activeLink === 'dashboard'} onClick={() => navigate('/dashboard')}>Dashboard</NavLink>
           )}
-          {itemCount > 0 && <CartWrap ref={cartRef}>
-            <CartButton aria-label="Cart" onClick={() => setCartOpen(!cartOpen)}>
-              <ShoppingCart />
-              <CartBadge>{itemCount}</CartBadge>
-            </CartButton>
-            {cartOpen && (
-              <CartDropdown>
-                <CartHeader>Cart ({itemCount})</CartHeader>
-                {cartItems}
-              </CartDropdown>
-            )}
-          </CartWrap>}
+          {/* Cart removed entirely per "корзины не будет, убери".
+              Per project_no_cart memory. */}
           {isLoggedIn ? (
             <AccountPillWrap ref={avatarRef}>
               <AccountPill
@@ -710,7 +697,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
 
                   {!planLoading && !isPro && (
                     <Button
-                      $variant="accent"
+                      $variant="upgrade"
                       $size="md"
                       $fullWidth
                       onClick={() => { setAvatarOpen(false); openUpgrade(); }}
@@ -764,10 +751,6 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
           )}
         </NavLinks>
         <MobileRight>
-          <CartButton aria-label="Cart" onClick={() => setCartOpen(!cartOpen)}>
-            <ShoppingCart />
-            {itemCount > 0 && <CartBadge>{itemCount}</CartBadge>}
-          </CartButton>
           <BurgerButton aria-label={menuOpen ? 'Close menu' : 'Open menu'} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X /> : <Menu />}
           </BurgerButton>
@@ -776,17 +759,7 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
     </Nav>
     <NavSpacer />
 
-    {/* Mobile cart bottom sheet */}
-    {cartOpen && isMobile && (
-      <>
-        <CartOverlay onClick={() => setCartOpen(false)} />
-        <CartSheet>
-          <CartSheetHandle />
-          <CartHeader>Cart ({itemCount})</CartHeader>
-          {cartItems}
-        </CartSheet>
-      </>
-    )}
+    {/* Cart removed entirely per "корзины не будет" + project_no_cart. */}
 
     {menuOpen && (
       <>

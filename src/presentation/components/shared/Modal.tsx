@@ -62,6 +62,7 @@ const Overlay = styled.div`
 `;
 
 const Dialog = styled.div<{ $size: 'sm' | 'md' | 'lg' | 'xl' }>`
+  position: relative;
   background: ${({ theme }) => theme.colors.background.elevated};
   border-radius: ${({ theme }) => theme.radii.xl};
   box-shadow: ${({ theme }) => theme.shadows.modal};
@@ -72,6 +73,33 @@ const Dialog = styled.div<{ $size: 'sm' | 'md' | 'lg' | 'xl' }>`
   display: flex;
   flex-direction: column;
   animation: ${slideUp} 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+`;
+
+/* Floating close button — used when the modal has no title/eyebrow header
+ * (e.g. <LoginModal>). Sits in the top-right corner without consuming
+ * layout space, so the modal content sits flush at the body padding edge
+ * instead of being pushed down by an empty Header row. */
+const FloatingCloseBtn = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: none;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text.body};
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: background ${({ theme }) => theme.transitions.fast}, color ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.interactive.hover};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
 `;
 
 const Header = styled.div`
@@ -214,7 +242,7 @@ export function Modal({
   return (
     <Overlay onClick={handleOverlayClick}>
       <Dialog $size={size} role="dialog" aria-modal="true" aria-label={title}>
-        {(title || eyebrow || !hideClose) && (
+        {(title || eyebrow) ? (
           <Header>
             <TitleWrap>
               {eyebrow && <Eyebrow $tone={eyebrowTone}>{eyebrow}</Eyebrow>}
@@ -227,7 +255,11 @@ export function Modal({
               </CloseBtn>
             )}
           </Header>
-        )}
+        ) : !hideClose ? (
+          <FloatingCloseBtn onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </FloatingCloseBtn>
+        ) : null}
         <Body>{children}</Body>
       </Dialog>
     </Overlay>

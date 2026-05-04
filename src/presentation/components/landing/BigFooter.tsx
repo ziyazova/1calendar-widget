@@ -51,6 +51,14 @@ const FooterWrapper = styled.footer`
      * via the wrapper Section's padding-top token. */
     padding: 2px ${({ theme }) => theme.layout.mobile.gutter} 0;
   }
+
+  /* Tablet — extra right padding (48 → 72) so the right-aligned
+   * Legal column doesn't sit flush with the viewport edge. Left
+   * stays at 48 to keep the brand block's existing position. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 53px 72px 0 48px;
+  }
 `;
 
 const FooterTop = styled.div`
@@ -193,6 +201,13 @@ const FooterBottomWrapper = styled.div`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 16px;
+  }
+
+  /* Tablet — match FooterWrapper's right padding so the copyright
+   * row aligns with the brand block above. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 0 72px 41px 48px;
   }
 `;
 

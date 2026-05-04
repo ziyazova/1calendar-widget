@@ -44,7 +44,7 @@ const PanelContainer = styled.div<{ $mobileOpen?: boolean }>`
   z-index: ${({ theme }) => theme.zIndex.sticky};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    width: 240px;
+    width: 272px;
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
@@ -74,6 +74,13 @@ const PanelHeader = styled.div`
      = 80px. */
   padding: 80px 32px 16px 6px;
   border-bottom: none;
+
+  /* Tablet (≤lg) — bump left padding 6 → 10 so the title/badge nudge
+   * 4px right off the panel's flush-left edge. Per "чуть правее на 4
+   * пикселя или отступ слева 4". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    padding-left: 10px;
+  }
 `;
 
 const PanelTitle = styled.h2`
@@ -114,6 +121,12 @@ const PanelContent = styled.div`
 
   &::-webkit-scrollbar {
     width: 0;
+  }
+
+  /* Tablet (≤lg) — match PanelHeader: 4px more left padding so the body
+   * controls line up with the title above. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    padding-left: 10px;
   }
 `;
 

@@ -454,6 +454,47 @@ const HeroScene = styled.div`
      * Horizontal gutter token (20). */
     padding: 52px ${({ theme }) => theme.layout.mobile.gutter} 48px;
   }
+
+  /* Tablet + narrow/mid desktop (769–1339) — flex-center HeroCard at a
+   * fixed 660 height. From ≥1340 default 728 + padding-anchored layout.
+   * No align-items: collapses HeroCard's width otherwise. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 1339px) {
+    height: 660px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px;
+  }
+
+  /* No-widgets range (769–1029) — match the main landing's HeroSectionV2
+   * height: min-height 480 with symmetric vertical padding so both
+   * heroes occupy the same vertical slot when widgets are hidden. From
+   * 1030+ widgets reappear and the 660-tall slab from the rule above
+   * applies. Per "по высоте выровни с главным хиро" + "виджеты с 1030". */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    height: auto;
+    min-height: 480px;
+    padding: 36px 20px 36px;
+  }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.tablet} + 1px))
+    and (max-width: 1099px) {
+    height: auto;
+    min-height: 480px;
+    padding: 36px 48px 36px;
+  }
+
+  /* Narrow tablet (769–900) — taller fill band + symmetric 36 padding.
+   * Per "высоту хиро увеличь когда размер страницы 769–900". Bumped
+   * min-height 480 → 580 so the surfaceAlt slab reads more confidently
+   * at these tablet widths. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 900px) {
+    min-height: 610px;
+    padding: 36px 20px 36px;
+  }
 `;
 
 const FloatingWidget = styled.div<{ $left?: string; $right?: string; $top: string; $delay: string; $anim: number }>`
@@ -494,12 +535,55 @@ const FloatingWidget = styled.div<{ $left?: string; $right?: string; $top: strin
   animation-delay: ${({ $delay }) => $delay};
   will-change: transform;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    width: 140px;
+  /* Phone + tablet + narrow desktop (≤1099) — hide floating widgets.
+   * From 1100+ widgets reappear on /widgets. Per "только у страницы с
+   * виджетами хиро виджеты с 1100". */
+  @media (max-width: 1099px) {
+    display: none;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    display: none;
+  /* Tablet + narrow/mid desktop (769–1339) — fixed-size override.
+   * Cards 200px wide, 24px from viewport edge, bottom widgets compressed
+   * to top: 280. From ≥1340 the original inline widths + negative
+   * offsets read correctly. NOTE: superseded by the ≤1240 hide above
+   * within its overlap; only 1241–1339 actually shows the override. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 1339px) {
+    width: 200px !important;
+    ${({ $left }) => $left && `left: 24px;`}
+    ${({ $right }) => $right && `right: 24px;`}
+    ${({ $top }) => {
+      const num = parseInt($top, 10);
+      return num > 200 ? `top: 280px;` : '';
+    }}
+  }
+
+  /* Narrow tablet (769–840) — push slightly closer to the viewport edge
+   * (8 vs 24) and shrink ~5% (200 → 190) so the cards sit further from
+   * the centered headline at narrow widths. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 840px) {
+    width: 182px !important;
+    ${({ $left }) => $left && `left: 8px;`}
+    ${({ $right }) => $right && `right: 8px;`}
+  }
+
+  /* Wide tablet / narrow desktop (1020–1339) — bump ~7% (200 → 215) so
+   * the cards have more visual presence at these wider viewports
+   * without yet being at full desktop size. */
+  @media (min-width: 1020px) and (max-width: 1339px) {
+    width: 215px !important;
+  }
+
+  /* 1100–1339 — drop all four widgets 10px lower so they don't crowd
+   * the headline at this newly-shown range. Per "с 1100 до 1340 виджеты
+   * нижние и верхние на 10 пикселей ниже". 1340+ keeps the original
+   * positions untouched. */
+  @media (min-width: 1100px) and (max-width: 1339px) {
+    ${({ $top }) => {
+      const num = parseInt($top, 10);
+      return num > 200 ? `top: 300px;` : `top: ${num + 10}px;`;
+    }}
   }
 `;
 
@@ -534,7 +618,7 @@ const WidgetGalleryHeader = styled.div`
 
 const WidgetGalleryTitleRow = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
 `;
 
@@ -551,6 +635,11 @@ const WidgetGalleryTitle = styled.h2`
     font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+  }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
   }
 `;
 
@@ -633,11 +722,6 @@ const LandingMobileGalleryCard = styled.div<{ $i?: number }>`
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
     box-shadow: ${({ theme }) => theme.shadows.mobileCard};
     flex-shrink: 0;
-    /* 641-768 — fixed 240 width so 2-3 cards + a teaser fit in the
-     * marquee viewport. Mirrors TemplateCardWrap on / Top Templates
-     * (the 240 tablet-tier). Per "с 640 ширины пусть в горизонтале
-     * показывает чуть больше виджетов чем один" (c_2026-04-29). */
-    width: 240px;
     scroll-snap-align: start;
 
     &:hover {
@@ -646,9 +730,33 @@ const LandingMobileGalleryCard = styled.div<{ $i?: number }>`
     }
   }
 
-  /* Phone (≤640) — 75vw with ~25% peek of the next card at the right
-   * edge. Same as TemplateCardWrap mobile-tier. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+  /* Progressive card widths so the visible-card count grows smoothly
+   * with the viewport — 1.25 → 1.55 → 2 → ~3 across the mobile/tablet
+   * range. Replaces the previous two-step 75vw / 240px rule which jumped
+   * from 1.25 cards at 620 straight to 2.5 at 641. Per "с 620 видеть
+   * больше полутора, дальше при скейле больше и больше пока не три".
+   * Each rule overrides the wider-bracket one above thanks to source order.
+   */
+
+  /* Tablet wide (721-768) — ~3 cards fit in the marquee. */
+  @media (min-width: 721px) and (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    width: 33vw;
+  }
+
+  /* Tablet narrow (621-720) — ~2 cards visible. */
+  @media (min-width: 621px) and (max-width: 720px) {
+    width: 45vw;
+  }
+
+  /* Phone wide (481-620) — ~1.55 cards visible (1 full + ~half peek)
+   * so the user sees clearly that more cards exist on the right. */
+  @media (min-width: 481px) and (max-width: 620px) {
+    width: 60vw;
+  }
+
+  /* Phone narrow (≤480) — 75vw with ~25% peek of the next card. Same
+   * recipe as TemplateCardWrap mobile-tier. */
+  @media (max-width: 480px) {
     width: 75vw;
   }
 
@@ -717,6 +825,11 @@ const LoggedInTitle = styled.h1`
   letter-spacing: -0.03em;
   margin: 0 0 10px;
 
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
+
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
@@ -756,9 +869,11 @@ const WidgetGalleryGrid = styled.div`
     align-items: start;
   }
 
-  /* Phone (≤600) — single-column grid. Breakpoint bumped from sm (480)
-   * to 600 per "2 в ряд пусть будет после 600" (c_2026-04-28). */
-  @media (max-width: 600px) {
+  /* Phone (≤499) — single-column grid. Breakpoint dropped from 600 to
+   * 499 to mirror /studio's WidgetGrid: 500–680 stays 2-col so the
+   * gallery matches the saved-widgets section's tablet rhythm. Per
+   * "сделаем такую же логику, оставим лейблы". */
+  @media (max-width: 499px) {
     grid-template-columns: 1fr;
     column-gap: 0;
     row-gap: 20px;
@@ -800,13 +915,26 @@ const WidgetGalleryCardWrap = styled.div<{ $i?: number }>`
   }
 
   /* Tag (calendar/clock/board) sizing:
-   *  - ≤768 (1-кол + 2-кол): sm 12, padding 5/12
+   *  - ≤499 (1-кол): sm 12, padding 5/12 (default mobile rule below)
+   *  - 500-620 (2-кол narrow): xs 11, padding 3/10 — cards are tight in
+   *    this range so labels need to shrink to match, otherwise the tag
+   *    eats the image's top-left corner. Per "с 500 до 620 лейбл меньше"
+   *    (c_2026-05-04).
    *  - 769-1100 (3-кол compact): xs 11, padding 3/10 — narrower cards,
-   *    Tag should be more compact. Pro pill matches via Label[size="xs"]
-   *    which already runs smaller; bumped a touch tighter via the
-   *    descendant Label override below. Per "769-1100 — лейблы
-   *    календарь и про надо меньше" (c_2026-04-28).
+   *    Tag should be more compact.
    *  - >1100: default Tag (no override). */
+  @media (min-width: 500px) and (max-width: 620px) {
+    ${Tag} {
+      padding: 3px 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.xs};
+    }
+    ${CardBadgeRow} > span:nth-child(2) {
+      padding: 0 7px;
+      font-size: 9px;
+      height: 16px;
+    }
+  }
+
   @media (min-width: 769px) and (max-width: 1100px) {
     ${Tag} {
       padding: 3px 10px;
@@ -873,11 +1001,10 @@ const WidgetGalleryMeta = styled.div`
     }
   }
 
-  /* Phone (≤600) — 1-col grid → title and button on the same row.
-   * Per "2 в ряд после 600" (c_2026-04-28). Customize variant swap
-   * to "primary" (black) is done in JSX via useIsMobile, so no color
-   * overrides here — only size. */
-  @media (max-width: 600px) {
+  /* Phone (≤499) — 1-col grid → title and button on the same row.
+   * Customize variant swap to "primary" (black) is done in JSX via
+   * useIsMobile, so no color overrides here — only size. */
+  @media (max-width: 499px) {
     flex-direction: row;
     align-items: center;
     gap: 8px;
@@ -902,6 +1029,15 @@ const WidgetGalleryMeta = styled.div`
       justify-content: center;
     }
   }
+
+  /* Previously: a 640–768 override flipped the meta back to a row layout
+   * inside this range, but inside the logged-out marquee (LandingMobileGallery)
+   * the cards are narrow at 640+ and the row layout cramped the title
+   * against the button. The column layout from the ≤1100 rule now applies
+   * uninterrupted from 500 to 1100, so the card meta layout no longer
+   * shifts when crossing 640 — only when crossing 1100 (column → default
+   * row). Per "лейаут карточки не должен меняться при 640, пусть остаётся
+   * до 770+". */
 `;
 
 const WidgetGalleryCardTitle = styled.span`
@@ -1248,6 +1384,11 @@ const PricingTitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0 0 8px;
 
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
+
   /* Mobile — sectionHeadline tokens (24/600/1). */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
@@ -1526,7 +1667,17 @@ export const WidgetStudioPage: React.FC = () => {
                 {(item.pro && !quota.isPro) || quota.atLimit ? (
                   <SharedButton $variant="upgrade" $size="sm" onClick={openUpgrade}><Sparkle /> Upgrade</SharedButton>
                 ) : (
-                  <SharedButton $variant={isCompact ? 'primary' : 'secondary'} $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
+                  /* Variant tied to LAYOUT, not just compact mode:
+                   * - Phone (≤480, isPhone) — meta is row, button is small
+                   *   AND next to the title → "primary" (black) reads as
+                   *   the dominant action.
+                   * - 500-1099 — meta drops button below the title (column,
+                   *   full-width). Black would be too heavy for a stacked
+                   *   block; "secondary" lets the title stay the anchor.
+                   * - ≥1100 — default secondary (frozen by user request).
+                   * Per "не делай чёрной когда кнопка спускается вниз,
+                   * только когда маленькая и напротив имени". */
+                  <SharedButton $variant={isPhone ? 'primary' : 'secondary'} $size="sm" onClick={() => startCustomize({ title: item.title, category: item.category, type: item.type, style: item.style })}><Pencil /> Customize</SharedButton>
                 )}
               </WidgetGalleryMeta>
             </WidgetGalleryCardWrap>

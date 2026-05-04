@@ -16,9 +16,24 @@ export function useDebugMode() {
         setEnabled(prev => !prev);
       }
     };
+    /* Custom event so non-keyboard surfaces (the dev panel "Debug
+       inspector" row in ClaudeFeedback) can toggle debug mode without
+       re-implementing the state. Dispatch from anywhere with
+       window.dispatchEvent(new Event('peachy:toggle-debug')). */
+    const handleToggle = () => setEnabled(prev => !prev);
     window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+    window.addEventListener('peachy:toggle-debug', handleToggle);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('peachy:toggle-debug', handleToggle);
+    };
   }, []);
+
+  /* Broadcast state changes so external surfaces (dev panel) can mirror
+     the active/inactive indicator without sharing the hook instance. */
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('peachy:debug-state', { detail: { enabled } }));
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled) return;

@@ -21,14 +21,20 @@ interface LoginModalProps {
   initialSignUp?: boolean;
 }
 
-/* Reset the Modal body's `gap: 16px` + `> * { margin: 0 }` rules. LoginFlow
-   ships its own vertical spacing (Title margin-bottom, Subtitle margin-bottom,
-   Divider margin, etc.) and is happiest left alone. */
+/* LoginFlow ships its own vertical spacing (Title margin-bottom, Subtitle
+   margin-bottom, Divider margin, etc.). Wrap it as a normal block so the
+   Modal body sees a SINGLE child — its `gap: 16px` and `> * { margin: 0 }`
+   apply only to FlowWrap (a no-op), letting LoginFlow's intentional margins
+   drive the spacing inside. Previously `display: contents` exposed every
+   LoginFlow element as a flex child of Body, which stacked the Body gap
+   (16) on top of each margin → headings drifted 20-30px apart. */
 const FlowWrap = styled.div`
-  display: contents;
-
-  /* Re-allow margins on direct children since the Modal body resets them */
-  > * { margin: revert; }
+  display: block;
+  width: 100%;
+  /* Modal Body has padding: 20px 24px 24px. Bump top and bottom so the
+   * dialog feels less cramped around the LoginFlow — final effective
+   * vertical padding 32 top / 36 bottom. */
+  padding: 12px 0 12px 0;
 `;
 
 /* Mobile sheet body — generous symmetric padding so LoginFlow content

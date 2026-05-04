@@ -58,6 +58,11 @@ const Title = styled.h2`
      * the landing (HowItWorks/Testimonials/CTA all use 8). */
     margin: 0 0 ${({ theme }) => theme.layout.mobile.titleToBody} 0;
   }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
 `;
 
 const Subtitle = styled.p`

@@ -4,14 +4,13 @@ import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-do
 import { TopNav } from '../components/layout/TopNav';
 import {
   PageWrapper,
-  LandingFooter,
   Button,
   Card,
   Modal,
   ModalFooter,
   GoogleIcon,
 } from '@/presentation/components/shared';
-import { Mail, Lock, Eye, EyeOff, Check, CheckCircle2, MailCheck, LogOut, ArrowRight, KeyRound } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Check, CheckCircle2, MailCheck, LogOut, ArrowRight, ArrowLeft, KeyRound } from 'lucide-react';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { hasSupabaseEnv } from '@/infrastructure/services/supabase';
 
@@ -20,11 +19,42 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 80px 24px 120px;
 
-  /* Phone — compact form per "тут чуть компактнее" (c_2026-04-29).
-   * 32 top + 48 bottom (was 48/80). Title→form rhythm tightens too
-   * via Subtitle margin-bottom override below. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: 32px 20px 48px;
+  /* Phone+tablet — vertically center the form. The tab/phone Login
+   * needed a true vertical center, plus a Back affordance (the
+   * MobileBackBtn rendered inside the Container, see below). */
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 24px 20px 48px;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+`;
+
+/* Back affordance — only on phone+tablet. Sticks to top-left of the
+ * Container above the centered form. Per "добавь назад кнопку на
+ * телефоне + на планшете тоже выровнить надо". */
+const MobileBackBtn = styled.button`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    margin: 0 0 16px -4px;
+    color: ${({ theme }) => theme.colors.text.body};
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+
+    svg { width: 14px; height: 14px; }
+    &:hover { color: ${({ theme }) => theme.colors.text.primary}; }
   }
 `;
 
@@ -38,7 +68,7 @@ const Title = styled.h1`
 
   /* Phone — sectionHeadline (24/600/1.2). 32 was too dominant on a
    * 375 viewport and pushed the form below into the fold. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
@@ -53,7 +83,7 @@ const Subtitle = styled.p`
 
   /* Phone — Subtitle → form gap 32 → 20 per "тут чуть компактнее"
    * (c_2026-04-29). */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     margin-bottom: 20px;
   }
 `;
@@ -146,7 +176,7 @@ const BottomText = styled.p`
   /* Phone — 16 (was 12, +4). User asked to push the "Don't have an
    * account?" link a touch lower from the Google CTA so it doesn't
    * stick to the button. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     margin-top: 16px;
   }
 `;
@@ -439,6 +469,9 @@ export const LoginPage: React.FC = () => {
       <PageWrapper>
         <TopNav logoSub="Account" />
         <Container>
+          <MobileBackBtn onClick={() => navigate(-1)}>
+            <ArrowLeft /> Back
+          </MobileBackBtn>
           <Card $variant="elevated" $padding="lg" $radius="lg" style={{ textAlign: 'center' }}>
             <SignedInAvatar>
               {auth.user?.avatarUrl ? (
@@ -457,7 +490,6 @@ export const LoginPage: React.FC = () => {
             </Button>
           </Card>
         </Container>
-        <LandingFooter onNavigate={(path) => navigate(path)} />
       </PageWrapper>
     );
   }
@@ -478,6 +510,9 @@ export const LoginPage: React.FC = () => {
       <PageWrapper>
         <TopNav logoSub="Account" />
         <Container>
+          <MobileBackBtn onClick={() => navigate(-1)}>
+            <ArrowLeft /> Back
+          </MobileBackBtn>
           <ConfirmCard>
             <ConfirmIcon><MailCheck /></ConfirmIcon>
             <div style={{ fontSize: 22, fontWeight: 600, color: theme.colors.text.primary, letterSpacing: '-0.02em' }}>
@@ -511,7 +546,6 @@ export const LoginPage: React.FC = () => {
             </div>
           </ConfirmCard>
         </Container>
-        <LandingFooter onNavigate={(path) => navigate(path)} />
       </PageWrapper>
     );
   }
@@ -569,6 +603,9 @@ export const LoginPage: React.FC = () => {
       <TopNav logoSub="Account" />
 
       <Container>
+        <MobileBackBtn onClick={() => navigate(-1)}>
+          <ArrowLeft /> Back
+        </MobileBackBtn>
         <Title>{isSignUp ? 'Create account' : 'Welcome back'}</Title>
         <Subtitle>{isSignUp ? 'Start your Peachy journey' : 'Log in to your Peachy account'}</Subtitle>
 
@@ -860,7 +897,6 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
       </Modal>
-      <LandingFooter onNavigate={(path) => navigate(path)} />
     </PageWrapper>
   );
 };

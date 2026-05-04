@@ -57,6 +57,20 @@ const TemplatesMarqueeWrap = styled.div`
     overscroll-behavior-x: contain;
     scroll-padding-left: 20px;
   `}
+
+  /* Tablet (769–1024) — left padding matches GalleryHeader / the rest of
+   * the landing's 48px gutter so the first card's left edge aligns with
+   * the section title. Right keeps a tighter 24px so the next card peeks
+   * cleanly into the mask-fade ("swipe for more" affordance). Without this
+   * the marquee was reading 24px to the left of the title — the whole
+   * row felt unaligned with the page rhythm. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 16px 24px 16px 48px;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scroll-padding-left: 48px;
+  }
 `;
 
 const GalleryHeader = styled.div`
@@ -103,6 +117,11 @@ const GalleryTitle = styled.h2`
     font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+  }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
   }
 `;
 
@@ -258,27 +277,23 @@ const TemplateCardWrap = styled.div`
     z-index: 2;
   }
 
-  /* Tablet — narrower card so 3 cards + a teaser of the 4th fit in
-   * the marquee viewport (was jumping straight from 300 to 200). */
+  /* Tablet (≤1024) — narrower card. Hover-scale disabled because
+   * touch devices fire :hover on tap and the whole card pulses, which
+   * reads as a stuck state. Inner image scale on tap is handled by
+   * TemplateMockupImage via :active. */
   ${media.tablet`
     width: 240px;
-  `}
-
-  /* Mobile — width 75vw so the next card peeks ~25% at the right
-   * edge (peek = scroll affordance). Snap-align start keeps the
-   * focused card flush to the section gutter.
-   * Hover scale disabled — on phone the desktop &:hover rule fires on
-   * tap and pulses the entire card, which reads as "the card was
-   * pressed" rather than "the content responded".
-   * Comment c_mog84l4d: "у телефона при нажатии увеличивается вся
-   * карточка, убери это". */
-  ${media.mobile`
-    width: 75vw;
-    scroll-snap-align: start;
 
     &:hover {
       transform: none;
     }
+  `}
+
+  /* Mobile (≤640) — width 75vw so the next card peeks ~25% at the
+   * right edge. Hover-scale already off via the tablet rule above. */
+  ${media.mobile`
+    width: 75vw;
+    scroll-snap-align: start;
   `}
 `;
 

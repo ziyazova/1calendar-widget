@@ -63,9 +63,13 @@ export const PurchaseImg = styled.div`
      image; surfaceMuted fills the leftover space when the natural
      aspect doesn't match. Per "картинка не входит в рамку — увеличь
      рамку и адаптируй контент" (c_2026-04-29). */
-  width: 88px;
+  /* Bumped width 88 → 96 + smaller radius (md=12 → sm=8) so portrait
+   * template screenshots show with less side-letterboxing while the
+   * visible corner reads as a quieter, more confident frame. Per
+   * "по ширине на пару пикселей больше + меньше скругления". */
+  width: 96px;
   height: 76px;
-  border-radius: ${({ theme }) => theme.radii.md};
+  border-radius: ${({ theme }) => theme.radii.sm};
   overflow: hidden;
   background: ${({ theme }) => theme.colors.background.surfaceMuted};
   flex-shrink: 0;
@@ -81,7 +85,7 @@ export const PurchaseImg = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    width: 72px;
+    width: 80px;
     height: 66px;
   }
 `;

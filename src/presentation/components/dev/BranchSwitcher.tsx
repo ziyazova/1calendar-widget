@@ -128,7 +128,11 @@ const spin = keyframes`
 
 const Bar = styled.div`
   position: fixed;
-  top: 88px;
+  /* Sits ABOVE the ClaudeFeedback DevPanel (bottom: 16px, ~280px tall
+   * with the Debug + Design system + 2 toolbar rows). 12px breathing
+   * gap between the two. Both anchored to the right edge so the dev
+   * cluster stacks cleanly in the bottom-right corner. */
+  bottom: 320px;
   right: 16px;
   display: flex;
   flex-direction: column;

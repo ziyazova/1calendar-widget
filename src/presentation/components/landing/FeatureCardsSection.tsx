@@ -9,18 +9,36 @@ const FeatureCardsSectionWrap = styled.section`
 
   /* Phone — break out of WidgetStudioSection's 20px gutter so the
    * carousel runs edge-to-edge (next card peeks at the right edge). */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 649px) {
     padding: 0;
     margin: 0 -20px;
     max-width: none;
+  }
+
+  /* Tablet — slightly narrower than desktop (880 vs 940) but wider
+   * than the first-pass 720 which read as cramped per user feedback.
+   * Cards keep desktop-like presence; text bumps already applied to
+   * Title/Desc give them a little extra weight. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    max-width: 880px;
   }
 `;
 
 const FeatureStack = styled.div`
   position: relative;
-  height: 624px;
+  /* aspect-ratio drives height so the stacked layout scales evenly
+   * with width — at narrower desktop/tablet widths the stack shrinks
+   * in lockstep with the cards instead of leaving a tall hollow box.
+   * 892 (max card width inside the 940 wrap) × 720 — fits the active
+   * card (892/560 aspect) plus the 2× peek-step (max(45px, 7.5%))
+   * with a touch of breathing room below at desktop widths. */
+  aspect-ratio: 892 / 720;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 649px) {
+    /* Mobile uses horizontal scroll-snap, not the desktop stack —
+     * reset the desktop aspect-ratio so flex children drive height. */
+    aspect-ratio: auto;
     height: auto;
     display: flex;
     gap: 12px;
@@ -28,10 +46,12 @@ const FeatureStack = styled.div`
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    /* flex-start prevents shorter cards from stretching to match the
-     * tallest card in the row — was reading as awkward whitespace
-     * inside the cards with shorter copy ("растягивается по дурачки"). */
-    align-items: flex-start;
+    /* stretch — every card matches the tallest sibling so the carousel
+     * row reads as a uniform set (same width via min(90vw, 400px) on
+     * the card; same height via this stretch). Per "они одной высоты
+     * и ширины на телефонной версии". The earlier flex-start kept
+     * shorter copy compact at the cost of a ragged row. */
+    align-items: stretch;
     /* Carousel matches TemplatesGallery: gutter on both sides of the
      * scroll port + scroll-padding-left so the snap rest position lines
      * up with the gutter (otherwise mandatory snap pulls the first
@@ -67,17 +87,28 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
   position: absolute;
   left: 0;
   right: 0;
-  height: 515px;
+  /* aspect-ratio drives height so the card scales evenly with width.
+   * 892 × 560 — bumped from 515 so cards read a touch taller on
+   * desktop/tablet per "по высоте чуть больше карточки". Mobile
+   * branch resets aspect-ratio: auto since cards are content-driven
+   * inside the horizontal scroll. */
+  aspect-ratio: 892 / 560;
   z-index: ${({ $index, $activeIdx, $total }) => {
     // circular distance behind active
     const behind = ($index - $activeIdx + $total) % $total;
     return behind === 0 ? $total + 1 : $total - behind;
   }};
+  /* Peek = 48px on desktop (≥650). Was 44 (FeatureCardTab nominal height)
+   * but the tab's actual rendered height is ~48 (14 top pad + 14px line
+   * × 1.5 line-height + 14 bottom pad ≈ 49) so the middle card's tab
+   * strip was being covered by 2-4px on the bottom. 48 keeps the full
+   * coloured strip visible without leaking body content. Mobile uses its
+   * own scroll layout — this only affects the desktop stack. */
   top: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
-    const base = ($total - 1) * 50;
-    const offset = behind === 0 ? ($index === 0 ? -2 : -5) : 0;
-    return `${base - behind * 50 + offset}px`;
+    const totalSteps = $total - 1;
+    const stepsForThis = totalSteps - behind;
+    return `${stepsForThis * 48}px`;
   }};
   transform: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
@@ -85,13 +116,17 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     const scaleVal = 1 - behind * 0.03;
     return `scale(${scaleVal})`;
   }};
+  /* Per-step horizontal inset bumped from 2.25% → 4% so the width
+   * difference between stacked cards reads clearly (back card sits
+   * 8% in from each side at desktop, ~36px). Per "разница между
+   * карточками по ширине более видимой когда друг за другом". */
   margin-left: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
-    return `${behind * 20}px`;
+    return `${behind * 4}%`;
   }};
   margin-right: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
-    return `${behind * 20}px`;
+    return `${behind * 4}%`;
   }};
   opacity: ${({ $index, $activeIdx, $total }) => {
     const behind = ($index - $activeIdx + $total) % $total;
@@ -109,19 +144,28 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     }};
     top: ${({ $index, $activeIdx, $total }) => {
       const behind = ($index - $activeIdx + $total) % $total;
-      const base = ($total - 1) * 50;
-      if (behind === 0) return `${base}px`;
-      return `${base - behind * 52 - 14}px`;
+      const totalSteps = $total - 1;
+      const stepsForThis = totalSteps - behind;
+      if (behind === 0) {
+        return `${totalSteps * 48}px`;
+      }
+      /* On hover back cards lift 10px so the user sees a small "lift"
+       * gesture, but the tab-only contract stays — no body leaks. */
+      return `${stepsForThis * 48 - 10}px`;
     }};
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 649px) {
     position: static;
     flex-direction: column;
     flex-shrink: 0;
-    /* 90vw card — wider focused card with a small (~10%) peek of the
-     * next card to signal scrollability without dominating. */
-    width: 90vw;
+    /* Reset the desktop aspect-ratio — mobile cards are content-driven
+     * (vertical stack of tab + body + image) and must auto-size. */
+    aspect-ratio: auto;
+    /* Card width — next card peeks ~4% on the right (was 6%, dropped
+     * because at certain widths the next card was reading too prominent).
+     * Formula: card = (vw − 32) / 1.04. 500px cap freezes look at ~545+. */
+    width: min(calc((100vw - 32px) / 1.04), 500px);
     height: auto;
     padding: 0;
     gap: 0;
@@ -132,17 +176,13 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     opacity: 1 !important;
     scroll-snap-align: start;
     overflow: hidden;
-    /* Mobile uses radii.lg (16) — generic content card token, same as
-     * HowItWorks step card and Testimonials card so all phone-card
-     * surfaces share one corner radius. Desktop keeps radii['2xl'] (24)
-     * unchanged. */
-    border-radius: ${({ theme }) => theme.radii.lg};
-    /* Card fill = background.elevated (white) so the per-card $color
-     * border reads cleanly against the section background. The previous
-     * surfaceAlt fill was muddying the colored border edge.
-     * Comment c_mog9wiit: "карточку выделить, сливается — мб залить в
-     * цвет футера" → resolved by colored outline instead of tinted fill. */
-    background: ${({ theme }) => theme.colors.background.elevated};
+    /* Mobile bumped to radii.xl (20) — softer corners per "углы более
+     * скруглые у карточек" (telephone version). Desktop keeps
+     * radii['2xl'] (24). */
+    border-radius: ${({ theme }) => theme.radii.xl};
+    /* Transparent fill — per "оставь прозрачным фон не заливай ничем".
+     * The colored outline still reads against the page background. */
+    background: transparent;
     /* Border picks up each card's tab color (Functionality / Design /
      * Payment) — same logic as desktop so the mobile outline echoes the
      * tab dot. Soft 0.35 alpha keeps it readable without shouting. */
@@ -175,24 +215,25 @@ const FeatureCardTab = styled.div<{ $color: string; $intensity?: number }>`
   gap: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
+  /* Tab label colour = per-card $color × 0.55 (darkened tone). Echoes
+   * the coloured dot/strip without going pastel-light, and stays readable
+   * over the soft tinted tab background. Applied at all viewports
+   * (desktop + mobile) so the colour treatment is consistent — the back
+   * cards in the desktop stack now read with their card-color label too,
+   * not the global dark text. FeatureTabTitle inherits via color: inherit. */
+  color: ${({ $color }) => {
+    const hex = $color.replace('#', '');
+    const r = Math.round(parseInt(hex.slice(0, 2), 16) * 0.55);
+    const g = Math.round(parseInt(hex.slice(2, 4), 16) * 0.55);
+    const b = Math.round(parseInt(hex.slice(4, 6), 16) * 0.55);
+    return `rgb(${r}, ${g}, ${b})`;
+  }};
 
-  /* Mobile — fixed window-style header: 44 height, 16 horizontal.
-   * Tab title text uses a darkened version of the per-card $color
-   * (multiplied by 0.55) so each tab label echoes its dot but reads
-   * as a confident dark accent instead of a pastel. FeatureTabTitle
-   * inherits this via color: inherit. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  /* Mobile — fixed window-style header: 44 height, 16 horizontal. */
+  @media (max-width: 649px) {
     height: 44px;
     padding: 0 16px;
     font-size: 12px;
-    color: ${({ $color }) => {
-      const hex = $color.replace('#', '');
-      const r = Math.round(parseInt(hex.slice(0, 2), 16) * 0.55);
-      const g = Math.round(parseInt(hex.slice(2, 4), 16) * 0.55);
-      const b = Math.round(parseInt(hex.slice(4, 6), 16) * 0.55);
-      return `rgb(${r}, ${g}, ${b})`;
-    }};
     min-width: 0;
 
     > *:first-of-type ~ * {
@@ -212,18 +253,12 @@ const FeatureTabDot = styled.span<{ $color: string }>`
 const FeatureTabTitle = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.text.primary};
+  /* Inherit colour from FeatureCardTab — that ancestor sets the tab
+   * label tone (per-card $color × 0.55) at every viewport, so the
+   * label here picks up the darkened card colour on both desktop and
+   * mobile instead of the previous global dark text on desktop. */
+  color: inherit;
   letter-spacing: -0.01em;
-
-  /* Mobile — inherit color from FeatureCardTab (now per-card $color) so
-   * each tab label echoes its dot. Weight 500 — slightly bolder than
-   * 400 so the per-card color reads with intent without competing with
-   * the card title.
-   * Comments: c_mog6wo8p ("приглушить") + c_mog9ycm3 ("чуть жирнее"). */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    color: inherit;
-    font-weight: 500;
-  }
 `;
 
 const FeatureTabActions = styled.div`
@@ -245,7 +280,7 @@ const FeatureCardBody = styled.div`
   flex: 1;
 
   /* Mobile — symmetric 20 padding box (top/right/bottom/left). */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 649px) {
     flex-direction: column;
     padding: 20px;
     gap: 0;
@@ -263,6 +298,17 @@ const FeatureCardText = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: center;
+
+  /* Mobile — text sits flush left under the tab. max-width caps the
+   * line length so on wider mobile cards the title/desc don't stretch
+   * edge-to-edge. 24px padding all around. */
+  @media (max-width: 649px) {
+    flex: 0 1 auto;
+    align-self: flex-start;
+    width: 100%;
+    max-width: 320px;
+    padding: 24px;
+  }
 `;
 
 const FeatureCardTitle = styled.h3`
@@ -273,13 +319,19 @@ const FeatureCardTitle = styled.h3`
   margin: 0 0 12px;
   line-height: 1.2;
 
-  /* Mobile — cardHeadline token (16/700/1.35). Tight 8 below for
-   * title→desc pair. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.cardHeadline.size};
+  /* Mobile — fixed 16px headline (locked, not clamped) so the heading
+   * reads at the same size on every phone width. */
+  @media (max-width: 649px) {
+    font-size: 16px;
     font-weight: ${({ theme }) => theme.typography.mobile.cardHeadline.weight};
     line-height: ${({ theme }) => theme.typography.mobile.cardHeadline.lineHeight};
     margin: 0 0 8px 0;
+  }
+
+  /* Narrow desktop-stack range (650–770) — title smaller (22 → 18) so
+   * it sits proportionally inside the narrower card column. */
+  @media (min-width: 650px) and (max-width: 770px) {
+    font-size: 18px;
   }
 `;
 
@@ -290,13 +342,20 @@ const FeatureCardDesc = styled.p`
   margin: 0;
   letter-spacing: -0.01em;
 
-  /* Mobile — cardBody token (14/400/1.5). 24 below sets desc → image. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
+  /* Mobile — fixed 14px body (locked, not clamped). Pairs with the 16px
+   * locked headline above for a stable 16/14 hierarchy on every phone. */
+  @media (max-width: 649px) {
+    font-size: 14px;
     font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
     line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
     color: ${({ theme }) => theme.colors.text.body};
-    margin: 0 0 24px 0;
+    margin: 0 0 8px 0;
+  }
+
+  /* Narrow desktop-stack range (650–770) — drop body 14 → 13 so it
+   * stays in proportion with the smaller title. */
+  @media (min-width: 650px) and (max-width: 770px) {
+    font-size: 13px;
   }
 `;
 
@@ -304,10 +363,13 @@ const FeatureCardImage = styled.div`
   flex: 1;
   min-width: 0;
   align-self: stretch;
-  margin: 40px 0 0 0;
+  /* % values keep the image's offset proportional to card width, so
+   * the picture stays in the same relative position as the card scales
+   * across 650px → 1200px. 4.5% ≈ 40px at the 892px reference width. */
+  margin: 2.25% 0 0 -4.5%;
   overflow: hidden;
   border: none;
-  background: ${({ theme }) => theme.colors.background.surfaceMuted};
+  background: transparent;
   position: relative;
   border-radius: ${({ theme }) => theme.radii['2xl']} 0 0 0;
 
@@ -317,19 +379,24 @@ const FeatureCardImage = styled.div`
     object-fit: cover;
     object-position: center;
     display: block;
+
+    @media (max-width: 649px) {
+      transform: scale(1.06);
+      transform-origin: center;
+    }
   }
 
-  /* Mobile — 4:3 aspect (taller than 16:10), media-radius token (md=12)
-   * so the image is one notch tighter than its parent card (lg=16) per
-   * the hierarchy invariant: media radius < card radius. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin: 0;
+  /* Mobile — 4:3 (taller than 16:10) so the iPad-mockup screenshots
+   * fit without the bottom getting cropped. Radius bumped md → lg
+   * (16) per "больше скругления у картинок внутренних". */
+  @media (max-width: 649px) {
+    margin: 0 0 4px 0;
     flex: 0 0 auto;
     height: auto;
     aspect-ratio: 4 / 3;
     min-height: 0;
-    border-radius: ${({ theme }) => theme.radii.md};
-    background: ${({ theme }) => theme.colors.background.surfaceMuted};
+    border-radius: ${({ theme }) => theme.radii.lg};
+    background: transparent;
   }
 `;
 
@@ -338,7 +405,7 @@ const FeatureCardImage = styled.div`
 const Dots = styled.div`
   display: none;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 649px) {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -378,12 +445,17 @@ const WhyTitle = styled.h2`
   letter-spacing: -0.03em;
   margin: 0 0 32px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 649px) {
     font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
     /* Solo title (no subtitle) → cards = 16 (bodyToCards). */
     margin: 0 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
+  }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
   }
 `;
 
@@ -412,7 +484,7 @@ const FEATURE_CARDS = [
     color: '#F4A672',
     title: 'Pay once. Yours forever.',
     desc: 'One payment. It lives in your Notion for as long as you need.',
-    image: '/feature-pricing.png',
+    image: '/feature-payment.png',
   },
 ];
 
@@ -469,7 +541,9 @@ export const FeatureCardsSection: React.FC = () => {
                 <FeatureCardTitle>{f.title}</FeatureCardTitle>
                 <FeatureCardDesc>{f.desc}</FeatureCardDesc>
               </FeatureCardText>
-              <FeatureCardImage />
+              <FeatureCardImage>
+                <img src={f.image} alt={f.tab} loading="lazy" />
+              </FeatureCardImage>
             </FeatureCardBody>
           </FeatureCard>
         ))}

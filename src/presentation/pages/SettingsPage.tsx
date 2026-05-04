@@ -88,7 +88,16 @@ const Shell = styled.main`
   margin: 0 auto;
   padding: 32px 24px 64px;
 
-  @media (max-width: 600px) {
+  /* Tablet (769–1024) — pull horizontal padding to gutter so the
+   * card column reads aligned with the rest of the site at this width.
+   * Vertical stays generous since the page is short. */
+  @media (min-width: 769px) and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 28px 20px 56px;
+  }
+
+  /* Phone (≤768) — was ≤600; extended up so all phone widths use
+   * the same compact frame. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 24px 16px 48px;
   }
 `;
@@ -99,6 +108,12 @@ const PageTitle = styled.h1`
   letter-spacing: -0.03em;
   margin: 0 0 4px;
   color: ${({ theme }) => theme.colors.text.primary};
+
+  /* Tablet+phone — drop from 6xl (~40) to a more proportional 28
+   * so the title doesn't dominate the narrower column. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 28px;
+  }
 `;
 
 const PageSubtitle = styled.p`

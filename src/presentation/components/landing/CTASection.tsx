@@ -76,6 +76,11 @@ export const CTATitle = styled.h2`
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
     margin-bottom: 0;
   }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
 `;
 
 export const CTASubtitle = styled.p`

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Plus, X, List, Palette, Sparkles } from 'lucide-react';
+import { Plus, X, List, Sparkles, Bug } from 'lucide-react';
 import { useDevPanelsHidden } from './useDevPanelsHidden';
 
 type Mode = 'idle' | 'picking' | 'composing' | 'list';
@@ -49,6 +49,17 @@ export function ClaudeFeedback() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
   const hoverBoxRef = useRef<HTMLDivElement>(null);
+  /* Mirror DebugOverlay's enabled state via the broadcast event so the
+     "Debug inspector" row in this dev panel can show active/inactive
+     and act as a real on/off toggle. */
+  const [debugOn, setDebugOn] = useState(false);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      setDebugOn(!!(e as CustomEvent<{ enabled: boolean }>).detail?.enabled);
+    };
+    window.addEventListener('peachy:debug-state', handler);
+    return () => window.removeEventListener('peachy:debug-state', handler);
+  }, []);
 
   const pendingCount = comments.filter((c) => c.status === 'pending').length;
   const fixedCount = comments.filter((c) => c.status === 'fixed').length;
@@ -349,7 +360,7 @@ export function ClaudeFeedback() {
       {toast && <Toast>{toast}</Toast>}
 
       {!hidden && (
-        <DevPanel>
+        <DevPanel data-debug-ui>
           <DevBrand>Feedback</DevBrand>
 
           <DevRow
@@ -381,19 +392,22 @@ export function ClaudeFeedback() {
             </DevText>
           </DevRow>
 
+          <DevRow
+            $active={debugOn}
+            onClick={() => window.dispatchEvent(new Event('peachy:toggle-debug'))}
+          >
+            <DevIcon><Bug /></DevIcon>
+            <DevText>
+              <DevTitle>{debugOn ? 'Debug inspector — ON' : 'Debug inspector'}</DevTitle>
+              <DevSub>{debugOn ? 'click to turn off · ⌃D' : 'spacing, typography, tokens · ⌃D'}</DevSub>
+            </DevText>
+          </DevRow>
+
           <DevRowLink href="/dev">
             <DevIcon><Sparkles /></DevIcon>
             <DevText>
               <DevTitle>Design system</DevTitle>
               <DevSub>token-driven · mirrors prod · /dev</DevSub>
-            </DevText>
-          </DevRowLink>
-
-          <DevRowLink href="/dev">
-            <DevIcon><Palette /></DevIcon>
-            <DevText>
-              <DevTitle>Design system (legacy)</DevTitle>
-              <DevSub>old showcase · /dev</DevSub>
             </DevText>
           </DevRowLink>
         </DevPanel>
@@ -465,7 +479,7 @@ const slideInPanel = keyframes`
 
 const DevPanel = styled.div`
   position: fixed;
-  top: 248px;
+  bottom: 16px;
   right: 16px;
   width: 220px;
   display: flex;
@@ -639,7 +653,10 @@ const Backdrop = styled.div`
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
+  /* Comments panel anchors to the bottom-LEFT now that the DevPanel
+   * (Feedback toolbar) lives in the bottom-right corner — keeps the
+   * two surfaces from overlapping. */
+  justify-content: flex-start;
   padding: 24px;
   z-index: 2147483600;
   animation: ${fadeIn} 0.15s ease;

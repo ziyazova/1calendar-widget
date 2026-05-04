@@ -25,6 +25,11 @@ const SectionTitle = styled.h2`
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
   }
+
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
 `;
 
 const SectionSubtitle = styled.p`

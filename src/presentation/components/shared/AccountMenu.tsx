@@ -233,6 +233,11 @@ export const UpgradeInner = styled.span`
 export const UpgradePrice = styled.span`
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
+  /* Inherit text colour from the button variant (was hardcoded white,
+     which disappeared when the dropdown switched from $variant="accent"
+     to $variant="upgrade" — translucent indigo + white text became
+     unreadable on a near-white background). */
+  color: currentColor;
+  opacity: 0.88;
   letter-spacing: 0.01em;
 `;

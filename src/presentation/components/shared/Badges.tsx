@@ -109,26 +109,49 @@ export const PlanBadge = styled.span<{ $pro?: boolean; $size?: 'xs' | 'sm' }>`
   }}
 `;
 
+/* Per-type tints for the dashboard "Your widgets" gallery — translucent
+   washes only (no gradients), each visually distinct so calendar/clock/
+   board read as a soft category map at a glance.
+   - Calendar: rose (warm, life-events tone)
+   - Clock: blue (precision, system tone)
+   - Board: peach (creative/mood tone, matches FeatureCardsSection
+     "Payment" #F4A672) */
+const tagKindTints: Record<'calendar' | 'clock' | 'board', { bg: string; fg: string }> = {
+  /* Calendar — dusty rose / blush. Hot pink (#EC4899) read as too
+     saturated; this softer mauve-pink (#C57A8E) feels warm and quiet. */
+  calendar: { bg: 'rgba(197, 122, 142, 0.10)', fg: 'rgba(140, 70, 95, 0.70)' },
+  clock:    { bg: 'rgba(51, 132, 244, 0.07)',  fg: 'rgba(38, 86, 158, 0.65)' },
+  board:    { bg: 'rgba(244, 166, 114, 0.10)', fg: 'rgba(150, 96, 50, 0.70)' },
+};
+
 /* Tag — subtle inline category/metadata chip (lowercase, surface bg).
    Use for taxonomy markers like "planners", "student", "productivity" —
-   NOT tier indicators (those use <Label $variant>). */
-export const Tag = styled.span<{ $accent?: boolean }>`
+   NOT tier indicators (those use <Label $variant>).
+
+   $kind overrides the $accent indigo wash with a per-type translucent
+   tint (calendar/clock/board) so the dashboard "Your widgets" labels
+   read as a soft category map. Falls through to $accent (indigo) if no
+   $kind is provided. */
+export const Tag = styled.span<{
+  $accent?: boolean;
+  $kind?: 'calendar' | 'clock' | 'board';
+}>`
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  /* $accent (logged-in studio cards) — airy translucent wash in deep
-     indigo (#4F57C9) + same indigo at higher opacity for text, giving a
-     muted-accent feel that harmonizes with the wash. No outline. Default
-     — hairline border with body text. */
-  background: ${({ $accent }) =>
-    $accent ? 'rgba(79, 87, 201, 0.10)' : 'transparent'};
-  border: 1px solid ${({ $accent, theme }) =>
-    $accent ? 'transparent' : theme.colors.border.hairline};
+  background: ${({ $accent, $kind }) => {
+    if ($kind) return tagKindTints[$kind].bg;
+    return $accent ? 'rgba(99, 102, 241, 0.10)' : 'transparent';
+  }};
+  border: ${({ $accent, $kind, theme }) => {
+    if ($kind || $accent) return '1px solid transparent';
+    return `1px solid ${theme.colors.border.hairline}`;
+  }};
   border-radius: ${({ theme }) => theme.radii.full};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   font-weight: ${({ theme }) => theme.typography.weights.medium};
-  color: ${({ $accent, theme }) =>
-    $accent ? 'rgba(79, 87, 201, 0.85)' : theme.colors.text.body};
+  color: ${({ $kind, theme }) =>
+    $kind ? tagKindTints[$kind].fg : theme.colors.text.body};
   letter-spacing: -0.01em;
   white-space: nowrap;
 
@@ -139,6 +162,15 @@ export const Tag = styled.span<{ $accent?: boolean }>`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 2px 8px;
     font-size: ${({ theme }) => theme.typography.sizes['2xs']};
+  }
+
+  /* Tablet (769–1024) — between mobile (compact) and desktop (full).
+   * The Explore-widgets gallery cards on /widgets hit this range; the
+   * desktop sm-font chip reads as oversized on iPad widths. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    padding: 3px 10px;
+    font-size: ${({ theme }) => theme.typography.sizes.xs};
   }
 `;
 

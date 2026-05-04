@@ -103,7 +103,6 @@ function App() {
                   <Route path="/embed/clock" element={<ClockEmbedPage />} />
                   <Route path="/embed/board" element={<BoardEmbedPage />} />
                   <Route path="/dev" element={<DesignSystemPage />} />
-                  <Route path="/dev/v2" element={<DesignSystemPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/refund" element={<RefundPage />} />

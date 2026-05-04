@@ -59,6 +59,13 @@ const Title = styled.h2`
     line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
+
+  /* Tablet — slightly smaller headline so it doesn't dominate the
+   * compact 2-col layout. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
 `;
 
 const Subtitle = styled.p`
@@ -76,6 +83,14 @@ const Subtitle = styled.p`
     margin: ${({ theme }) => theme.layout.mobile.titleToBody} 0 ${({ theme }) => theme.layout.mobile.bodyToCards};
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
   }
+
+  /* Tablet — collapse the 100px desktop gap to 40px. The 2-col layout
+   * has less vertical density than 3-col, so the wide gap reads as
+   * empty space instead of breathing room. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    margin: 8px 0 40px;
+  }
 `;
 
 const MarqueeContainer = styled.div`
@@ -89,6 +104,15 @@ const MarqueeContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     grid-template-columns: repeat(2, 1fr);
     padding: 0 36px;
+  }
+
+  /* Tablet — softly narrowed 2-col grid (cap 880) so the cards have
+   * comfortable room without stretching full-iPad-width. The earlier
+   * 720 cap read as cramped per user feedback. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    max-width: 880px;
+    padding: 0 24px;
   }
 
   /* Mobile — the 3-column marquee is hidden entirely. Mobile uses
@@ -134,6 +158,13 @@ const MarqueeColumn = styled.div`
     &:nth-child(3) {
       display: none;
     }
+  }
+
+  /* Tablet — shorter scrolling column (480 vs 600) so the section feels
+   * compact rather than dominating the fold on iPad heights. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    height: 480px;
   }
 
   /* Mobile — column becomes the horizontal scroll container of a

@@ -20,15 +20,22 @@ const Content = styled.div`
   animation: ${fadeUp} 0.35s ease both;
   overflow-x: hidden;
 
-  /* Phone — catalog rhythm: top sectionPaddingY − 4 (= 32, raises the
-   * BackButton 4px up; BackButton's own margin-bottom 36 carries the
-   * released space as gap below it). Sides gutter (20). Bottom 100 to
-   * clear the sticky MobileBuyBar (~88px) with comfortable margin.
-   * Single rule covers ≤md range; sm-specific override removed since
-   * the values are now consistent across phone sizes. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  /* Phone — catalog rhythm: top sectionPaddingY − 4. Sides gutter (20).
+   * Bottom 100 to clear the sticky MobileBuyBar. */
+  @media (max-width: 949px) {
     padding: calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} - 4px)
       ${({ theme }) => theme.layout.mobile.gutter}
+      100px;
+  }
+
+  /* Tablet sub-range (641–949) — bump horizontal padding to 48 so the
+   * page has comfortable breathing room from viewport edges (mobile's
+   * 20-gutter reads as too tight on a wider screen). Lower bound
+   * extended from 769 → 641 so 640–768 widths share the same rhythm
+   * and the carousel no longer "stops" with empty space at ~700–768. */
+  @media (min-width: 641px) and (max-width: 949px) {
+    padding: calc(${({ theme }) => theme.layout.mobile.sectionPaddingY} - 4px)
+      48px
       100px;
   }
 `;
@@ -52,7 +59,7 @@ const TwoCol = styled.div`
     row-gap: 24px;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: flex;
     flex-direction: column;
     /* 36 — uniform major-block gap on mobile (TopSection / RightCol /
@@ -68,7 +75,7 @@ const TopSection = styled.div`
   min-width: 0;
   max-width: 100%;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     order: 1;
   }
 `;
@@ -79,7 +86,7 @@ const RightCol = styled.div`
   grid-row: 1 / 3;
   grid-column: 2;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     position: static;
     order: 2;
     width: 100%;
@@ -90,7 +97,7 @@ const BottomSection = styled.div`
   min-width: 0;
   max-width: 100%;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     order: 4;
   }
 `;
@@ -99,7 +106,7 @@ const BottomSection = styled.div`
  * to keep elements visible in their original desktop layout while the
  * mobile flow renders a re-positioned copy of the same content. */
 const DesktopOnly = styled.div`
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: none;
   }
 `;
@@ -112,7 +119,7 @@ const DesktopOnly = styled.div`
 const MobileOnlyAt = styled.div<{ $order: number }>`
   display: none;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: block;
     order: ${({ $order }) => $order};
     min-width: 0;
@@ -182,7 +189,7 @@ const Title = styled.h1`
    * 18 sub-section headlines so the page hierarchy reads cleanly:
    * Title 24 → Section H2 18 → body 14. Per "Title планнера 24, h2
    * секций 18, body 14". */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-size: 24px;
     font-weight: ${({ theme }) => theme.typography.mobile.sectionHeadline.weight};
     line-height: 1.2;
@@ -205,7 +212,7 @@ const Description = styled.p`
   /* Phone — body 14/1.5 (sizes.base). Mobile rules locked separately
    * via /templates/:id mobile rhythm; never roll desktop bumps into
    * the mobile branch. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-size: ${({ theme }) => theme.typography.sizes.base};
     line-height: 1.5;
     color: ${({ theme }) => theme.colors.text.tertiary};
@@ -225,7 +232,7 @@ const DesktopCarousel = styled.div`
 
   & > div { box-shadow: none; }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: none;
   }
 `;
@@ -238,7 +245,7 @@ const DesktopCarousel = styled.div`
 const MobileCarousel = styled.div`
   display: none;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
@@ -249,6 +256,18 @@ const MobileCarousel = styled.div`
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter};
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
+  }
+
+  /* Tablet sub-range (641–949) — Content uses 48px page padding here,
+   * not the 20px gutter. Drop the negative pull entirely so the carousel
+   * stays within the same 48px column as the title/description/cards
+   * instead of leaking to the viewport edge. Range extended to 641 so
+   * 640–768 widths inherit the same alignment. */
+  @media (min-width: 641px) and (max-width: 949px) {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 `;
 
@@ -300,7 +319,7 @@ const MobileSlideCounter = styled.div`
 const MobileCarouselWrap = styled.div`
   position: relative;
 
-  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px)) {
+  @media (min-width: calc(949px + 1px)) {
     & > ${MobileSlideCounter} { display: none; }
   }
 `;
@@ -502,7 +521,7 @@ const SectionTitle = styled.h2`
    * via theme.layout.mobile.detailPage tokens. Edit there to retune
    * the whole page in one shot. Spec: title 16/600/1.3, title→content
    * 12, section→section 36. Per c_2026-04-28. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-size: ${({ theme }) => theme.layout.mobile.detailPage.titleSize};
     font-weight: ${({ theme }) => theme.layout.mobile.detailPage.titleWeight};
     line-height: ${({ theme }) => theme.layout.mobile.detailPage.titleLineHeight};
@@ -532,7 +551,7 @@ const OverviewText = styled.p`
    * кажется больше — почини" (c_2026-04-28). margin-top: 0 explicit
    * so the styled p element doesn't pick up browser default top margin
    * (about 1em) on top of SectionTitle's 12 below. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     /* Mobile font lock — desktop bumped to 16, mobile must stay 14. */
     font-size: ${({ theme }) => theme.typography.sizes.base};
     margin-top: 0;
@@ -561,7 +580,7 @@ const FeatureList = styled.ul`
   row-gap: 16px;
 
   /* Mobile lock — flex column, dense block rhythm, sectionGap below. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -583,7 +602,7 @@ const FeatureItem = styled.li`
   padding: 10px 12px;
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     /* Mobile lock — inline list (no card chrome), tighter gap. */
     border: 0;
     border-radius: 0;
@@ -637,7 +656,7 @@ const FeatureItemTitle = styled.span`
   line-height: 1.35;
   letter-spacing: -0.01em;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     line-height: 1.25;
     /* Mobile — keep dark color (text.body inherits from desktop), but
      * lighter weight (medium 500) instead of semibold (600). Per
@@ -655,7 +674,7 @@ const FeatureItemDesc = styled.span`
   color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: 1.5;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     margin-top: 2px;
     font-size: ${({ theme }) => theme.typography.sizes.base};
     line-height: 1.35;
@@ -676,7 +695,7 @@ const BenefitsCard = styled(Card)`
    * Per "расстояние между секциями 36" (c_2026-04-28). */
   margin-bottom: 36px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     /* No fill on mobile, no padding — Benefits read as a quiet inline
      * list flush with the page gutter. Per "заливку вообще убери".
      * margin-top -8 lifts to the image (8px closer); margin-bottom 28
@@ -700,7 +719,7 @@ const PagesCard = styled(Card)`
   background: ${({ theme }) => theme.colors.background.surfaceAlt};
   border-color: ${({ theme }) => theme.colors.border.light};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     background: transparent;
     padding: 0 16px;
     /* margin-bottom 0 on mobile — TwoCol's flex gap (36) carries the
@@ -730,7 +749,7 @@ const BenefitRow = styled.div`
 
   /* Mobile — 14×14 to match FeatureBadge (Key Features). All page
    * checkmarks read identical on phone per "галочки одинаковые" (c_2026-04-28). */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     svg { width: 14px; height: 14px; }
   }
 
@@ -754,7 +773,7 @@ const BtnGroup = styled.div`
    * lived inside this group on desktop is now hidden alongside on
    * phone — bar carries the action, no inline disclaimer needed.
    * Per "убираем кнопку Buy Now + Buy on Etsy спускаем к навигации". */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: none;
   }
 `;
@@ -862,7 +881,7 @@ const PagesGroupedHeader = styled.div`
    * here — caused layout-shift when the accordion below expanded
    * ("блок поднимается наверх", c_2026-04-28). The Pages Included
    * section gets its lift from BenefitsCard's reduced mb instead. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     margin-top: 0;
     margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.titleToContent};
   }
@@ -879,7 +898,7 @@ const PagesGroupedSubtitle = styled.span`
   color: ${({ theme }) => theme.colors.text.tertiary};
   letter-spacing: -0.01em;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-size: ${({ theme }) => theme.typography.sizes.base};
   }
 `;
@@ -918,7 +937,7 @@ const PagesGroupedRow = styled.div<{ $open: boolean }>`
     transform: rotate(${({ $open }) => ($open ? '180deg' : '0deg')});
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-weight: 600;
     /* Mobile lock — keep 10 vertical padding (touch target stays
      * compact); desktop bumped to 14 above for breath. */
@@ -938,7 +957,7 @@ const PagesGroupedRowMeta = styled.span`
   /* Mobile — 12 (sizes.sm). The count meta reads as a tiny caption
    * next to the section name, sitting below the 14 page-wide body
    * size. Per "цифра и pages меньше". */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-size: ${({ theme }) => theme.typography.sizes.sm};
   }
 `;
@@ -959,7 +978,7 @@ const PagesGroupedInner = styled.ul`
   padding: 6px 24px 14px 36px;
   margin: 0;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     /* Mobile — Card mobile padding (0 16) carries horizontal; only
      * indent inside. */
     padding: 6px 0 10px 12px;
@@ -974,7 +993,7 @@ const PagesGroupedItem = styled.li`
   animation: ${fadeUp} 0.2s ease both;
 
   /* Mobile bumps to 14 — page-wide "non-headline = 14" rule. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     font-size: ${({ theme }) => theme.typography.sizes.base};
   }
 `;
@@ -1030,7 +1049,7 @@ const RelatedGrid = styled.div`
    * compact 8 since the cards already breathe via stretch. */
   gap: 16px;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     gap: 8px;
   }
 `;
@@ -1062,7 +1081,7 @@ const RelatedThumbSlot = styled.div`
     box-shadow: none;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     width: 112px;
 
     /* Mobile — disable the card's hover border/shadow swap so the
@@ -1110,6 +1129,13 @@ const RelatedPreview = styled.div`
     inset: 0;
     filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.1));
   }
+
+  /* Touch widths — kill the popup preview entirely. The hover-fired
+   * enlargement reads as a glitch on tap, so on phone/tablet the row
+   * stays static (only the navigation onClick remains). */
+  @media (max-width: 949px) {
+    display: none;
+  }
 `;
 
 const RelatedInfo = styled.div`
@@ -1154,7 +1180,7 @@ const FaqList = styled.div`
     border-top: 0;
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     /* margin-bottom 0 on mobile — TwoCol's flex gap (36) carries the
      * gap to Related Templates. Was sectionGap (36), doubled with
      * flex gap = 72. Per "паддинг снизу убери" (c_2026-04-28).
@@ -1204,7 +1230,7 @@ const MobileBuyBar = styled.div`
   padding: 12px 16px 14px;
   padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: 949px) {
     display: flex;
     gap: 8px;
 
@@ -1602,7 +1628,7 @@ export const TemplateDetailPage: React.FC = () => {
                   <RelatedPreview><img src={r.image} alt={r.title} /></RelatedPreview>
                   <RelatedThumbSlot>
                     <TemplateMockupCard $size="thumb" $interactive>
-                      <TemplateMockupImage $size="thumb" src={r.image} alt={r.title} />
+                      <TemplateMockupImage $size="thumb" $hoverZoom={false} src={r.image} alt={r.title} />
                     </TemplateMockupCard>
                   </RelatedThumbSlot>
                   <RelatedInfo>

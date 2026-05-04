@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/presentation/hooks/useIsMobile';
 import { Button, PlanBadge } from '@/presentation/components/shared';
 import {
   PricingGrid,
@@ -30,6 +31,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
   const theme = useTheme();
   const { isRegistered } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,14 +55,17 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: theme.zIndex.modal, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div
         onClick={onClose}
         style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
       />
       <div style={{
-        position: 'relative', background: '#fff', borderRadius: 28, padding: '48px 40px 40px',
-        width: 650, maxWidth: '92vw',
+        position: 'relative', background: '#fff',
+        borderRadius: isMobile ? 20 : 28,
+        padding: isMobile ? '28px 18px 20px' : '48px 40px 40px',
+        width: 650,
+        maxWidth: isMobile ? 'calc(100vw - 24px)' : '92vw',
         boxShadow: '0 32px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06)',
         animation: 'upgradeModalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
       }}>
@@ -69,52 +74,82 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
           onClick={onClose}
           aria-label="Close"
           style={{
-            position: 'absolute', top: 20, right: 20, width: 36, height: 36, border: 'none',
-            background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer', fontSize: 20, color: '#bbb',
+            position: 'absolute',
+            top: isMobile ? 12 : 20,
+            right: isMobile ? 12 : 20,
+            width: isMobile ? 32 : 36,
+            height: isMobile ? 32 : 36,
+            border: 'none',
+            background: 'rgba(0,0,0,0.04)', borderRadius: 12, cursor: 'pointer',
+            fontSize: isMobile ? 18 : 20,
+            color: '#bbb',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >×</button>
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? 20 : 36 }}>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 48, height: 48, borderRadius: 16,
-            /* Outline + airy translucent accent wash so the bubble feels
-               filled but stays light. */
-            background: 'rgba(99, 102, 241, 0.10)',
-            border: `1.5px solid ${theme.colors.accent}`,
-            color: theme.colors.accent,
-            marginBottom: 16,
-          }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-              <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
-            </svg>
-          </div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: theme.colors.text.primary, letterSpacing: '-0.03em' }}>Upgrade to Pro</div>
-          <div style={{ fontSize: 15, color: theme.colors.text.tertiary, marginTop: 8 }}>Unlock all styles and unlimited widgets</div>
+            fontSize: isMobile ? 22 : 28,
+            fontWeight: 700,
+            color: theme.colors.text.primary,
+            letterSpacing: '-0.03em',
+          }}>Upgrade to Pro</div>
+          <div style={{
+            fontSize: isMobile ? 13 : 15,
+            color: theme.colors.text.tertiary,
+            marginTop: isMobile ? 6 : 8,
+          }}>Unlock all styles and unlimited widgets</div>
+
+          {/* Phone-only "You're on Free" pill — replaces the redundant Free
+             card below by acknowledging the user's current plan inline. */}
+          {isMobile && (
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              marginTop: 12,
+              padding: '4px 10px',
+              borderRadius: 999,
+              background: 'rgba(0,0,0,0.04)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: theme.colors.text.tertiary,
+              letterSpacing: '0.02em',
+            }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: theme.colors.text.muted,
+              }} />
+              Currently on Free
+            </div>
+          )}
         </div>
 
-        {/* Pricing grid — same styled components used on /widgets so the
-            cards stay 1:1 with the landing's pricing block. */}
+        {/* Pricing grid — desktop shows side-by-side Free + Pro for direct
+           comparison. Phone (≤480) shows ONLY the Pro card; the Free state
+           is conveyed by the pill in the header above. Pattern matches what
+           Linear / Notion / Apple do on mobile upsells — drop redundant
+           "current plan" card to halve the scroll height. */}
         <PricingGrid>
-          <PricingCard>
-            <PricingPlanRow>
-              <PricingPlan>Free</PricingPlan>
-            </PricingPlanRow>
-            <PricingPriceRow>
-              <PricingPrice>$0</PricingPrice>
-              <PricingPeriod>forever</PricingPeriod>
-            </PricingPriceRow>
-            <PricingFeatures>
-              <li><Check /> Up to 3 widgets</li>
-              <li><Check /> Calendar &amp; Clock only</li>
-              <li><Check /> Basic colors &amp; layout</li>
-              <li><Check /> Embed in Notion</li>
-            </PricingFeatures>
-            <Button $variant="outline" $size="lg" $fullWidth onClick={onClose} style={{ marginTop: 24 }}>
-              Current plan
-            </Button>
-          </PricingCard>
+          {!isMobile && (
+            <PricingCard>
+              <PricingPlanRow>
+                <PricingPlan>Free</PricingPlan>
+              </PricingPlanRow>
+              <PricingPriceRow>
+                <PricingPrice>$0</PricingPrice>
+                <PricingPeriod>forever</PricingPeriod>
+              </PricingPriceRow>
+              <PricingFeatures>
+                <li><Check /> Up to 3 widgets</li>
+                <li><Check /> Calendar &amp; Clock only</li>
+                <li><Check /> Basic colors &amp; layout</li>
+                <li><Check /> Embed in Notion</li>
+              </PricingFeatures>
+              <Button $variant="outline" $size="lg" $fullWidth onClick={onClose} style={{ marginTop: 24 }}>
+                Current plan
+              </Button>
+            </PricingCard>
+          )}
           <PricingCard $highlighted>
             <PricingPlanRow>
               <PricingPlan $highlighted>Pro</PricingPlan>
@@ -136,10 +171,21 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ open, onClose }) => 
               $fullWidth
               disabled={submitting}
               onClick={handleGetPro}
-              style={{ marginTop: 24 }}
+              style={{ marginTop: isMobile ? 16 : 24 }}
             >
               {submitting ? 'Redirecting…' : isRegistered ? 'Get Pro' : 'Sign up to continue'}
             </Button>
+            {isMobile && (
+              <Button
+                $variant="ghost"
+                $size="md"
+                $fullWidth
+                onClick={onClose}
+                style={{ marginTop: 6 }}
+              >
+                Maybe later
+              </Button>
+            )}
             {error && (
               <div style={{ marginTop: 10, fontSize: 12, color: theme.colors.danger.soft, textAlign: 'center' }}>
                 {error}

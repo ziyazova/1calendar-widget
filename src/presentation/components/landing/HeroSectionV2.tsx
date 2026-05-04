@@ -41,6 +41,36 @@ const Hero = styled.section`
     padding: 36px 20px 0;
   }
 
+  /* Tablet (769–1024) — compact min-height (480 vs 620 desktop) and
+   * symmetric vertical padding so the Hero band reads as a tight,
+   * balanced block instead of inheriting the desktop's tall slot.
+   * Mobile (≤768) is overridden separately below and stays untouched. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    min-height: 480px;
+    padding: 36px 20px 36px;
+  }
+
+  /* Narrow tablet (769–900) — tighter padding so content packs together
+   * inside the band, but min-height stays at the tablet 480 so the
+   * tinted background slab keeps its height. Per "верни заливку". */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 900px) {
+    padding: 28px 20px 28px;
+  }
+
+  /* Narrow desktop without floats (1025–1240) — widgets are hidden in
+   * this range, so the default desktop's asymmetric 40/0 vertical
+   * padding leaves content biased upward. Switch to symmetric 36/36
+   * with the desktop 48 horizontal gutter so the Stack sits centered
+   * in the section. Range bumped from 1140 → 1240 to match the
+   * widget-hide cap. Per "до 1240 не показывай виджеты". */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.tablet} + 1px))
+    and (max-width: 1240px) {
+    min-height: 480px;
+    padding: 36px 48px 36px;
+  }
+
   /* Phone — symmetric 63/63 padding (total 126). Hero height locked at 545
    * per "высоту хиро 545 у обоих" + content vertically centered within
    * the section per "выровни контент по середине секции". The earlier
@@ -83,6 +113,16 @@ const Eyebrow = styled.div`
   color: ${({ theme }) => theme.colors.peach.inkSoft};
   font-weight: 500;
   margin-top: -32px;
+
+  /* Tablet + narrow desktop without floats (769–1240) — Hero uses
+   * symmetric padding to center the Stack; the desktop's −32 lift
+   * biases content upward and leaves a visible gap at the bottom of
+   * the section. Reset so Stack truly centers across the entire
+   * no-widgets range. Per "772–1048 не отцентрован — чекни". */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 1240px) {
+    margin-top: 0;
+  }
 
   /* Mobile — fixed-height pill (32); spacing below = 28 (was 24, +4),
    * stars-group → text gap = 10. Text 12. */
@@ -324,24 +364,59 @@ const TplFloat = styled.div<{ $pos: 'left' | 'right' }>`
     transform: ${({ $pos }) => ($pos === 'left' ? 'rotate(-8deg)' : 'rotate(8deg)')};
   }
 
-  @media (max-width: 1200px) {
-    ${({ $pos }) =>
-      $pos === 'left'
-        ? `left: calc(-2% + 74px);`
-        : `right: calc(-2% + 74px);`}
-  }
-
-  @media (max-width: 900px) {
-    ${({ $pos }) =>
-      $pos === 'left'
-        ? `top: 20px; left: calc(-10% + 74px);`
-        : `bottom: 20px; right: calc(-10% + 74px);`}
-  }
-
-  /* Phone — hide decorative template floats entirely. They overlap the
-   * headline + CTAs on narrow viewports and aren't worth the conflict. */
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  /* Phone + tablet + narrow desktop (≤1099) — hide decorative floats.
+   * From 1100+ widgets reappear. Per "пусть виджеты появляются с 1100". */
+  @media (max-width: 1099px) {
     display: none;
+  }
+
+  /* Narrow desktop (1025–1459) — keep the 250×248 container, but scale
+   * the inner card via transform so ALL internal content (text, checkboxes,
+   * habit ticks, icons) shrinks proportionally instead of leaving the
+   * box smaller while content overflows. Position is moved closer to the
+   * headline so the cards don't read as banished to the corners.
+   * The inner TplCard has its own scale(0.94) base and scale(1) on hover;
+   * we override both via the direct child div. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.tablet} + 1px))
+    and (max-width: 1459px) {
+    ${({ $pos }) =>
+      $pos === 'left'
+        ? `top: 48px; left: calc(2% + 24px);`
+        : `bottom: 32px; right: calc(2% + 24px);`}
+
+    & > div {
+      transform: scale(0.7) !important;
+    }
+    &:hover > div {
+      transform: scale(0.74) !important;
+    }
+  }
+
+  /* Very narrow desktop (1025–1184) — at this width the headline is
+   * close enough to the viewport edge that the calc(2% + 24px) offset
+   * still has the cards crowding the centered text. Pull 16px further
+   * outward (calc(2% + 8px)) so the visible card clears the headline.
+   * From ≥1185 the gutter is wide enough that the +24 default reads
+   * fine. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.tablet} + 1px))
+    and (max-width: 1184px) {
+    ${({ $pos }) =>
+      $pos === 'left'
+        ? `left: calc(2% + 8px);`
+        : `right: calc(2% + 8px);`}
+  }
+
+  /* Wider narrow desktop (1340–1459) — viewport has enough gutter that
+   * the cards can read at a more confident size. Bump scale 0.7 → 0.82
+   * (and hover 0.74 → 0.86) so they don't look like miniatures next to
+   * the still-large headline. */
+  @media (min-width: 1340px) and (max-width: 1459px) {
+    & > div {
+      transform: scale(0.82) !important;
+    }
+    &:hover > div {
+      transform: scale(0.86) !important;
+    }
   }
 `;
 
@@ -357,9 +432,14 @@ const TplCard = styled.div<{ $variant: 'planner' | 'habits' }>`
     const b = parseInt(hex.slice(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, 0.5)`;
   }};
+  /* Soft layered elevation — was 0 12 24 / 0.08 + 0 32 64 / 0.16 which
+   * pooled as a dirty dark slab under each card. Replaced with a
+   * three-stop ambient shadow (warm near-black + negative spread offsets)
+   * so the cards lift cleanly off the page without a heavy underline. */
   box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.08),
-    0 32px 64px rgba(0, 0, 0, 0.16);
+    0 1px 2px rgba(26, 22, 19, 0.04),
+    0 12px 24px -8px rgba(26, 22, 19, 0.08),
+    0 28px 56px -20px rgba(26, 22, 19, 0.12);
   width: 100%;
   height: 100%;
   display: flex;
@@ -387,7 +467,17 @@ const Chrome = styled.div<{ $variant: 'planner' | 'habits' }>`
   padding: 14px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #2B2320;
+  /* Tab label = per-card $variant colour × 0.55 (darkened tone) so
+   * "Planner" / "Routine" echo the dot but read as a confident dark
+   * accent — mirrors the FeatureCardsSection ("Functionality" / "Design"
+   * / "Payment") pattern. Crumbs inherits this colour. */
+  color: ${({ $variant }) => {
+    const hex = TAB_COLORS[$variant].replace('#', '');
+    const r = Math.round(parseInt(hex.slice(0, 2), 16) * 0.55);
+    const g = Math.round(parseInt(hex.slice(2, 4), 16) * 0.55);
+    const b = Math.round(parseInt(hex.slice(4, 6), 16) * 0.55);
+    return `rgb(${r}, ${g}, ${b})`;
+  }};
   background: ${({ $variant }) => {
     const hex = TAB_COLORS[$variant].replace('#', '');
     const r = parseInt(hex.slice(0, 2), 16);
@@ -414,7 +504,9 @@ const Crumbs = styled.div`
   gap: 10px;
   font-size: 13px;
   font-weight: 500;
-  color: #2B2320;
+  /* Inherit Chrome's per-card darkened tone so the "Planner"/"Routine"
+   * text picks up the same colour as the dot. */
+  color: inherit;
   letter-spacing: -0.01em;
 `;
 

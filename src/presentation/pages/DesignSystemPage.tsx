@@ -100,6 +100,7 @@ import {
   BannerCta as DashBannerCta,
 } from './StudioPage';
 import { PurchaseCard, PurchaseImg } from '@/presentation/components/dashboard/PurchaseList';
+import { LoginModal } from '../components/auth/LoginModal';
 import { ColorPicker } from '../components/ui/ColorPicker';
 import {
   widgetColors, backgroundColors, accentColors,
@@ -374,7 +375,10 @@ export const DesignSystemPage: React.FC = () => {
     | 'deleteAccount'
     | 'changePassword'
     | 'resetPassword'
-    | 'upgrade';
+    | 'upgrade'
+    | 'limitReached'
+    | 'login'
+    | 'signup';
   const [openModal, setOpenModal] = useState<ModalKey>(null);
   const closeModal = () => setOpenModal(null);
 
@@ -1183,6 +1187,15 @@ export const DesignSystemPage: React.FC = () => {
             <Button $variant="accent" $size="md" onClick={() => setOpenModal('upgrade')}>
               <Sparkles /> Upgrade to Pro
             </Button>
+            <Button $variant="outline" $size="md" onClick={() => setOpenModal('limitReached')}>
+              <Sparkles /> Limit reached
+            </Button>
+            <Button $variant="outline" $size="md" onClick={() => setOpenModal('login')}>
+              <LogOut style={{ transform: 'rotate(180deg)' }} /> Log in
+            </Button>
+            <Button $variant="outline" $size="md" onClick={() => setOpenModal('signup')}>
+              <Plus /> Sign up
+            </Button>
           </Row>
         </SurfaceCard>
       </Section>
@@ -1346,6 +1359,50 @@ export const DesignSystemPage: React.FC = () => {
       {/* 6. Upgrade to Pro — real shared <UpgradeModal>. Edits there
           propagate live here so DS and prod stay 1:1. */}
       <UpgradeModal open={openModal === 'upgrade'} onClose={closeModal} />
+
+      {/* 7. Limit reached — compact upsell. Fires when a Free user hits
+          the widget cap (3) and taps "Customize" / "+ New widget". One
+          tap → onUpgrade jumps to the full pricing modal. Mirrors the
+          small-modal recipe (eyebrow + title + body + dual footer). */}
+      <Modal
+        open={openModal === 'limitReached'}
+        onClose={closeModal}
+        eyebrow="Free plan"
+        title="You've hit your widget limit"
+        size="sm"
+        hideClose
+      >
+        <ModalBodyText>
+          Free includes <strong>3 widgets</strong>. Upgrade to Pro for unlimited
+          widgets, all styles, and full customization.
+        </ModalBodyText>
+        <ModalFooter>
+          <Button type="button" $variant="outline" $size="lg" onClick={closeModal}>
+            Maybe later
+          </Button>
+          <Button
+            type="button"
+            $variant="accent"
+            $size="lg"
+            onClick={() => setOpenModal('upgrade')}
+          >
+            <Sparkles /> Upgrade to Pro
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* 8. Login — real shared <LoginModal>. Same surface that fires
+          when a logged-out user taps "Customize" on a widget card. On
+          mobile it auto-renders as a BottomSheet (handled inside). */}
+      <LoginModal open={openModal === 'login'} onClose={closeModal} />
+
+      {/* 9. Sign up — same shared <LoginModal> with the Sign Up tab
+          pre-selected. Single source of truth for both flows. */}
+      <LoginModal
+        open={openModal === 'signup'}
+        onClose={closeModal}
+        initialSignUp
+      />
 
       <MegaTitle id="chrome" data-num="06 — Site chrome">TopNav &amp; footers</MegaTitle>
 

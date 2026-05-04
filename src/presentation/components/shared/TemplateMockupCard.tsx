@@ -85,5 +85,16 @@ export const TemplateMockupImage = styled.img<{
 
   ${({ $hoverZoom = true }) =>
     $hoverZoom &&
-    `${TemplateMockupCard}:hover & { transform: scale(1.06); }`}
+    `
+      ${TemplateMockupCard}:hover & { transform: scale(1.06); }
+
+      /* Tablet+phone (≤1024): hover triggers on tap and reads as a
+       * "stuck" state. Disable hover-scale, switch to a brief :active
+       * pulse so a tap still gives the same enlarge feedback. Per
+       * "при клике пусть увеличивается контент внутри". */
+      @media (max-width: 1024px) {
+        ${TemplateMockupCard}:hover & { transform: none; }
+        ${TemplateMockupCard}:active & { transform: scale(1.06); }
+      }
+    `}
 `;

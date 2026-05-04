@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import styled, { keyframes, useTheme } from 'styled-components';
-import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, Type, Palette, LayoutDashboard, Wand2, ChevronLeft } from 'lucide-react';
+import { Copy, Check, Pencil, Trash2, Plus, Download, ExternalLink, LogOut, Settings, ArrowRight, Link as LinkIcon, Save as SaveIcon, Cloud, Loader2, Type, Palette, LayoutDashboard, Wand2, ChevronLeft, ChevronDown } from 'lucide-react';
 import { Logger } from '../../infrastructure/services/Logger';
 import { DIContainer } from '../../infrastructure/di/DIContainer';
 import { Widget } from '../../domain/entities/Widget';
@@ -10,7 +10,7 @@ import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { TopNav } from '../components/layout/TopNav';
 import { EmailVerificationBanner } from '../components/shared/EmailVerificationBanner';
-import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, Tag, Toast, ToastShell, ToastIconBubble, ToastMessage } from '@/presentation/components/shared';
+import { Button as SharedButton, BottomSheet, Segment, SegmentGroup, PlanUsageCard, Modal, ModalFooter, Tag, Toast, ToastShell, ToastIconBubble, ToastMessage, FilterChip, FilterRow } from '@/presentation/components/shared';
 import { PurchaseListItem, usePurchases } from '@/presentation/components/dashboard/PurchaseList';
 import {
   /* Single source of truth for empty-state visuals — see DS showcase. */
@@ -87,37 +87,225 @@ const TabBarWrap = styled.div`
   }
 `;
 
-/* Section headers */
-const SectionRow = styled.div`
+/* Section headers. $noFiltersBelow signals that the next sibling is the
+ * widget grid (no SavedControlsRow in between) — phone mode gets +4px
+ * extra bottom margin so the title-to-cards gap reads consistent with
+ * the title-to-filters gap (20px) when filters ARE shown. */
+const SectionRow = styled.div<{ $noFiltersBelow?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    margin-bottom: 12px;
+    /* Drop the section header down 4px on phone so the title clears the
+     * Welcome subtitle by a touch — visually separates the two stacks. */
+    margin-top: 4px;
+    margin-bottom: ${({ $noFiltersBelow }) => ($noFiltersBelow ? '16px' : '12px')};
   }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
+  font-size: ${({ theme }) => theme.typography.sizes['6xl']};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
 
-  /* Phone — drop from 5xl (26) to 3xl (20) so the section header sits
-   * below the welcome H1 (24) without competing. */
+  /* Phone — section title sits BELOW Welcome H1 (24/sectionHeadline)
+   * in the visual hierarchy, so it should read smaller. 4xl = 22 stays
+   * just under the 24 welcome heading. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+    font-size: ${({ theme }) => theme.typography.sizes['4xl']};
+    gap: 6px;
   }
 `;
 
 const SectionCount = styled.span`
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.text.tertiary};
-  margin-left: 6px;
+  color: ${({ theme }) => theme.colors.text.muted};
   font-size: ${({ theme }) => theme.typography.sizes.lg};
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    font-size: ${({ theme }) => theme.typography.sizes.sm};
+  }
+`;
+
+/* Filter dropdown + sort toggle above "Your widgets" — only rendered
+ * when the user has 6+ saved widgets. Desktop spreads them apart
+ * (filter left, sort right). Phone groups them on the left so the two
+ * matched-pair pills read as a single compact toolbar instead of being
+ * stretched across the full row. */
+const SavedControlsRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  /* margin-top collapses with SectionRow's margin-bottom to the larger
+   * of the two, so 24 here = 24px gap (SectionRow's 16 is absorbed). */
+  margin-top: 24px;
+  margin-bottom: 20px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 20px;
+    margin-bottom: 16px;
+
+    ${FilterRow} {
+      mask-image: none;
+      -webkit-mask-image: none;
+      overflow: visible;
+    }
+
+    ${FilterRow} [data-active='true'] {
+      background: ${({ theme }) => theme.colors.background.surfaceAlt};
+      color: ${({ theme }) => theme.colors.text.primary};
+      border: 1px solid ${({ theme }) => theme.colors.border.medium};
+    }
+    ${FilterRow} [data-active='true']:hover {
+      background: ${({ theme }) => theme.colors.background.surfaceMuted};
+      color: ${({ theme }) => theme.colors.text.primary};
+      border: 1px solid ${({ theme }) => theme.colors.border.medium};
+    }
+  }
+`;
+
+/* Filter dropdown — same compact pill as the sort toggle, but opens a
+ * small popover with category options. Used instead of a row of chips
+ * so the filter and sort controls read as a matching pair (single small
+ * pill + small pill with chevron). */
+const FilterDropdownWrap = styled.div`
+  position: relative;
+`;
+
+const FilterDropdownBtn = styled.button<{ $open: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  background: transparent;
+  border-radius: ${({ theme }) => theme.radii.md};
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.body};
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: background ${({ theme }) => theme.transitions.fast},
+    border-color ${({ theme }) => theme.transitions.fast},
+    color ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.interactive.hover};
+    border-color: ${({ theme }) => theme.colors.border.medium};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+    transform: rotate(${({ $open }) => ($open ? '180deg' : '0deg')});
+  }
+`;
+
+const FilterDropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  min-width: 140px;
+  padding: 4px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  border-radius: ${({ theme }) => theme.radii.md};
+  box-shadow:
+    0 1px 2px rgba(26, 22, 19, 0.04),
+    0 8px 24px -6px rgba(26, 22, 19, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+const FilterDropdownItem = styled.button<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  border: none;
+  background: ${({ $active, theme }) =>
+    $active ? theme.colors.background.surfaceAlt : 'transparent'};
+  color: ${({ $active, theme }) =>
+    $active ? theme.colors.text.primary : theme.colors.text.body};
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: ${({ $active }) => ($active ? 500 : 400)};
+  letter-spacing: -0.01em;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background ${({ theme }) => theme.transitions.fast},
+    color ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.interactive.hover};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+    color: ${({ theme }) => theme.colors.accent};
+  }
+`;
+
+/* Minimal sort toggle — single text-style button that flips between
+ * Newest and Oldest. Reads as a quiet trailing label, not a competing
+ * control next to the filter dropdown. Small chevron rotates to convey
+ * direction. Inspired by Linear / Notion's compact sort affordances. */
+const SortToggleBtn = styled.button<{ $direction: 'desc' | 'asc' }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid ${({ theme }) => theme.colors.border.light};
+  background: transparent;
+  border-radius: ${({ theme }) => theme.radii.md};
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.body};
+  font-family: inherit;
+  font-size: ${({ theme }) => theme.typography.sizes.sm};
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: background ${({ theme }) => theme.transitions.fast},
+    border-color ${({ theme }) => theme.transitions.fast},
+    color ${({ theme }) => theme.transitions.fast};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.interactive.hover};
+    border-color: ${({ theme }) => theme.colors.border.medium};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+    transform: rotate(${({ $direction }) => ($direction === 'desc' ? '0deg' : '180deg')});
+  }
 `;
 
 /* Widget cards. Mobile/tablet adaptation mirrors the /widgets gallery
@@ -131,6 +319,21 @@ const WidgetGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 
+  /* Tablet narrow (769–900) — 3-column grid feels squeezed; drop to 2.
+   * Cards capped at 380px per column so the visual size of each tile
+   * stays constant from ~780 up through 900 (user note: "с 780 до 900
+   * пусть не меняются") instead of growing 60px wider as the viewport
+   * stretches. Grid centers within the page so the empty room appears
+   * symmetrically on both sides rather than reading as a left-bias. */
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 380px));
+    justify-content: center;
+    column-gap: 16px;
+    row-gap: 20px;
+    align-items: start;
+  }
+
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 16px;
@@ -138,7 +341,7 @@ const WidgetGrid = styled.div`
     align-items: start;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 499px) {
     grid-template-columns: 1fr;
     column-gap: 0;
     row-gap: 20px;
@@ -172,24 +375,20 @@ export const WidgetCard = styled.div<{ $i: number }>`
       box-shadow: ${({ theme }) => theme.shadows.mobileCard};
     }
 
-    /* Tag (calendar/clock/board) inside the preview scales up on
-       mobile to match the /widgets gallery card. Default Tag is too
-       small relative to the bigger 2-col / 1-col surfaces. */
+    /* Tag (calendar/clock/board) — slightly smaller on mobile per
+     * "лейблы чуть меньше по размеру" (c_2026 tablet pass). */
     ${Tag} {
-      padding: 5px 12px;
-      font-size: ${({ theme }) => theme.typography.sizes.sm};
+      padding: 4px 10px;
+      font-size: ${({ theme }) => theme.typography.sizes.xs};
     }
   }
 
-  /* 1-в-ряд (≤600) — Tag drops further to sm (12) with 4/11 padding.
-     Iterated through md (13) per "чуть меньше" then again per
-     "лейблы все такие календарь часы и тд которые в карточках когда
-     один в ряд надо меньше" (c_2026-04-29). At full-width the tag
-     should read as a quiet category marker, not a callout. */
-  @media (max-width: 600px) {
+  /* 1-в-ряд (≤679) — Tag stays small but with 3/9 padding. At full-
+     width the tag should read as a quiet category marker. */
+  @media (max-width: 679px) {
     ${Tag} {
-      padding: 4px 11px;
-      font-size: ${({ theme }) => theme.typography.sizes.sm};
+      padding: 3px 9px;
+      font-size: ${({ theme }) => theme.typography.sizes.xs};
     }
   }
 
@@ -201,6 +400,17 @@ export const WidgetCard = styled.div<{ $i: number }>`
     ${Tag} {
       padding: 3px 10px;
       font-size: ${({ theme }) => theme.typography.sizes.xs};
+    }
+  }
+
+  /* Phone-tablet 2-col range (500–680) — cards are narrow enough that
+     the calendar/clock/board Tag inside the preview crowds the small
+     thumbnail and competes with the widget name. Hide it for a cleaner
+     read; name + actions still convey identity. Per "у карточек нет
+     лейблов и название виджетов отдельно строка а кнопки отдельно". */
+  @media (min-width: 500px) and (max-width: 680px) {
+    ${Tag} {
+      display: none;
     }
   }
 `;
@@ -223,14 +433,24 @@ export const WidgetBottom = styled.div`
   justify-content: space-between;
   border-top: 1px solid rgba(0,0,0,0.04);
 
-  /* Compact 3-col range (769-1100) — at the narrow end (≈211px wide
-     at 769 viewport) the inline row "Name | Edit Copy Delete" gets
-     cramped: Edit button text wraps or the actions row pushes the name
-     out of view. Stack the name above a full-width actions row instead,
-     mirroring WidgetGalleryMeta's compact-range layout in /widgets.
-     ≤768 (2-col) and ≤600 (1-col) keep the inline row — at those
-     widths the cards are wide enough to handle name + 3 buttons. */
-  @media (min-width: 769px) and (max-width: 1100px) {
+  /* Compact 3-col range (901-1100) — at the narrow end the inline row
+     "Name | Edit Copy Delete" gets cramped: Edit button text wraps or
+     the actions row pushes the name out of view. Stack the name above
+     a full-width actions row instead. Range starts at 901 (not 769) so
+     the 2-col grid at 769-900 keeps its inline row layout — the wider
+     2-col cards have plenty of room for "Name | actions" on one line.
+     Per "766-900 пусть лейаут не меняется, кнопки в одну линию с именем". */
+  @media (min-width: 901px) and (max-width: 1100px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 12px 12px;
+  }
+
+  /* Phone-tablet 2-col range (500–680) — same column layout: name on
+     its own line, actions on the next. Per "название виджетов
+     отдельно строка а кнопки отдельно". */
+  @media (min-width: 500px) and (max-width: 680px) {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
@@ -296,6 +516,11 @@ const WelcomeH1 = styled.h1`
   letter-spacing: -0.03em;
   margin: 0 0 6px;
 
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
+
   /* Force Apple Color Emoji for the wave 👋 across platforms — keeps the
      iOS-style glyph in Welcome regardless of OS emoji font. */
   .emoji {
@@ -304,11 +529,11 @@ const WelcomeH1 = styled.h1`
     font-weight: normal;
   }
 
-  /* Phone — sectionHeadline rhythm (24/600/1.2). Per "адаптируй
-   * /studio дашборд под телефон" (c_2026-04-29). */
+  /* Phone — bumped to 28 so Welcome reads as the dominant heading on
+   * dashboard and outranks "Your widgets" (22) below it. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.mobile.sectionHeadline.size};
-    line-height: ${({ theme }) => theme.typography.mobile.sectionHeadline.lineHeight};
+    font-size: 28px;
+    line-height: 1.15;
   }
 `;
 
@@ -574,6 +799,80 @@ export const MobileWidgetScale = styled.div`
   filter: drop-shadow(0 6px 18px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04));
 `;
 
+/* Desktop+tablet artboard. Default desktop kept identical to the
+ * earlier inline style (margin 12/12/24/48). On tablet (769–1024) the
+ * studio paddings shrink and the artboard widens — per "паддинги
+ * студии чуть меньше, артборд чуть шире на планшете". */
+export const DesktopArtboard = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+    #F8F8F7;
+  margin: 12px 12px 24px 48px;
+  border-radius: 20px;
+  border: 1px solid ${({ theme }) => theme.colors.border.hairline};
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    margin: 8px 8px 16px 16px;
+  }
+`;
+
+/* Desktop+tablet widget scale. $zoom is the React-state zoom (default
+ * 1.2). On tablet the widget renders 20% smaller than the same zoom
+ * value — per "виджет на 20 процентов меньше на планшете". */
+export const DesktopWidgetScale = styled.div<{ $zoom: number }>`
+  transform: scale(${({ $zoom }) => $zoom}) translateY(-32px);
+  transform-origin: center center;
+  transition: transform 0.15s ease;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04));
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    transform: scale(${({ $zoom }) => $zoom * 0.8}) translateY(-32px);
+  }
+`;
+
+/* Customization panel wrap — desktop 300, tablet 272 (was 240, bumped
+ * +32 per "панель дизайнерскую шире чуть на планшете"). */
+export const DesktopPanelWrap = styled.div`
+  width: 300px;
+  flex-shrink: 0;
+  overflow: auto;
+  background: ${({ theme }) => theme.colors.background.elevated};
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    width: 272px;
+  }
+`;
+
+/* Studio editor top bar — desktop's 48 left + 310 right padding aligns
+ * Back/name with the artboard's 48 left margin and the 300 panel on
+ * the right. On tablet the artboard's left margin shrinks to 16 and
+ * the panel narrows to 240, so the top bar follows: Back/name lock
+ * to the artboard's left edge and the PlanUsageCard hugs the panel's
+ * left edge. Per "Back/Collage Calendar к левой части артборда" +
+ * "Upgrade now к правой части артборда". */
+export const EditorTopBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 310px 0 48px;
+  height: 68px;
+  background: ${({ theme }) => theme.colors.background.elevated};
+  flex-shrink: 0;
+  z-index: 10;
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    padding: 15px 280px 0 16px;
+  }
+`;
+
 export const MobileSectionTabs = styled.div`
   display: flex;
   gap: 6px;
@@ -611,6 +910,34 @@ export const MobileSectionTab = styled.button<{ $active: boolean; $disabled?: bo
   svg { width: 18px; height: 18px; stroke-width: 1.75; }
 `;
 
+/* Board widget is a tall portrait camera frame (340×604 design size)
+ * that doesn't fit the 4:3 card preview at the same scale as Calendar
+ * /Clock. Instead of a fixed transform, give it a sized container at
+ * 94% (6% smaller than full bounds, per user "чуть меньше еще на 6%"). */
+const BoardPreviewFit = styled.div`
+  width: 94%;
+  height: 94%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+`;
+
+/* Board variant of DesktopWidgetScale — bypasses the transform: scale
+ * + filter: drop-shadow that DesktopWidgetScale applies, since the
+ * InspirationBoard ResizeObserver already auto-fits to its container.
+ * Wrapping it in a transform: scale($zoom = 1.2) blew up the 340×604
+ * design size beyond the artboard bounds. */
+const BoardEditorFit = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04));
+`;
+
 /* Preview helpers */
 const PreviewScale = styled.div`
   transform: scale(0.55);
@@ -623,6 +950,20 @@ const PreviewScale = styled.div`
      room around it, matching the visual weight at wider viewports. */
   @media (min-width: 769px) and (max-width: 1100px) {
     transform: scale(0.385);
+  }
+
+  /* 769–900 — 2-col grid + another +8% bump on top so the widget
+   * inside the wider card reads as a confident thumbnail. 0.385
+   * × 1.08 × 1.08 ≈ 0.449. */
+  @media (min-width: 769px) and (max-width: 900px) {
+    transform: scale(0.449);
+  }
+
+  /* 500–680 — phone-tablet 2-col tier. Cards drop the Tag and stack
+   * name/actions, so the preview can shrink 10% from the default 0.55
+   * to feel proportional inside a narrower card. 0.55 × 0.9 ≈ 0.495. */
+  @media (min-width: 500px) and (max-width: 680px) {
+    transform: scale(0.495);
   }
 `;
 
@@ -650,7 +991,7 @@ const WidgetPreview: React.FC<{ type: string; style: string; savedSettings?: Rec
   }
   if (type === 'board') {
     const s = new BoardSettings({ ...saved, layout: style as BoardSettings['layout'] });
-    return <PreviewScale><InspirationBoard settings={s} /></PreviewScale>;
+    return <BoardPreviewFit><InspirationBoard settings={s} /></BoardPreviewFit>;
   }
   return null;
 };
@@ -768,6 +1109,43 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const [deleteTarget, setDeleteTarget] = useState<SavedWidget | null>(null);
   const [studioZoom, setStudioZoom] = useState(1.2);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  /* Filter + sort for "Your widgets" — only surfaces in the UI when the
+   * user has 6+ saved widgets (below that the section reads as a small
+   * grid where chips and a sorter would be visual noise). Keys mirror
+   * SavedWidget.type so filtering is direct. */
+  type SavedFilter = 'all' | 'calendar' | 'clock' | 'board';
+  type SavedSort = 'newest' | 'oldest';
+  const [savedFilter, setSavedFilter] = useState<SavedFilter>('all');
+  const [savedSort, setSavedSort] = useState<SavedSort>('newest');
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const filterMenuRef = useRef<HTMLDivElement>(null);
+
+  /* Close the filter dropdown when the user clicks outside of it. */
+  useEffect(() => {
+    if (!filterMenuOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (!filterMenuRef.current?.contains(e.target as Node)) {
+        setFilterMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [filterMenuOpen]);
+
+  /* Apply filter + sort to the saved widgets list. Memoised so the grid
+   * only re-renders when the underlying data or controls actually change.
+   * Sort compares created_at ISO strings lexicographically (chronological). */
+  const visibleWidgets = useMemo(() => {
+    const list = savedFilter === 'all'
+      ? widgets
+      : widgets.filter(w => w.type === savedFilter);
+    return [...list].sort((a, b) => {
+      const ta = a.created_at || '';
+      const tb = b.created_at || '';
+      return savedSort === 'oldest' ? ta.localeCompare(tb) : tb.localeCompare(ta);
+    });
+  }, [widgets, savedFilter, savedSort]);
   const lastSavedRef = useRef<string>('');
   const savedStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1153,10 +1531,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' as const, height: '100vh', background: theme.colors.background.elevated }}>
         {/* Editor top bar */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 24px 0 48px', paddingRight: 310, height: 68, paddingTop: 15, background: theme.colors.background.elevated, flexShrink: 0, zIndex: 10,
-        }}>
+        <EditorTopBar>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button onClick={handleEditorBack} style={{
               display: 'flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
@@ -1188,7 +1563,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 }}
                 style={{
                   height: 30, padding: '0 10px',
-                  fontSize: 15, fontWeight: 600, color: theme.colors.state.active, letterSpacing: '-0.02em',
+                  fontSize: 15, fontWeight: 600, color: theme.colors.accent, letterSpacing: '-0.02em',
                   fontFamily: 'inherit',
                   border: `1px solid ${theme.colors.state.active}`, borderRadius: 8,
                   background: theme.colors.background.surfaceAlt, outline: 'none', minWidth: 180,
@@ -1201,12 +1576,13 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 aria-label="Rename widget"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontSize: 15, fontWeight: 600, color: theme.colors.state.active, letterSpacing: '-0.02em',
+                  fontSize: 15, fontWeight: 600, color: theme.colors.accent, letterSpacing: '-0.02em',
                   cursor: 'text', padding: '4px 0',
+                  whiteSpace: 'nowrap',
                 }}
                 className="rename-target"
               >
-                <span>{editingWidgetName || editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
+                <span style={{ whiteSpace: 'nowrap' }}>{editingWidgetName || editingWidgetKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
                 <Pencil
                   style={{
                     width: 11, height: 11, color: theme.colors.text.tertiary,
@@ -1247,23 +1623,12 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               />
             )}
           </div>
-        </div>
+        </EditorTopBar>
 
         {/* Editor body */}
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           {/* Artboard */}
-          <div style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            position: 'relative', overflow: 'hidden',
-            background: `
-              radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 20%, rgba(51, 132, 244, 0.04) 0%, transparent 50%),
-              radial-gradient(ellipse at 60% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
-              #F8F8F7`,
-            margin: '12px 12px 24px 48px',
-            borderRadius: 20,
-            border: `1px solid ${theme.colors.border.hairline}`,
-          }}>
+          <DesktopArtboard>
             {/* Dot grid */}
             <div style={{
               position: 'absolute', inset: 0,
@@ -1275,14 +1640,19 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
             {/* Widget — flex parent centers horizontally; translateY(-32px)
                 lifts it slightly above the geometric center so the bottom
-                Copy toolbar doesn't crowd it. */}
-            <div style={{
-              transform: `scale(${studioZoom}) translateY(-32px)`, transformOrigin: 'center center',
-              transition: 'transform 0.15s ease',
-              filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.08)) drop-shadow(0 2px 6px rgba(0,0,0,0.04))',
-            }}>
-              <WidgetDisplay widget={editingWidget} />
-            </div>
+                Copy toolbar doesn't crowd it. Board widget bypasses the
+                DesktopWidgetScale transform (which would multiply its
+                340×604 design size by zoom and overflow the artboard) —
+                its own ResizeObserver auto-scales to fit. */}
+            {editingWidget.type === 'board' ? (
+              <BoardEditorFit>
+                <WidgetDisplay widget={editingWidget} />
+              </BoardEditorFit>
+            ) : (
+              <DesktopWidgetScale $zoom={studioZoom}>
+                <WidgetDisplay widget={editingWidget} />
+              </DesktopWidgetScale>
+            )}
 
             {/* Floating toolbar — bottom center */}
             <div style={{
@@ -1312,13 +1682,10 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 {copied ? <><Check /> Copied!</> : <><Copy /> Copy</>}
               </SharedButton>
             </div>
-          </div>
+          </DesktopArtboard>
 
           {/* Customization panel */}
-          <div style={{
-            width: 300, flexShrink: 0, overflow: 'auto',
-            background: theme.colors.background.elevated,
-          }}>
+          <DesktopPanelWrap>
             <CustomizationPanel
               widget={editingWidget}
               onSettingsChange={(settings) => {
@@ -1330,7 +1697,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               widgetLimit={3}
               onUpgrade={() => openUpgrade()}
             />
-          </div>
+          </DesktopPanelWrap>
         </div>
         {/* Custom-positioned toast for editor mode — centered over the
             artboard column (viewport center minus half the 300px sidebar).
@@ -1488,9 +1855,65 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
             </BannerSurface>
 
             {/* Your widgets */}
-            <SectionRow>
+            <SectionRow $noFiltersBelow={widgets.length < 6 || new Set(widgets.map(w => w.type)).size < 2}>
               <SectionTitle>Your widgets <SectionCount>{widgets.length}</SectionCount></SectionTitle>
             </SectionRow>
+
+            {/* Filter + sort controls — show only when 6+ widgets AND
+              the user has at least 2 different widget types. With one
+              type the chips would be redundant (everything matches "All"
+              + that one type). With <6 widgets the grid is small enough
+              that filters add visual noise instead of speed. */}
+            {widgets.length >= 6 && new Set(widgets.map(w => w.type)).size >= 2 && (() => {
+              const FILTER_OPTIONS = ([
+                { key: 'all', label: 'All' },
+                { key: 'calendar', label: 'Calendars' },
+                { key: 'clock', label: 'Clocks' },
+                { key: 'board', label: 'Boards' },
+              ] as const).filter(f => f.key === 'all' || widgets.some(w => w.type === f.key));
+              const activeLabel = FILTER_OPTIONS.find(f => f.key === savedFilter)?.label ?? 'All';
+              return (
+                <SavedControlsRow>
+                  <FilterDropdownWrap ref={filterMenuRef}>
+                    <FilterDropdownBtn
+                      $open={filterMenuOpen}
+                      onClick={() => setFilterMenuOpen(o => !o)}
+                      aria-haspopup="menu"
+                      aria-expanded={filterMenuOpen}
+                    >
+                      {activeLabel}
+                      <ChevronDown />
+                    </FilterDropdownBtn>
+                    {filterMenuOpen && (
+                      <FilterDropdownMenu role="menu">
+                        {FILTER_OPTIONS.map(f => (
+                          <FilterDropdownItem
+                            key={f.key}
+                            $active={savedFilter === f.key}
+                            onClick={() => {
+                              setSavedFilter(f.key);
+                              setFilterMenuOpen(false);
+                            }}
+                            role="menuitem"
+                          >
+                            {f.label}
+                            {savedFilter === f.key && <Check />}
+                          </FilterDropdownItem>
+                        ))}
+                      </FilterDropdownMenu>
+                    )}
+                  </FilterDropdownWrap>
+                  <SortToggleBtn
+                    $direction={savedSort === 'newest' ? 'desc' : 'asc'}
+                    onClick={() => setSavedSort(savedSort === 'newest' ? 'oldest' : 'newest')}
+                    aria-label={`Sort by ${savedSort === 'newest' ? 'newest' : 'oldest'} first`}
+                  >
+                    {savedSort === 'newest' ? 'Newest' : 'Oldest'}
+                    <ChevronDown />
+                  </SortToggleBtn>
+                </SavedControlsRow>
+              );
+            })()}
 
             {!loading && widgets.length === 0 ? (
               <DashEmptyBox onClick={() => navigate('/widgets')}>
@@ -1498,12 +1921,23 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 <DashEmptyTitle>No widgets yet</DashEmptyTitle>
                 <DashEmptyHint>Create your first widget from the gallery above</DashEmptyHint>
               </DashEmptyBox>
+            ) : visibleWidgets.length === 0 ? (
+              <DashEmptyBox onClick={() => setSavedFilter('all')}>
+                <DashEmptyCircle><Plus /></DashEmptyCircle>
+                <DashEmptyTitle>No widgets in this category</DashEmptyTitle>
+                <DashEmptyHint>Tap to clear the filter</DashEmptyHint>
+              </DashEmptyBox>
             ) : (
               <WidgetGrid>
-                {widgets.map((w, i) => (
+                {visibleWidgets.map((w, i) => (
                   <WidgetCard key={w.id} $i={i}>
                     <WidgetPreviewWrap onClick={() => handleEdit(w)}>
-                      <Tag $accent style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>{w.type === 'calendar' ? 'calendar' : w.type === 'clock' ? 'clock' : 'board'}</Tag>
+                      <Tag
+                        $kind={w.type === 'calendar' ? 'calendar' : w.type === 'clock' ? 'clock' : 'board'}
+                        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}
+                      >
+                        {w.type === 'calendar' ? 'calendar' : w.type === 'clock' ? 'clock' : 'board'}
+                      </Tag>
                       <WidgetPreview type={w.type} style={w.style} savedSettings={w.settings} />
                     </WidgetPreviewWrap>
                     <WidgetBottom>

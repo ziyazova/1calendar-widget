@@ -84,25 +84,6 @@ const DebugBadge = styled.button`
   &:hover { background: #cc2a22; }
 `;
 
-const DebugToggle = styled.button<{ $on: boolean }>`
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
-  border-radius: ${({ theme }) => theme.radii.md};
-  border: none;
-  background: ${({ $on }) => $on ? '#FF3B30' : 'rgba(0,0,0,0.06)'};
-  color: ${({ $on }) => $on ? '#fff' : '#999'};
-  font-size: 18px;
-  cursor: pointer;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${({ theme }) => theme.transitions.medium};
-  &:hover { background: ${({ $on }) => $on ? '#cc2a22' : 'rgba(0,0,0,0.1)'}; }
-`;
 
 const RedlinesOverlay = styled.div`
   position: fixed;
@@ -242,7 +223,6 @@ export const DebugOverlay: React.FC = () => {
           )}
         </RedlinesOverlay>
       )}
-      <DebugToggle $on={debug.enabled} onClick={debug.toggle} data-debug-ui>{'\u2699'}</DebugToggle>
     </>
   );
 };

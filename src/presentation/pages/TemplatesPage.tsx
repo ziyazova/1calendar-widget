@@ -38,6 +38,11 @@ const PageTitle = styled.h1`
   letter-spacing: ${({ theme }) => theme.typography.letterSpacing.tight};
   margin: 0 0 10px;
 
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+    font-size: 32px;
+  }
+
   /* Phone — sectionHeadline tokens (24/600/1). Margin-bottom = titleToBody
    * (8) — Title → Subtitle rhythm matches every landing section that has
    * a subtitle. Per "расстояние от title до body как на лендинге". */
