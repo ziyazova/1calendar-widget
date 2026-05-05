@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { analyzeElement, type DebugDetails } from './debugAnalyzer';
 
 export function useDebugMode() {
   const [enabled, setEnabled] = useState(false);
   const [info, setInfo] = useState('');
+  const [details, setDetails] = useState<DebugDetails | null>(null);
   const [locked, setLocked] = useState(false);
   const selectedRef = useRef<HTMLElement | null>(null);
   const secondRef = useRef<HTMLElement | null>(null);
@@ -193,14 +195,17 @@ export function useDebugMode() {
         return;
       }
 
-      // First click — select element
+      // First click — select element + run full analysis (tokens +
+      // responsive). Hover keeps the cheap string-only path; click is
+      // when the user wants the rich panel.
       if (selectedRef.current) selectedRef.current.removeAttribute('data-debug-selected');
       if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
       el.setAttribute('data-debug-selected', 'true');
       selectedRef.current = el;
       setMeasureInfo('');
-      const text = getInfo(el);
-      setInfo(text);
+      const analysis = analyzeElement(el);
+      setDetails(analysis);
+      setInfo(analysis.text);
       setLocked(true);
     };
 
@@ -228,6 +233,7 @@ export function useDebugMode() {
     if (selectedRef.current) { selectedRef.current.removeAttribute('data-debug-selected'); selectedRef.current = null; }
     if (secondRef.current) { secondRef.current.removeAttribute('data-debug-selected'); secondRef.current = null; }
     setLocked(false);
+    setDetails(null);
     setMeasureInfo('');
   }, []);
   const copyInfo = useCallback(() => {
@@ -270,5 +276,5 @@ export function useDebugMode() {
     return () => document.removeEventListener('mousemove', update);
   }, [enabled, locked]);
 
-  return { enabled, info, toggle, locked, unlock, copyInfo, measureMode, toggleMeasure, measureInfo, redlines };
+  return { enabled, info, details, toggle, locked, unlock, copyInfo, measureMode, toggleMeasure, measureInfo, redlines };
 }

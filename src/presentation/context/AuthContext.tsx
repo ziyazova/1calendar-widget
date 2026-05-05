@@ -47,6 +47,13 @@ interface AuthContextType {
   isPro: boolean;
   planLoading: boolean;
   refreshPlan: () => Promise<void>;
+  /* Dev-only override — when ON in dev, treats the current session as
+   * Pro + registered so the owner can test gated features (settings,
+   * unlimited widgets, paid-only styles) without buying a subscription
+   * or running SQL on the profiles table. Wired through the dev panel
+   * toggle. Has no effect in production builds. */
+  devProOverride: boolean;
+  setDevProOverride: (on: boolean) => void;
 }
 
 const GUEST_CODE = 'PEACHY2026';
@@ -77,6 +84,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGuest, setIsGuest] = useState(() => localStorage.getItem(GUEST_KEY) === 'true');
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<Plan>(DEFAULT_PLAN);
+  /* Dev-only Pro override — read from localStorage so the toggle
+   * survives reloads. Disabled at build time outside dev so the flag
+   * never affects production users. */
+  const [devProOverride, setDevProOverrideState] = useState<boolean>(() => {
+    if (!import.meta.env.DEV) return false;
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('peachy-dev-pro') === '1';
+  });
+  const setDevProOverride = useCallback((on: boolean) => {
+    if (!import.meta.env.DEV) return;
+    if (on) localStorage.setItem('peachy-dev-pro', '1');
+    else localStorage.removeItem('peachy-dev-pro');
+    setDevProOverrideState(on);
+  }, []);
   // planLoading stays true until the first getPlan() resolves — surfaces
   // cleanly gate Pro-only UI so a logged-in user doesn't see a flash of
   // free-tier state (upgrade ring, Upgrade button) on hard refresh.
@@ -136,7 +157,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const mode: AuthMode = supabaseUser ? 'registered' : isGuest ? 'guest' : null;
-  const user = supabaseUser ? profileFromUser(supabaseUser) : isGuest ? { name: 'Guest User', email: 'guest@peachy.studio', avatarUrl: undefined } : null;
+  /* Dev override synthesises a profile so guarded pages (Settings,
+   * /studio account-sidebar) render without a real Supabase session.
+   * Only kicks in when devProOverride is ON in dev. */
+  const devUser: UserProfile = { name: 'Dev User', email: 'dev@peachy.studio', avatarUrl: undefined };
+  const realUser = supabaseUser ? profileFromUser(supabaseUser) : isGuest ? { name: 'Guest User', email: 'guest@peachy.studio', avatarUrl: undefined } : null;
+  const user = realUser ?? (devProOverride && import.meta.env.DEV ? devUser : null);
 
   const loginWithCode = useCallback((code: string): boolean => {
     // Don't shadow an existing registered session with the guest flag —
@@ -302,14 +328,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const hasGoogleLogin = identities.some(i => i.provider === 'google');
   const isEmailVerified = Boolean(supabaseUser?.email_confirmed_at);
 
+  /* When devProOverride is ON in dev: treat the session as registered
+   * + Pro so guarded UI (Settings page, Pro-only widget styles,
+   * unlimited widgets) becomes accessible. Production builds always
+   * see effectiveOverride === false because devProOverride is gated
+   * behind import.meta.env.DEV at the setter. */
+  const effectiveOverride = devProOverride && import.meta.env.DEV;
+  const effectiveMode: AuthMode = effectiveOverride ? 'registered' : mode;
+  const effectiveIsRegistered = effectiveOverride ? true : mode === 'registered';
+  const effectiveIsPro = effectiveOverride ? true : plan.isPro;
+
   return (
     <AuthContext.Provider value={{
-      mode,
+      mode: effectiveMode,
       user,
       supabaseUser,
-      isLoggedIn: mode !== null,
+      isLoggedIn: effectiveOverride ? true : mode !== null,
       isGuest,
-      isRegistered: mode === 'registered',
+      isRegistered: effectiveIsRegistered,
       loading,
       loginWithCode,
       register,
@@ -331,9 +367,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       hasPasswordLogin,
       hasGoogleLogin,
       plan,
-      isPro: plan.isPro,
+      isPro: effectiveIsPro,
       planLoading,
       refreshPlan,
+      devProOverride: effectiveOverride,
+      setDevProOverride,
     }}>
       {children}
     </AuthContext.Provider>

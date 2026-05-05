@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Plus, X, List, Sparkles, Bug } from 'lucide-react';
+import { MessageSquarePlus, X, MessageSquare, Inspect, Sparkles, Palette } from 'lucide-react';
 import { useDevPanelsHidden } from './useDevPanelsHidden';
+import { useAuth } from '@/presentation/context/AuthContext';
 
 type Mode = 'idle' | 'picking' | 'composing' | 'list';
 type Category = 'copy' | 'spacing' | 'color' | 'layout' | 'bug' | 'other';
@@ -40,6 +41,7 @@ interface Comment {
 
 export function ClaudeFeedback() {
   const hidden = useDevPanelsHidden();
+  const { devProOverride, setDevProOverride } = useAuth();
   const [mode, setMode] = useState<Mode>('idle');
   const [target, setTarget] = useState<PickedTarget | null>(null);
   const [comment, setComment] = useState('');
@@ -361,54 +363,55 @@ export function ClaudeFeedback() {
 
       {!hidden && (
         <DevPanel data-debug-ui>
-          <DevBrand>Feedback</DevBrand>
-
+          {/* Single-line rows — title + optional badge, no DevSub.
+              Cleaner stack now that we're up to 5 actions. Hover the
+              row for full label via title attribute. */}
           <DevRow
             $active={mode === 'picking'}
             onClick={() => setMode(mode === 'picking' ? 'idle' : 'picking')}
+            title={mode === 'picking' ? 'Cancel picking (esc)' : 'Pick any element to leave a comment'}
           >
-            <DevIcon>{mode === 'picking' ? <X /> : <Plus />}</DevIcon>
-            <DevText>
-              <DevTitle>{mode === 'picking' ? 'Cancel picking' : 'New comment'}</DevTitle>
-              <DevSub>{mode === 'picking' ? 'esc to exit' : 'pick any element on page'}</DevSub>
-            </DevText>
+            <DevIcon>{mode === 'picking' ? <X /> : <MessageSquarePlus />}</DevIcon>
+            <DevTitle>{mode === 'picking' ? 'Cancel' : 'New comment'}</DevTitle>
           </DevRow>
 
           <DevRow
             $active={mode === 'list'}
             onClick={() => setMode(mode === 'list' ? 'idle' : 'list')}
+            title={`${pendingCount} pending · ${fixedCount} fixed`}
           >
-            <DevIcon><List /></DevIcon>
-            <DevText>
-              <DevTitle>
-                View comments
-                {(pendingCount + fixedCount) > 0 && (
-                  <DevBadge $green={fixedCount > 0 && pendingCount === 0}>
-                    {fixedCount > 0 ? fixedCount : pendingCount}
-                  </DevBadge>
-                )}
-              </DevTitle>
-              <DevSub>{pendingCount} pending · {fixedCount} fixed</DevSub>
-            </DevText>
+            <DevIcon><MessageSquare /></DevIcon>
+            <DevTitle>
+              Comments
+              {(pendingCount + fixedCount) > 0 && (
+                <DevBadge $green={fixedCount > 0 && pendingCount === 0}>
+                  {fixedCount > 0 ? fixedCount : pendingCount}
+                </DevBadge>
+              )}
+            </DevTitle>
           </DevRow>
 
           <DevRow
             $active={debugOn}
             onClick={() => window.dispatchEvent(new Event('peachy:toggle-debug'))}
+            title="Toggle debug inspector (⌃D)"
           >
-            <DevIcon><Bug /></DevIcon>
-            <DevText>
-              <DevTitle>{debugOn ? 'Debug inspector — ON' : 'Debug inspector'}</DevTitle>
-              <DevSub>{debugOn ? 'click to turn off · ⌃D' : 'spacing, typography, tokens · ⌃D'}</DevSub>
-            </DevText>
+            <DevIcon><Inspect /></DevIcon>
+            <DevTitle>Debug{debugOn ? ' · on' : ''}</DevTitle>
           </DevRow>
 
-          <DevRowLink href="/dev">
+          <DevRow
+            $active={devProOverride}
+            onClick={() => setDevProOverride(!devProOverride)}
+            title={devProOverride ? 'Pro override is ON — unlimited widgets, settings unlocked' : 'Toggle Pro override for testing'}
+          >
             <DevIcon><Sparkles /></DevIcon>
-            <DevText>
-              <DevTitle>Design system</DevTitle>
-              <DevSub>token-driven · mirrors prod · /dev</DevSub>
-            </DevText>
+            <DevTitle>Pro{devProOverride ? ' · on' : ''}</DevTitle>
+          </DevRow>
+
+          <DevRowLink href="/dev" title="Design system showcase (/dev)">
+            <DevIcon><Palette /></DevIcon>
+            <DevTitle>Design system</DevTitle>
           </DevRowLink>
         </DevPanel>
       )}
@@ -481,30 +484,34 @@ const DevPanel = styled.div`
   position: fixed;
   bottom: 16px;
   right: 16px;
-  width: 220px;
+  width: 208px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  /* Frosted glass — matches BranchSwitcher Bar. Opaque fallback for
-     browsers without backdrop-filter. */
-  background: rgba(22, 22, 24, 0.68);
+  gap: 2px;
+  padding: 8px;
+  /* Tinted obsidian glass — slightly cooler than pure black, with a
+   * very soft indigo undertone so the panel reads as part of the
+   * Peachy palette rather than a generic devtool. */
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(99, 102, 241, 0.10) 0%, rgba(99, 102, 241, 0) 60%),
+    rgba(18, 18, 22, 0.72);
   @supports not (backdrop-filter: blur(0)) {
-    background: rgba(22, 22, 24, 0.96);
+    background: rgba(18, 18, 22, 0.96);
   }
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   color: #fff;
   font-family: ui-monospace, monospace;
   font-size: 12px;
   z-index: 2147483600;
   box-shadow:
-    0 20px 40px -12px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 24px 48px -16px rgba(0, 0, 0, 0.55),
+    0 4px 12px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20);
   border-radius: ${({ theme }) => theme.radii.xl};
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  animation: ${slideInPanel} 0.28s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  animation: ${slideInPanel} 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 const DevBrand = styled.div`
@@ -520,32 +527,57 @@ const DevBrand = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 `;
 
-// Plain string — no theme context. Keep literals (this is dev tooling only).
+/* Plain string — no theme context. Keep literals (this is dev tooling
+ * only). Spring-curve transition on every prop so toggle/hover feels
+ * tactile rather than mechanical. */
 const devRowBase = `
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
-  border-radius: 12px;
+  padding: 7px 10px;
+  border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition:
+    background 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.22s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   text-align: left;
   text-decoration: none;
   width: 100%;
+  position: relative;
 `;
 
 const DevRow = styled.button<{ $active: boolean }>`
   ${devRowBase}
-  background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'transparent')};
-  border-color: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.14)' : 'transparent')};
+  /* Active = soft indigo wash + glowing edge, picking up Peachy's
+   * brand accent (#6366F1). Inactive rows stay quiet — only the
+   * active one carries colour, which makes the panel feel alive
+   * without being noisy. */
+  background: ${({ $active }) => ($active
+    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(99, 102, 241, 0.10))'
+    : 'transparent')};
+  border-color: ${({ $active }) => ($active ? 'rgba(129, 140, 248, 0.35)' : 'transparent')};
+  color: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.85)')};
+  box-shadow: ${({ $active }) => ($active
+    ? '0 0 0 1px rgba(129, 140, 248, 0.10), 0 6px 18px -8px rgba(99, 102, 241, 0.50)'
+    : 'none')};
 
   &:hover {
-    background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)')};
-    border-color: rgba(255, 255, 255, 0.12);
+    background: ${({ $active }) => ($active
+      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(99, 102, 241, 0.14))'
+      : 'rgba(255, 255, 255, 0.06)')};
+    border-color: ${({ $active }) => ($active ? 'rgba(129, 140, 248, 0.45)' : 'rgba(255, 255, 255, 0.10)')};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -553,8 +585,13 @@ const DevRowLink = styled.a`
   ${devRowBase}
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.10);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -562,14 +599,15 @@ const DevIcon = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: currentColor;
+  opacity: 0.85;
   svg {
-    width: 14px;
-    height: 14px;
-    stroke-width: 2;
+    width: 15px;
+    height: 15px;
+    stroke-width: 1.75;
   }
 `;
 

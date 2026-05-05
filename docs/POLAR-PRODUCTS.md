@@ -1,88 +1,181 @@
-# Polar product catalogue — 2026-04-18 snapshot
+# Polar product integration
 
-Source of truth for Polar product ids used by in-site checkout. Refresh by
-hitting the `polar-list-products` Edge Function (naming convention in Polar
-is `{etsyListingId} - {title}` so auto-matching by Etsy id works).
+> Updated 2026-05-05 — migrated from hardcoded `polarProductId` UUIDs in code
+> to runtime resolution via Etsy listing id. See **Architecture** below.
 
-> To refresh: open
-> `https://vyycfwgkawtqkjllvsuc.supabase.co/functions/v1/swift-processor`
-> (current deployment name; rename later) — returns JSON. Paste into this
-> file or diff against it.
+## Architecture
 
-## Subscription
+**Single source of truth: the Etsy listing id.** Each template in
+`src/presentation/data/templates.ts` carries only an `etsyUrl`
+(e.g. `https://www.etsy.com/listing/1736107034`). The numeric id is
+parsed out via `getTemplateEtsyId()` and used everywhere downstream.
 
-| Name | Polar product id | Price | Recurring |
-|---|---|---|---|
-| Peachy Widget Subscription | `32f0b97d-accd-42e8-a495-4139dab6961d` | $4.00 | monthly |
+Polar's internal UUIDs (`ce9b8c81-...`) **do not appear in the code**. They
+live only in Polar's dashboard. The `polar-checkout` Edge Function resolves
+Etsy id → Polar UUID at request time by listing all Polar products and
+matching the one whose name starts with `{etsyId} `.
 
-Referenced by `POLAR_PRO_PRICE_ID` (Supabase secret — env var kept the legacy
-name even though it's a product id now).
+```
+   templates.ts                  polar-checkout                    Polar
+   ────────────                  ──────────────                    ─────
+   etsyUrl: ".../1736107034"  →  GET /v1/products/?limit=100   →   33 items
+                                 find(name startsWith "1736107034 ")
+                                 → product.id (UUID)
+                                 POST /v1/checkouts/ { products: [UUID] }
+                                                                   ↓
+                                  successful payment              Polar webhook
+                                                                   ↓
+                                  recordOrder() in polar-webhook   purchases table
+```
 
-## Templates mapped to site (`src/presentation/data/templates.ts`)
+### Why this design
 
-These 13 have a card on the site and a `polarProductId` in code.
+- One mental model: you think in Etsy ids (Etsy listing + Polar product
+  name + URL slug all share the same number).
+- Polar UUIDs can change (recreate product → new UUID) without any code
+  edit. As long as the Polar product name still starts with the Etsy id,
+  the site keeps working.
+- No periodic sync script, no manual UUID copy-paste, no out-of-date
+  mapping table to maintain.
 
-| Etsy id | Template title | Polar product id | Price |
-|---|---|---|---|
-| 1736107034 | Notion Life Planner, Coquette Dashboard | `ce9b8c81-b345-40a2-bf2b-88d98206a4c1` | $9.00 |
-| 1755349936 | Ultimate Wellness Notion 2026 | `7bdfe90a-5182-42b7-83da-8580d13660a8` | $8.00 |
-| 1783878805 | Notion Student Planner, ADHD Academic Dashboard | `c7ed28ea-f289-4d9b-995c-1b3d5d963c12` | $8.00 |
-| 1825825830 | Notion Life Planner, Cottagecore Dashboard | `b93535e2-b518-4bb1-b18e-d166b867c2a3` | $9.00 |
-| 1737912942 | Witchy Notion Life Planner, Dark Academia | `52d1dbea-bc2a-4c91-bf75-abc50b34dead` | $10.00 |
-| 1773207250 | Light Academia Notion Student Planner | `73771fd2-284e-499d-9fc5-e1219ab861c4` | $8.00 |
-| 1775842529 | Glow Up Notion, Self-Care & Fitness | `48899592-5480-452c-931f-1f070cfcf8eb` | $8.00 |
-| 1827799444 | Matcha Notion Life Planner | `23df2ca8-7b26-49d7-8173-22d7d9d44b27` | $9.00 |
-| 1837862393 | Notion Life Planner 2026, Coquette | `410c035a-e013-4a0e-9ff6-8e60df1d7c64` | $9.00 |
-| 1824384930 | Minimalist Notion Life Planner | `83f84551-d312-4e81-ad41-ca42663d5424` | $9.00 |
-| 1787041091 | Dark Academia Notion Student Planner | `9c94c452-3bf2-42f3-ba68-15e7f96021d6` | $8.00 |
-| 1785090897 | University Student Planner, ADHD Study | `f6d16580-63f9-4d2d-9081-a4dc76252384` | $8.00 |
+### The naming convention is load-bearing
 
-(Template id=5 in `templates.ts` shares Polar product with id=3 — both point
-to Etsy listing 1783878805. Split if you want a distinct SKU.)
+Every Polar product **must** be named `{etsyId} {anything}` — for example
+`1736107034 Notion Life Planner`. If you remove the leading Etsy id from
+a product name, Buy Now for that template will fail with
+`product_not_found_for_etsy_id`.
 
-## Polar products with NO matching site card (21 — add cards if useful)
+## Files
 
-Use this when creating new `TEMPLATES[]` entries: pick a row, copy the id,
-paste into a new card with `etsyUrl: 'https://www.etsy.com/listing/{etsyId}'`.
+| File | Role |
+|---|---|
+| `src/presentation/data/templates.ts` | Template catalogue. `etsyUrl` is the join key. Exports `getEtsyIdFromUrl()` + `getTemplateEtsyId()` helpers. |
+| `src/presentation/pages/TemplateDetailPage.tsx` | Buy Now button passes `etsyId` to the Edge Function. |
+| `src/infrastructure/services/SubscriptionService.ts` | `startCheckout({ etsyId })` — no etsyId means subscription. |
+| `supabase/functions/polar-checkout/index.ts` | Resolves `etsyId` → Polar UUID, opens hosted checkout. Subscription path uses `POLAR_PRO_PRICE_ID` env var. |
+| `supabase/functions/polar-webhook/index.ts` | Handles `subscription.*` (writes `profiles`) **and** `order.*` (writes `purchases`). |
+| `src/infrastructure/services/PurchaseService.ts` | Reads `purchases` table. |
+| `src/presentation/components/dashboard/PurchaseList.tsx` | Matches purchase → template by extracting leading number from `product_name`. |
+| `supabase/migrations/006_purchases.sql` | DB schema for one-time purchases. |
+| `supabase/functions/polar-list-products/index.ts` | Helper Edge Function — dumps all Polar products. Use for debugging or audits. |
 
-| Etsy id | Product name | Polar product id | Price |
-|---|---|---|---|
-| 1511075211 | Skincare Tracker Notion, Routine Planner | `6a7ead90-e57a-46ec-85c9-a61bbe2976d4` | $3.00 |
-| 1785090897 | University Student Planner, ADHD Study Dashboard | — duplicate — | — |
-| 1833782524 | Notion Bundle: Witchy Life & Dark Academia | `4abdb10b-587b-45a3-abd3-4881a8216901` | $14.00 |
-| 1455009409 | Ultimate Life Planner Notion 2025 + Video Guides | `040fcdf2-c861-4954-98e4-c5a6abb6e473` | $8.00 |
-| 1648357642 | Ultimate Life Planner Notion, All-in-One 2025 | `01da9eae-f8da-4f11-a856-7011d644a4e1` | $9.00 |
-| 1518242629 | Notion Ultimate Life Planner, All-in-One | `6ac96e68-5511-4109-b5c5-b5efc1bef1a2` | $9.00 |
-| 1770857990 | Notion Academic Planner, ADHD Student Dashboard | `b197502b-844d-436c-91f4-7a193a6d9397` | $8.00 |
-| 1847967787 | Light Academia Bundle v2 | `54c9d148-f18e-49c2-aa69-8071893206d2` | $14.00 |
-| 1833776562 | Light Academia Bundle | `ef1cfa0f-9ad4-4154-b9f0-5ac969be8594` | $14.00 |
-| 1833783004 | ADHD Notion Bundle | `fd9c4d06-3614-4a21-afe6-119f6fa1c897` | $14.00 |
-| 1833778056 | Coquette Notion Bundle | `c0651cba-39aa-4944-89d5-583a9bec7608` | $14.00 |
-| 1655623970 | That Girl Student Planner | `cf89fac3-cde8-4e94-ba99-fa3dd3dd6404` | $9.00 |
-| 1750838601 | It Girl Notion Life Planner | `e8cf6082-4dbf-4a0e-9166-f17d4fc35781` | $9.00 |
-| 1843358559 | Notion Life Planner, Pink Dashboard 2026 | `7c055968-895d-44c7-8eb2-ae5c129d53a0` | $9.00 |
-| 1833770890 | Glow Up Bundle: Light Academia & Self-Care | `d481bb75-a767-42ca-a465-7a3ecc736c43` | $14.00 |
-| 1833774500 | Glow Up Notion Bundle | `1958ccc3-d2a4-488d-95a7-7d8720497bc1` | $14.00 |
-| 1847984631 | Ultimate Notion Bundle: Life, Student & Wardrobe | `2f0c6d58-3bd1-4304-9635-7c8ef6a40c70` | $13.00 |
-| 1479569220 | Aesthetic Wardrobe Manager Notion | `f3830fb0-1870-45fe-932e-0edb8abd76be` | $5.00 |
-| 1847987121 | Matcha Notion Bundle | `f651af0a-4c50-43c3-b860-eb2490971c41` | $13.00 |
-| 1786418895 | ADHD Student Planner, Minimalist Academic | `53468f90-a2d3-4743-8000-5a7903b35c04` | $8.00 |
-| 1847972665 | Wellness Notion Bundle | `d3659ef9-0ab5-47d6-98fe-492b8606f209` | $14.00 |
-| 1785036251 | College Student Planner, ADHD Study | `2434de75-b855-47e3-8a50-7c421937e180` | $8.00 |
+## End-to-end flow
 
-## Adding a new template card (cheat sheet)
+1. User opens `/templates/{etsyId}` and clicks **Buy Now**.
+2. `TemplateDetailPage.handleBuyNow` calls
+   `SubscriptionService.startCheckout({ etsyId, successPath: '/studio?purchased={etsyId}' })`.
+3. Edge Function `polar-checkout` lists Polar products, finds the one
+   matching `etsyId`, creates a hosted checkout for its UUID.
+4. User completes payment on Polar.
+5. Polar redirects browser to `successPath`.
+6. Polar fires `order.paid` webhook → `polar-webhook` writes a row to
+   `purchases` (with `polar_product_id` UUID, `product_name`, etsy id in
+   metadata, etc).
+7. Dashboard's Purchases tab loads via `PurchaseService.getMyPurchases()`,
+   `PurchaseList` parses Etsy id from `product_name`, joins to local
+   `TEMPLATES` for image + title.
 
-1. Find the product in the table above (or refresh via the Edge Function).
-2. In `src/presentation/data/templates.ts`, add a new entry to `TEMPLATES`
-   with `polarProductId: '<id>'` plus the usual fields (title, description,
-   image, etc.).
-3. Commit. No Polar-side change needed.
+## Adding a new template
 
-## Known drift
+1. **In Polar dashboard** ([products](https://polar.sh/dashboard/aliia-ziiazova/products)):
+   - Either create a new product named `{etsyId} {whatever}`, or pick an
+     existing one with the right Etsy id in its name.
+   - The product's UUID doesn't matter to the codebase — the Etsy id in
+     the name is the join key.
+2. **In `src/presentation/data/templates.ts`**, add a new entry to
+   `TEMPLATES` with at minimum:
+   ```ts
+   {
+     id: '<etsyId>',                                       // page slug
+     title: '...',
+     etsyUrl: 'https://www.etsy.com/listing/<etsyId>',     // join key
+     // ...standard fields: description, price, image, etc.
+   }
+   ```
+3. Commit, push, deploy. **No Polar-side change** needed beyond ensuring
+   the product name starts with the Etsy id.
 
-- Prices in `templates.ts` (`price` / `priceNum`) are **hard-coded** and may
-  drift from Polar. Do a price reconciliation pass whenever you touch this
-  doc — align the card price to what Polar actually charges.
-- Product names in Polar include the Etsy listing id prefix because that's
-  how the sync was seeded. Do **not** rename the prefix — it's the join key
-  for this doc.
+The Buy Now button picks up `etsyUrl` automatically and the resolver finds
+the Polar product on the next click.
+
+## Removing a template
+
+Just delete the entry from `TEMPLATES`. The Polar product can stay or be
+archived in Polar — neither side breaks.
+
+## Editing prices
+
+Prices in `templates.ts` (`price` / `priceNum`) are **hard-coded** and
+must be kept in sync with the Polar product price manually. Do a price
+reconciliation pass whenever you touch this doc — align the card price to
+what Polar actually charges.
+
+## Subscription (Peachy Pro) — separate flow
+
+Subscription doesn't go through the Etsy id resolver. The Edge Function
+falls back to `POLAR_PRO_PRICE_ID` (Supabase secret) when no `etsyId` is
+in the request body. Upgrade button in `UpgradeModal` calls
+`startCheckout()` with no args. See `docs/SUBSCRIPTION.md`.
+
+## Webhook events to subscribe in Polar
+
+In Polar dashboard → Settings → Webhooks → your endpoint
+(`https://vyycfwgkawtqkjllvsuc.supabase.co/functions/v1/polar-webhook`),
+events must include:
+
+- `subscription.created` / `subscription.updated` / `subscription.canceled`
+  / `subscription.revoked` — for Peachy Pro plan state.
+- `order.created` / `order.updated` / `order.paid` — for one-time template
+  purchases. Without these, payments succeed in Polar but no `purchases`
+  row appears and Buyers see nothing in their dashboard.
+- `order.refunded` — optional, `order.updated` already covers status
+  flips.
+
+## Debugging
+
+**Buy Now fails with checkout error:**
+1. Open Supabase Dashboard → Edge Functions → `polar-checkout` → **Logs**.
+2. Look for the latest entry. Common errors:
+   - `product_not_found_for_etsy_id` → the Polar product isn't named
+     `{etsyId} ...`. Fix the name in Polar.
+   - `polar_list_failed` → `POLAR_ACCESS_TOKEN` secret is missing or
+     invalid. Reset in Supabase → Edge Functions → Secrets.
+   - `polar_failed` → Polar rejected the checkout creation. The `detail`
+     field has Polar's error message.
+
+**Purchase doesn't appear in dashboard after payment:**
+1. Check Polar Dashboard → Webhooks → your endpoint → **Logs**. If you
+   see a 401 → secret mismatch (`POLAR_WEBHOOK_SECRET` in Supabase ≠
+   what Polar shows in webhook settings).
+2. If 200 — open Supabase → Edge Functions → `polar-webhook` → Logs.
+   Look for `order missing email` or `no supabase_user_id in metadata`.
+3. Check the `purchases` table directly in SQL Editor:
+   `select * from purchases order by created_at desc limit 10`.
+
+**Dashboard shows generic placeholder image instead of template card:**
+- The `product_name` in the purchase row doesn't start with a numeric
+  Etsy id, OR the Etsy id doesn't match any template's `etsyUrl`.
+- Run the dump endpoint to see Polar product names:
+  `https://vyycfwgkawtqkjllvsuc.supabase.co/functions/v1/polar-list-products`
+
+## Deployment
+
+Edge Function changes only take effect after deploy:
+
+```bash
+npx -y supabase@latest functions deploy polar-checkout --project-ref vyycfwgkawtqkjllvsuc
+npx -y supabase@latest functions deploy polar-webhook --project-ref vyycfwgkawtqkjllvsuc --no-verify-jwt
+```
+
+`--no-verify-jwt` is **mandatory** for the webhook — Polar signs requests
+with its own HMAC, not a Supabase JWT.
+
+## Required Supabase secrets
+
+| Name | Source |
+|---|---|
+| `POLAR_ACCESS_TOKEN` | Polar Dashboard → Settings → API Tokens → Create token |
+| `POLAR_WEBHOOK_SECRET` | Polar Dashboard → Settings → Webhooks → your endpoint → Signing secret (`polar_whs_...`) |
+| `POLAR_PRO_PRICE_ID` | Polar UUID of the Peachy Pro subscription product |
+| `APP_BASE_URL` | `https://1calendar-widget-aliias-projects-37358320.vercel.app` |
+| `POLAR_API_URL` | Optional — defaults to `https://api.polar.sh`. Set to `https://sandbox-api.polar.sh` for sandbox testing. |

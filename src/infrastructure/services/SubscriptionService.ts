@@ -17,6 +17,30 @@ const DEFAULT_PLAN: Plan = {
   polarSubscriptionId: null,
 };
 
+/* Owner-allowlist — emails that always read as Pro regardless of the
+ * profiles.is_pro column. Used so the shop owner can build / preview
+ * widgets for her own catalogue without taking out a subscription on
+ * herself. Lives client-side and is visible in the JS bundle, which
+ * is fine because:
+ *   1. The Pro gates this unlocks (settings page, widget cap, paid
+ *      styles) are UX features, not security boundaries.
+ *   2. Server-side limits (RLS, Polar webhook) still apply.
+ *   3. The list is short and only contains owner-controlled emails.
+ *
+ * Add a new email here when onboarding another team member; remove
+ * when they leave. */
+const OWNER_EMAILS = new Set<string>([
+  'ziyazovaa@gmail.com',
+]);
+
+const OWNER_PLAN: Plan = {
+  isPro: true,
+  status: 'active',
+  currentPeriodEnd: null,
+  polarCustomerId: null,
+  polarSubscriptionId: null,
+};
+
 export const SubscriptionService = {
   /**
    * Reads the current user's plan row from `public.profiles`. Returns the
@@ -26,6 +50,13 @@ export const SubscriptionService = {
   async getPlan(): Promise<Plan> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return DEFAULT_PLAN;
+
+    /* Owner shortcut — bypass the profiles lookup entirely so the
+     * shop owner is always Pro on every device, regardless of what
+     * the DB row says. Email comparison is lower-case to be safe. */
+    if (user.email && OWNER_EMAILS.has(user.email.toLowerCase())) {
+      return OWNER_PLAN;
+    }
 
     const { data, error } = await supabase
       .from('profiles')

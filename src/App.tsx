@@ -110,7 +110,11 @@ function App() {
               <ScrollToTop />
               <DebugOverlay />
               {import.meta.env.DEV && <DevPanelsToggle />}
-              {import.meta.env.DEV && <BranchSwitcher />}
+              {/* BranchSwitcher hidden — design-experiment is the only
+                  branch in active use; main is no longer maintained
+                  and there are no other feature branches yet. Re-mount
+                  if/when we revive a multi-branch flow. */}
+              {false && import.meta.env.DEV && <BranchSwitcher />}
               {import.meta.env.DEV && <ClaudeFeedback />}
               <PageTransition>
                 <Routes>
