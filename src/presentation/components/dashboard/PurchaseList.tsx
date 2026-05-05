@@ -4,7 +4,7 @@ import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PurchaseService, type Purchase } from '@/infrastructure/services/PurchaseService';
 import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
-import { TEMPLATES } from '@/presentation/data/templates';
+import { TEMPLATES, getTemplateEtsyId } from '@/presentation/data/templates';
 import { Button as SharedButton } from '@/presentation/components/shared';
 import { Logger } from '@/infrastructure/services/Logger';
 
@@ -164,11 +164,16 @@ const formatDate = (iso: string) => {
 };
 
 /* Joins a Polar purchase row with the local TEMPLATES catalogue so
-   we can render image + title + slug. Falls back to a generic
-   placeholder for legacy or newly-listed Polar products that aren't
-   in the local catalogue yet. */
+   we can render image + title + slug. Polar products are named
+   `{etsyId} {title}` so we extract the leading numeric id from
+   `productName` and match it to a template by its Etsy listing URL.
+   Falls back to a generic placeholder for legacy or newly-listed
+   Polar products that aren't in the local catalogue yet. */
 const enrich = (p: Purchase) => {
-  const template = TEMPLATES.find(t => t.polarProductId === p.polarProductId);
+  const etsyId = p.productName?.match(/^(\d+)/)?.[1] ?? null;
+  const template = etsyId
+    ? TEMPLATES.find(t => getTemplateEtsyId(t) === etsyId)
+    : null;
   return {
     image: template?.image ?? '/template-main.png',
     slug: template?.id,
@@ -178,12 +183,16 @@ const enrich = (p: Purchase) => {
 
 /* DEV-only fallback — when the real purchases table returns empty,
    inject one fake row so the UI is testable end-to-end without buying
-   anything. Tied to import.meta.env.DEV so prod never sees it. */
+   anything. Tied to import.meta.env.DEV so prod never sees it.
+   `productName` mirrors the live Polar naming convention so the
+   matching logic in `enrich` resolves it to a real template. */
 const DEV_FAKE_PURCHASE: Purchase = {
   id: 'dev-fake-1',
   polarOrderId: 'DEV-PEACHY-1042',
-  polarProductId: TEMPLATES[0]?.polarProductId ?? 'dev-product',
-  productName: TEMPLATES[0]?.title ?? 'Weekly Planner',
+  polarProductId: 'dev-product',
+  productName: TEMPLATES[0]
+    ? `${getTemplateEtsyId(TEMPLATES[0]) ?? 'unknown'} ${TEMPLATES[0].title}`
+    : 'Weekly Planner',
   amountCents: 799,
   currency: 'USD',
   status: 'paid',

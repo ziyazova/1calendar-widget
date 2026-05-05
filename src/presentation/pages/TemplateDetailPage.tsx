@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, ChevronDown, Eye, ShoppingCart, Check } from
 import { TopNav } from '../components/layout/TopNav';
 import { PageWrapper, BackButton, Button, Card, Accordion, TemplateMockupCard, TemplateMockupImage, LandingFooter } from '@/presentation/components/shared';
 import { fadeUp } from '@/presentation/themes/animations';
-import { TEMPLATES, FAQ_ITEMS } from '@/presentation/data/templates';
+import { TEMPLATES, FAQ_ITEMS, getTemplateEtsyId } from '@/presentation/data/templates';
 import { useCart } from '@/presentation/context/CartContext';
 import { useAuth } from '@/presentation/context/AuthContext';
 import { SubscriptionService } from '@/infrastructure/services/SubscriptionService';
@@ -49,17 +49,17 @@ const TwoCol = styled.div`
    * (c_2026-04-28). Matches the lg breakpoint width so the sidebar
    * stays consistent across desktop sizes. */
   grid-template-columns: 1fr 280px;
-  grid-template-rows: auto auto;
-  /* Column gap 48 (main → sidebar). Row gap 28 (Top → Bottom) —
-   * iteratively reduced 48 → 40 → 32 → 28 per "Template Overview ещё
-   * на 4 пикселя ближе к фото" (c_2026-05-05). */
+  /* Single auto row — main column owns its TopSection + BottomSection
+   * stack natively (no grid-row spanning), so when the sidebar's
+   * accordions expand the grid rows don't grow and the main
+   * description never shifts. Per "когда раскрываю в сайдбаре —
+   * двигается основное описание" (c_2026-05-05). */
+  grid-template-rows: auto;
   column-gap: 48px;
-  row-gap: 28px;
   align-items: start;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     column-gap: 32px;
-    row-gap: 24px;
   }
 
   @media (max-width: 949px) {
@@ -71,6 +71,29 @@ const TwoCol = styled.div`
      * 36 margin-bottom gave 60 — fixed by removing PagesCard's
      * margin-bottom and letting flex-gap own the rhythm. */
     gap: 36px;
+  }
+`;
+
+/* Main column wrapper — holds TopSection + BottomSection on desktop
+ * so they live in a single grid cell. On mobile it's display: contents
+ * so its children become direct flex items of TwoCol and the existing
+ * `order` rules continue to drive the mobile sequence (Title →
+ * Sidebar → Description → Bottom). */
+const MainCol = styled.div`
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Row gap inside main column — matches the previous TwoCol row-gap
+   * so TopSection → BottomSection rhythm stays unchanged. */
+  gap: 28px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+    gap: 24px;
+  }
+
+  @media (max-width: 949px) {
+    display: contents;
   }
 `;
 
@@ -86,7 +109,6 @@ const TopSection = styled.div`
 const RightCol = styled.div`
   position: sticky;
   top: calc(57px + 32px);
-  grid-row: 1 / 3;
   grid-column: 2;
 
   @media (max-width: 949px) {
@@ -573,26 +595,23 @@ const OverviewText = styled.p`
 const FeatureList = styled.ul`
   list-style: none;
   padding: 0;
-  /* Desktop:
-   *  - section gap 56 (matches OverviewText rhythm)
-   *  - title → cards gap = 20
-   *  - 2-column grid. Larger gap (20/16 → 24/20) so cards breathe.
-   *    Per "карточки меньше по размеру, больше спейса между"
-   *    (c_2026-04-28). */
+  /* Single-column inline list across desktop and mobile — clean text
+   * with a check icon, no card chrome or fill. Per "сделай Key Features
+   * везде без заливки, просто текст с галочкой в один ряд, не в два"
+   * (c_2026-05-05). The previous 2-col grid + tile card recipe felt
+   * busy against the simpler 1-line feature copy. */
   margin: 0 0 52px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 40px;
-  row-gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 
-  /* Mobile lock — flex column, looser block rhythm. Bumped 12 → 18 per
-   * c_moslfjdf "чуть больше спеса чуть посвободнее в Key Features" so
-   * each feature line gets more breathing space without growing the
-   * card chrome. */
+  /* Mobile — same single-column inline list, looser breathing. Gap 14
+   * gives each line elbow room without padding into card territory.
+   * Per "на телефоне по приятнее сделай" (c_2026-05-05). */
   @media (max-width: 949px) {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
     margin-top: 0;
     margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.sectionGap};
   }
@@ -603,21 +622,16 @@ const FeatureItem = styled.li`
   align-items: flex-start;
   gap: 10px;
   word-break: break-word;
-  /* Desktop — soft surfaceAlt fill (lightest neutral, #FAFAFA) +
-   * outline. Padding tightened 12/14 → 10/12 per "паддинги у этих
-   * карточек меньше" (c_2026-04-28). */
-  border: 1px solid ${({ theme }) => theme.colors.border.light};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 10px 12px;
-  background: ${({ theme }) => theme.colors.background.surfaceAlt};
+  /* No card chrome anywhere — just check icon + text inline. Per
+   * "сделай Key Features везде без заливки, просто текст с галочкой
+   * в один ряд" (c_2026-05-05). */
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
 
   @media (max-width: 949px) {
-    /* Mobile lock — inline list (no card chrome), tighter gap. */
-    border: 0;
-    border-radius: 0;
-    padding: 0;
-    background: transparent;
-    gap: 8px;
+    gap: 10px;
   }
 `;
 
@@ -655,21 +669,23 @@ const FeatureBody = styled.div`
  * string renders as the title (no body). */
 const FeatureItemTitle = styled.span`
   display: block;
-  /* Desktop 14 (base) — cards are compact, title sits as a strong
-   * 14/600 line above a 13 desc. Mobile lock pins to base. */
-  font-size: ${({ theme }) => theme.typography.sizes.base};
-  font-weight: ${({ theme }) => theme.typography.weights.semibold};
-  /* Quieter than text.primary so the title doesn't compete with the
-   * page-level H1 / Section titles. */
-  color: ${({ theme }) => theme.colors.text.body};
-  line-height: 1.35;
+  /* Desktop bumped 14 → 16 (lg) since the card chrome was removed —
+   * the feature line now needs to carry weight on its own. Per
+   * "больше шрифт надо без заливки, но шрифт больше" (c_2026-05-05). */
+  font-size: ${({ theme }) => theme.typography.sizes.lg};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+  color: ${({ theme }) => theme.colors.text.primary};
+  line-height: 1.45;
   letter-spacing: -0.01em;
 
   @media (max-width: 949px) {
-    line-height: 1.25;
-    /* Mobile — keep dark color (text.body inherits from desktop), but
-     * lighter weight (medium 500) instead of semibold (600). Per
-     * "вернём тёмный цвет, но менее жирный вес" (c_2026-04-28). */
+    /* Mobile — 15 (base+1) reads as a comfortable inline list line.
+     * Body color (slightly lighter than text.primary) keeps the page
+     * H1 dominant while the feature lines stay legible. Per "на
+     * телефоне по приятнее сделай" (c_2026-05-05). */
+    font-size: 15px;
+    line-height: 1.4;
+    color: ${({ theme }) => theme.colors.text.body};
     font-weight: ${({ theme }) => theme.typography.weights.medium};
   }
 `;
@@ -699,10 +715,12 @@ const FeatureItemDesc = styled.span`
  * stack reads as its own block rather than a sidebar card. Per
  * "не ту секцию раскрасил — надо было Benefits, и только у телефона". */
 const BenefitsCard = styled(Card)`
-  /* Desktop — 36 gap to the Pages Included block below (uniform
-   * section→section rhythm, matches the mobile sectionGap token).
-   * Per "расстояние между секциями 36" (c_2026-04-28). */
-  margin-bottom: 36px;
+  /* Desktop — 40 gap to the Pages Included block below. Bumped 36 → 40
+   * per "на десктопе в сайдбаре чуть больше спеса между тремя блоками"
+   * (c_2026-05-05). Internal block-to-list gap stays tight via
+   * PagesGroupedHeader's own margin-bottom — the bump only widens the
+   * inter-block rhythm. */
+  margin-bottom: 40px;
 
   @media (max-width: 949px) {
     /* No fill on mobile, no padding — Benefits read as a quiet inline
@@ -1322,6 +1340,13 @@ export const TemplateDetailPage: React.FC = () => {
 
   const template = TEMPLATES.find(t => t.id === id);
 
+  /* Etsy id parsed from `template.etsyUrl` is the single source of truth
+   * for buy flows. The `polar-checkout` Edge Function resolves it to a
+   * Polar UUID server-side by matching product names. When this is null
+   * (no etsyUrl) the in-site Buy button falls back to the Etsy / cart
+   * paths below. */
+  const etsyId = template ? getTemplateEtsyId(template) : null;
+
   /* Real gallery — falls back to [image] when `images` isn't populated.
    * Drives both the desktop chevron carousel and the mobile scroll-snap
    * row so both views render the same set of slides.
@@ -1369,7 +1394,7 @@ export const TemplateDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = async () => {
-    if (!template.polarProductId) return;
+    if (!etsyId) return;
     // Guests can buy too — Polar collects the email on its checkout page,
     // the webhook records the purchase by email, and the buyer can link it
     // to an account later (AuthContext back-fills on sign-in).
@@ -1377,8 +1402,8 @@ export const TemplateDetailPage: React.FC = () => {
     setBuying(true);
     try {
       await SubscriptionService.startCheckout({
-        productId: template.polarProductId,
-        successPath: `/studio?purchased=${template.polarProductId}`,
+        etsyId,
+        successPath: `/studio?purchased=${etsyId}`,
       });
     } catch (e) {
       setBuyError(e instanceof Error ? e.message : 'Checkout failed. Please try again.');
@@ -1394,6 +1419,7 @@ export const TemplateDetailPage: React.FC = () => {
         <BackButton label="Templates" onClick={() => navigate('/templates')} />
 
         <TwoCol>
+          <MainCol>
           <TopSection>
             <Title>{template.title}</Title>
             {/* Description sits under the title on every device — short
@@ -1498,6 +1524,7 @@ export const TemplateDetailPage: React.FC = () => {
               ))}
             </FaqList>
           </BottomSection>
+          </MainCol>
 
           {/* ── Right sidebar ── */}
           <RightCol>
@@ -1509,7 +1536,7 @@ export const TemplateDetailPage: React.FC = () => {
               <BenefitRow><Check /> Lifetime Updates</BenefitRow>
 
               <BtnGroup>
-                {template.polarProductId && !isFree && (
+                {etsyId && !isFree && (
                   <Button
                     $variant="primary"
                     $size="lg"
@@ -1608,7 +1635,7 @@ export const TemplateDetailPage: React.FC = () => {
                 at the very bottom of the page via <MobileOnlyAt
                 $order={5}> below. */}
             <DesktopOnly>
-              <SectionTitle style={{ fontSize: '16px', marginTop: '36px', marginBottom: '16px' }}>Related Templates</SectionTitle>
+              <SectionTitle style={{ fontSize: '16px', marginTop: '52px', marginBottom: '16px' }}>Related Templates</SectionTitle>
               <RelatedGrid>
                 {related.map(r => (
                   <RelatedCard key={r.id} onClick={() => navigate(`/templates/${r.id}`)}>
@@ -1669,7 +1696,7 @@ export const TemplateDetailPage: React.FC = () => {
           their side and may differ. The in-page <BtnGroup> hides these
           buttons on mobile so the bar is the only fulfillment surface
           on phone. */}
-      {(template.polarProductId || template.etsyUrl || FEATURES.ENABLE_LOCAL_CHECKOUT) && (
+      {(etsyId || template.etsyUrl || FEATURES.ENABLE_LOCAL_CHECKOUT) && (
         <MobileBuyBar>
           {FEATURES.ENABLE_LOCAL_CHECKOUT && inCart ? (
             <Button $variant="success" $size="lg" onClick={() => removeItem(template.id)}>
@@ -1677,14 +1704,14 @@ export const TemplateDetailPage: React.FC = () => {
             </Button>
           ) : (
             <>
-              {template.polarProductId && !isFree && (
+              {etsyId && !isFree && (
                 <Button $variant="primary" $size="lg" onClick={handleBuyNow} disabled={buying}>
                   {buying ? 'Opening…' : `Buy Now · ${template.price}`}
                 </Button>
               )}
               {template.etsyUrl && (
                 <Button
-                  $variant={template.polarProductId && !isFree ? 'secondary' : 'primary'}
+                  $variant={etsyId && !isFree ? 'secondary' : 'primary'}
                   $size="lg"
                   as="a"
                   href={template.etsyUrl}
@@ -1697,7 +1724,7 @@ export const TemplateDetailPage: React.FC = () => {
               {/* Local-checkout fallback when neither Polar nor Etsy
                   is configured — keeps the bar useful for free items
                   and dev environments. Embeds price for Polar parity. */}
-              {!template.polarProductId && !template.etsyUrl && (
+              {!etsyId && !template.etsyUrl && (
                 <Button $variant="primary" $size="lg" onClick={handleAddToCart}>
                   {isFree ? 'Get for Free' : `Add to Cart · ${template.price}`}
                 </Button>

@@ -1665,8 +1665,14 @@ export const WidgetStudioPage: React.FC = () => {
     setExpanding(true);
     /* "Launch" from /widgets goes to the dashboard — there's no widget
        in editor state at this point, so /studio would just bounce back
-       via the dashboard guard. */
-    setTimeout(() => navigate('/dashboard'), 450);
+       via the dashboard guard. Timeout dropped 450 → 250ms so the
+       anonymous view fades out faster — was leaving a noticeable
+       "stuck on /widgets" flash before /dashboard mounted. Per
+       c_moshdlmr "оказываюсь на этой же странице на полсекунды
+       потом в дашборде, флоу почистить". */
+    /* replace: true so back-button from /dashboard doesn't bounce
+     * back into the /widgets-anonymous→login loop. */
+    setTimeout(() => navigate('/dashboard', { replace: true }), 250);
   }, [navigate]);
 
   // If already logged in, show "Go to Studio" instead of auto-redirect
@@ -1692,8 +1698,13 @@ export const WidgetStudioPage: React.FC = () => {
     setCodeError("That doesn't look like an email address. Please check and try again.");
   }, [codeInput, loginWithCode, handleLaunch, navigate]);
 
-  // Logged-in view — clean gallery matching /templates layout
-  if (isLoggedIn) {
+  // Logged-in view — clean gallery matching /templates layout.
+  // While `expanding` is true (handleLaunch fired) we deliberately
+  // keep rendering the anonymous tree so the fade-out animation runs
+  // on the same content the user already sees, instead of swapping
+  // to the logged-in gallery for ~250ms before /dashboard mounts.
+  // Per c_moshdlmr "оказываюсь на этой же странице на полсекунды".
+  if (isLoggedIn && !expanding) {
     return (
       <PageWrapper>
         <TopNav activeLink="studio" logoSub="Widgets" />
@@ -2100,7 +2111,13 @@ export const WidgetStudioPage: React.FC = () => {
             setNameModal(pendingCustomize);
             setWidgetName(pendingCustomize.title);
             setPendingCustomize(null);
+            return;
           }
+          /* No pendingCustomize → user opened LoginModal from the
+             generic "Try for free" CTA. Send them straight to the
+             dashboard so /widgets doesn't briefly flip to the
+             logged-in gallery. Per c_moshdlmr "флоу почистить". */
+          handleLaunch();
         }}
       />
 

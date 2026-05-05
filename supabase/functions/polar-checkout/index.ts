@@ -47,18 +47,46 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'missing_env' }, 500);
   }
 
-  // Optional productId + successPath override from the client body. Falls back
-  // to the subscription product for backwards compat.
-  let body: { productId?: string; successPath?: string } = {};
+  // Optional etsyId + successPath override from the client body. When
+  // etsyId is set, resolve it to a Polar product UUID by listing products
+  // and finding the one whose name starts with `{etsyId} ` (this is the
+  // naming convention enforced in the Polar dashboard). When etsyId is
+  // absent, fall back to the subscription product (Peachy Pro) for
+  // backwards compat with the upgrade flow.
+  let body: { etsyId?: string; successPath?: string } = {};
   try {
     const raw = await req.text();
     if (raw) body = JSON.parse(raw);
   } catch { /* empty body is fine */ }
 
-  const productId = body.productId ?? POLAR_PRO_ID;
+  let productId: string | undefined;
+  if (body.etsyId) {
+    const listRes = await fetch(`${POLAR_API_URL}/v1/products/?limit=100`, {
+      headers: {
+        Authorization: `Bearer ${POLAR_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!listRes.ok) {
+      const text = await listRes.text();
+      console.error('[polar-checkout] product list failed', listRes.status, text);
+      return json({ error: 'polar_list_failed', detail: text }, 502);
+    }
+    const listData = await listRes.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const match = (listData.items ?? []).find((p: any) =>
+      typeof p?.name === 'string' && p.name.startsWith(`${body.etsyId} `)
+    );
+    if (!match) {
+      return json({ error: 'product_not_found_for_etsy_id', etsyId: body.etsyId }, 404);
+    }
+    productId = match.id;
+  } else {
+    productId = POLAR_PRO_ID;
+  }
   if (!productId) return json({ error: 'missing_product_id' }, 400);
 
-  const isSubscription = productId === POLAR_PRO_ID;
+  const isSubscription = !body.etsyId;
 
   // Subscriptions require auth (we need the Supabase user to bind the
   // plan to). One-time template purchases allow guests — Polar collects
@@ -74,14 +102,16 @@ Deno.serve(async (req: Request) => {
   if (isSubscription && !user) return json({ error: 'unauthorized' }, 401);
 
   // Default success path: subscription returns to Settings with ?upgraded=1;
-  // template purchases return to /studio?purchased=<productId>.
-  const defaultSuccessPath = isSubscription ? '/settings?upgraded=1' : `/studio?purchased=${productId}`;
+  // template purchases return to /studio?purchased=<etsyId>.
+  const defaultSuccessPath = isSubscription ? '/settings?upgraded=1' : `/studio?purchased=${body.etsyId}`;
   const successPath = body.successPath ?? defaultSuccessPath;
 
   // Build metadata conditionally — Polar copies this through to the
   // subscription / order, and our webhook pulls user id + product id
-  // back out from here.
+  // back out from here. We also stash etsy_id when present so we can
+  // trace orders back to the catalogue without relying on Polar UUIDs.
   const metadata: Record<string, string> = { product_id: productId };
+  if (body.etsyId) metadata.etsy_id = body.etsyId;
   if (user) metadata.supabase_user_id = user.id;
 
   // Ask Polar to open a checkout session. Pre-fill the email when we know

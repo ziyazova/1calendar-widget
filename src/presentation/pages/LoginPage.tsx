@@ -584,7 +584,9 @@ export const LoginPage: React.FC = () => {
           return;
         }
         // Session granted (e.g. auto-confirm enabled) → go to dashboard.
-        navigate('/dashboard');
+        // replace: true so back-button doesn't bounce into the /login
+        // → "already signed in" loop. Per c_moshdlmr "back в loop".
+        navigate('/dashboard', { replace: true });
       } else {
         if (!canSubmitLogin) {
           setError('Please enter your email and password.');
@@ -599,7 +601,7 @@ export const LoginPage: React.FC = () => {
           }
           return;
         }
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     } finally {
       setSubmitting(false);

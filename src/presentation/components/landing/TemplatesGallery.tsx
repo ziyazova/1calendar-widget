@@ -214,7 +214,27 @@ const TEMPLATE_CATEGORIES: { label: string; category: Category | null }[] = [
 
 // Curated presentation order for the landing marquee. IDs reference
 // `TEMPLATES` — no duplicated card data lives in this file.
-const LANDING_TEMPLATE_IDS = ['1', '2', '6', '8', '3', '7', '12', '10', '4', '9', '11', '13', '5'];
+/* IDs are now Etsy listing numbers (consistent with template.id which
+ * mirrors the Etsy listing) so the marquee picks up each template
+ * directly by its listing id. Order matches the previous curated
+ * presentation: id 5 (Student Planner Light) currently has the same
+ * Etsy URL as id 3 (Academic Planner Dark) so it stays as '5' until
+ * its real listing id is provided. */
+const LANDING_TEMPLATE_IDS = [
+  '1736107034', // 1  Ultimate Life Planner
+  '1755349936', // 2  Ultimate Wellness Planner
+  '1737912942', // 6  Mystic Life Planner
+  '1775842529', // 8  Glow Up Planner
+  '1783878805', // 3  Academic Planner Dark
+  '1773207250', // 7  Light Academia Planner
+  '1787041091', // 12 Dark Academia Student
+  '1837862393', // 10 Cherub Planner
+  '1825825830', // 4  Green Life Planner
+  '1827799444', // 9  Olive Life Planner
+  '1824384930', // 11 Minimalist Green Planner
+  '1785090897', // 13 University Planner
+  '5',          // Student Planner Light — Etsy listing id pending
+];
 const LANDING_TEMPLATES = LANDING_TEMPLATE_IDS
   .map(id => TEMPLATES.find(t => t.id === id))
   .filter((t): t is NonNullable<typeof t> => Boolean(t));

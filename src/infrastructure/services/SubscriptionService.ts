@@ -52,11 +52,13 @@ export const SubscriptionService = {
    * Asks the `polar-checkout` Edge Function for a hosted checkout URL and
    * redirects the browser. Throws a human-readable error on failure.
    *
-   * Pass `productId` to buy a specific template (catalogue item). When
-   * omitted, defaults to the Pro subscription product server-side.
+   * Pass `etsyId` (the numeric Etsy listing id) to buy a specific
+   * template — the Edge Function resolves it to a Polar product UUID by
+   * matching against product names (`{etsyId} {title}` convention).
+   * When omitted, defaults to the Pro subscription product server-side.
    * `successPath` lets callers override the post-checkout landing page.
    */
-  async startCheckout(opts?: { productId?: string; successPath?: string }): Promise<void> {
+  async startCheckout(opts?: { etsyId?: string; successPath?: string }): Promise<void> {
     const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
       'polar-checkout',
       { body: opts ?? {} },

@@ -1069,7 +1069,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { isRegistered, isGuest, user, plan, isPro, planLoading } = useAuth();
-  // `?purchased=<polarProductId>` lands here from Polar after a successful
+  // `?purchased=<etsyId>` lands here from Polar after a successful
   // template checkout. Show a banner + optional signup CTA for guests.
   const [purchasedProductId, setPurchasedProductId] = useState<string | null>(() => searchParams.get('purchased'));
   /* Tab state synced with URL ?tab=. Lets the navbar dropdown deep-link
@@ -1972,28 +1972,30 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                           aria-label={copiedWidgetId === w.id ? 'Copied' : 'Copy embed URL'}
                           title={copiedWidgetId === w.id ? 'Copied!' : 'Copy embed URL'}
                           onClick={async () => {
-                            // Prefer the persisted embed_url; fall back to
-                            // generating one on the fly from the saved
-                            // settings so newly-saved widgets (where the
-                            // DB column may not have flushed yet) still copy.
-                            let url = w.embed_url || '';
-                            if (!url) {
-                              try {
-                                const widget = await diContainer.createWidgetUseCase.execute(w.type);
-                                const s = (w.settings || {}) as Record<string, unknown>;
-                                let updated;
-                                if (w.type === 'calendar') {
-                                  updated = widget.updateSettings(new CalendarSettings({ ...s, style: w.style as CalendarSettings['style'] }));
-                                } else if (w.type === 'clock') {
-                                  updated = widget.updateSettings(new ClockSettings({ ...s, style: w.style as ClockSettings['style'] }));
-                                } else {
-                                  updated = widget.updateSettings(new BoardSettings({ ...s, layout: w.style as BoardSettings['layout'] }));
-                                }
-                                url = diContainer.getWidgetEmbedUrlUseCase.execute(updated);
-                              } catch (err) {
-                                Logger.error('StudioPage', 'Failed to generate embed URL', err);
-                                return;
+                            // ALWAYS regenerate the embed URL from current
+                            // settings + current VITE_EMBED_BASE_URL. Reading
+                            // w.embed_url directly was returning stale URLs
+                            // saved when the user was testing on localhost
+                            // (or under a previous production domain) — the
+                            // copied link then 404'd / wouldn't iframe in
+                            // Notion. Generating fresh ensures the link
+                            // always points at the current production host.
+                            let url = '';
+                            try {
+                              const widget = await diContainer.createWidgetUseCase.execute(w.type);
+                              const s = (w.settings || {}) as Record<string, unknown>;
+                              let updated;
+                              if (w.type === 'calendar') {
+                                updated = widget.updateSettings(new CalendarSettings({ ...s, style: w.style as CalendarSettings['style'] }));
+                              } else if (w.type === 'clock') {
+                                updated = widget.updateSettings(new ClockSettings({ ...s, style: w.style as ClockSettings['style'] }));
+                              } else {
+                                updated = widget.updateSettings(new BoardSettings({ ...s, layout: w.style as BoardSettings['layout'] }));
                               }
+                              url = diContainer.getWidgetEmbedUrlUseCase.execute(updated);
+                            } catch (err) {
+                              Logger.error('StudioPage', 'Failed to generate embed URL', err);
+                              return;
                             }
                             setCopiedWidgetId(w.id);
                             setTimeout(() => setCopiedWidgetId(null), 2000);
