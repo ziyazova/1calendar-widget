@@ -71,13 +71,13 @@ const PanelHeader = styled.div`
   /* PanelContainer is position:fixed; top:0 — so padding-top counts from
      the viewport top, not the editor body. To align with the artboard's
      top edge we need: top bar height (68px) + artboard margin-top (12px)
-     = 80px. */
-  padding: 80px 32px 16px 6px;
+     = 80px. Desktop left padding dropped 6 → 0 per "сдвинуть контент
+     панели на 4-8px левее". */
+  padding: 80px 32px 16px 0;
   border-bottom: none;
 
-  /* Tablet (≤lg) — bump left padding 6 → 10 so the title/badge nudge
-   * 4px right off the panel's flush-left edge. Per "чуть правее на 4
-   * пикселя или отступ слева 4". */
+  /* Tablet (≤lg) — keeps the small 10px left padding so the title sits
+   * comfortably inside the narrower tablet panel. */
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     padding-left: 10px;
   }
@@ -117,14 +117,17 @@ const WidgetBadgeText = styled.span`
 const PanelContent = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 0 32px 32px 6px;
+  /* Desktop left padding 0 (was 6) — body lines up with PanelHeader's
+     new 0 left edge, shifting the form 6px leftward per "сдвинь контент
+     панели на 4-8px левее". */
+  padding: 0 32px 32px 0;
 
   &::-webkit-scrollbar {
     width: 0;
   }
 
-  /* Tablet (≤lg) — match PanelHeader: 4px more left padding so the body
-   * controls line up with the title above. */
+  /* Tablet (≤lg) — body still gets the small 10px left padding so the
+   * controls don't sit flush against the panel edge. */
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     padding-left: 10px;
   }

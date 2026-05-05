@@ -101,7 +101,7 @@ export const WidgetStudioSection: React.FC<WidgetStudioSectionProps> = ({ onNavi
       <Header>
         <TitleRow>
           <Title>Why people love Peachy</Title>
-          <Subtitle>Aesthetic and organized. Finally, both.</Subtitle>
+          <Subtitle>Structure that actually works.</Subtitle>
         </TitleRow>
       </Header>
       <FeatureCardsSection />

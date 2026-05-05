@@ -30,10 +30,23 @@ export const ConsentBannerWrap = styled.div`
   gap: 14px;
   animation: ${slideUp} 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* Tablet (521-768) — keep the row layout but tighten width + padding
+   * so the banner doesn't dominate the narrower viewport. */
+  @media (min-width: 521px) and (max-width: 768px) {
+    width: calc(100vw - 24px);
+    bottom: 16px;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  /* Phone (≤520) — stack icon / message / action vertically. */
   @media (max-width: 520px) {
     flex-direction: column;
     align-items: stretch;
-    padding: 16px;
+    width: calc(100vw - 16px);
+    bottom: 12px;
+    padding: 14px;
+    gap: 12px;
   }
 `;
 

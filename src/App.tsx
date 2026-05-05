@@ -68,8 +68,35 @@ function ScrollToTop() {
   return null;
 }
 
+/* Embed routes (Calendar / Clock / Board) render INSIDE Notion's iframe
+ * via iframely. Notion's sandboxed iframe blocks third-party cookies and
+ * may throw on localStorage / Supabase init, which used to crash the
+ * whole React tree. Detect the path early and render an "embed-only"
+ * subtree that skips Auth/Cart/UpgradeModal providers entirely — embed
+ * pages don't need any of them. Per "виджеты не работают при вставке в
+ * Notion" (c_2026-05-05). */
+const isEmbedRoute = typeof window !== 'undefined' &&
+  window.location.pathname.startsWith('/embed/');
+
 function App() {
   const diContainer = DIContainer.getInstance();
+
+  if (isEmbedRoute) {
+    return (
+      <ErrorBoundary>
+        <ThemeProvider theme={theme}>
+          <GlobalStyles />
+          <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Routes>
+              <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
+              <Route path="/embed/clock" element={<ClockEmbedPage />} />
+              <Route path="/embed/board" element={<BoardEmbedPage />} />
+            </Routes>
+          </Router>
+        </ThemeProvider>
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -99,9 +126,6 @@ function App() {
                   <Route path="/templates/:id" element={<TemplateDetailPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
-                  <Route path="/embed/calendar" element={<CalendarEmbedPage />} />
-                  <Route path="/embed/clock" element={<ClockEmbedPage />} />
-                  <Route path="/embed/board" element={<BoardEmbedPage />} />
                   <Route path="/dev" element={<DesignSystemPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/terms" element={<TermsPage />} />

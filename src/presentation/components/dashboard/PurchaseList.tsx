@@ -79,8 +79,12 @@ export const PurchaseImg = styled.div`
      coming in from global styles or shared Card chrome. */
   img {
     display: block;
-    width: 100% !important;
-    height: 100% !important;
+    /* Pull the screenshot in by 6% on each side so the product reads
+     * as a tile sitting inside the frame rather than filling it edge-
+     * to-edge. Per "продукт слишком большой, чуть зум-аут" (c_2026-05-05). */
+    width: 88% !important;
+    height: 88% !important;
+    margin: 6% auto !important;
     object-fit: contain !important;
   }
 

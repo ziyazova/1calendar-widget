@@ -154,6 +154,11 @@ const SavedControlsRow = styled.div`
   margin-bottom: 20px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    /* Filters back to flex-start (left). Iteration: tried flex-end
+     * per c_mosln3o0 ("мб справа?") but it read awkward sitting alone
+     * on the right with no left counterweight (c_mosmzjq1: "сдвинь
+     * фильтры влево, сейчас странно"). Left-aligned matches the
+     * section title above so the column reads as one stack. */
     justify-content: flex-start;
     gap: 8px;
     margin-top: 20px;

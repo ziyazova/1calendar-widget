@@ -59,6 +59,18 @@ const Overlay = styled.div`
   z-index: ${({ theme }) => theme.zIndex.modal};
   padding: 20px;
   animation: ${fadeIn} 0.2s ease;
+
+  /* Mobile — anchor modal near the top of the viewport so the
+   * software keyboard + browser chrome (URL bar) don't cover the
+   * dialog when an input takes focus. Centered alignment on phone
+   * routinely got the input pushed below the keyboard, making it
+   * impossible to type. Per c_mosmhqwj "на телефоне модалки
+   * открываются и тяжело переименовывать тк поверх них какие-то в
+   * браузере штуки". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    align-items: flex-start;
+    padding-top: 56px;
+  }
 `;
 
 const Dialog = styled.div<{ $size: 'sm' | 'md' | 'lg' | 'xl' }>`

@@ -172,7 +172,7 @@ export const LandingPage: React.FC = () => {
         <WidgetStudioSection onNavigate={(path) => navigate(path)} />
       </Section>
 
-      <Section $size="lg">
+      <Section $size="md">
         <HowItWorksSection />
       </Section>
 

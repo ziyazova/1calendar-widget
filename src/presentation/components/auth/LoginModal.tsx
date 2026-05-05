@@ -31,10 +31,10 @@ interface LoginModalProps {
 const FlowWrap = styled.div`
   display: block;
   width: 100%;
-  /* Modal Body has padding: 20px 24px 24px. Bump top and bottom so the
-   * dialog feels less cramped around the LoginFlow — final effective
-   * vertical padding 32 top / 36 bottom. */
-  padding: 12px 0 12px 0;
+  /* Modal Body has padding: 20px 24px 24px. Bump top and bottom MORE
+   * than before — final effective vertical padding 40 top / 44 bottom.
+   * Per "паддинги сверху снизу больше". */
+  padding: 20px 0 20px 0;
 `;
 
 /* Mobile sheet body — generous symmetric padding so LoginFlow content

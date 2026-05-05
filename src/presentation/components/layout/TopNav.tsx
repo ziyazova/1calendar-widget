@@ -701,7 +701,16 @@ export const TopNav: React.FC<TopNavProps> = ({ logoPressed, onLogoClick, active
                       $size="md"
                       $fullWidth
                       onClick={() => { setAvatarOpen(false); openUpgrade(); }}
-                      style={{ justifyContent: 'space-between', padding: '0 14px', height: 38 }}
+                      /* Slightly taller (42 vs 38), softer 12px radius,
+                         tighter inner padding so the Sparkles + label +
+                         price read as a balanced premium chip. */
+                      style={{
+                        justifyContent: 'space-between',
+                        padding: '0 12px',
+                        height: 42,
+                        borderRadius: 12,
+                        letterSpacing: '-0.01em',
+                      }}
                     >
                       <UpgradeInner>
                         <Sparkles fill="currentColor" strokeWidth={1.5} />

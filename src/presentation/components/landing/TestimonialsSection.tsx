@@ -410,7 +410,7 @@ const ALL_TESTIMONIALS: Testimonial[] = (() => {
 /* ── Exported Component ── */
 export const TestimonialsSection: React.FC = () => (
   <Section data-ux="Testimonials Section">
-    <Title>Loved by 10,000+ users</Title>
+    <Title>Loved by 11,000+ users</Title>
     <Subtitle>See what people are saying about Peachy</Subtitle>
     <MarqueeContainer>
       <TestimonialColumn items={testimonials.col1} columnKey="c1" duration={35} />

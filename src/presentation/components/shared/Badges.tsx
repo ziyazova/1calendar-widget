@@ -117,9 +117,11 @@ export const PlanBadge = styled.span<{ $pro?: boolean; $size?: 'xs' | 'sm' }>`
    - Board: peach (creative/mood tone, matches FeatureCardsSection
      "Payment" #F4A672) */
 const tagKindTints: Record<'calendar' | 'clock' | 'board', { bg: string; fg: string }> = {
-  /* Calendar — dusty rose / blush. Hot pink (#EC4899) read as too
-     saturated; this softer mauve-pink (#C57A8E) feels warm and quiet. */
-  calendar: { bg: 'rgba(197, 122, 142, 0.10)', fg: 'rgba(140, 70, 95, 0.70)' },
+  /* Calendar — soft sage mint. Earlier rose (#C57A8E) read still a touch
+     harsh; sage feels calmer and more "calendar-y" (organised, restful)
+     while staying pastel and visually distinct from the blue clock and
+     peach board. */
+  calendar: { bg: 'rgba(170, 200, 175, 0.18)', fg: 'rgba(70, 115, 85, 0.75)' },
   clock:    { bg: 'rgba(51, 132, 244, 0.07)',  fg: 'rgba(38, 86, 158, 0.65)' },
   board:    { bg: 'rgba(244, 166, 114, 0.10)', fg: 'rgba(150, 96, 50, 0.70)' },
 };

@@ -88,9 +88,11 @@ const GalleryHeader = styled.div`
      * bodyToCards 20). Visual descent matches sections that have a
      * subtitle. */
     margin-bottom: ${({ theme }) => theme.layout.mobile.titleToCards};
-    /* Center the title row on mobile to match WidgetStudio /
-     * Testimonials / CTA. Last user note: "выровни контент". */
-    text-align: center;
+    /* Title is left-aligned on mobile because the "Explore all"
+     * button now sits opposite it across all phone widths (per
+     * c_moslapvr). Centering would push the title and button apart
+     * awkwardly via space-between. */
+    text-align: left;
   }
 `;
 
@@ -98,6 +100,16 @@ const GalleryTitleRow = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
+  /* Mobile — vertically center the headline against the inline
+   * "Explore all" button so the row reads as one balanced line.
+   * flex-start (desktop default) leaves the button visually low next
+   * to the headline cap-line on phone. Per c_moslogms / c_mosmg1nr
+   * "выровни хедлайн с кнопкой на телефоне". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    align-items: center;
+    gap: 12px;
+  }
 `;
 
 const GalleryTitleGroup = styled.div`
@@ -165,34 +177,27 @@ const DesktopExploreSlot = styled.div`
   }
 `;
 
-/* Phone-only (≤sm = 480) CTA row that sits under the marquee. Centered
- * full-width button. Above sm the button moves up to HeaderExploreSlot
- * next to the "Top templates" headline (since FilterRow is hidden on
- * the 481-768 range, there's no inline slot for it yet). Per "после 480
- * кнопка уходит к секции Top Templates напротив headline; после
- * появления фильтров — напротив фильтров как на десктопе" (c_2026-04-29). */
+/* Phone CTA row under the marquee — kept hidden everywhere now. The
+ * button always sits opposite the "Top templates" headline on phone
+ * via HeaderExploreSlot (per c_moslapvr: "в телефоне сделай её напротив
+ * Top Templates всегда"). Component left in place in case we need to
+ * bring it back, but it never renders. */
 const MobileExploreRow = styled.div`
   display: none;
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    display: flex;
-    padding: 28px ${({ theme }) => theme.layout.mobile.gutter} 0;
-
-    & > * { width: 100%; }
-  }
 `;
 
-/* Wide-phone / tablet slot (481-768) — sits next to the "Top templates"
- * headline because the FilterRow is hidden in that range. Button takes
- * its natural desktop width (no full-stretch). Above md the FilterRow
- * appears and the button moves there via DesktopExploreSlot. */
+/* Phone + tablet slot (≤md = 768) — sits next to the "Top templates"
+ * headline. Used to be 481-768 only with a separate stacked button row
+ * below 480; merged into one rule per c_moslapvr. Button takes its
+ * natural width; above md the FilterRow appears and the button moves
+ * to DesktopExploreSlot. */
 const HeaderExploreSlot = styled.div`
   display: none;
 
-  @media (min-width: calc(${({ theme }) => theme.breakpoints.sm} + 1px))
-    and (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 `;
 
@@ -260,7 +265,13 @@ const TemplatesScrollHint = styled.div`
     transform: scale(0.95);
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+  /* Hide whenever the viewport isn't wide enough for the arrow to sit
+   * outside the 1200px cards row (cards stop at ~1455 from left, arrow
+   * is 36px wide and pinned right:80, so it needs a viewport ≥ ~1440
+   * to clear the cards). At narrower widths it overlaps the trailing
+   * cards. Per c_mosnatnh "стрелка только когда не налегает на
+   * темплейты — если налегает, убирай". */
+  @media (max-width: 1440px) {
     display: none;
   }
 `;
@@ -312,13 +323,16 @@ const TemplateCardMeta = styled.div`
   padding: 6px;
 
   /* Mobile — same row layout as desktop: title left, price right.
-   * Title ellipsizes if needed (white-space: nowrap on the title). */
+   * Title ellipsizes if needed (white-space: nowrap on the title).
+   * Horizontal padding bumped 4 → 8 per c_moslp1cs "паддинги 2-4
+   * слева/справа у названия" — title sat too close to the card's
+   * left edge on phone. */
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     flex-direction: row;
     align-items: baseline;
     justify-content: space-between;
     gap: 8px;
-    padding: 0 4px;
+    padding: 0 8px;
   }
 `;
 

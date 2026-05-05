@@ -143,10 +143,11 @@ const FooterNav = styled.div`
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* column-gap 20 (was 16) — c_mog87f5w: "чуть больше свепса между
-     * колонками". "Widget Studio" still fits at this gap. */
-    column-gap: 20px;
-    row-gap: 28px;
+    /* Bumped column-gap 20 → 24 and row-gap 28 → 32 per c_mosld8kt
+     * "чуть чуть больше спеса между блоками" — links read less cramped
+     * inside the 375 viewport without forcing a wrap. */
+    column-gap: 24px;
+    row-gap: 32px;
   }
 `;
 
@@ -154,6 +155,12 @@ const NavGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  /* Mobile — slightly looser link rhythm inside each column (12 → 14)
+   * to match the bumped column/row gaps above. Per c_mosld8kt. */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    gap: 14px;
+  }
 `;
 
 /* Legal column variant — single column stack (Privacy / Terms / Refund
@@ -164,6 +171,10 @@ const LegalLinks = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    gap: 14px;
+  }
 `;
 
 const NavTitle = styled.span`
@@ -194,10 +205,10 @@ const FooterBottomWrapper = styled.div`
      container and pins the copyright row to the floor — works even when
      content naturally totals less than min-height. */
   margin-top: auto;
-  /* Desktop pb 41 (was 32, +9). Symmetric pair with FooterWrapper's
-     padding-top 62→71 (also +9), absorbing the FooterOuter +18 height
-     bump evenly between top and bottom. */
-  padding: 0 48px 41px;
+  /* Desktop pb 24 (was 41) — copyright row drops closer to the page
+     bottom so it sits lower under the nav links, per user feedback
+     "чуть ниже этот текст у футера чуть отпусти". */
+  padding: 0 48px 24px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
     padding: 0 ${({ theme }) => theme.layout.mobile.gutter} 16px;

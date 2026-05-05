@@ -18,7 +18,10 @@ const Content = styled.div`
   margin: 0 auto;
   padding: 48px 48px 0;
   animation: ${fadeUp} 0.35s ease both;
-  overflow-x: hidden;
+  /* No overflow-x: hidden here — PageWrapper already clamps the page
+   * to viewport width. Setting overflow-x on this Content too created
+   * a second scroll-block context on desktop, which manifested as the
+   * "double scrollbar" the user reported (root + inner). */
 
   /* Phone — catalog rhythm: top sectionPaddingY − 4. Sides gutter (20).
    * Bottom 100 to clear the sticky MobileBuyBar. */
@@ -47,11 +50,11 @@ const TwoCol = styled.div`
    * stays consistent across desktop sizes. */
   grid-template-columns: 1fr 280px;
   grid-template-rows: auto auto;
-  /* Column gap 48 (main → sidebar). Row gap 40 (Top → Bottom)
-   * — reduced from 48 by 8 per "уменьши гэп между фото и Template
-   * Overview на десктопе" (c_2026-04-28). */
+  /* Column gap 48 (main → sidebar). Row gap 28 (Top → Bottom) —
+   * iteratively reduced 48 → 40 → 32 → 28 per "Template Overview ещё
+   * на 4 пикселя ближе к фото" (c_2026-05-05). */
   column-gap: 48px;
-  row-gap: 40px;
+  row-gap: 28px;
   align-items: start;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
@@ -200,9 +203,12 @@ const Title = styled.h1`
 const Description = styled.p`
   /* Desktop bumped 14 → 16 — supporting copy under H1 was reading
    * thin against the 32 hero. Per "текст слишком мелкий на компе"
-   * (c_2026-04-28). Mobile keeps 14 explicitly via override below. */
+   * (c_2026-04-28). Mobile keeps 14 explicitly via override below.
+   * Color was text.body — too active under the 32 H1; quietened to
+   * text.tertiary (matches the mobile rhythm) per "менее активный
+   * цвет тут" (c_2026-05-05). */
   font-size: ${({ theme }) => theme.typography.sizes.xl};
-  color: ${({ theme }) => theme.colors.text.body};
+  color: ${({ theme }) => theme.colors.text.tertiary};
   line-height: ${({ theme }) => theme.typography.lineHeights.relaxed};
   /* Description → carousel gap 24 (was 12) — needs more breath
    * before the photo. Mobile lock via override below. */
@@ -539,7 +545,7 @@ const OverviewText = styled.p`
   /* Desktop section gap 32 → 56 so blocks have proper breathing room
    * per "мало воздуха везде, адаптируй красиво" (c_2026-04-28
    * desktop pass). Mobile lock at sectionGap below. */
-  margin: 0 0 46px;
+  margin: 0 0 52px;
   word-break: break-word;
 
   /* Mobile rhythm — body sits 12 below the title and 36 above the
@@ -573,17 +579,20 @@ const FeatureList = styled.ul`
    *  - 2-column grid. Larger gap (20/16 → 24/20) so cards breathe.
    *    Per "карточки меньше по размеру, больше спейса между"
    *    (c_2026-04-28). */
-  margin: 0 0 46px;
+  margin: 0 0 52px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 40px;
   row-gap: 16px;
 
-  /* Mobile lock — flex column, dense block rhythm, sectionGap below. */
+  /* Mobile lock — flex column, looser block rhythm. Bumped 12 → 18 per
+   * c_moslfjdf "чуть больше спеса чуть посвободнее в Key Features" so
+   * each feature line gets more breathing space without growing the
+   * card chrome. */
   @media (max-width: 949px) {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 18px;
     margin-top: 0;
     margin-bottom: ${({ theme }) => theme.layout.mobile.detailPage.sectionGap};
   }
@@ -733,7 +742,9 @@ const BenefitRow = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 12px;
+  /* Row → row gap bumped 12 → 16 per "между блоками чуть больше
+   * расстояния на 4 пикселя примерно" (c_2026-05-05). */
+  margin-bottom: 16px;
   font-size: ${({ theme }) => theme.typography.sizes.base};
   color: ${({ theme }) => theme.colors.text.primary};
 

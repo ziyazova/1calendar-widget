@@ -666,15 +666,15 @@ export const LoginFlow: React.FC<LoginFlowProps> = ({
       <Divider $embedded={embedded}>or</Divider>
 
       <Button
-        $variant="secondary"
-        $size="md"
+        $variant="outline"
+        $size="lg"
         $fullWidth
         onClick={() => auth.loginWithGoogle()}
-        /* display:flex (block-level) — Button defaults to inline-flex
-           which ignores margin:auto, so the constrained-width pill
-           slid to the left edge instead of centering. Same fix used
-           on LoginPage's Google button. */
-        style={{ display: 'flex', maxWidth: 320, margin: '0 auto' }}
+        /* outline + lg — feels like a real auth CTA (was secondary md
+           which read as a footnote button). Width capped to 320 +
+           centred so it visually pairs with the email "Log in" CTA
+           above without dominating. */
+        style={{ display: 'flex', maxWidth: 320, margin: '0 auto', fontWeight: 600 }}
       >
         <GoogleIcon />
         Continue with Google

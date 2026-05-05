@@ -17,7 +17,10 @@ import { hasSupabaseEnv } from '@/infrastructure/services/supabase';
 const Container = styled.div`
   max-width: 420px;
   margin: 0 auto;
-  padding: 80px 24px 120px;
+  /* Desktop padding balanced to ~symmetric (was 80/120 — form drifted
+   * upward). Now 100/100 so the form sits at true vertical center of
+   * the viewport-tall area. Per "для десктопа отцентруй чуть чуть". */
+  padding: 100px 24px 100px;
 
   /* Phone+tablet — vertically center the form. The tab/phone Login
    * needed a true vertical center, plus a Back affordance (the
@@ -35,9 +38,14 @@ const Container = styled.div`
  * Container above the centered form. Per "добавь назад кнопку на
  * телефоне + на планшете тоже выровнить надо". */
 const MobileBackBtn = styled.button`
+  /* Hidden on phone per c_moslikhl "убери это с Log In / Sign In с
+   * телефона" — TopNav owns the back affordance, this in-page Back
+   * was redundant on a 375 viewport. Kept available on tablet because
+   * /login Container scrolls without TopNav visible there. */
   display: none;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
+  @media (min-width: calc(${({ theme }) => theme.breakpoints.md} + 1px))
+    and (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     display: inline-flex;
     align-items: center;
     gap: 6px;

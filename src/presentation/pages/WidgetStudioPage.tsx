@@ -52,6 +52,14 @@ const HeroCard = styled.div`
   margin: 8px auto 0;
   padding: 16px 48px 40px;
   text-align: center;
+  /* Explicit flex column + horizontal center on desktop — text-align
+   * alone wasn't centering block-level children (EmailRow / divider /
+   * Google button) so the whole stack drifted slightly off the
+   * surfaceAlt background's center. Per "отцентруй на дектсопе по
+   * заливке". */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
   z-index: 3;
   animation: ${fadeUp} 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
@@ -290,6 +298,11 @@ const EmailInput = styled.input`
   color: ${({ theme }) => theme.colors.peach.deep};
   background: #fff;
   outline: none;
+  /* Kill mobile Safari/Chrome tap-highlight flash + any UA focus ring
+   * the user reported as "яркая фиолето-синяя outline" on tap.
+   * Per c_mosnxo87 — replace it with the soft border-color shift in
+   * :focus below. */
+  -webkit-tap-highlight-color: transparent;
   letter-spacing: -0.005em;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 4px 12px rgba(26, 22, 19, 0.04);
   transition: border-color ${({ theme }) => theme.transitions.medium}, box-shadow ${({ theme }) => theme.transitions.medium};
@@ -298,7 +311,9 @@ const EmailInput = styled.input`
     color: ${({ theme }) => theme.colors.peach.hint};
   }
 
-  &:focus {
+  &:focus,
+  &:focus-visible {
+    outline: none;
     border-color: rgba(26, 22, 19, 0.32);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 4px 14px rgba(26, 22, 19, 0.08);
   }
@@ -854,7 +869,11 @@ const LoggedInSubtitle = styled.p`
 const WidgetGalleryGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 48px 24px;
+  /* Desktop — no bottom padding; the wrapping Section owns the gap
+   * to the next block. Trailing 24px here was double-counting and
+   * read as "лишний padding снизу у компа версии у галереи"
+   * (c_mosnpqmz). */
+  padding: 20px 48px 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 28px;
@@ -1054,6 +1073,16 @@ const WidgetGalleryCardTitle = styled.span`
     font-size: ${({ theme }) => theme.typography.mobile.cardBody.size};
     font-weight: ${({ theme }) => theme.typography.mobile.cardBody.weight};
     line-height: ${({ theme }) => theme.typography.mobile.cardBody.lineHeight};
+    /* One-line title on phone — long names ("Typewriter Calendar")
+     * were wrapping to two lines and pushing the row taller. Pro
+     * pill already moves into CardBadgeRow above the image on
+     * mobile, so the title doesn't compete with it for inline space.
+     * Per c_mosns9m5. */
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
 `;
 
@@ -1183,14 +1212,19 @@ const ComparisonCard = styled.div`
 
 const ComparisonHeader = styled.div`
   /* Neutral header — body color (darker than tertiary) for stronger
-   * presence as the table lead-in. Was tertiary which read as faded. */
+   * presence as the table lead-in. Was tertiary which read as faded.
+   * Background uses the same lavender Pro-column wash so the eyebrow
+   * row reads as Pro-tier accent. Iteration history: started
+   * transparent, bumped to surfaceAlt (c_moslcrno "закрасить тоже"),
+   * then bumped to Pro lavender (c_mosmy0em "залить как Pro, только
+   * фон, не текст"). */
   padding: 18px 20px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: ${({ theme }) => theme.colors.text.body};
-  background: transparent;
+  background: rgba(99, 102, 241, 0.06);
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.light};
 `;
 
@@ -1211,18 +1245,17 @@ const ComparisonTable = styled.table`
     text-align: left;
     padding-left: 20px;
     font-weight: 600;
-    /* Feature column (axis labels) sits on the footer's surfaceAlt
-     * wash so the row labels feel grouped, contrasting with Pro's
-     * lavender wash. Per c_moh5k1rd "feature и free окрась в цвет
-     * футера bg". */
+    /* Feature column carries the surfaceAlt (footer) wash — swapped
+     * with FREE per c_mosp6oc3 "фри столбик без заливки, а вот фича
+     * как заливка футера, поменяй местами". The row labels group
+     * visually under the wash; FREE stays transparent. */
     background: ${({ theme }) => theme.colors.background.surfaceAlt};
   }
 
-  /* Free column gets the same surfaceAlt wash as Feature. Both columns
-   * (label + Free) share a quieter neutral tone — the eye lands on Pro
-   * (lavender) as the lead. */
+  /* Free column — transparent now (was surfaceAlt). Pro keeps its
+   * lavender wash so it remains the recommended-tier lead. */
   th:nth-child(2), td:nth-child(2) {
-    background: ${({ theme }) => theme.colors.background.surfaceAlt};
+    background: transparent;
   }
 
   /* Pro column gets the soft lavender wash so it reads as the
@@ -1260,6 +1293,36 @@ const ComparisonTable = styled.table`
     width: 16px;
     height: 16px;
     vertical-align: middle;
+  }
+
+  /* Mobile — tighter type + explicit column widths so the FEATURE
+   * column gets enough room for words like "Customization" /
+   * "Exclusive styles" without overflowing the table edge. Per
+   * c_mosno8cp "это не вмещается в телефон, выходит за границы". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    th, td {
+      font-size: 12.5px;
+      padding: 14px 8px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    th:first-child, td:first-child {
+      width: 44%;
+      padding-left: 14px;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      width: 28%;
+    }
+
+    th:last-child, td:last-child {
+      width: 28%;
+    }
+
+    thead th {
+      font-size: 10px;
+    }
   }
 `;
 
@@ -1435,6 +1498,17 @@ export const PricingCard = styled.div<{ $highlighted?: boolean }>`
   display: flex;
   flex-direction: column;
   ${({ $highlighted }) => $highlighted && 'box-shadow: 0 6px 32px rgba(100, 80, 200, 0.08);'}
+
+  /* Mobile — softer card chrome inside the UpgradeModal so it reads
+   * as one cohesive sheet instead of a card-on-card. Padding tighter
+   * (28/36 → 22/22), border lighter, shadow off (the modal already
+   * carries the elevation). Per c_moslj3of "более гармоничную модалку
+   * для телефона". */
+  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: 22px;
+    border-color: ${({ $highlighted }) => $highlighted ? 'rgba(130, 120, 200, 0.18)' : 'rgba(0, 0, 0, 0.06)'};
+    box-shadow: none;
+  }
 `;
 
 export const PricingPlanRow = styled.div`
@@ -1757,9 +1831,9 @@ export const WidgetStudioPage: React.FC = () => {
 
         <HeroCard>
             <HeroTitle>
-              Widgets your<br />{' '}Notion<TitleBreakMobile />{' '}is missing
+              Widgets your<br />{' '}notion<TitleBreakMobile />{' '}is missing
             </HeroTitle>
-            <HeroDesc>Pick a widget. Make it yours.<br />Paste into Notion. That's it.</HeroDesc>
+            <HeroDesc>Customizable, aesthetic, ready in seconds.<br />Pick a widget. Make it yours. Paste into Notion.</HeroDesc>
             {isLoggedIn ? (
               <EmailRow>
                 <SharedButton $variant="primary" $size="xl" $fullWidth onClick={handleLaunch}>
@@ -1803,9 +1877,11 @@ export const WidgetStudioPage: React.FC = () => {
       <PageContent $hide={expanding}>
 
       {/* Widget Gallery — horizontal scroll like Top Templates.
-          $size="md" mirrors LandingPage so hero → gallery gap is the same
-          80+80=160px (mobile 48+48=96px) as / hero → "Top templates". */}
-      <Section $size="md">
+          $size dropped md → sm on desktop bottom only via $bleedBottomDesktop:
+          NO, simpler — switch to "sm" so the gap to the next section
+          (HowItWorks $size="gap" → 70 top) is 48+70=118 instead of 80+70=150.
+          Per c_mosmuoy4 "на десктопе чуть меньше отступ снизу". */}
+      <Section $size="sm">
       <WidgetGallerySection>
         <WidgetGalleryHeader>
           <WidgetGalleryTitleRow>
@@ -1874,8 +1950,8 @@ export const WidgetStudioPage: React.FC = () => {
 
           <Section $size="flush">
           <PricingSection>
-            <PricingTitle>Simple pricing</PricingTitle>
-            <PricingSubtitle>Start free. Upgrade when you need more.</PricingSubtitle>
+            <PricingTitle>Start free, upgrade anytime</PricingTitle>
+            <PricingSubtitle>3 free widgets. Unlimited for $4/mo.</PricingSubtitle>
             <DesktopOnlyPricingGrid>
               <PricingGrid>
                 <PricingCard>

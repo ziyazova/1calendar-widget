@@ -1079,12 +1079,12 @@ export const DesignSystemPage: React.FC = () => {
         </SectionHeader>
 
         <SurfaceCard>
-          <VariantLabel>Free · wide · under limit (ring fills, tone — blue state.active)</VariantLabel>
+          <VariantLabel>Free · wide · under limit (ring fills, tone — success.fg)</VariantLabel>
           <Row>
             <PlanUsageCard mode="free" $size="wide" used={2} limit={3} onUpgrade={() => {}} />
           </Row>
 
-          <VariantLabel style={{ marginTop: 20 }}>Free · wide · at limit (ring fills, tone — peach.deepWarm)</VariantLabel>
+          <VariantLabel style={{ marginTop: 20 }}>Free · wide · at limit (ring fills, tone — danger.soft)</VariantLabel>
           <Row>
             <PlanUsageCard mode="free" $size="wide" used={3} limit={3} onUpgrade={() => {}} />
           </Row>

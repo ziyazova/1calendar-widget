@@ -28,12 +28,11 @@ const FeatureCardsSectionWrap = styled.section`
 const FeatureStack = styled.div`
   position: relative;
   /* aspect-ratio drives height so the stacked layout scales evenly
-   * with width — at narrower desktop/tablet widths the stack shrinks
-   * in lockstep with the cards instead of leaving a tall hollow box.
-   * 892 (max card width inside the 940 wrap) × 720 — fits the active
-   * card (892/560 aspect) plus the 2× peek-step (max(45px, 7.5%))
-   * with a touch of breathing room below at desktop widths. */
-  aspect-ratio: 892 / 720;
+   * with width. 892 × 660 — was 720 with extra breathing room below;
+   * tightened by 60px so the stack hugs the bottom card more cleanly
+   * (fits the 892/560 active card + the 2× 48px peek tabs + minimal
+   * trailing gap). */
+  aspect-ratio: 892 / 660;
 
   @media (max-width: 649px) {
     /* Mobile uses horizontal scroll-snap, not the desktop stack —
@@ -176,30 +175,32 @@ const FeatureCard = styled.div<{ $active: boolean; $index: number; $total: numbe
     opacity: 1 !important;
     scroll-snap-align: start;
     overflow: hidden;
-    /* Mobile bumped to radii.xl (20) — softer corners per "углы более
-     * скруглые у карточек" (telephone version). Desktop keeps
-     * radii['2xl'] (24). */
-    border-radius: ${({ theme }) => theme.radii.xl};
-    /* Mobile fill = footer's surfaceAlt — soft warm tint that ties the
-     * carousel into the page's bottom rhythm. Image inside stays
-     * transparent so it doesn't read as a separate tinted block. */
-    background: ${({ theme }) => theme.colors.background.surfaceAlt};
-    /* Border picks up each card's tab color (Functionality / Design /
-     * Payment) — same logic as desktop so the mobile outline echoes the
-     * tab dot. 1.5px width + 0.45 alpha so the outline reads more
-     * confidently on the surfaceAlt fill (was 1px / 0.35). */
-    border: 1.5px solid ${({ $color }) => {
+    /* Bumped to 2xl (24) for a softer, more modern card silhouette
+     * (was xl=20). Per "карточки красивее, моднее, современнее" —
+     * 24px corner radius is the canonical "card" radius across recent
+     * iOS / Linear / Vercel UI. */
+    border-radius: ${({ theme }) => theme.radii['2xl']};
+    /* Mobile fill = card $color at very soft 0.03 alpha — softer
+     * than the previous 0.05 wash so the tint reads as a hint rather
+     * than a coloured panel. Per "заливку ещё чуть светлее сделай". */
+    background: ${({ $color }) => {
       const hex = $color.replace('#', '');
       const r = parseInt(hex.slice(0, 2), 16);
       const g = parseInt(hex.slice(2, 4), 16);
       const b = parseInt(hex.slice(4, 6), 16);
-      return `rgba(${r}, ${g}, ${b}, 0.45)`;
-    }} !important;
-    /* Quiet single-layer shadow — was a heavier mobileCard token that
-     * fought with the new colored border. !important needed because
-     * the desktop box-shadow above is itself a function of $index/
-     * $activeIdx and would otherwise win specificity. */
-    box-shadow: 0 1px 2px rgba(26, 22, 19, 0.03), 0 6px 16px -6px rgba(26, 22, 19, 0.06) !important;
+      return `rgba(${r}, ${g}, ${b}, 0.03)`;
+    }};
+    /* Neutral hairline replacing the per-card coloured border. Card
+     * identity now lives in the coloured tab strip + dot at the top,
+     * not the outline — the body reads as a plain surface card, which
+     * feels more harmonious. Per "более гармоничные карточки". */
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    /* Two-stop modern soft shadow — close hairline + wider drop so
+     * the card has a quiet sense of elevation against the surfaceAlt
+     * page wash without going heavy. !important needed because the
+     * desktop box-shadow above is a function of $index/$activeIdx
+     * and would otherwise win specificity. */
+    box-shadow: 0 1px 2px rgba(26, 22, 19, 0.04), 0 12px 28px -10px rgba(26, 22, 19, 0.10) !important;
   }
 `;
 
@@ -281,10 +282,14 @@ const FeatureCardBody = styled.div`
   padding: 0 0 0 40px;
   flex: 1;
 
-  /* Mobile — symmetric 20 padding box (top/right/bottom/left). */
+  /* Mobile — order is flipped (column-reverse) so the image hero
+   * sits directly under the tab and the text block lives at the
+   * bottom of the card. Per "фото первее, текст ниже ≤650".
+   * Pattern matches Apple's "what's new" cards: coloured eyebrow →
+   * hero image → text caption. */
   @media (max-width: 649px) {
-    flex-direction: column;
-    padding: 20px;
+    flex-direction: column-reverse;
+    padding: 0;
     gap: 0;
   }
 `;
@@ -300,16 +305,24 @@ const FeatureCardText = styled.div`
   flex-direction: column;
   justify-content: center;
   align-self: center;
+  /* Desktop — 8px left padding nudges the title/desc inward from
+   * the body's own 40px padding-left so the column sits with a
+   * touch more breathing room from the image. Per c_mosnhoxy
+   * "текст сдвинь чуть на 8 пикселей вправо". Mobile branch below
+   * resets padding for its own gutter rhythm. */
+  padding-left: 8px;
 
-  /* Mobile — text sits flush left under the tab. max-width caps the
-   * line length so on wider mobile cards the title/desc don't stretch
-   * edge-to-edge. 28px padding all around. */
+  /* Mobile — text uses the same 24px horizontal gutter as the image
+   * holder above, so they share a vertical edge and read as one
+   * harmonious column ("надо гармонично с текстом внутри"). Top
+   * padding 0 because the image holder above carries its own bottom
+   * margin (18) — extra top here would double the gap. */
   @media (max-width: 649px) {
     flex: 0 1 auto;
     align-self: flex-start;
     width: 100%;
-    max-width: 320px;
-    padding: 28px;
+    max-width: 360px;
+    padding: 0 24px 22px;
   }
 `;
 
@@ -361,7 +374,7 @@ const FeatureCardDesc = styled.p`
   }
 `;
 
-const FeatureCardImage = styled.div`
+const FeatureCardImage = styled.div<{ $color: string }>`
   flex: 1;
   min-width: 0;
   align-self: stretch;
@@ -373,38 +386,58 @@ const FeatureCardImage = styled.div`
   border: none;
   background: transparent;
   position: relative;
+  /* The image FRAME is fully controllable from THIS container:
+   *  - border-radius defines the rounded corners of the visible image
+   *  - overflow:hidden clips the img inside the frame regardless of its
+   *    intrinsic dimensions
+   *  - margin offsets the frame within the card (negative left lets the
+   *    image bleed leftward over the card edge for a designed crop)
+   * Swap the image file freely — the frame stays consistent because
+   * sizing comes from this container, not from the img element. */
   border-radius: ${({ theme }) => theme.radii['2xl']} 0 0 0;
 
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* Desktop (≥650) — contain so the full mockup fits without the
+     * sides getting cropped (cover was clipping landscape tablet
+     * screenshots horizontally). transform: scale(0.85) on top adds
+     * ~15% breathing room around the image so it reads as a tile
+     * inside the frame, not edge-to-edge. Per c_2026-05-05 "фото надо
+     * зум-аут на 20% на десктопе" → "они обрезаются по ширине чуть". */
+    object-fit: contain;
     object-position: center;
     display: block;
+    transform: scale(0.85);
+    transform-origin: center;
 
     @media (max-width: 649px) {
-      transform: scale(1.06);
-      transform-origin: center;
-      /* mix-blend-mode: multiply — white pixels in the widget mockup
-       * blend out against the card's surfaceAlt fill, so the screenshot
-       * reads as content sitting on the card surface, not on a separate
-       * white block. */
-      mix-blend-mode: multiply;
+      /* Mobile — pure contain at scale 1.0. The holder above is now
+       * 5:4 (matches mockup natural ratio), so contain renders the
+       * image edge-to-edge without crop or letterbox. Scale > 1.0
+       * was previously cropping top/bottom against the holder's
+       * overflow: hidden — removed per "фото обрезается сверху снизу
+       * сам мокап". */
+      object-fit: contain;
+      transform: none;
     }
   }
 
-  /* Mobile — 4:3 (taller than 16:10) so the iPad-mockup screenshots
-   * fit without the bottom getting cropped. Radius bumped md → lg
-   * (16) per "больше скругления у картинок внутренних". */
+  /* Mobile — aspect-ratio matches the source mockups' natural 5:4
+   * exactly, so object-fit: contain renders the image edge-to-edge
+   * without any letterboxing AND without crop. This is the largest
+   * the mockup can read at this width. 24px horizontal gutter shared
+   * with the text below for harmonious column alignment; 22 top
+   * breathes from the tab, 18 bottom separates from the text. */
   @media (max-width: 649px) {
-    margin: 0 0 4px 0;
     flex: 0 0 auto;
+    width: auto;
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 5 / 4;
     min-height: 0;
-    border-radius: ${({ theme }) => theme.radii.lg};
-    /* Transparent — same as the card around it, so the image sits on
-     * the page background, not on a tinted block. */
+    margin: 22px 24px 18px;
+    border-radius: 0;
+    padding: 0;
     background: transparent;
   }
 `;
@@ -477,22 +510,22 @@ const FEATURE_CARDS = [
      * and mobile (tab bg, dot, mobile title color, carousel pagination
      * active color all read from this $color). */
     color: '#7FA96B',
-    title: 'Built just for you.',
-    desc: 'Automations, dashboards, pre-filled sections — ready instantly.',
+    title: 'Works from day one.',
+    desc: "Dashboards, automations, pre-filled sections, everything is set up so you don't have to.",
     image: '/feature-functionality.png',
   },
   {
     tab: 'Design',
     color: '#3B82F6',
-    title: 'Looks just right.',
-    desc: 'Clean, aesthetic, thoughtful. Open it and it just feels right.',
+    title: 'Designed to feel right.',
+    desc: 'Clean, intentional, aesthetic. Every detail considered so your workspace looks as good as it works.',
     image: '/feature-design.png',
   },
   {
     tab: 'Payment',
     color: '#F4A672',
-    title: 'Pay once. Yours forever.',
-    desc: 'One payment. It lives in your Notion for as long as you need.',
+    title: 'Pay once. Keep forever.',
+    desc: 'No subscription, no renewal. One payment and it lives in your Notion for as long as you need it.',
     image: '/feature-payment.png',
   },
 ];
@@ -550,7 +583,7 @@ export const FeatureCardsSection: React.FC = () => {
                 <FeatureCardTitle>{f.title}</FeatureCardTitle>
                 <FeatureCardDesc>{f.desc}</FeatureCardDesc>
               </FeatureCardText>
-              <FeatureCardImage>
+              <FeatureCardImage $color={f.color}>
                 <img src={f.image} alt={f.tab} loading="lazy" />
               </FeatureCardImage>
             </FeatureCardBody>

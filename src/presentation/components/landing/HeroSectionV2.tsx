@@ -876,7 +876,7 @@ export const HeroSectionV2: React.FC<HeroSectionV2Props> = ({ onBrowseTemplates,
           </Headline>
 
           <Sub data-ux="Hero V2 Subtitle">
-            Templates and widgets designed to make your Notion feel calm, clear, and a little more yours.
+            Templates and widgets that make Notion beautiful, organized, and completely yours.
           </Sub>
 
           <CTAs>
