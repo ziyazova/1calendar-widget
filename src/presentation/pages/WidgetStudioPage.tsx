@@ -1615,7 +1615,6 @@ const GALLERY_ITEMS: { image: string; title: string; category: WidgetCategory; t
   { image: '/gallery-calendar-classic.png', title: 'Classic Calendar', category: 'calendar', type: 'calendar', style: 'classic' },
   { image: '/gallery-calendar-collage.png', title: 'Collage Calendar', category: 'calendar', type: 'calendar', style: 'collage' },
   { image: '/gallery-calendar-typewriter.png', title: 'Typewriter Calendar', category: 'calendar', type: 'calendar', style: 'typewriter', pro: true },
-  { image: '/gallery-clock-digital.png', title: 'Digital Clock', category: 'clock', type: 'clock', style: 'classic' },
   { image: '/gallery-clock-flower.png', title: 'Flower Clock', category: 'clock', type: 'clock', style: 'flower', pro: true },
   { image: '/gallery-clock-flip.png', title: 'Flip Clock', category: 'clock', type: 'clock', style: 'classic' },
   { image: '/gallery-camera.png', title: 'Camera', category: 'boards', type: 'board', style: 'grid' },

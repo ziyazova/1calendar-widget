@@ -36,7 +36,9 @@ const FRAME_CONFIG = {
   alarm: {
     image: '/alarm-clock-frame.png',
     aspectRatio: 1215 / 1650,
-    designSize: 206,
+    /* Bumped from 206 (which was the old width) to 280 so the scene's tall
+       side fills ZoomWrapper without being smaller than it used to be. */
+    designSize: 280,
     faceSize: '62%',
     faceOffsetX: 2,
     faceOffsetY: 28,
@@ -53,9 +55,18 @@ const FRAME_CONFIG = {
 
 type FrameType = keyof typeof FRAME_CONFIG;
 
+/* For tall frames (aspectRatio < 1), pin the long side (height) to designSize
+   and let width flow from aspectRatio — otherwise the rendered scene is taller
+   than the surrounding ZoomWrapper (which is square at designSize) and the
+   top of the frame gets clipped both in the studio preview and the embed. */
 const SceneWrapper = styled.div<{ $frame: FrameType; $designSize: number; $offsetX: number; $offsetY: number }>`
   position: absolute;
-  width: ${({ $designSize }) => $designSize}px;
+  ${({ $frame, $designSize }) => {
+    const ar = FRAME_CONFIG[$frame].aspectRatio;
+    return ar >= 1
+      ? `width: ${$designSize}px;`
+      : `height: ${$designSize}px;`;
+  }}
   aspect-ratio: ${({ $frame }) => FRAME_CONFIG[$frame].aspectRatio};
   background-image: url('${({ $frame }) => FRAME_CONFIG[$frame].image}');
   background-size: contain;

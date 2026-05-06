@@ -309,7 +309,9 @@ const TypewriterColorRow = styled.div`
   gap: 8px;
   min-height: 26px;
   align-items: center;
-  padding: 2px 0 0 0;
+  /* 4px left padding so the leftmost dot's 2.5px focus halo isn't clipped
+     by PanelContent's 0px left padding (overflow:hidden on PanelContainer) */
+  padding: 2px 0 2px 4px;
 `;
 
 const TypewriterColorDot = styled.button<{ $color: string; $active: boolean }>`
@@ -520,25 +522,38 @@ const RemoveButton = styled.button`
   }
 `;
 
-const LayoutOption = styled.button<{ $active: boolean }>`
+const LayoutOption = styled.button<{ $active: boolean; $disabled?: boolean }>`
   flex: 1;
   height: 36px;
   border: none;
-  background: ${({ $active, theme }) => $active ? theme.colors.interactive.accentHover : theme.colors.interactive.hover};
-  box-shadow: ${({ $active, theme }) => $active ? `0 0 0 1px ${theme.colors.accent}` : theme.shadows.form};
-  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.body};
+  background: ${({ $active, $disabled, theme }) =>
+    $disabled ? theme.colors.interactive.hover :
+    $active ? theme.colors.interactive.accentHover : theme.colors.interactive.hover};
+  /* inset shadow keeps the outline inside the button — outer outlines were
+     getting clipped by PanelContent's 0px left padding on desktop */
+  box-shadow: ${({ $active, $disabled, theme }) =>
+    $disabled ? theme.shadows.form :
+    $active ? `inset 0 0 0 1px ${theme.colors.accent}` : theme.shadows.form};
+  color: ${({ $active, $disabled, theme }) =>
+    $disabled ? theme.colors.text.muted :
+    $active ? theme.colors.accent : theme.colors.text.body};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
+  cursor: ${({ $disabled }) => $disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${({ $disabled }) => $disabled ? 0.5 : 1};
   font-family: inherit;
   letter-spacing: -0.01em;
   transition: all ${({ theme }) => theme.transitions.fast};
 
   &:hover {
-    box-shadow: 0 0 0 1px ${({ theme }) => theme.colors.accent};
-    background: ${({ theme }) => theme.colors.interactive.accentHover};
-    color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text.primary};
+    box-shadow: ${({ $disabled, theme }) =>
+      $disabled ? theme.shadows.form : `inset 0 0 0 1px ${theme.colors.accent}`};
+    background: ${({ $disabled, theme }) =>
+      $disabled ? theme.colors.interactive.hover : theme.colors.interactive.accentHover};
+    color: ${({ $active, $disabled, theme }) =>
+      $disabled ? theme.colors.text.muted :
+      $active ? theme.colors.accent : theme.colors.text.primary};
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) { height: 40px; font-size: 13px; }
@@ -671,7 +686,9 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 </LayoutOption>
                 <LayoutOption
                   $active={(settings as ClockSettings).clockFrame === 'vintage'}
-                  onClick={() => onSettingsChange({ clockFrame: 'vintage' })}
+                  $disabled
+                  onClick={() => { /* Vintage frame artwork pending — disabled until ready */ }}
+                  title="Coming soon"
                 >
                   Vintage
                 </LayoutOption>
