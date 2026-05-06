@@ -126,13 +126,26 @@ One adaptive `CustomizationPanel.tsx` component serves all widget types. Section
 
 ## Embed System
 
-- Widgets are embedded as iframes; all config lives in the URL query string
+- Widgets are embedded as iframes; configuration travels in the URL query string
 - **Compact URL encoding** (`?c=<encoded>`) via `CompactUrlCodec.ts` — field shorthand, color palette indexing, default omission → 60-70% smaller URLs
 - **Legacy format** (`?config=<base64>`) still supported for decoding
 - `EmbedScaleWrapper.tsx`: accepts `refWidth`/`refHeight` props (from `embedWidth`/`embedHeight` settings), scales via CSS transform using ResizeObserver. Scale range: **0.25–2.0** (scales both down and up)
-- Embed pages (`CalendarEmbedPage`, `ClockEmbedPage`) extract `embedWidth`/`embedHeight` from parsed settings and pass to `EmbedScaleWrapper`
+- Embed pages (`CalendarEmbedPage`, `ClockEmbedPage`, `BoardEmbedPage`) extract `embedWidth`/`embedHeight` from parsed settings and pass to `EmbedScaleWrapper`
 - URL encoding: `embedWidth` → `ew`, `embedHeight` → `eh`, `theme` → `tm` (omitted when equal to defaults)
 - `index.html` includes a script for iframe auto-height via `postMessage`/`ResizeObserver`
+
+### Live-sync (`?c=...&i=<public_id>`)
+
+For widgets saved by registered users, the URL also carries an 8-char `public_id` so embeds reflect owner edits and deletions in real time — without breaking already-pasted links.
+
+- **Render**: embed pages render from `?c=<settings>` immediately (instant first paint, works offline)
+- **Sync**: in parallel, if `&i=<public_id>` is present, `usePublicWidgetSync` calls the `get_public_widget(p_id)` Supabase RPC and swaps in fresh settings on success
+- **Delete / pause**: RPC returns empty when the widget is hard-deleted or `is_active=false` → embed renders the `WidgetUnavailable` placeholder (Lottie kitten + brand domain from `BRAND_DOMAIN`)
+- **Network failure**: error from RPC keeps the URL fallback rendering — Supabase outage degrades to "frozen settings", not a broken iframe
+- **Legacy URLs**: any URL without `&i=` skips the RPC and uses the URL settings directly — every widget already pasted in a customer's Notion before this shipped keeps working unchanged
+- **Guest-mode widgets** (no Supabase row) never get a `public_id` — their URLs stay `?c=...` only
+
+Files: `src/infrastructure/services/PublicWidgetService.ts`, `src/presentation/hooks/usePublicWidgetSync.ts`, `src/presentation/components/embed/WidgetUnavailable.tsx`. The placeholder's hostname strapline reads `BRAND_DOMAIN` (derived from `VITE_EMBED_BASE_URL` in `src/config/brand.ts`), so renaming the live host only requires editing one Vercel env var.
 
 ### Embed URL Base Domain
 
@@ -386,20 +399,59 @@ create table public.widgets (
   style text not null,       -- 'modern-grid-zoom-fixed', 'classic', 'analog-classic', etc
   settings jsonb not null default '{}',
   embed_url text,
+  public_id text not null unique,  -- 8-char base62, generated in WidgetStorageService.saveWidget
+  is_active boolean not null default true,  -- soft-delete flag (current UI hard-deletes)
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
 ```
 
-**RLS:** Enabled. Users can only CRUD their own rows (`auth.uid() = user_id`).
-**Migration:** `supabase/migrations/001_widgets.sql`
+**RLS:** Enabled, tier-aware (see "Tier Enforcement" below). Users can SELECT/UPDATE/DELETE their own rows; INSERT is gated on count + style.
+**Migrations:** `001_widgets.sql` (table), `007_public_widgets.sql` (public_id + is_active + RPC), `008_restore_widgets_policies.sql` (recovery), `009_restore_tier_enforcement.sql` (tier policies).
 
 #### WidgetStorageService API
 
-- `getUserWidgets()` → `Promise<SavedWidget[]>` — fetch all user's widgets
-- `saveWidget({ name, type, style, settings, embed_url })` → `Promise<SavedWidget | null>`
+- `getUserWidgets()` → `Promise<SavedWidget[]>` — fetch all user's widgets (returns `public_id` and `is_active`)
+- `saveWidget({ name, type, style, settings, embed_url })` → `Promise<SavedWidget | null>` — generates `public_id` client-side (`crypto.getRandomValues` → 8 base62 chars), retries up to 5x on the unique-constraint collision
 - `updateWidget(id, { name?, settings?, embed_url? })` → `Promise<boolean>`
-- `deleteWidget(id)` → `Promise<boolean>`
+- `deleteWidget(id)` → `Promise<boolean>` — currently a hard delete (the `is_active` column exists for a future "pause widget" flow; both produce the same embed-side outcome via the `get_public_widget` RPC)
+- Throws `WidgetTierError` when an INSERT/UPDATE is rejected by the tier RLS policy (free user over the 3-widget cap, or attempting a Pro-only style)
+
+#### RPC: `get_public_widget(p_id text)`
+
+Public read for embed pages — `security definer`, granted to `anon` so unauthenticated Notion iframe loads work.
+
+Returns `(type, style, settings)` for a widget where `public_id = p_id AND is_active = true`. Empty result is the embed page's signal to render `WidgetUnavailable`.
+
+### Tier Enforcement (RLS)
+
+Migration `009_restore_tier_enforcement.sql` defines two helpers:
+
+- `public.user_is_pro(uid uuid) → boolean`: combines an **owner email allowlist** (currently just `ziyazovaa@gmail.com` — operator stays unmetered while Polar sync is in flight) with `profiles.is_pro` (mirrored from Polar by the `polar-webhook` Edge Function). Wraps the `profiles` lookup in `exception when undefined_table` so the function still works on partially-migrated DBs (returns false / "free" instead of erroring).
+- `public.is_pro_style(style text) → boolean`: returns true for Pro-gated widget styles (current list: `'typewriter'`, `'flower'`). To change the gate, `CREATE OR REPLACE` this function in a new migration — no frontend deploy needed.
+
+The `widgets.INSERT` policy allows the row when:
+- `auth.uid() = user_id` AND
+- (`user_is_pro` is true) OR (caller has fewer than 3 active widgets AND `is_pro_style(style)` is false)
+
+The `widgets.UPDATE` policy mirrors the style check on the new row, so a free user can't change an existing widget's style to a Pro one.
+
+**Adding an operator / dev to the allowlist:** edit `user_is_pro` in a new migration, replacing the `('ziyazovaa@gmail.com')` tuple with the expanded list, then `npx supabase db push`.
+
+### Database Migrations Workflow
+
+Migrations live in `supabase/migrations/NNN_<name>.sql` and apply to the live DB **only via the Supabase CLI** (installed as a project devDep — use `npx supabase ...`):
+
+```bash
+npx supabase migration new <name>     # scaffold a new file
+# edit supabase/migrations/<NNN>_<name>.sql
+npx supabase db push                  # apply all pending migrations transactionally
+npx supabase migration list           # show local vs remote status
+```
+
+**Don't paste SQL into the Supabase Dashboard SQL Editor.** SQL Editor pastes don't update the `supabase_migrations` tracking table, drift the file repo from real DB state, and — most painfully — when a multi-statement paste fails halfway, Postgres leaves DDL committed up to the failure point with no rollback. May 2026's "studio can't save widgets" outage was caused by this exact pattern (migration 007's policy DROP committed before its CREATE failed on a missing `user_is_pro`).
+
+If a migration was applied via SQL Editor before this rule existed, mark it tracked with `npx supabase migration repair --status applied <NNN>`.
 
 ### E-commerce System
 
@@ -463,6 +515,10 @@ When `mode='registered'`, the Studio sidebar shows an **Account** section below 
 - Theme hook: `src/presentation/hooks/useResolvedTheme.ts`
 - Classic Calendar: `src/presentation/components/widgets/calendar/styles/ClassicCalendar.tsx`
 - **Supabase client:** `src/infrastructure/services/supabase.ts`
+- **Public widget RPC client:** `src/infrastructure/services/PublicWidgetService.ts`
+- **Live-sync hook:** `src/presentation/hooks/usePublicWidgetSync.ts`
+- **Unavailable placeholder:** `src/presentation/components/embed/WidgetUnavailable.tsx` (+ `src/presentation/assets/cat-unavailable.lottie`)
+- **Brand domain config:** `src/config/brand.ts`
 - **Auth context:** `src/presentation/context/AuthContext.tsx`
 - **Cart context:** `src/presentation/context/CartContext.tsx`
 - **Widget storage:** `src/infrastructure/services/WidgetStorageService.ts`
@@ -472,7 +528,7 @@ When `mode='registered'`, the Studio sidebar shows an **Account** section below 
 - **Checkout page:** `src/presentation/pages/CheckoutPage.tsx`
 - **Template detail:** `src/presentation/pages/TemplateDetailPage.tsx`
 - **Supabase env:** `.env.local` (gitignored)
-- **DB migration:** `supabase/migrations/001_widgets.sql`
+- **DB migrations:** `supabase/migrations/` — apply via `npx supabase db push`, never via SQL Editor (see "Database Migrations Workflow")
 
 ## Documentation
 
