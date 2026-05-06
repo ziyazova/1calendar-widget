@@ -143,4 +143,69 @@ describe('CompactUrlCodec', () => {
       expect(extracted!.settings.primaryColor).toBe('#764BA2');
     });
   });
+
+  describe('public_id (live-sync) param', () => {
+    it('appends &i= when publicId is provided', () => {
+      const url = CompactUrlCodec.createCompactEmbedUrl(
+        'https://example.com',
+        'clock',
+        { primaryColor: '#667EEA', style: 'modern' },
+        'AbCdEf12'
+      );
+
+      expect(url).toMatch(/\?c=[^&]+&i=AbCdEf12$/);
+    });
+
+    it('omits &i= when publicId is null/undefined', () => {
+      const url = CompactUrlCodec.createCompactEmbedUrl(
+        'https://example.com',
+        'clock',
+        { primaryColor: '#667EEA', style: 'modern' }
+      );
+
+      expect(url).not.toContain('&i=');
+    });
+
+    it('extractPublicId reads the &i= param', () => {
+      const url = CompactUrlCodec.createCompactEmbedUrl(
+        'https://example.com',
+        'calendar',
+        { style: 'modern-grid' },
+        'XyZ12345'
+      );
+
+      expect(CompactUrlCodec.extractPublicId(url)).toBe('XyZ12345');
+    });
+
+    it('extractPublicId returns null for legacy URLs without &i=', () => {
+      const url = CompactUrlCodec.createCompactEmbedUrl(
+        'https://example.com',
+        'calendar',
+        { style: 'modern-grid' }
+      );
+
+      expect(CompactUrlCodec.extractPublicId(url)).toBeNull();
+    });
+
+    it('settings still roundtrip when publicId is included', () => {
+      // Belt-and-braces: the &i= param must not break the existing ?c= decoder.
+      const settings = {
+        primaryColor: '#FF0000',
+        backgroundColor: '#000000',
+        style: 'modern',
+      };
+
+      const url = CompactUrlCodec.createCompactEmbedUrl(
+        'https://example.com',
+        'clock',
+        settings,
+        'pubabc12'
+      );
+      const extracted = CompactUrlCodec.extractFromCompactUrl(url);
+
+      expect(extracted).not.toBeNull();
+      expect(extracted!.widgetType).toBe('clock');
+      expect(extracted!.settings.primaryColor).toBe('#FF0000');
+    });
+  });
 });

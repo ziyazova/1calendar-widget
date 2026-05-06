@@ -8,8 +8,9 @@ export interface WidgetRepository {
   findAll(): Promise<Widget[]>;
   delete(id: string): Promise<void>;
 
-  // Widget-specific operations
-  saveToUrl(widget: Widget): string;
+  // Widget-specific operations. publicId — короткий id из Supabase, при
+  // наличии вшивается в URL параметром &i= для live-синка эмбедов.
+  saveToUrl(widget: Widget, publicId?: string | null): string;
   loadFromUrl(url: string): Widget | null;
 
   // Configuration operations

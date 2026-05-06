@@ -31,14 +31,17 @@ export class WidgetRepositoryImpl implements WidgetRepository {
     this.widgets.delete(id);
   }
 
-  // Использует новый компактный кодек для максимально коротких URL
-  saveToUrl(widget: Widget): string {
+  // Использует новый компактный кодек для максимально коротких URL.
+  // publicId опционален: добавляется в URL как &i= только если виджет
+  // сохранён в Supabase. Эмбед-страница использует его для подтягивания
+  // свежих настроек (live-update + soft-delete-aware).
+  saveToUrl(widget: Widget, publicId?: string | null): string {
     const rawBase = import.meta.env.VITE_EMBED_BASE_URL || window.location.origin;
     // Strip whitespace (Vercel env-var pastes can carry trailing \n) + trailing slash.
     // Without this, a stray \n breaks Notion's "embed link" paste even though the
     // <input> visually hides it.
     const baseUrl = rawBase.replace(/\s+/g, '').replace(/\/+$/, '');
-    return this.urlCodec.createSuperCompactUrl(baseUrl, widget.type, widget.settings);
+    return this.urlCodec.createSuperCompactUrl(baseUrl, widget.type, widget.settings, publicId);
   }
 
   loadFromUrl(url: string): Widget | null {

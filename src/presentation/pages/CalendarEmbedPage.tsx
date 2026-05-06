@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Logger } from '../../infrastructure/services/Logger';
 import { CalendarWidget } from '../components/widgets/CalendarWidget';
 import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
+import { WidgetUnavailable } from '../components/embed/WidgetUnavailable';
 import { Widget } from '../../domain/entities/Widget';
 import { CalendarSettings } from '../../domain/value-objects/CalendarSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
 import { useResolvedTheme, NOTION_DARK_BG } from '../hooks/useResolvedTheme';
+import { usePublicWidgetSync } from '../hooks/usePublicWidgetSync';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
@@ -80,38 +82,37 @@ const ErrorState = styled.div`
 `;
 
 export const CalendarEmbedPage: React.FC = () => {
-  const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [settings, setSettings] = useState<CalendarSettings>(new CalendarSettings());
+  const [urlSettings, setUrlSettings] = useState<CalendarSettings>(new CalendarSettings());
+
+  const publicId = useMemo(() => {
+    const codec = new UrlCodecService();
+    return codec.extractPublicId();
+  }, []);
 
   useEffect(() => {
     try {
       const codecService = new UrlCodecService();
       const config = codecService.extractConfigFromUrl();
 
-      Logger.info('CalendarEmbed', 'Parsing URL config', config);
+      Logger.info('CalendarEmbed', 'Parsing URL config', { config, publicId });
 
       if (config) {
         if (config.widgetType === 'calendar' || !config.widgetType) {
           const s = new CalendarSettings(config.settings || config);
-          setSettings(s);
+          setUrlSettings(s);
           Logger.info('CalendarEmbed', 'Loaded settings', {
             embedWidth: s.embedWidth,
             embedHeight: s.embedHeight,
             style: s.style,
             theme: s.theme,
           });
-          const calendarWidget = Widget.createCalendar('embed-calendar', s);
-          setWidget(calendarWidget);
         } else {
           throw new Error('Invalid calendar widget configuration');
         }
       } else {
-        const defaultSettings = new CalendarSettings();
-        setSettings(defaultSettings);
-        const defaultWidget = Widget.createCalendar('default-calendar', defaultSettings);
-        setWidget(defaultWidget);
+        setUrlSettings(new CalendarSettings());
       }
     } catch (err) {
       Logger.error('CalendarEmbed', 'Failed to load calendar widget', err);
@@ -119,7 +120,16 @@ export const CalendarEmbedPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [publicId]);
+
+  const { liveSettings, unavailable } = usePublicWidgetSync(publicId);
+
+  const effectiveSettings = unavailable
+    ? null
+    : (liveSettings ? new CalendarSettings(liveSettings) : urlSettings);
+  const widget = effectiveSettings
+    ? Widget.createCalendar('embed-calendar', effectiveSettings)
+    : null;
 
   const notionTheme = useResolvedTheme('auto');
   const isTransparent = new URLSearchParams(window.location.search).has('nobg');
@@ -138,7 +148,23 @@ export const CalendarEmbedPage: React.FC = () => {
     );
   }
 
-  if (error || !widget) {
+  if (unavailable) {
+    return (
+      <EmbedController>
+        <GlobalEmbedStyles $bgColor={containerBg} />
+        <EmbedContainer>
+          <EmbedScaleWrapper
+            refWidth={urlSettings.embedWidth}
+            refHeight={urlSettings.embedHeight}
+          >
+            <WidgetUnavailable />
+          </EmbedScaleWrapper>
+        </EmbedContainer>
+      </EmbedController>
+    );
+  }
+
+  if (error || !widget || !effectiveSettings) {
     return (
       <EmbedController>
         <GlobalEmbedStyles $bgColor={containerBg} />
@@ -155,8 +181,8 @@ export const CalendarEmbedPage: React.FC = () => {
   }
 
   Logger.debug('CalendarEmbed', 'Rendering with embed size', {
-    embedWidth: settings.embedWidth,
-    embedHeight: settings.embedHeight,
+    embedWidth: effectiveSettings.embedWidth,
+    embedHeight: effectiveSettings.embedHeight,
   });
 
   return (
@@ -164,12 +190,12 @@ export const CalendarEmbedPage: React.FC = () => {
       <GlobalEmbedStyles $bgColor={containerBg} />
       <EmbedContainer>
         <EmbedScaleWrapper
-          refWidth={settings.embedWidth}
-          refHeight={settings.embedHeight}
+          refWidth={effectiveSettings.embedWidth}
+          refHeight={effectiveSettings.embedHeight}
         >
           <CalendarWidget widget={widget} />
         </EmbedScaleWrapper>
       </EmbedContainer>
     </EmbedController>
   );
-}; 
+};

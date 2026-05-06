@@ -260,11 +260,19 @@ export class CompactUrlCodec {
     }
   }
 
-  // Создает супер короткую ссылку
-  static createCompactEmbedUrl(baseUrl: string, widgetType: string, settings: Record<string, any>): string {
+  // Создает супер короткую ссылку. publicId (если передан) добавляется
+  // отдельным URL-параметром &i=, чтобы embed-страница могла прочитать его
+  // без декодирования base64.
+  static createCompactEmbedUrl(
+    baseUrl: string,
+    widgetType: string,
+    settings: Record<string, any>,
+    publicId?: string | null
+  ): string {
     const encoded = this.encode(widgetType, settings);
     const route = `/embed/${widgetType}`;
-    return `${baseUrl}${route}?c=${encoded}`; // 'c' вместо 'config'
+    const idSuffix = publicId ? `&i=${encodeURIComponent(publicId)}` : '';
+    return `${baseUrl}${route}?c=${encoded}${idSuffix}`;
   }
 
   // Извлекает настройки из компактного URL
@@ -279,6 +287,17 @@ export class CompactUrlCodec {
 
       return this.decode(compactParam);
     } catch (error) {
+      return null;
+    }
+  }
+
+  // Извлекает publicId из &i=. Возвращает null если параметра нет (значит,
+  // это legacy URL без привязки к Supabase — рендерим только из ?c=).
+  static extractPublicId(url?: string): string | null {
+    try {
+      const urlObj = new URL(url || window.location.href);
+      return urlObj.searchParams.get('i');
+    } catch {
       return null;
     }
   }

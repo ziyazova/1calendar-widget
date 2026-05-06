@@ -1285,6 +1285,10 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
         style,
         settings,
         embed_url: null,
+        // Local (guest) widgets have no Supabase row, so no live-sync id —
+        // their embed URLs stay legacy ?c=... only.
+        public_id: '',
+        is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -1394,7 +1398,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
 
   // If editing, show full-screen editor (Figma-style artboard)
   if (editorOpen && editingWidget) {
-    const embedUrl = diContainer.getWidgetEmbedUrlUseCase.execute(editingWidget);
+    // Look up the saved record's public_id so the embed URL becomes live-syncing.
+    // Empty string when the widget hasn't been persisted yet (first edit before
+    // first save) — the URL just stays legacy ?c=... until persist() runs.
+    const savedRecord = editingWidgetId ? widgets.find(w => w.id === editingWidgetId) : null;
+    const embedUrl = diContainer.getWidgetEmbedUrlUseCase.execute(editingWidget, savedRecord?.public_id);
     // copied state is declared at component level
 
     // ── Mobile editor (≤768): stacked layout + bottom sheet panel ──
@@ -1992,7 +2000,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                               } else {
                                 updated = widget.updateSettings(new BoardSettings({ ...s, layout: w.style as BoardSettings['layout'] }));
                               }
-                              url = diContainer.getWidgetEmbedUrlUseCase.execute(updated);
+                              url = diContainer.getWidgetEmbedUrlUseCase.execute(updated, w.public_id);
                             } catch (err) {
                               Logger.error('StudioPage', 'Failed to generate embed URL', err);
                               return;

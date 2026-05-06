@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Logger } from '../../infrastructure/services/Logger';
 import { ClockWidget } from '../components/widgets/ClockWidget';
 import { EmbedScaleWrapper } from '../components/embed/EmbedScaleWrapper';
+import { WidgetUnavailable } from '../components/embed/WidgetUnavailable';
 import { Widget } from '../../domain/entities/Widget';
 import { ClockSettings } from '../../domain/value-objects/ClockSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
 import { useResolvedTheme, NOTION_DARK_BG } from '../hooks/useResolvedTheme';
+import { usePublicWidgetSync } from '../hooks/usePublicWidgetSync';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
@@ -82,38 +84,39 @@ const ErrorState = styled.div`
 `;
 
 export const ClockEmbedPage: React.FC = () => {
-  const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [settings, setSettings] = useState<ClockSettings>(new ClockSettings());
+  const [urlSettings, setUrlSettings] = useState<ClockSettings>(new ClockSettings());
+
+  // Read public_id from URL once. If absent (legacy URL or guest-mode link),
+  // sync hook stays idle and we render purely from URL settings.
+  const publicId = useMemo(() => {
+    const codec = new UrlCodecService();
+    return codec.extractPublicId();
+  }, []);
 
   useEffect(() => {
     try {
       const codecService = new UrlCodecService();
       const config = codecService.extractConfigFromUrl();
 
-      Logger.info('ClockEmbed', 'Parsing URL config', config);
+      Logger.info('ClockEmbed', 'Parsing URL config', { config, publicId });
 
       if (config) {
         if (config.widgetType === 'clock' || !config.widgetType) {
           const s = new ClockSettings(config.settings || config);
-          setSettings(s);
+          setUrlSettings(s);
           Logger.info('ClockEmbed', 'Loaded settings', {
             embedWidth: s.embedWidth,
             embedHeight: s.embedHeight,
             style: s.style,
             theme: s.theme,
           });
-          const clockWidget = Widget.createClock('embed-clock', s);
-          setWidget(clockWidget);
         } else {
           throw new Error('Invalid clock widget configuration');
         }
       } else {
-        const defaultSettings = new ClockSettings();
-        setSettings(defaultSettings);
-        const defaultWidget = Widget.createClock('default-clock', defaultSettings);
-        setWidget(defaultWidget);
+        setUrlSettings(new ClockSettings());
       }
     } catch (err) {
       Logger.error('ClockEmbed', 'Failed to load clock widget', err);
@@ -121,7 +124,19 @@ export const ClockEmbedPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [publicId]);
+
+  const { liveSettings, unavailable } = usePublicWidgetSync(publicId);
+
+  // Live settings (from Supabase) override URL settings once the RPC returns;
+  // otherwise the page renders from URL — so a Supabase outage degrades to
+  // "frozen settings" rather than a broken iframe.
+  const effectiveSettings = unavailable
+    ? null
+    : (liveSettings ? new ClockSettings(liveSettings) : urlSettings);
+  const widget = effectiveSettings
+    ? Widget.createClock('embed-clock', effectiveSettings)
+    : null;
 
   const notionTheme = useResolvedTheme('auto');
   const isTransparent = new URLSearchParams(window.location.search).has('nobg');
@@ -140,7 +155,25 @@ export const ClockEmbedPage: React.FC = () => {
     );
   }
 
-  if (error || !widget) {
+  // Owner deleted/paused the widget → cute "unavailable" placeholder.
+  // Sized to the URL-encoded dimensions so it doesn't reflow customer pages.
+  if (unavailable) {
+    return (
+      <EmbedController>
+        <GlobalEmbedStyles $bgColor={containerBg} />
+        <EmbedContainer>
+          <EmbedScaleWrapper
+            refWidth={urlSettings.embedWidth}
+            refHeight={urlSettings.embedHeight}
+          >
+            <WidgetUnavailable />
+          </EmbedScaleWrapper>
+        </EmbedContainer>
+      </EmbedController>
+    );
+  }
+
+  if (error || !widget || !effectiveSettings) {
     return (
       <EmbedController>
         <GlobalEmbedStyles $bgColor={containerBg} />
@@ -157,8 +190,8 @@ export const ClockEmbedPage: React.FC = () => {
   }
 
   Logger.debug('ClockEmbed', 'Rendering with embed size', {
-    embedWidth: settings.embedWidth,
-    embedHeight: settings.embedHeight,
+    embedWidth: effectiveSettings.embedWidth,
+    embedHeight: effectiveSettings.embedHeight,
   });
 
   return (
@@ -166,8 +199,8 @@ export const ClockEmbedPage: React.FC = () => {
       <GlobalEmbedStyles $bgColor={containerBg} />
       <EmbedContainer>
         <EmbedScaleWrapper
-          refWidth={settings.embedWidth}
-          refHeight={settings.embedHeight}
+          refWidth={effectiveSettings.embedWidth}
+          refHeight={effectiveSettings.embedHeight}
         >
           <ClockWidget widget={widget} />
         </EmbedScaleWrapper>

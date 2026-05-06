@@ -9,8 +9,26 @@ export interface SavedWidget {
   style: string;
   settings: Record<string, unknown>;
   embed_url: string | null;
+  public_id: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+const PUBLIC_ID_ALPHABET =
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+// 8-char base62 → ~218T combinations. Collisions are vanishingly rare in
+// practice; the unique constraint on widgets.public_id is the ultimate
+// arbiter — saveWidget retries a few times on the off chance of a clash.
+function generatePublicId(): string {
+  const buf = new Uint8Array(8);
+  crypto.getRandomValues(buf);
+  let out = '';
+  for (let i = 0; i < 8; i++) {
+    out += PUBLIC_ID_ALPHABET[buf[i] % 62];
+  }
+  return out;
 }
 
 /**
@@ -59,27 +77,39 @@ export const WidgetStorageService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
-    const { data, error } = await supabase
-      .from('widgets')
-      .insert({
-        user_id: user.id,
-        name: widget.name,
-        type: widget.type,
-        style: widget.style,
-        settings: widget.settings,
-        embed_url: widget.embed_url || null,
-      })
-      .select()
-      .single();
+    // Retry a few times on the (vanishingly rare) public_id collision.
+    // Postgres unique violation surfaces as code 23505.
+    const MAX_ATTEMPTS = 5;
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const { data, error } = await supabase
+        .from('widgets')
+        .insert({
+          user_id: user.id,
+          name: widget.name,
+          type: widget.type,
+          style: widget.style,
+          settings: widget.settings,
+          embed_url: widget.embed_url || null,
+          public_id: generatePublicId(),
+        })
+        .select()
+        .single();
 
-    if (isRlsViolation(error)) {
-      throw new WidgetTierError(error!.message);
+      if (isRlsViolation(error)) {
+        throw new WidgetTierError(error!.message);
+      }
+      if (error?.code === '23505') {
+        // public_id collision — try again with a fresh id.
+        continue;
+      }
+      if (error) {
+        Logger.error('WidgetStorage', 'Failed to save widget', error);
+        return null;
+      }
+      return data;
     }
-    if (error) {
-      Logger.error('WidgetStorage', 'Failed to save widget', error);
-      return null;
-    }
-    return data;
+    Logger.error('WidgetStorage', 'public_id collisions exhausted retry budget');
+    return null;
   },
 
   async updateWidget(id: string, updates: {

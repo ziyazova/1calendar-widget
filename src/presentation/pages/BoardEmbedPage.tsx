@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Logger } from '../../infrastructure/services/Logger';
 import { BoardWidget } from '../components/widgets/BoardWidget';
+import { WidgetUnavailable } from '../components/embed/WidgetUnavailable';
 import { Widget } from '../../domain/entities/Widget';
 import { BoardSettings } from '../../domain/value-objects/BoardSettings';
 import { UrlCodecService } from '../../infrastructure/services/url-codec/UrlCodecService';
 import { EmbedController } from './EmbedController';
-import { useResolvedTheme, NOTION_DARK_BG } from '../hooks/useResolvedTheme';
+import { usePublicWidgetSync } from '../hooks/usePublicWidgetSync';
 
 const GlobalEmbedStyles = createGlobalStyle<{ $bgColor: string }>`
   html, body {
@@ -79,38 +80,37 @@ const ErrorState = styled.div`
 `;
 
 export const BoardEmbedPage: React.FC = () => {
-  const [widget, setWidget] = useState<Widget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [settings, setSettings] = useState<BoardSettings>(new BoardSettings());
+  const [urlSettings, setUrlSettings] = useState<BoardSettings>(new BoardSettings());
+
+  const publicId = useMemo(() => {
+    const codec = new UrlCodecService();
+    return codec.extractPublicId();
+  }, []);
 
   useEffect(() => {
     try {
       const codecService = new UrlCodecService();
       const config = codecService.extractConfigFromUrl();
 
-      Logger.info('BoardEmbed', 'Parsing URL config', config);
+      Logger.info('BoardEmbed', 'Parsing URL config', { config, publicId });
 
       if (config) {
         if (config.widgetType === 'board' || !config.widgetType) {
           const s = new BoardSettings(config.settings || config);
-          setSettings(s);
+          setUrlSettings(s);
           Logger.info('BoardEmbed', 'Loaded settings', {
             embedWidth: s.embedWidth,
             embedHeight: s.embedHeight,
             imageCount: s.imageUrls.length,
             theme: s.theme,
           });
-          const boardWidget = Widget.createBoard('embed-board', s);
-          setWidget(boardWidget);
         } else {
           throw new Error('Invalid board widget configuration');
         }
       } else {
-        const defaultSettings = new BoardSettings();
-        setSettings(defaultSettings);
-        const defaultWidget = Widget.createBoard('default-board', defaultSettings);
-        setWidget(defaultWidget);
+        setUrlSettings(new BoardSettings());
       }
     } catch (err) {
       Logger.error('BoardEmbed', 'Failed to load board widget', err);
@@ -118,7 +118,16 @@ export const BoardEmbedPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [publicId]);
+
+  const { liveSettings, unavailable } = usePublicWidgetSync(publicId);
+
+  const effectiveSettings = unavailable
+    ? null
+    : (liveSettings ? new BoardSettings(liveSettings) : urlSettings);
+  const widget = effectiveSettings
+    ? Widget.createBoard('embed-board', effectiveSettings)
+    : null;
 
   if (loading) {
     return (
@@ -126,6 +135,17 @@ export const BoardEmbedPage: React.FC = () => {
         <GlobalEmbedStyles $bgColor="transparent" />
         <EmbedContainer>
           <LoadingState>Loading board...</LoadingState>
+        </EmbedContainer>
+      </EmbedController>
+    );
+  }
+
+  if (unavailable) {
+    return (
+      <EmbedController>
+        <GlobalEmbedStyles $bgColor="transparent" />
+        <EmbedContainer>
+          <WidgetUnavailable />
         </EmbedContainer>
       </EmbedController>
     );

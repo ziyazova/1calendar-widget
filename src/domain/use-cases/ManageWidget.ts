@@ -38,8 +38,8 @@ export class UpdateWidgetUseCase {
 export class GetWidgetEmbedUrlUseCase {
   constructor(private widgetRepository: WidgetRepository) { }
 
-  execute(widget: Widget): string {
-    return this.widgetRepository.saveToUrl(widget);
+  execute(widget: Widget, publicId?: string | null): string {
+    return this.widgetRepository.saveToUrl(widget, publicId);
   }
 }
 

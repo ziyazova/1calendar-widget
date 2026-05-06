@@ -114,8 +114,20 @@ export class UrlCodecService {
     return `/embed/${widgetType}`;
   }
 
-  // Быстрый метод создания супер короткой ссылки
-  createSuperCompactUrl(baseUrl: string, widgetType: string, settings: Record<string, any>): string {
-    return CompactUrlCodec.createCompactEmbedUrl(baseUrl, widgetType, settings);
+  // Быстрый метод создания супер короткой ссылки. publicId опционален —
+  // присутствует только для виджетов, сохранённых в Supabase, чтобы embed
+  // мог подтянуть свежие настройки и реагировать на удаление.
+  createSuperCompactUrl(
+    baseUrl: string,
+    widgetType: string,
+    settings: Record<string, any>,
+    publicId?: string | null
+  ): string {
+    return CompactUrlCodec.createCompactEmbedUrl(baseUrl, widgetType, settings, publicId);
+  }
+
+  // Извлечь publicId (?i=) из URL — отдельно от настроек.
+  extractPublicId(url?: string): string | null {
+    return CompactUrlCodec.extractPublicId(url);
   }
 } 
