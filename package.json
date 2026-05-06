@@ -17,6 +17,7 @@
     "audit:design": "bash scripts/design-audit.sh"
   },
   "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.19.1",
     "@rive-app/react-canvas": "^4.27.1",
     "@supabase/supabase-js": "^2.99.3",
     "lucide-react": "^0.263.1",
