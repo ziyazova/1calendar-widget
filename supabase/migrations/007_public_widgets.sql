@@ -91,28 +91,8 @@ $$;
 
 grant execute on function public.get_public_widget(text) to anon, authenticated;
 
--- ─────────────────────────────────────────────────────────────────────────
--- Tier-enforcement update: count only active widgets toward the free quota.
--- Without this, a free user who soft-deletes a widget (future feature) would
--- still hit their cap. Hard delete via the API is unaffected.
--- ─────────────────────────────────────────────────────────────────────────
-
-drop policy if exists "insert own widgets within tier" on public.widgets;
-create policy "insert own widgets within tier"
-  on public.widgets
-  for insert
-  with check (
-    auth.uid() = user_id
-    and (
-      public.user_is_pro(auth.uid())
-      or (
-        (
-          select count(*)
-          from public.widgets
-          where user_id = auth.uid()
-            and is_active = true
-        ) < 3
-        and not public.is_pro_style(style)
-      )
-    )
-  );
+-- Note: the free-tier INSERT policy (migration 004) currently counts ALL
+-- widgets toward the 3-widget cap. Once we ship a "pause widget" UI (so
+-- is_active becomes user-controlled rather than just a delete bookkeeping
+-- flag), that policy should be rewritten to count only is_active=true rows.
+-- Deferred to a follow-up migration to keep this one self-contained.
