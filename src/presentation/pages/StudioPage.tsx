@@ -1493,7 +1493,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </MobileEmbedCopyBtn>
             </MobileEmbedBar>
             <MobileWidgetScale>
-              <WidgetDisplay widget={editingWidget} />
+              <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string })?.style ?? ''}`} widget={editingWidget} />
             </MobileWidgetScale>
           </MobileArtboard>
 
@@ -1657,13 +1657,17 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 DesktopWidgetScale transform (which would multiply its
                 340×604 design size by zoom and overflow the artboard) —
                 its own ResizeObserver auto-scales to fit. */}
+            {/* key forces a clean remount whenever the widget type/style
+                changes — without it, each widget's ResizeObserver-based
+                zoom hook keeps stale dimensions from the previous render
+                and the widget shrinks on the second switch. */}
             {editingWidget.type === 'board' ? (
               <BoardEditorFit>
-                <WidgetDisplay widget={editingWidget} />
+                <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string })?.style ?? ''}`} widget={editingWidget} />
               </BoardEditorFit>
             ) : (
               <DesktopWidgetScale $zoom={studioZoom}>
-                <WidgetDisplay widget={editingWidget} />
+                <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string })?.style ?? ''}`} widget={editingWidget} />
               </DesktopWidgetScale>
             )}
 

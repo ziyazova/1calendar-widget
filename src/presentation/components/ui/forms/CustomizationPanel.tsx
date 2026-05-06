@@ -710,13 +710,17 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 </LayoutOption>
                 <LayoutOption
                   $active={false}
-                  onClick={() => {}}
+                  $disabled
+                  onClick={() => { /* Masonry layout pending — only Grid ships today */ }}
+                  title="Coming soon"
                 >
                   Masonry
                 </LayoutOption>
                 <LayoutOption
                   $active={false}
-                  onClick={() => {}}
+                  $disabled
+                  onClick={() => { /* Carousel layout pending — only Grid ships today */ }}
+                  title="Coming soon"
                 >
                   Carousel
                 </LayoutOption>
