@@ -169,7 +169,10 @@ export const FlowerClock: React.FC<FlowerClockProps> = ({ settings, time, textCo
     });
     ro.observe(outerRef.current);
     return () => ro.disconnect();
-  }, [isEmbed]);
+    // re-run when designSize changes (frame switch Bloom↔Retro↔Vintage),
+    // otherwise the closure keeps the previous frame's designSize and zoom
+    // is computed against the wrong reference
+  }, [isEmbed, frameConfig.designSize]);
 
   const hours = time.getHours() % 12;
   const minutes = time.getMinutes();

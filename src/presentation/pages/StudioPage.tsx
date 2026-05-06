@@ -1493,7 +1493,7 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
               </MobileEmbedCopyBtn>
             </MobileEmbedBar>
             <MobileWidgetScale>
-              <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string })?.style ?? ''}`} widget={editingWidget} />
+              <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string; clockFrame?: string })?.style ?? ''}:${(editingWidget.settings as { clockFrame?: string })?.clockFrame ?? ''}`} widget={editingWidget} />
             </MobileWidgetScale>
           </MobileArtboard>
 
@@ -1663,11 +1663,11 @@ export const StudioPage: React.FC<StudioPageProps> = ({ diContainer }) => {
                 and the widget shrinks on the second switch. */}
             {editingWidget.type === 'board' ? (
               <BoardEditorFit>
-                <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string })?.style ?? ''}`} widget={editingWidget} />
+                <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string; clockFrame?: string })?.style ?? ''}:${(editingWidget.settings as { clockFrame?: string })?.clockFrame ?? ''}`} widget={editingWidget} />
               </BoardEditorFit>
             ) : (
               <DesktopWidgetScale $zoom={studioZoom}>
-                <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string })?.style ?? ''}`} widget={editingWidget} />
+                <WidgetDisplay key={`${editingWidget.type}:${(editingWidget.settings as { style?: string; clockFrame?: string })?.style ?? ''}:${(editingWidget.settings as { clockFrame?: string })?.clockFrame ?? ''}`} widget={editingWidget} />
               </DesktopWidgetScale>
             )}
 
