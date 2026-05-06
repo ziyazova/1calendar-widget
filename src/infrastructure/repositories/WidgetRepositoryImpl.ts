@@ -33,7 +33,11 @@ export class WidgetRepositoryImpl implements WidgetRepository {
 
   // Использует новый компактный кодек для максимально коротких URL
   saveToUrl(widget: Widget): string {
-    const baseUrl = import.meta.env.VITE_EMBED_BASE_URL || window.location.origin;
+    const rawBase = import.meta.env.VITE_EMBED_BASE_URL || window.location.origin;
+    // Strip whitespace (Vercel env-var pastes can carry trailing \n) + trailing slash.
+    // Without this, a stray \n breaks Notion's "embed link" paste even though the
+    // <input> visually hides it.
+    const baseUrl = rawBase.replace(/\s+/g, '').replace(/\/+$/, '');
     return this.urlCodec.createSuperCompactUrl(baseUrl, widget.type, widget.settings);
   }
 
